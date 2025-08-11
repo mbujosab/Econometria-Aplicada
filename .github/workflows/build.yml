@@ -1,0 +1,121 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git emacs pandoc aspell aspell-en aspell-es zip gretl
+        pip install jupyter nbconvert
+
+    - name: Install Python modules
+      run: |
+        pip install sympy numpy pandas matplotlib dataframe-image statsmodels seaborn
+
+    - name: Verify Jupyter Installation
+      run: |
+        jupyter kernelspec list
+
+    - name: Install LaTeX
+      run: |
+        sudo apt-get install -y texlive  texlive-latex-recommended texlive-latex-extra  texlive-fonts-extra texlive-fonts-recommended texlive-xetex texlive-science python3-pygments texlive-lang-spanish texlive-bibtex-extra texlive-binaries texlive-extra-utils texlive-font-utils texlive-luatex texlive-xetex dvipng
+
+    - name: Disable tlmgr (prevent accidental calls)
+      run: sudo mv /usr/bin/tlmgr /usr/bin/tlmgr.disabled || true
+
+    - name: Clone Scimax
+      run: |
+        git clone https://github.com/jkitchin/scimax.git ~/Software/scimax
+
+    - name: Download ox-ipynb.el
+      run: |
+        wget https://raw.githubusercontent.com/jkitchin/ox-ipynb/master/ox-ipynb.el -O ~/Software/scimax/ox-ipynb.el
+
+    - name: Install s.el and dash.el
+      run: |
+        emacs --batch --eval "(require 'package)" \
+                      --eval "(add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\"))" \
+                      --eval "(package-refresh-contents)" \
+                      --eval "(package-install 's)" \
+                      --eval "(package-install 'dash)"
+
+    - name: Create no-tlmgr.el
+      run: |
+        mkdir -p ~/.emacs.d
+        echo "(setq system-packages-use-sudo nil)" > ~/.emacs.d/no-tlmgr.el
+        echo "(setq TeX-install-font-lock nil)" >> ~/.emacs.d/no-tlmgr.el
+        echo "(setq TeX-live-install-texmf nil)" >> ~/.emacs.d/no-tlmgr.el
+
+    - name: Verify ox-ipynb Installation
+      run: |
+        emacs --batch \
+              --eval "(add-to-list 'load-path \"~/Software/scimax/\")" \
+              --eval "(dolist (dir (directory-files \"~/.emacs.d/elpa/\" t \"^[^.]\")) (add-to-list 'load-path dir))" \
+              --eval "(require 'ox-ipynb)"
+
+    - name: Create .binder directory
+      run: mkdir -p docs/.binder
+
+    - name: Ficheros de configuracion
+      run: |
+        emacs --batch org-publish.org -l org -f org-babel-tangle
+
+    - name: Execute Makefile notebooksYslides
+      run: |
+        set -e
+        make notebooksYslides
+
+    - name: Inspección tras notebooksYslides
+      run: |
+        echo "Contenido de ./Lecciones:"
+        find ./Lecciones
+        echo "Contenido de ./docs:"
+        find ./docs
+
+    - name: Execute Makefile practicas
+      run: |
+        set -e
+        make practicas
+        echo "Contenido de ./Lecciones/Practicas:"
+        find ./Lecciones/Practicas
+
+    - name: Execute Makefile calendario
+      run: |
+        set -e
+        make calendario
+
+    - name: Execute Makefile publicacion
+      run: |
+        set -e
+        make publicacion
+
+    - name: Comprobar contenido de docs antes de deploy
+      run: |
+        echo "Contenido de docs antes de deploy:"
+        ls -la docs
+
+    - name: Deploy docs/ a gh-pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GH_PAGES_TOKEN }}
+        publish_dir: ./docs
+        publish_branch: gh-pages
+        force_orphan: true
+#        destination_dir: docs
+#        allow_empty_commit: true
