@@ -1,0 +1,1612 @@
+.#+TITLE: Publicación de los ficheros org en GitHub pages
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+
+# +OPTIONS: toc:nil
+
+#+TAGS: noexport
+#+EXCLUDE_TAGS: noexport
+
+#+startup: shrink
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/readtheorg_inline.theme
+# ###########
+
+#+LATEX_HEADER_EXTRA: \usepackage{fullpage}
+
+
+#+LATEX_HEADER_EXTRA: \usepackage[spanish]{babel}
+#+LATEX_HEADER_EXTRA: \usepackage{lmodern}
+#+LATEX_HEADER_EXTRA: \usepackage{tabularx}
+#+LATEX_HEADER_EXTRA: \usepackage{booktabs}
+
+#+LATEX: \maketitle
+
+* Fichero =makefile=
+
+Genera el directorio público =docs= con los ficheros para GitPages con subdirectorios para los =CuadernosElectronicos=, =pdfs=, =Transparencias= y los ficheros con las lecciones en ~html~.
+
+#+BEGIN_SRC makefile :noweb no-export :results silent :tangle makefile
+LECCIONES_SRC = ./org-lessons
+LECCIONES_tmp = ./Lecciones
+DOCS = ./docs
+CUADERNOS = $(DOCS)/CuadernosElectronicos
+TRANSPARENCIAS = $(DOCS)/Transparencias
+
+SRC_FILES = $(LECCIONES_SRC)/Lecc*.org
+
+.PHONY: all clean cleanAll directorios series_formales calendario notebooksYslides
+
+all: calendario notebooksYslides practicas publicacion
+
+calendario: directorios $(DOCS)/Calendario-Econometria-Aplicada.pdf
+
+$(DOCS)/Calendario-Econometria-Aplicada.pdf:
+	emacs --batch Calendario/README.org -l org -f org-babel-tangle
+	cd Calendario && make Calendario-Econometria-Aplicada.pdf
+
+publicacion: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES))) README.org index.org
+	echo "FICHEROS EN CuadernosElectronicos y Transparencias?..."
+	cp -a $(LECCIONES_tmp)/Lecc*.slides.html $(TRANSPARENCIAS)
+	ls $(CUADERNOS)
+	ls $(TRANSPARENCIAS)
+	echo "EJECUCIÓN DE publica.el..."
+	emacs --batch \
+	  --load ~/Software/scimax/init.el \
+	  -l publica.el
+	echo "FICHEROS EN Docs?..."
+	find $(DOCS)
+	touch $@
+
+
+notebooksYslides: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES)))
+	touch $@
+
+$(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
+	make directorios
+	make series_formales
+	cp -a $(LECCIONES_SRC)/*.bib $(LECCIONES_tmp)
+	cp -a $< $(LECCIONES_tmp)
+	echo "EJECUCION DEL NOTEBOOK DE ORG: $(LECCIONES_tmp)/$(@F:.ipynb=.org)..."
+	emacs -Q -l ~/Software/scimax/init.el $(LECCIONES_tmp)/$(@F:.ipynb=.org) --batch --eval "(org-babel-execute-buffer)" --eval "(save-buffer)" --kill
+	echo "FICHEROS EN ./lecciones?..."
+	find $(LECCIONES_tmp)
+	echo "FICHEROS EN ./docs/Lecciones/img?..."
+	cp -a $(LECCIONES_tmp)/img $(DOCS)/Lecciones
+	find $(DOCS)/Lecciones/img
+	echo "Contenido de img tras notebook:"
+	find $(LECCIONES_tmp)/img
+	echo "COPIO LO QUE SE HA GENERADO (.ipynb sin ejecutar y las imágenes) A ./docs..."
+	cp -a $(LECCIONES_tmp)/$(@F) $(CUADERNOS)
+	ln -snf -r $(DOCS)/Lecciones/img/ $(TRANSPARENCIAS)/
+	ln -snf -r $(DOCS)/Lecciones/img/ $(CUADERNOS)/
+#	# Ejecutar el notebook con jupyter nbconvert
+	echo "EJECUCION DEL NOTEBOOK DE JUPYTER..."
+	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/$(@F) 
+	echo "CREACIÓN DE LAS SLIDES..."
+	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/$(@F) 
+	echo "➡️ FICHEROS EN docs/ TRAS GENERAR SLIDES Y NOTEBOOKS DE JUPYTER..."
+	find $(DOCS)
+
+
+# Lista de archivos fuente .org en org-practicas
+PRACTICAS_SRC = $(wildcard org-practicas/*.org)
+
+# Ficheros .done como señal de que fueron tanglados
+PRACTICAS_DONE = $(patsubst org-practicas/%.org, $(LECCIONES_tmp)/Practicas/%.done, $(PRACTICAS_SRC))
+
+# Objetivo principal
+practicas: $(PRACTICAS_DONE)
+	@echo "✅ Todas las prácticas actualizadas."
+
+$(LECCIONES_tmp)/Practicas/%.done: org-practicas/%.org
+	echo "➡️ Copiando y ejecutando $< ..."
+	mkdir -p $(LECCIONES_tmp)/Practicas/guiones
+	cp $< $(LECCIONES_tmp)/Practicas/
+	ln -snf -r $(LECCIONES_tmp)/datos $(LECCIONES_tmp)/Practicas/
+	cp -a org-practicas/hansl.tex $(LECCIONES_tmp)/Practicas/
+	echo "🧠 Ejecutando org-babel-tangle y eval..."
+	set -e; \
+	if emacs --batch \
+	  --load ~/Software/scimax/init.el \
+	  $(LECCIONES_tmp)/Practicas/$*.org \
+	  --eval "(org-babel-execute-buffer)" \
+	  --eval "(save-buffer)" \
+	  --kill; then \
+	    echo "✅ Correcto: $<"; \
+	    touch $@; \
+	else \
+	    echo "❌ Error al procesar $<"; \
+	    rm -f $@; \
+	    exit 1; \
+	fi
+	echo "➡️ listado de ficheros en el subdirectorio guiones"
+	ls -lR $(LECCIONES_tmp)/Practicas/guiones  # Debug para Actions
+
+series_formales: $(LECCIONES_tmp)/src/implementacion_series_formales.org
+
+$(LECCIONES_tmp)/src/implementacion_series_formales.org: $(LECCIONES_SRC)/src/implementacion_series_formales.org
+	echo "INICIO IMPLEMENTACION_SERIES_FORMALES.ipynb..."
+	make directorios
+	cp $< $(LECCIONES_tmp)/src/
+	emacs -q --batch $(LECCIONES_tmp)/src/implementacion_series_formales.org -l org -f org-babel-tangle
+	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.py $(CUADERNOS)/src/
+	ln -sf -r $(CUADERNOS)/src/implementacion_series_formales.py $(CUADERNOS)/
+	emacs -q --batch \
+	  --load ~/Software/scimax/init.el \
+	  --eval "(require 'ox-ipynb)" \
+	  --eval "(ox-ipynb-export-org-file-to-ipynb-file \"Lecciones/src/implementacion_series_formales.org\")"
+	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb
+	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb
+	jupyter nbconvert --execute --to html $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb
+	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb $(CUADERNOS)
+	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.slides.html $(TRANSPARENCIAS)
+	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.html $(DOCS)/Lecciones/src/
+	echo "TERMINADO IMPLEMENTACION_SERIES_FORMALES.ipynb..."
+
+directorios:
+	mkdir -v -p $(LECCIONES_tmp)/src
+	mkdir -v -p $(LECCIONES_tmp)/img
+	mkdir -v -p $(DOCS)/pdfs
+	mkdir -v -p $(DOCS)/.binder
+	mkdir -v -p $(DOCS)/Lecciones/img
+	mkdir -v -p $(DOCS)/Lecciones/src
+	mkdir -v -p $(TRANSPARENCIAS)
+	mkdir -v -p $(CUADERNOS)/src
+	cp -a ./css $(LECCIONES_tmp)/
+	cp -a ./datos $(LECCIONES_tmp)/
+	cp -a ./datos $(DOCS)/
+	touch directorios
+
+clean:
+	rm -r -f $(LECCIONES_tmp)
+
+cleanAll: clean
+	#find $(DOCS)/ -mindepth 1 ! -name 'README.org' ! -name '.binder' -exec rm -rf {} +
+	rm -r -f $(DOCS)
+	rm -f directorios
+	rm -f series_formales
+	rm -f publicacion
+	rm -f practicas
+	rm -f notebooksYslides
+	rm -f sitemap.org
+	rm -r -f logs
+#+END_SRC
+
+** Aclaraciones
+
+El directorio =./Lecciones= es temporal (en el fichero ~makefile~ se hace referencia a él con =$(LECCIONES_tmp)=). En dicho directorio se ejecutan los notebooks. Los ficheros creados se copian en distintos subdirectorios del directorio de publicación =./docs= (en el fichero ~makefile~ es referenciado con =$(DOCS)= ). El subdirectorio =./docs= es el directorio de donde "cuelgan" las páginas web; dichas páginas se distribuyen desde la rama =gh-pages= del repositorio.
+
+
+* Fichero =build.yml=
+
+Contiene las instrucciones que ejecutará GitHub Actions en el repositorio cada vez que éste sea actualizado.
+
+Usa el contenido de la rama =main=. 
+#+BEGIN_SRC yml :tangle .github/workflows/build.yml
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git emacs pandoc aspell aspell-en aspell-es zip gretl
+        pip install jupyter nbconvert
+
+    - name: Install Python modules
+      run: |
+        pip install sympy numpy pandas matplotlib dataframe-image statsmodels seaborn
+
+    - name: Verify Jupyter Installation
+      run: |
+        jupyter kernelspec list
+
+    - name: Install LaTeX
+      run: |
+        sudo apt-get install -y texlive  texlive-latex-recommended texlive-latex-extra  texlive-fonts-extra texlive-fonts-recommended texlive-xetex texlive-science python3-pygments texlive-lang-spanish texlive-bibtex-extra texlive-binaries texlive-extra-utils texlive-font-utils texlive-luatex texlive-xetex dvipng
+
+    - name: Disable tlmgr (prevent accidental calls)
+      run: sudo mv /usr/bin/tlmgr /usr/bin/tlmgr.disabled || true
+
+    - name: Clone Scimax
+      run: |
+        git clone https://github.com/jkitchin/scimax.git ~/Software/scimax
+
+    - name: Download ox-ipynb.el
+      run: |
+        wget https://raw.githubusercontent.com/jkitchin/ox-ipynb/master/ox-ipynb.el -O ~/Software/scimax/ox-ipynb.el
+
+    - name: Install s.el and dash.el
+      run: |
+        emacs --batch --eval "(require 'package)" \
+                      --eval "(add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\"))" \
+                      --eval "(package-refresh-contents)" \
+                      --eval "(package-install 's)" \
+                      --eval "(package-install 'dash)"
+
+    - name: Create no-tlmgr.el
+      run: |
+        mkdir -p ~/.emacs.d
+        echo "(setq system-packages-use-sudo nil)" > ~/.emacs.d/no-tlmgr.el
+        echo "(setq TeX-install-font-lock nil)" >> ~/.emacs.d/no-tlmgr.el
+        echo "(setq TeX-live-install-texmf nil)" >> ~/.emacs.d/no-tlmgr.el
+
+    - name: Verify ox-ipynb Installation
+      run: |
+        emacs --batch \
+              --eval "(add-to-list 'load-path \"~/Software/scimax/\")" \
+              --eval "(dolist (dir (directory-files \"~/.emacs.d/elpa/\" t \"^[^.]\")) (add-to-list 'load-path dir))" \
+              --eval "(require 'ox-ipynb)"
+
+    - name: Create .binder directory
+      run: mkdir -p docs/.binder
+
+    - name: Ficheros de configuracion
+      run: |
+        emacs --batch org-publish.org -l org -f org-babel-tangle
+
+    - name: Execute Makefile notebooksYslides
+      run: |
+        set -e
+        make notebooksYslides
+
+    - name: Inspección tras notebooksYslides
+      run: |
+        echo "Contenido de ./Lecciones:"
+        find ./Lecciones
+        echo "Contenido de ./docs:"
+        find ./docs
+
+    - name: Execute Makefile practicas
+      run: |
+        set -e
+        make practicas
+        echo "Contenido de ./Lecciones/Practicas:"
+        find ./Lecciones/Practicas
+
+    - name: Execute Makefile calendario
+      run: |
+        set -e
+        make calendario
+
+    - name: Execute Makefile publicacion
+      run: |
+        set -e
+        make publicacion
+
+    - name: Comprobar contenido de docs antes de deploy
+      run: |
+        echo "Contenido de docs antes de deploy:"
+        ls -la docs
+
+    - name: Deploy docs/ a gh-pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GH_PAGES_TOKEN }}
+        publish_dir: ./docs
+        publish_branch: gh-pages
+        force_orphan: true
+#        destination_dir: docs
+#        allow_empty_commit: true
+#+END_SRC
+
+
+** Aclaraciones
+
+**** tlmgr
+Scimax intenta usar ~tlmgr~ para instalar paquetes de $\LaTeX{}$, pero =Actions= de =GitHub= no lo permite. Las medidas tomadas para evitar este problema han sido 
+1. Al ejecutarse ~.github/workflows/build.yml~ en GitHub Actions se crea un fichero =~/.emacs.d/no-tlmgr.el= con el siguiente contenido
+   #+BEGIN_SRC 
+(setq system-packages-use-sudo nil)
+(setq TeX-install-font-lock nil)
+   #+END_SRC
+   así, al publicar los ficheros, podemos llamar a scimax del siguiente modo
+   #+BEGIN_SRC 
+emacs --batch \
+  --load ~/.emacs.d/no-tlmgr.el \
+  --load ~/Software/scimax/init.el \
+  -l publica.el
+   #+END_SRC
+2. Además en ~.github/workflows/build.yml~ he añadido
+   #+BEGIN_SRC 
+    - name: Disable tlmgr (prevent accidental calls)
+      run: sudo mv /usr/bin/tlmgr /usr/bin/tlmgr.disabled || true
+   #+END_SRC
+
+Quizá sea suficiente solo con esto segundo. Pero si quito el fichero =~/.emacs.d/no-tlmgr.el=, también he de omitirlo en las llamadas a emacs usando scimax (como así funciona... así se queda).
+
+*** Consulta a Copilot sobre la generación de figuras
+
+Tuve dificultades para que la ejecución en GitHub Actions de los de los cuadernos electrónicos de Scimax creara las figuras. A continuación copio mi consulta a copilot: 
+
+#+BEGIN_QUOTE
+-----
+-----
+*/Consulta/*:
+/Anteriormente faltaba por instalar el paquete dvipng. Una vez instalado dvipng, el bloque de código/:
+
+#+BEGIN_SRC jupyter-python :results file :exports results
+plt.plot([1,2,3],[4,5,6])
+plt.savefig("img/prueba_action.png")
+"img/prueba_action.png"
+#+END_SRC
+
+/ha creado correctamente el fichero "img/prueba_action.png" con la figura. Sin embargo, el bloque/
+
+#+BEGIN_SRC jupyter-python :results file :file ./img/lecc01/PIB_UEM.png
+df1.plot(x='obs',xlabel='',figsize=(15,4)).set_title('PIB zona euro',fontsize=18)
+#+END_SRC
+
+/no ha creado el fichero ./img/lecc01/PIB_UEM.png con su correspondiente figura./
+-----
+-----
+#+END_QUOTE
+
+¡Excelente que la instalación de dvipng haya solucionado la generación de imágenes para el primer bloque!  
+Ahora, pasemos a analizar por qué el segundo bloque *no genera* el archivo `./img/lecc01/PIB_UEM.png`.
+
+-----
+
+**** Diagnóstico y causas probables
+
+***** 1. Diferencia clave entre ambos bloques
+
+- *Bloque que funciona:*
+
+  #+BEGIN_SRC org
+  #+BEGIN_SRC jupyter-python :results file :exports results
+  plt.plot([1,2,3],[4,5,6])
+  plt.savefig("img/prueba_action.png")
+  "img/prueba_action.png"
+  #+END_SRC
+  #+END_SRC
+
+  - Aquí, tú generas la figura y la guardas explícitamente con `plt.savefig()`, y luego devuelves el nombre del archivo en la última línea.
+
+- *Bloque que falla:*
+
+  #+BEGIN_SRC org
+  #+BEGIN_SRC jupyter-python :results file :file ./img/lecc01/PIB_UEM.png
+  df1.plot(x='obs',xlabel='',figsize=(15,4)).set_title('PIB zona euro',fontsize=18)
+  #+END_SRC
+  #+END_SRC
+
+  - Aquí confías en que org-babel/jupyter-python guardará automáticamente la figura en `:file`, pero el método pandas `df.plot()` *no guarda ni devuelve* el archivo.
+
+***** 2. ¿Por qué falla el segundo bloque?
+
+- El argumento `:file ./img/lecc01/PIB_UEM.png` espera que el último comando del bloque *guarde la imagen en ese path* (o devuelva una figura que org/jupyter pueda guardar ahí).
+- El método `df1.plot(...).set_title(...)` crea y modifica una figura activa, pero *no la guarda*.
+- Si usas solo `set_title()`, no hay ninguna instrucción para guardar el gráfico.
+- Por defecto, ni org-babel ni jupyter-python pueden adivinar que la figura debe ser guardada en ese path si no se lo indicas de forma explícita.
+
+-----
+
+**** Solución recomendada
+
+*Debes guardar la figura manualmente al path especificado*, y devolver ese path como resultado del bloque.
+
+***** Forma correcta:
+
+#+BEGIN_SRC jupyter-python :results file :file ./img/lecc01/PIB_UEM.png
+ax = df1.plot(x='obs', xlabel='', figsize=(15,4))
+ax.set_title('PIB zona euro', fontsize=18)
+import matplotlib.pyplot as plt
+plt.savefig("./img/lecc01/PIB_UEM.png")
+"./img/lecc01/PIB_UEM.png"
+#+END_SRC
+
+- Esto asegura que la imagen se guarda donde deseas y que el bloque devuelve el path correcto para que org-babel inserte la imagen en el documento.
+
+***** Alternativas
+
+- Si usas solo `:results file` sin `:file`, puedes devolver el nombre del archivo en la última línea.
+- Siempre asegúrate de llamar a `plt.savefig()` *después* de crear el gráfico.
+
+-----
+
+**** Resumen
+
+- El bloque con `plt.savefig(...)` funciona porque guarda explícitamente la imagen.
+- El bloque con pandas `plot` y solo `set_title()` *NO guarda la imagen*; debes añadir `plt.savefig()` y devolver el path.
+- Así, org-babel/jupyter-python incrustará correctamente la imagen en el documento exportado.
+
+-----
+
+#+BEGIN_QUOTE
+-----
+-----
+*/Consulta/*:
+/Sin embargo. Cuando ejecuto localmente el fichero org sí se crean las figuras en mi disco. ¿Hay algún modo de que también se creen con Actions sin modificar los bloques? Es decir, ¿hay algún modo de que funcionen tal y como están ahora mismo?/
+-----
+-----
+#+END_QUOTE
+
+¡Esta es una pregunta muy frecuente al usar org-babel/jupyter en entornos CI/CD!  
+La diferencia entre tu entorno local y GitHub Actions suele deberse a *la configuración del entorno gráfico* y de *matplotlib*.
+
+-----
+
+**** ¿Por qué funciona localmente pero no en Actions?
+
+- *Localmente*, matplotlib tiene acceso a un entorno gráfico (X11, Wayland, etc.) y suele usar un backend como `TkAgg`, `Qt5Agg`,…
+- *En GitHub Actions* (o cualquier entorno headless), *matplotlib no tiene acceso a un display* y por defecto puede intentar usar un backend que requiere uno, lo que impide guardar imágenes.
+
+***** Backend headless necesario
+
+Para guardar imágenes sin display, *matplotlib debe usar un backend como "Agg"*.
+
+-----
+
+**** Solución: Forzar el backend "Agg" para matplotlib
+
+Esto se puede hacer *sin modificar los bloques* añadiendo una configuración previa en tu flujo de trabajo o al comienzo de la ejecución.
+
+***** Opción 1: Variable de entorno en el workflow
+
+Añade esto antes de ejecutar Emacs en tu `build.yml`:
+
+#+BEGIN_SRC yaml
+- name: Set MPLBACKEND (matplotlib)
+  run: echo "MPLBACKEND=Agg" >> $GITHUB_ENV
+#+END_SRC
+
+Matplotlib detectará esto y usará el backend adecuado.
+
+***** Opción 2: Variable de entorno en shell
+
+O directamente en el comando de ejecución:
+
+#+BEGIN_SRC bash
+MPLBACKEND=Agg emacs -Q -l ~/Software/scimax/init.el ./lecciones/Lecc01.org --batch ...
+#+END_SRC
+
+***** Opción 3: Configuración en Emacs/jupyter-python
+
+Si puedes modificar la configuración de Emacs que se carga, añade a tu init.el o a la cabecera de los bloques:
+
+#+BEGIN_SRC python
+import matplotlib
+matplotlib.use("Agg")
+#+END_SRC
+
+Pero esto requeriría modificar los bloques, que quieres evitar.
+
+-----
+
+**** Resumen
+
+- *El problema*: matplotlib necesita el backend "Agg" para funcionar headless.
+- *La solución sin modificar los bloques*: establece la variable de entorno `MPLBACKEND=Agg` en el workflow antes de ejecutar Emacs.
+- *Así*, los bloques que generan imágenes funcionarán igual en Actions que localmente, *sin necesidad de cambiar el código de los bloques*.
+
+-----
+-----
+-----
+*/SOLUCIÓN FINALMENTE ADOPTADA/*:
+
+El backend "Agg"  no me funcionó, por lo que opté por indicar explícitamente en el código de python el fichero donde se debe guardar cada figura.
+-----
+-----
+-----
+
+
+
+* Script =publica.el= de elisp para publicar los =.org= es formato =pdf= y ~html~
+
+Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
+
+#+BEGIN_SRC  emacs-lisp :tangle publica.el :results silent
+;;; publica.el --- Publicación HTML y PDF para el repositorio Scimax-ELN
+
+(require 'ox-publish)
+
+(setq org-confirm-babel-evaluate nil
+      org-export-with-broken-links t
+      org-html-validation-link nil
+      org-html-head-include-scripts nil
+      org-html-head-include-default-style nil)
+
+(defun my-org-latex-publish-to-pdf (plist filename pub-dir)
+  "Publica un archivo Org como PDF tras ejecutar bloques de código."
+  (message "Exportando a PDF: %s" filename)
+  (with-current-buffer (find-file-noselect filename)
+    ;(org-babel-execute-buffer)
+    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(let* ((base-directory "./"))
+  (setq org-publish-project-alist
+        (append org-publish-project-alist
+                `(("index"
+                   :base-directory ,base-directory
+                   :base-extension "org"
+                   :publishing-directory ,(concat base-directory "docs")
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
+                   :recursive t
+                   :publishing-function org-html-publish-to-html
+                   :auto-preamble t
+                   :auto-sitemap t
+                   :with-author nil
+                   :with-creator nil
+                   :with-toc t
+                   :section-numbers nil)
+
+                  ("pdf"
+                   :base-directory "./Lecciones/"
+                   :base-extension "org"
+                   :publishing-directory ,(concat base-directory "docs/pdfs")
+                   :exclude "src\\|org-lessons\\|org-practicas"
+                   :recursive t
+                   :publishing-function my-org-latex-publish-to-pdf
+                   :auto-preamble t)
+
+                  ("static-index"
+                   :base-directory ,base-directory
+                   :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|txt\\|svg\\|aiff\\|inp"
+                   :publishing-directory ,(concat base-directory "docs")
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|docs\\|chatCopilot.*\\|org-publish.*\\|README.org"
+                   :recursive t
+                   :publishing-function org-publish-attachment)
+
+                  ("web-repositorio" :components ("index" "pdf" "static-index")))))
+
+  (message "🟢 Iniciando publicación del índice (web-repositorio)...")
+  (org-publish "web-repositorio" t)
+  (message "✅ Publicación del índice completada."))
+
+#+END_SRC
+
+# (unless (file-directory-p "logs")
+#   (make-directory "logs"))
+# (with-temp-file "logs/publica.log"
+#   (insert (format "Publicado el %s\n" (current-time-string))))
+
+Podemos chequear la versión local ejecutando en emacs el siguiente bloque
+
+#+BEGIN_SRC emacs-lisp :results silent
+(browse-url "docs/index.html")
+#+END_SRC
+
+
+* slides para GitHubpages
+
+Esta es la configuración para convertir los Notebooks de Jupyter en slides:
+#+BEGIN_SRC python :tangle mycfg-GitHubPages.py
+c = get_config()
+
+c.SlidesExporter.reveal_theme = 'solarized'
+c.SlidesExporter.reveal_scroll = True
+c.SlidesExporter.language_code = 'es'
+
+c.SlidesExporter.mathjax_url = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"
+
+c.SlidesExporter.jquery_url = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+
+c.SlidesExporter.require_js_url = "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"
+#+END_SRC
+
+
+[[https://nbconvert.readthedocs.io/en/latest/config_options.html][Configuración para nbconvert]] (las slides usan ficheros de la web para poder funcionar en GitHubPages)
+
+[[https://dbafromthecold.com/2021/02/21/creating-presentations-with-reveal-and-github-pages/][creating-presentations-with-reveal-and-github-pages]]
+
+https://github.com/RichardAfolabi/Presentation_js
+
+https://emasuriano.com/til/2024-07-01-create-presentations-from-notebook/
+
+https://github.com/yjwen/org-reveal
+https://github.com/hexmode/ox-reveal
+
+
+* Directorio =.binder= para MyBinder
+
+** Fichero =environment.yml= 
+
+Dado que los notebooks del curso emplean algunos módulos de python, la ejecución online en [[https://mybinder.org/][MyBinder]] de los correspondientes Notebooks de Jupyter requiere de la creación de un fichero que indique las dependencias necesarias para que se instale el software necesario (creo que =defaults= instala el latex necesario para los gráficos). 
+
+#+BEGIN_SRC yml :tangle docs/.binder/environment.yml
+name: binder-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - ipykernel
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - sympy
+  - statsmodels
+  - pip:
+      - dataframe_image
+#+END_SRC
+
+
+** Fichero =apt.txt= 
+
+Algunos gráficos de los notebooks usan \LaTeX{}. Este fichero indica a MyBinder qué paquetes debe instalar para cubrir las dependencias.
+
+#+BEGIN_SRC text :tangle docs/.binder/apt.txt
+texlive
+texlive-latex-extra
+texlive-fonts-recommended
+texlive-fonts-extra
+dvipng
+cm-super
+#+END_SRC
+
+
+
+* COMMENT Ñordas                                                   :noexport:
+
+#+BEGIN_SRC sh :results silent
+jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix reveal.js --no-input
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+(require 'ox-ipynb)
+(ox-ipynb-export-org-file-to-ipynb-file "Lecc01.org")
+(ox-ipynb-export-org-file-to-ipynb-file "Lecc02.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc03.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc04.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc05.org")
+#+END_SRC
+
+#+RESULTS:
+: Lecc01.ipynb
+
+
+# jupyter nbconvert --config mycfg.py
+# jupyter nbconvert --config mycfg.py  --to slides --reveal-prefix reveal.js
+# jupyter nbconvert --config mycfg.py  --to slides --offline embed --reveal-prefix reveal.js
+
+¿furula? NO
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+
+(add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t)
+
+(require 'use-package)
+(use-package htmlize)
+
+(require 'ox-publish)
+;(use-package htmlize)
+
+;(require 'ox-publish)
+
+(defun my-org-babel-execute-buffer ()
+  "Ejecuta todos los bloques de código en el buffer actual."
+  (org-babel-execute-buffer))
+
+(defun my-org-html-publish-to-html (plist filename pub-dir)
+  "Publica un archivo Org como HTML después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    (my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-html-publish-to-html plist filename pub-dir)))
+
+(defun my-org-latex-publish-to-pdf (plist filename pub-dir)
+  "Publica un archivo Org como PDF después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    (my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(let* ((base-directory "./lecciones/")
+       (public-directory "./docs/")
+       (org-export-with-broken-links t)
+       (org-publish-project-alist `(("html"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,public-directory
+                                     :exclude "docs\\|EjerciciosHide\\|SeriesSimuladas4\\|SeriesSimuladas12\\|Calendario\\|notas.*\\|.ipynb_checkpoints\\|00Notas.*\\|org-publisg.*\\|kk.*"
+                                     :recursive t
+                                     :publishing-function my-org-html-publish-to-html
+                                     :auto-preamble t
+                                     :auto-sitemap t)
+                                    
+                                    ("pdf"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,(concat public-directory "pdfs")
+                                     :exclude "docs"
+                                     :exclude "Calendario"
+                                     :exclude ".ipynb_checkpoints"
+                                     :exclude "reveal.js.old"
+                                     :exclude "notas.*"
+                                     :exclude "USB"
+                                     :recursive t
+                                     :publishing-function my-org-latex-publish-to-pdf
+                                     :auto-preamble t
+                                     :auto-sitemap nil)
+                                    
+                                    ("static-html"
+                                     :base-directory ,base-directory
+                                     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|svg\\|aiff\\|csv\\|gdt\\|inp\\|ipynb\\|html"
+                                     :publishing-directory ,public-directory
+                                     :exclude "docs\\|EjerciciosHide\\|SeriesSimuladas4\\|SeriesSimuladas12\\|notas.*\\|.ipynb_checkpoints\\|org-publisg.*\\|kk.*\\|Lecc*.pdf"
+                                     :recursive t
+                                     :publishing-function org-publish-attachment)
+
+                                    ("scimax-eln" :components ("html" "static-html" "pdf")))))
+
+  (org-publish "scimax-eln" t))
+#+END_SRC
+
+#+RESULTS:
+
+
+
+#+BEGIN_SRC emacs-lisp
+(require 'package)
+
+(add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t)
+
+(require 'use-package)
+(use-package htmlize)
+
+(require 'ox-publish)
+
+(defun my-org-babel-execute-buffer ()
+  "Ejecuta todos los bloques de código en el buffer actual."
+  (org-babel-execute-buffer))
+
+(defun my-org-html-publish-to-html (plist filename pub-dir)
+  "Publica un archivo Org como HTML después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    (my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-html-publish-to-html plist filename pub-dir)))
+
+(defun my-org-latex-publish-to-pdf (plist filename pub-dir)
+  "Publica un archivo Org como PDF después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    (my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(let* ((base-directory "./lecciones/")
+       (public-directory "./docs/")
+       (org-export-with-broken-links t)
+       (org-publish-project-alist `(("html"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,public-directory
+                                     :exclude "docs\\|EjerciciosHide\\|SeriesSimuladas4\\|SeriesSimuladas12\\|Calendario\\|notas.*\\|.ipynb_checkpoints\\|00Notas.*\\|org-publisg.*\\|kk.*"
+                                     :recursive t
+                                     :publishing-function my-org-html-publish-to-html
+                                     :auto-preamble t
+                                     :auto-sitemap t)
+                                    
+                                    ("pdf"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,(concat public-directory "pdfs")
+                                     :exclude "docs"
+                                     :exclude "Calendario"
+                                     :exclude ".ipynb_checkpoints"
+                                     :exclude "reveal.js.old"
+                                     :exclude "notas.*"
+                                     :exclude "USB"
+                                     :recursive t
+                                     :publishing-function my-org-latex-publish-to-pdf
+                                     :auto-preamble t
+                                     :auto-sitemap nil)
+                                    
+                                    ("static-html"
+                                     :base-directory ,base-directory
+                                     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|svg\\|aiff\\|csv\\|gdt\\|inp\\|ipynb\\|html"
+                                     :publishing-directory ,public-directory
+                                     :exclude "docs\\|EjerciciosHide\\|SeriesSimuladas4\\|SeriesSimuladas12\\|notas.*\\|.ipynb_checkpoints\\|org-publisg.*\\|kk.*\\|Lecc*.pdf"
+                                     :recursive t
+                                     :publishing-function org-publish-attachment)
+
+                                    ("scimax-eln" :components ("html" "static-html" "pdf")))))
+
+  (org-publish "scimax-eln" t))
+#+END_SRC
+
+clean:
+	rm -r -f $(DOCS)
+	rm -r -f $(LECCIONES)
+	rm -f directorios
+	rm -f series_formales
+
+
+#+BEGIN_SRC bash  :results silent
+rm Lecc*.{pdf,slides.html}
+#+END_SRC
+
+#+BEGIN_SRC  makefile :noweb no-export :results silent :exports none 
+OUT_DIR=./
+# Using GNU Make-specific functions here
+FILES=$(patsubst Lecc%.org,$(OUT_DIR)/Lecc%.tex,$(wildcard *.org))
+PDF-FILES=$(patsubst Lecc%.tex,$(OUT_DIR)/Lecc%.pdf,$(wildcard *.tex))
+
+#.PHONY: all clean install-doc
+.PHONY: all install-doc
+
+Lecc01.pdf: %.tex
+	latexmk -c $@ 
+
+all: install-doc
+
+#install-doc: $(FILES)  $(PDF-FILES)
+install-doc: $(PDF-FILES)
+
+$(OUT_DIR):
+	mkdir -v -p $(OUT_DIR)
+
+#%.tex: %.org
+#	emacs -q -l ~/Software/scimax/init.el $< --batch -f org-latex-export-to-latex --kill
+
+%.pdf: %.tex
+	latexmk -pdf --shell-escape -interaction=batchmode $< 
+	latexmk -c
+
+pedeefes: %.pdf
+
+#$(OUT_DIR)/%.tex: %.tex
+#	install -v -m 644 -t $(OUT_DIR) $<
+#	rm $<
+$(OUT_DIR)/%.pdf: %.pdf
+	install -v -m 644 -t ./notas $<
+
+#clean:
+#	rm *.tex
+#+END_SRC
+
+
+* COMMENT otros                                                    :noexport:
+
+#+BEGIN_SRC sh :results silent
+#pdflatex --shell-escape  -interaction=batchmode Lecc01.tex
+#pdflatex --shell-escape  -interaction=batchmode Lecc01.tex
+#latexmk -c Lecc01.tex
+
+#pdflatex --shell-escape  -interaction=batchmode Lecc02.tex
+#pdflatex --shell-escape  -interaction=batchmode Lecc02.tex
+#latexmk -c Lecc02.tex
+
+#pdflatex --shell-escape  -interaction=batchmode Lecc03.tex
+#pdflatex --shell-escape  -interaction=batchmode Lecc03.tex
+#latexmk -c Lecc03.tex
+
+#pdflatex --shell-escape  -interaction=batchmode Lecc04.tex
+#pdflatex --shell-escape  -interaction=batchmode Lecc04.tex
+#latexmk -c Lecc04.tex
+
+#pdflatex --shell-escape  -interaction=batchmode Lecc05.tex
+#pdflatex --shell-escape  -interaction=batchmode Lecc05.tex
+#latexmk -c Lecc05.tex
+
+#pdflatex --shell-escape  -interaction=batchmode Lecc06.tex
+#pdflatex --shell-escape  -interaction=batchmode Lecc06.tex
+#latexmk -c Lecc06.tex
+
+#pdflatex --shell-escape  -interaction=batchmode Lecc07.tex
+#pdflatex --shell-escape  -interaction=batchmode Lecc07.tex
+#latexmk -c Lecc07.tex
+
+#pdflatex --shell-escape  -interaction=batchmode Lecc08.tex
+#pdflatex --shell-escape  -interaction=batchmode Lecc08.tex
+#latexmk -c Lecc08.tex
+
+#+END_SRC
+
+
+#+BEGIN_SRC sh  :results silent :dir ./Ejercicios
+
+#pdflatex --shell-escape  -interaction=batchmode mortality-marriages.tex
+#pdflatex --shell-escape  -interaction=batchmode mortality-marriages.tex
+#latexmk -c mortality-marriages.tex
+
+#pdflatex --shell-escape  -interaction=batchmode NombreOscarYConsumoDePetroleo.tex
+#pdflatex --shell-escape  -interaction=batchmode NombreOscarYConsumoDePetroleo.tex
+#latexmk -c NombreOscarYConsumoDePetroleo.tex
+
+#pdflatex --shell-escape  -interaction=batchmode EjercicioIdentificacionModeloARIMA.tex
+#pdflatex --shell-escape  -interaction=batchmode EjercicioIdentificacionModeloARIMA.tex
+#latexmk -c EjercicioIdentificacionModeloARIMA.tex
+
+#pdflatex --shell-escape  -interaction=batchmode SegundoEjercicioIdentificacionARIMA.tex
+#pdflatex --shell-escape  -interaction=batchmode SegundoEjercicioIdentificacionARIMA.tex
+#latexmk -c SegundoEjercicioIdentificacionARIMA.tex
+
+#pdflatex --shell-escape  -interaction=batchmode IndicePreciosViviendasNuevasYdeSegundaMano.tex
+#pdflatex --shell-escape  -interaction=batchmode IndicePreciosViviendasNuevasYdeSegundaMano.tex
+#latexmk -c IndicePreciosViviendasNuevasYdeSegundaMano.tex
+
+#pdflatex --shell-escape  -interaction=batchmode LetrasTesoroAmericano3y6meses.tex
+#pdflatex --shell-escape  -interaction=batchmode LetrasTesoroAmericano3y6meses.tex
+#latexmk -c LetrasTesoroAmericano3y6meses.tex
+
+#pdflatex --shell-escape  -interaction=batchmode SerieCuentasFinancierasBE.tex
+#pdflatex --shell-escape  -interaction=batchmode SerieCuentasFinancierasBE.tex
+#latexmk -c SerieCuentasFinancierasBE.tex
+
+#pdflatex --shell-escape  -interaction=batchmode FumadoresVsIncendios.tex
+#pdflatex --shell-escape  -interaction=batchmode FumadoresVsIncendios.tex
+#latexmk -c SerieCuentasFinancierasBE.tex
+
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :results silent
+(require 'ox-ipynb)
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc01.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc02.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc03.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc04.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc05.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc06.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc07.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc08.org")
+#+END_SRC
+
+# :tangle publish_notebooks.el 
+#+BEGIN_SRC emacs-lisp :results silent
+(require 'ox-ipynb)
+(ox-ipynb-export-org-file-to-ipynb-file "lecciones/Lecc01.org")
+(ox-ipynb-export-org-file-to-ipynb-file "lecciones/Lecc02.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc02.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc03.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc04.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc05.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc06.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc07.org")
+;(ox-ipynb-export-org-file-to-ipynb-file "Lecc08.org")
+#+END_SRC
+
+
+#+BEGIN_SRC sh :results silent
+emacs -q -l ~/Software/scimax/init.el -batch -nw -l publish.el
+emacs -q -l ~/Software/scimax/init.el -batch -nw -l publish_notebooks.el
+cd lecciones
+jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix reveal.js
+mkdir CuadernosElectronicos
+mkdir Transparencias
+mv Lecc*.slides.html  Transparencias
+mv Lecc*.ipynb CuadernosElectronicos
+ln -s -r ./img/ ./Transparencias/
+ln -s -r ./img/ ./CuadernosElectronicos/
+rm -f Transparencias/reveal.js
+ln -s -r ../reveal.js Transparencias/reveal.js
+cd ..
+rm -f ./docs/datos
+ln -s -r ./datos/ ./docs/
+emacs -q -l ~/Software/scimax/init.el -batch -nw -l static_publish.el
+rm -f docs/Transparencias/reveal.js
+ln -s -r ./reveal.js docs/Transparencias/reveal.js
+#+END_SRC
+
+
+** Org-publish                                                     :noexport:
+
+#+BEGIN_SRC sh :results silent 
+#emacs -q -l ~/Software/scimax/init.el lecciones/Lecc01.org --batch -f org-babel-execute-buffer --kill
+#+END_SRC
+
+
+Necesitamos un pequeño guión en =elisp= para ajustar la publicación.
+# :tangle publish.el
+#+BEGIN_SRC emacs-lisp 
+(require 'package)
+
+(add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t)
+
+(require 'use-package)
+(use-package htmlize)
+
+(require 'ox-publish)
+
+(defun my-org-babel-execute-buffer ()
+  "Ejecuta todos los bloques de código en el buffer actual."
+  (org-babel-execute-buffer))
+
+(defun my-org-html-publish-to-html (plist filename pub-dir)
+  "Publica un archivo Org como HTML después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    ;(my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-html-publish-to-html plist filename pub-dir)))
+
+(defun my-org-latex-publish-to-pdf (plist filename pub-dir)
+  "Publica un archivo Org como PDF después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    ;(my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(let* ((base-directory "./lecciones/")
+       (public-directory "./docs/")
+       (org-export-with-broken-links t)
+       (org-publish-project-alist `(("html"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,public-directory
+                                     :exclude ".ipynb_checkpoints\\|00Notas.*\\|org-publisg.*\\|kk.*"
+                                     :recursive t
+                                     :publishing-function my-org-html-publish-to-html
+                                     :auto-preamble t
+                                     :auto-sitemap nil)
+                                    
+                                    ("pdf"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,(concat public-directory "pdfs")
+                                     :exclude ".ipynb_checkpoints"
+                                     :recursive t
+                                     :publishing-function my-org-latex-publish-to-pdf
+                                     :auto-preamble t
+                                     :auto-sitemap nil)
+                                    
+                                    ("scimax-eln" :components ("html" "pdf")))))
+
+  (org-publish "scimax-eln" t))
+#+END_SRC
+
+#+RESULTS:
+
+# :tangle static_publish.el
+#+BEGIN_SRC emacs-lisp :results silent
+(require 'package)
+
+(add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t)
+
+(require 'use-package)
+(use-package htmlize)
+
+(require 'ox-publish)
+
+(let* ((base-directory "./lecciones/")
+       (public-directory "./docs/")
+       (org-export-with-broken-links t)
+       (org-publish-project-alist `(("static-html"
+                                     :base-directory ,base-directory
+                                     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|svg\\|aiff\\|csv\\|gdt\\|inp\\|ipynb\\|html"
+                                     :publishing-directory ,public-directory
+                                     :exclude "readtheorg_inline.theme\\|mycfg-GitHubPages.py\\|Lecc*.pdf"
+                                     :recursive t
+                                     :publishing-function org-publish-attachment)
+
+                                    ("scimax-eln" :components ("static-html")))))
+
+  (org-publish "scimax-eln" t))
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :results silent
+(require 'ox-publish)
+
+(defun my-org-babel-execute-buffer ()
+  "Ejecuta todos los bloques de código en el buffer actual."
+  (org-babel-execute-buffer))
+
+(defun my-org-html-publish-to-html (plist filename pub-dir)
+  "Publica un archivo Org como HTML después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    ;(my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-html-publish-to-html plist filename pub-dir)))
+
+(defun my-org-latex-publish-to-pdf (plist filename pub-dir)
+  "Publica un archivo Org como PDF después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    ;(my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(let* ((base-directory "./lecciones/")
+       (public-directory "./docs/")
+       (org-export-with-broken-links t)
+       (org-publish-project-alist `(("html"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,public-directory
+                                     :exclude ".ipynb_checkpoints\\|00Notas.*\\|org-publisg.*\\|kk.*"
+                                     :recursive t
+                                     :publishing-function my-org-html-publish-to-html
+                                     :auto-preamble t
+                                     :auto-sitemap t)
+                                    
+                                    ("pdf"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,(concat public-directory "pdfs")
+                                     :exclude ".ipynb_checkpoints"
+                                     :recursive t
+                                     :publishing-function my-org-latex-publish-to-pdf
+                                     :auto-preamble t
+                                     :auto-sitemap nil)
+                                    
+                                    ("static-html"
+                                     :base-directory ,base-directory
+                                     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|svg\\|aiff\\|csv\\|gdt\\|inp\\|ipynb\\|html"
+                                     :publishing-directory ,public-directory
+                                     :exclude "docs\\|EjerciciosHide\\|.ipynb_checkpoints\\|org-publisg.*\\|kk.*\\|Lecc*.pdf"
+                                     :recursive t
+                                     :publishing-function org-publish-attachment)
+
+                                    ("scimax-eln" :components ("html" "static-html" "pdf")))))
+
+  (org-publish "scimax-eln" t))
+#+END_SRC
+
+
+
+Podemos chequear la versión local ejecutando el siguiente bloque
+
+#+BEGIN_SRC emacs-lisp :results silent
+(browse-url "docs/index.html")
+#+END_SRC
+
+
+#+BEGIN_SRC bash  :results silent
+rm Lecc*.{pdf,slides.html}
+#+END_SRC
+
+
+*** Commit and publish the html pages                              :noexport:
+
+To publish these we go into the html directory, commit all the files and push them to GitHUB.
+
+
+#+BEGIN_SRC sh 
+#git add docs
+git commit -m "update"
+git push
+#+END_SRC
+
+
+
+*** con pdfs
+
+#+BEGIN_SRC emacs-lisp
+(require 'ox-publish)
+
+(let* ((base-directory "./")
+       (public-directory "~/repos/Ectrkk/")
+       (org-export-with-broken-links t)
+       (org-publish-project-alist `(("html"
+				     :base-directory ,base-directory
+				     :base-extension "org"
+				     :publishing-directory ,(concat public-directory "docs")
+				     :exclude "docs"
+				     :exclude "Calendario"
+				     :exclude ".ipynb_checkpoints"
+				     :exclude "reveal.js.old"
+				     :exclude "USB"
+				     :recursive t
+				     :publishing-function org-html-publish-to-html
+				     :auto-preamble t
+				     :auto-sitemap t)
+				    ("pdf"
+				     :base-directory ,base-directory
+				     :base-extension "org"
+				     :publishing-directory ,(concat public-directory "docs/pdfs")
+				     :exclude "docs"
+				     :exclude "Calendario"
+				     :exclude ".ipynb_checkpoints"
+				     :exclude "reveal.js.old"
+				     :exclude "USB"
+				     :recursive t
+				     :publishing-function org-latex-publish-to-pdf
+				     :auto-preamble t
+				     :auto-sitemap nil)
+				    
+				    ("static-html"
+				     :base-directory ,base-directory
+				     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|txt\\|svg\\|aiff\\|csv\\|gdt\\|inp\\|ipynb"
+				     :publishing-directory ,(concat public-directory "docs")
+				     :exclude "docs"
+				     :exclude "Calendario"
+				     :exclude ".ipynb_checkpoints"
+				     :exclude "reveal.js.old"
+				     :exclude "USB"
+				     :recursive t
+				     :publishing-function org-publish-attachment)
+
+				    ;; ... all the components ...
+				    ("scimax-eln" :components ("html" "static-html" "pdf")))))
+
+  (org-publish "scimax-eln" t))
+#+END_SRC
+
+#+RESULTS:
+
+
+* COMMENT slides                                                   :noexport:
+
+[[https://nbconvert.readthedocs.io/en/latest/config_options.html][Configuración para nbconvert]] (las slides usan ficheros locales)
+
+# :tangle mycfg.py
+#+BEGIN_SRC python 
+c = get_config()
+c.NbConvertApp.notebooks = ["Lecc01.ipynb",
+                            "Lecc02.ipynb",
+                            "Lecc03.ipynb",
+                            "Lecc04.ipynb",
+                            "Lecc05.ipynb",
+                            "Lecc06.ipynb"]
+c.SlidesExporter.reveal_theme = 'solarized'
+c.SlidesExporter.reveal_scroll = True
+#+END_SRC
+
+# :tangle custom.css
+#+BEGIN_SRC css 
+.slides {
+  width: 90% !important;
+}
+#+END_SRC
+
+
+#+BEGIN_SRC sh :results none
+#jupyter nbconvert --config mycfg.py --to notebook
+jupyter nbconvert --config mycfg.py --to slides 
+#+END_SRC
+
+# omite las celdas de código
+#+BEGIN_SRC sh :results silent
+#jupyter nbconvert --config mycfg.py --to notebook
+jupyter nbconvert --config mycfg.py --to slides --no-input
+#+END_SRC
+
+
+# emacs --batch  --eval "(require 'org)(use-package ox-ipynb)" Lecc02.org --funcall ox-ipynb-export-org-file-to-ipynb-file
+
+# emacsclient -e '(progn (switch-to-buffer "my-presentation.org") (org-beamer-export-to-pdf))'
+
+# emacs --batch --load=plugin.el --load=my-funcs.el --eval=my-func file.v
+
+# c.SlidesExporter.reveal_theme = 'beige'
+# c.SlidesExporter.SlidesExporter.reveal_number = 'c/t'
+# c.SlidesExporter.slideNumber = True
+# c.SlidesExporter.reveal_width = 5500
+# c.SlidesExporter.reveal_height = 800
+
+#+BEGIN_SRC makefile :noweb no-export :results silent :exports none :tangle OLDmakefile.old
+# Directorios
+LECCIONES_SRC = ./org-lessons
+LECCIONES = ./lecciones
+DOCS = ./docs
+CUADERNOS = $(DOCS)/CuadernosElectronicos
+TRANSPARENCIAS = $(DOCS)/Transparencias
+
+# Patrón para los archivos fuente
+SRC_FILES = $(LECCIONES_SRC)/Lecc*.org
+
+# Regla principal
+all: notebooksYslides calendario
+	emacs -q -l ~/Software/scimax/init.el -batch -nw -l publica.el
+
+calendario: $(DOCS)/Calendario-Econometria-Aplicada.pdf
+
+$(DOCS)/Calendario-Econometria-Aplicada.pdf:
+	emacs --batch Calendario/README.org -l org -f org-babel-tangle
+	cd Calendario && make Calendario-Econometria-Aplicada.pdf
+
+notebooksYslides: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES)))
+
+# Regla para generar notebooks y slides
+$(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
+	make directorios 
+	make series_formales
+	cp -a $(LECCIONES_SRC)/*.bib $(LECCIONES)
+	cp -a $< $(LECCIONES)
+	emacs -q -l ~/Software/scimax/init.el $(LECCIONES)/$(@F:.ipynb=.org) --batch -f org-babel-execute-buffer --kill
+	mv $(LECCIONES)/$(@F:.ipynb=.ipynb) $(CUADERNOS)
+	mv $(LECCIONES)/$(@F:.ipynb=.slides.html) $(TRANSPARENCIAS)
+
+series_formales: $(LECCIONES_SRC)/src/implementacion_series_formales.org
+	make directorios 
+	cp $< $(LECCIONES)/src/
+	emacs --batch $(LECCIONES)/src/implementacion_series_formales.org -l org -f org-babel-tangle
+	ln -s -r $(LECCIONES)/src/implementacion_series_formales.py $(LECCIONES)/
+	cp -a $(LECCIONES)/src/implementacion_series_formales.py $(CUADERNOS)/src/
+	ln -s -r $(CUADERNOS)/src/implementacion_series_formales.py $(CUADERNOS)/
+	emacs -q -l ~/Software/scimax/init.el -batch -nw --eval "(require 'ox-ipynb)" --eval "(ox-ipynb-export-org-file-to-ipynb-file \"lecciones/src/implementacion_series_formales.org\")"
+	jupyter nbconvert --execute --inplace $(LECCIONES)/src/implementacion_series_formales.ipynb
+	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES)/src/implementacion_series_formales.ipynb
+	jupyter nbconvert --execute --to html $(LECCIONES)/src/implementacion_series_formales.ipynb
+	mv $(LECCIONES)/src/implementacion_series_formales.ipynb $(CUADERNOS)
+	mv $(LECCIONES)/src/implementacion_series_formales.slides.html $(TRANSPARENCIAS)
+	mv $(LECCIONES)/src/implementacion_series_formales.html $(DOCS)
+	touch $@
+
+directorios: 
+	mkdir -v -p $(LECCIONES)/src
+	mkdir -v -p $(LECCIONES)/img
+	mkdir -v -p $(DOCS)/img
+	mkdir -v -p $(DOCS)/pdfs
+	mkdir -v -p $(TRANSPARENCIAS)
+	mkdir -v -p $(CUADERNOS)/src
+	ln -s -r $(DOCS)/img/ $(TRANSPARENCIAS)/
+	ln -s -r $(DOCS)/img/ $(CUADERNOS)/
+	touch directorios
+
+clean:
+	rm -r -f $(LECCIONES)
+
+cleanAll: clean
+	find $(DOCS)/ -mindepth 1 ! -name 'README.org' -exec rm -rf {} +
+	rm -f directorios
+	rm -f series_formales
+
+#+END_SRC
+
+* COMMENT basura                                                   :noexport:
+
+Makefile para que sea totalmente compatible con el build.yml que definimos. Los cambios clave son:
+
+Se utiliza emacs --batch con --load ~/.emacs.d/no-tlmgr.el para evitar el problema con tlmgr.
+
+Se asegura que ox-ipynb y ob-jupyter se cargan explícitamente.
+
+Se evita la evaluación de bloques automáticamente, salvo en los casos que lo necesitas.
+
+Se mantiene toda tu lógica de directorios, copias, y nbconvert.
+
+
+$(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
+	make directorios
+	make series_formales
+	cp -a $(LECCIONES_SRC)/*.bib $(LECCIONES)
+	cp -a $< $(LECCIONES)
+	emacs --batch \
+	  --load ~/.emacs.d/no-tlmgr.el \
+	  --load ~/Software/scimax/init.el \
+	  --eval "(setq org-confirm-babel-evaluate nil)" \
+	  --eval "(require 'ox-ipynb)" \
+	  --eval "(require 'ob-jupyter)" \
+	  $(LECCIONES)/$(@F:.ipynb=.org) \
+	  -f org-babel-execute-buffer --kill
+	mv $(LECCIONES)/$(@F:.ipynb=.ipynb) $(CUADERNOS)
+	mv $(LECCIONES)/$(@F:.ipynb=.slides.html) $(TRANSPARENCIAS)
+
+$(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
+	make directorios
+	make series_formales
+	cp -a $(LECCIONES_SRC)/*.bib $(LECCIONES)
+	cp -a $< $(LECCIONES)
+	emacs --batch \
+	  --load ~/.emacs.d/no-tlmgr.el \
+	  --load ~/Software/scimax/init.el \
+	  --eval "(require 'ox-ipynb)" \
+	  --eval "(org-babel-execute-buffer)" \
+	  $(LECCIONES)/$(@F:.ipynb=.org) \
+	  -f org-babel-execute-buffer --kill
+	mv $(LECCIONES)/$(@F:.ipynb=.ipynb) $(CUADERNOS)
+	mv $(LECCIONES)/$(@F:.ipynb=.slides.html) $(TRANSPARENCIAS)
+
+#	#emacs -q -l ~/Software/scimax/init.el $(LECCIONES)/$(@F:.ipynb=.org) --batch -f org-babel-execute-buffer --kill
+
+#+BEGIN_SRC emacs-lisp :tangle publica.el.old :results silent
+(require 'ox-publish)
+
+(defun my-org-latex-publish-to-pdf (plist filename pub-dir)
+  "Publica un archivo Org como PDF después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(let* ((base-directory "./lecciones/")
+       (public-directory "./docs/")
+       (org-export-with-broken-links t)
+       (org-publish-project-alist `(("html"
+				     :base-directory ,base-directory
+				     :base-extension "org"
+                                     :publishing-directory ,public-directory
+				     :exclude "src\\|docs\\|Calendario"
+				     :recursive t
+				     :publishing-function org-html-publish-to-html
+				     :auto-preamble t
+				     :auto-sitemap nil)
+				    
+				    ("pdf"
+				     :base-directory ,base-directory
+				     :base-extension "org"
+				     :publishing-directory ,(concat public-directory "pdfs")
+ 				     :exclude "src\\|docs\\|Calendario"
+				     :recursive t
+				     :publishing-function my-org-latex-publish-to-pdf
+				     :auto-preamble t
+				     :auto-sitemap nil)
+				    
+				    ("static-html"
+				     :base-directory ,base-directory
+				     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|txt\\|svg\\|aiff\\|csv\\|gdt\\|inp\\|ipynb"
+				     :publishing-directory ,public-directory
+				     :exclude "src\\|docs\\|Calendario"
+				     :recursive t
+				     :publishing-function org-publish-attachment)
+
+				    ;; ... all the components ...
+				    ("scimax-eln" :components ("html" "static-html" "pdf")))))
+
+  (org-publish "scimax-eln" t))
+
+  ;; Customize the HTML output
+  (setq org-html-validation-link nil            ;; Don't show validation link
+        org-html-head-include-scripts nil       ;; Use our own scripts
+        org-html-head-include-default-style nil ;; Use our own styles
+        ;org-html-head "<link rel=\"stylesheet\" href=\"https://cdn.simplecss.org/simple.min.css\" />"
+   )
+
+  (let* ((base-directory "./")
+         (org-export-with-broken-links t)
+         (org-publish-project-alist `(("index"
+  				     :base-directory ,base-directory
+  				     :base-extension "org"
+  				     :publishing-directory ,(concat base-directory "docs")
+  				     :exclude "docs"
+  				     :recursive nil
+  				     :publishing-function org-html-publish-to-html
+  				     :auto-preamble t
+  				     :auto-sitemap t
+                                       :with-author nil           ;; Don't include author name
+                                       :with-creator nil          ;; Include Emacs and Org versions in footer
+                                       :with-toc t                ;; Include a table of contents
+                                       :section-numbers nil       ;; Don't include section numbers
+                                       :time-stamp-file nil)
+  				    
+  				    ("static-index"
+  				     :base-directory ,base-directory
+  				     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|txt\\|svg\\|aiff"
+  				     :publishing-directory ,(concat base-directory "docs")
+  				     :exclude "docs"
+  				     :recursive nil
+  				     :publishing-function org-publish-attachment)
+
+  				    ;; ... all the components ...
+  				    ;("scimax-eln" :components ("html" "static-html" "pdf")))))
+  				    ("web-repositorio" :components ("index" "static-index")))))
+
+    (org-publish "web-repositorio" t))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(require 'ox-publish)
+
+(defun my-org-babel-execute-buffer ()
+  "Ejecuta todos los bloques de código en el buffer actual."
+  (org-babel-execute-buffer))
+
+(defun my-org-html-publish-to-html (plist filename pub-dir)
+  "Publica un archivo Org como HTML después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    ;(my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-html-publish-to-html plist filename pub-dir)))
+
+(defun my-org-latex-publish-to-pdf (plist filename pub-dir)
+  "Publica un archivo Org como PDF después de ejecutar los bloques de código."
+  (with-current-buffer (find-file-noselect filename)
+    ;(my-org-babel-execute-buffer) ; Ejecuta los bloques
+    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(let* ((base-directory "./lecciones/")
+       (public-directory "./docs/")
+       (org-export-with-broken-links t)
+       (org-publish-project-alist `(("html"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,public-directory
+                                     :exclude ".ipynb_checkpoints\\|00Notas.*\\|org-publisg.*\\|kk.*\\|src"
+                                     :recursive t
+                                     :auto-preamble t
+                                     :auto-sitemap t
+				     :sitemap-title "Lecciones"
+                                     :publishing-function my-org-html-publish-to-html
+    				     :exclude-tags ("pdf"))
+                                   
+                                    ("pdf"
+                                     :base-directory ,base-directory
+                                     :base-extension "org"
+                                     :publishing-directory ,(concat public-directory "pdfs")
+                                     :exclude ".ipynb_checkpoints\\|src\\|sitemap.pdf"
+                                     :recursive t
+                                     :auto-preamble t
+                                     :auto-sitemap nil
+                                     :publishing-function my-org-latex-publish-to-pdf)
+                                    
+                                    ("static-html"
+                                     :base-directory ,base-directory
+                                     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|svg\\|aiff\\|csv\\|gdt\\|inp\\|ipynb\\|html"
+                                     :publishing-directory ,public-directory
+                                     :exclude "docs\\|src\\|EjerciciosHide\\|.ipynb_checkpoints\\|org-publisg.*\\|kk.*\\|Lecc*.pdf\\|sitemap.pdf"
+                                     :recursive t
+                                     :publishing-function org-publish-attachment)
+
+                                    ("scimax-eln" :components ("html" "static-html" "pdf")))))
+
+  (org-publish "scimax-eln" t))
+
+  ;; Customize the HTML output
+  (setq org-html-validation-link nil            ;; Don't show validation link
+        org-html-head-include-scripts nil       ;; Use our own scripts
+        org-html-head-include-default-style nil ;; Use our own styles
+        org-html-head "<link rel=\"stylesheet\" href=\"https://cdn.simplecss.org/simple.min.css\" />")
+
+  (let* ((base-directory "./")
+         (org-export-with-broken-links t)
+         (org-publish-project-alist `(("index"
+  				     :base-directory ,base-directory
+  				     :base-extension "org"
+  				     :publishing-directory ,(concat base-directory "docs")
+  				     :exclude "docs\\|org-publisg.org\\|chatCopilot.org"
+  				     :recursive nil
+  				     :publishing-function org-html-publish-to-html
+  				     :auto-preamble t
+  				     :auto-sitemap t
+                                       :with-author nil           ;; Don't include author name
+                                       :with-creator nil          ;; Include Emacs and Org versions in footer
+                                       :with-toc t                ;; Include a table of contents
+                                       :section-numbers nil       ;; Don't include section numbers
+                                       :time-stamp-file nil)
+  				    
+  				    ("static-index"
+  				     :base-directory ,base-directory
+  				     :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|txt\\|svg\\|aiff"
+  				     :publishing-directory ,(concat base-directory "docs")
+  				     :exclude "docs\\|org-publisg.org\\|chatCopilot.org"
+  				     :recursive nil
+  				     :publishing-function org-publish-attachment)
+
+  				    ;; ... all the components ...
+  				    ;("scimax-eln" :components ("html" "static-html" "pdf")))))
+  				    ("web-repositorio" :components ("index" "static-index")))))
+
+    (org-publish "web-repositorio" t))
+
+#+END_SRC
+
+#+RESULTS:
+
+Solución práctica para asegurar publicación:
+
+Verifica el flujo de publicación:
+
+Asegúrate de que los archivos en docs/ sean realmente nuevos o modificados en cada build, y que no estén descartados por .gitignore.
+El flujo actual está bien; los archivos están ahí.
+Para forzar la publicación aunque no haya cambios detectados:
+
+Puedes usar el parámetro allow_empty_commit: true en la acción peaceiris/actions-gh-pages para que se realice el commit aunque no haya cambios detectados.
+O usa force_orphan: true para recrear el historial cada vez (útil si quieres limpiar la rama gh-pages y publicar todo desde cero).
+Ejemplo modificado:
+
+YAML
+- name: Deploy docs to gh-pages
+  uses: peaceiris/actions-gh-pages@v4
+  with:
+    github_token: ${{ secrets.GITHUB_TOKEN }}
+    publish_dir: ./docs
+    publish_branch: gh-pages
+    allow_empty_commit: true
+O bien:
+
+YAML
+- name: Deploy docs to gh-pages
+  uses: peaceiris/actions-gh-pages@v4
+  with:
+    github_token: ${{ secrets.GITHUB_TOKEN }}
+    publish_dir: ./docs
+    publish_branch: gh-pages
+    force_orphan: true
+Opcional: Limpia la rama gh-pages antes de publicar. Si prefieres que solo se publique lo actual, el parámetro force_orphan: true borra todo lo anterior en gh-pages y sube solo lo de docs.
+
+Resumen:
+Tus archivos se generan correctamente. Si no se publica nada nuevo, usa allow_empty_commit: true para asegurar el commit, o force_orphan: true para limpiar y publicar siempre el contenido nuevo. Así garantizas que la acción de deploy siempre actualice la rama gh-pages, incluso si no hay cambios detectados por git.
+

@@ -1,0 +1,281 @@
+#+Title: Lección 1 --- Número de viajeros internacionales
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+#+OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+# +PROPERTY: header-args :tangle ./guiones/lecc01-airlinePass.inp
+
+#+OPTIONS: :eval yes
+#+PROPERTY: header-args :eval yes
+
+#+INFOJS_OPT: view:overview
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# +SETUPFILE: ../css/simple_inlineUCM.theme
+# +SETUPFILE: ../css/readtheorg_inline.theme
+# ###########
+
+#+latex_class_options: [10pt]
+
+#+LATEX_HEADER: \usepackage[spanish]{babel}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+# +LaTeX_HEADER: \usepackage{framed}
+#+LaTeX_HEADER: \usepackage{listings}
+#+LaTeX_HEADER: \input{hansl.tex}
+#+LaTeX_HEADER: \lstnewenvironment{hansl-gretl}
+#+LaTeX_HEADER: {\lstset{language={hansl},basicstyle={\ttfamily\footnotesize},numbers,rame=single,breaklines=true}}
+#+LaTeX_HEADER: {}
+#+LaTeX_HEADER: \newcommand{\hansl}[1]{\lstset{language={hansl},basicstyle={\ttfamily\small}}\lstinline{#1}}
+
+#+LaTeX_HEADER: \lstset{backgroundcolor=\color{lightgray!20}, }
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+
+#+LATEX: \maketitle
+
+
+* Número de viajeros internacionales
+
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones/Practicas/guiones/lecc01-airlinePass.inp][lecc01-airlinePass.inp]] |
+
+En esta primera práctica con [[https://gretl.sourceforge.net/es.html][Gretl]] reproduciremos el ejemplo visto en clase, en el que hemos aplicado distintas transformaciones a los datos hasta obtener una serie temporal que podemos asumir que podría ser una realización de un proceso estocástico estacionario.  Los datos son mensuales y contienen el número de viajeros internacionales (en miles) en las líneas aéreas norteamericanas en los años 1949--1960 que aparece en manual de Box & Jenkins.
+
+*Objetivo*
+
+1. Reproducir el primer ejemplo visto en clase.
+2. Mostrar datos.
+3. Transformarlos
+4. Generar gráficos.
+
+Comencemos cargando los datos:
+
+*/~Archivo --> Abrir datos --> Archivo de muestra~/* y en la pestaña
+*/~Gretl~/* seleccione =bjg=.
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+NAME: Lectura del fichero de datos
+#+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no
+open bjg
+#+end_src
+
+#+latex: }
+
+* Actividad 1 - mostrar datos
+***** Visualice los datos de precios y tamaños de las casas
+- En la ventana principal de [[https://gretl.sourceforge.net/es.html][Gretl]], marque con el ratón la variable: =g=.
+- ``Pinche'' sobre ella con el botón derecho del ratón.
+- Seleccione */~mostrar valores~/* del menú desplegable que se ha abierto al pinchar.
+  
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+  /o bien teclee en linea de comandos/:
+    #+NAME: Mostramos los valores de los datos en columna
+    #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+print -o g
+    #+end_src
+
+    #+RESULTS: Mostramos los valores de los datos en columna
+
+  #+latex: }
+
+#+latex: \vspace{-3pt}   
+  
+***** Ayuda
+Para consultar la documentación sobre cualquier comando, puede emplear el menú desplegable */~Ayuda~/* que aparece arriba, a la derecha de la ventana principal de [[https://gretl.sourceforge.net/es.html][Gretl]].
+  + */~Ayuda -> Guía de Instrucciones~/* y ``pinche'' sobre */~print~/*
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/: =help print=
+#+latex: }
+    
+* Actividad 2 - Gráfico de series temporales
+***** Scatter plot
+- Marque la variable =g= (pulsando ~ctrl~ y pinchando con el botón derecho del ratón sobre ella). Elija */~Gráfico de series temporales~/*
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+  /o bien teclee en linea de comandos/: =gnuplot g --time-series --with-lines=
+  #+latex: }
+
+***** Guardar gráfico como /icono/ para editarlo más tarde
+- ``Pinche'' con el botón derecho sobre la ventana del gráfico.
+- Seleccione */~Guardar a sesión como icono~/*
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+  /o bien teclee en linea de comandos/:
+    #+NAME: Guardamos scatterplot como icono
+    #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+AirlinePassengers <- gnuplot g --time-series --with-lines
+    #+end_src
+
+    #+RESULTS: Guardamos scatterplot como icono
+
+    (=AirlinePassengers= /es el nombre con el que se guardará el icono/)
+  #+latex: }
+
+En la zona inferior izquierda de la ventana principal puede ver una serie de iconos. Uno de ellos es la */~vista de iconos de sesión~/*.
+
+
+* Actividad 3 - Transformar logarítmicamente los datos
+Aunque el fichero ya contiene el logaritmo de la serie, vamos a transformar logarítmicamente los datos originales.
+
+Seleccione con el ratón la variable =g= y luego pulse en el menú desplegable */~Añadir~/* que aparece arriba, en el centro de la ventana principal de [[https://gretl.sourceforge.net/es.html][Gretl]].
+  + */~Añadir -> Logaritmos de las variables seleccionadas~/*
+
+    #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+    /o bien teclee en linea de comandos/: 
+      #+NAME: Aplicamos la transformación logarítmica
+      #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+logs g
+      #+end_src
+
+      #+RESULTS: Aplicamos la transformación logarítmica
+
+    #+latex: }
+Entre las variables aparecerá una nueva con el prefijo =l_=, es decir, en este caso aparecerá la variable =l_g= (que contiene exactamente la misma serie temporal que =lg=).
+
+Genere el gráfico de series temporales de esta nueva serie y guárdelo como un nuevo icono (use un nombre suficientemente descriptivo para el icono, por ejemplo =LogsAirlinePassengers=)
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+  #+NAME: Guardamos scatterplot como icono
+  #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+LogsAirlinePassengers <- gnuplot l_g --time-series --with-lines
+  #+end_src
+#+latex: }
+
+* Actividad 4 - Primera diferencia de los datos en logaritmos
+
+Seleccione con el ratón la variable =l_g= y luego pulse en el menú desplegable */~Añadir~/* que aparece arriba, en el centro de la ventana principal de [[https://gretl.sourceforge.net/es.html][Gretl]].
+  + */~Añadir -> Primeras diferencias de las variables seleccionadas~/*
+
+    #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+    /o bien teclee en linea de comandos/: 
+      #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+diff l_g
+      #+end_src
+    #+latex: }
+
+Entre las variables aparecerá una nueva con el prefijo =d_=, es decir, en este caso aparecerá la variable =d_l_g=.
+
+Genere el gráfico de series temporales de esta nueva serie y guárdelo como un nuevo icono (Use un nombre suficientemente descriptivo, por ejemplo =D_LogsAirlinePassengers=)
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+D_LogsAirlinePassengers <- gnuplot d_l_g --time-series --with-lines
+#+end_src
+#+latex: }
+
+* Actividad 5 - El logaritmo no es una función lineal
+
+Aunque el operador primera diferencia es lineal, la función logaritmo no lo es. Comprobemos que no es lo mismo la primera diferencia del logaritmo (calculado en la actividad anterior) que el logaritmo de la
+diferencia. 
+
+- Añada la primera diferencia de =g= y luego el logaritmo de =d_g=.
+- Marque con el ratón =d_l_g= y =l_d_g= y muestre sus valores; verá que son distintos (no solo eso, dado que la función logaritmo solo está definida para números positivos, en =l_d_g= parecen una gran cantidad de valores ausentes).
+
+  #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+  /en linea de comandos/: 
+    #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+diff g
+logs d_g
+print -o d_l_g l_d_g
+    #+end_src
+  #+latex: }
+
+* Actividad 6 - Diferencia de orden 12 (o estacional) de la primera diferencia de los datos en logaritmos
+Seleccione con el ratón la variable =d_l_g= y luego pulse en el menú desplegable */~Añadir~/* que aparece arriba, en el centro de la ventana principal de [[https://gretl.sourceforge.net/es.html][Gretl]].
+  + */~Añadir -> Diferencias estacionales de las variables seleccionadas~/*
+
+    #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+    /o bien teclee en linea de comandos/: 
+      #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+sdiff d_l_g
+      #+end_src
+    #+latex: }
+
+Entre las variables aparecerá una nueva con el prefijo =sd_=, es decir, en este caso aparecerá la variable =sd_d_l_g=.
+
+Genere el gráfico de series temporales de esta nueva serie y guárdelo como un nuevo icono (Use un nombre suficientemente descriptivo, por ejemplo =D12_D_LogsAirlinePassengers=)
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+  #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+D12_D_LogsAirlinePassengers <- gnuplot sd_d_l_g --time-series --with-lines
+  #+end_src
+#+latex: }
+
+Observe que en la serie obtenida ya no se observa ni tendencia ni un componente cíclico estacional.
+
+* Actividad 5 - El orden en que se aplican los operadores diferencia y diferencia estacional es irrelevante
+
+1) calcule la diferencia estacional de la serie en logaritmos =l_g= y genere su gráfico
+
+   #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+   /en linea de comandos/: 
+     #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+sdiff l_g
+D12_LogsAirlinePassengers <- gnuplot sd_l_g --time-series --with-lines
+     #+end_src
+   #+latex: }
+
+   Observe que en la serie obtenida ya no el componente cíclico estacional, pero sin embargo el promedio de cada año "deambula" alrededor del valor $0.1$ en ciclos de unos 4 años 
+
+2) ahora tome una primera diferencia de la serie anterior (sd_l_g) y compruebe las diferencias entre la serie resultante (=d_sd_l_g=) y la obtenida en la actividad anterior (=sd_d_l_g=).
+
+   #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+   /en linea de comandos/: 
+     #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+diff sd_l_g
+print -o sd_d_l_g  d_sd_l_g
+     #+end_src
+   #+latex: }
+
+Es decir, el orden en que se tomen la diferencia ordinaria y la diferencia estacional es irrelevante (pero recuerde que no pasa lo mismo con la transformación logarítmica, que debe la primera transformación aplicada a los datos).
+
+# +LATEX: \clearpage
+#+latex: {\vspace{10pt}
+#+latex: \noindent
+*Código completo de la práctica* ~lecc01-airlinePass.inp~
+#+latex: \vspace{10pt}
+\lstinputlisting{guiones/lecc01-airlinePass.inp}
+#+LATEX: \clearpage }

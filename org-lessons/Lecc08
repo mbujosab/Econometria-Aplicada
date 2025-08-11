@@ -1,0 +1,657 @@
+#+TITLE: Econometría Aplicada. Lección 8
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+
+# +OPTIONS: toc:nil
+
+# +EXCLUDE_TAGS: pngoutput noexport
+
+#+startup: shrink
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: readtheorg_inline.theme
+# +SETUPFILE: simple_inlineUCM.theme  
+# +SETUPFILE: bigblow_inline.theme
+# +SETUPFILE: darksun.theme
+# +SETUPFILE: white_clean.theme  
+# ###########
+
+#+REVEAL_INIT_OPTIONS: slideNumber:true
+
+#+LATEX_HEADER_EXTRA: \usepackage[spanish]{babel}
+#+LATEX_HEADER_EXTRA: \usepackage{lmodern}
+#+LATEX_HEADER_EXTRA: \usepackage{tabularx}
+#+LATEX_HEADER_EXTRA: \usepackage{booktabs}
+
+#+LaTeX_HEADER: \newcommand{\lag}{\mathsf{B}}
+#+LaTeX_HEADER: \newcommand{\Sec}[1]{\boldsymbol{#1}}
+#+LaTeX_HEADER: \newcommand{\Pol}[1]{\boldsymbol{#1}}
+
+#+LATEX: \maketitle
+
+# M-x jupyter-refresh-kernelspecs
+
+# C-c C-v C-b ejecuta el cuaderno electrónico
+
+#+OX-IPYNB-LANGUAGE: jupyter-R
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+#+BEGIN_SRC emacs-lisp :exports none :results silent
+(use-package ox-ipynb
+  :load-path (lambda () (expand-file-name "ox-ipynb" scimax-dir)))
+
+(setq org-babel-default-header-args:jupyter-R
+      '((:results . "value")
+	(:session . "jupyter-R")
+	(:kernel . "ir")
+	(:pandoc . "t")
+	(:exports . "both")
+	(:cache .   "no")
+	(:noweb . "no")
+	(:hlines . "no")
+	(:tangle . "no")
+	(:eval . "never-export")))
+
+(require 'jupyter-R)
+;(require 'jupyter)
+
+(org-babel-do-load-languages 'org-babel-load-languages org-babel-load-languages)
+
+(add-to-list 'org-src-lang-modes '("jupyter-R" . R))
+#+END_SRC
+
+
+#+begin_abstract
+En esta lección repasamos los instrumentos de identificación y
+diagnosis del análisis univariante. Extendemos la notación para
+incorporar modelos con raíces unitarias. Presentamos modelos
+estacionales y finalmente resumimos las ideas principales del análisis
+univariante.
+#+end_abstract
+
+***** COMMENT para Jupyter-Notebook              :noexports:
+\(
+\newcommand{\lag}{\mathsf{B}}
+\newcommand{\Sec}[1]{\boldsymbol{#1}}
+\newcommand{\Pol}[1]{\boldsymbol{#1}}
+\)
+
+
+***  Carga de algunas librerías de R
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :UNNUMBERED: t 
+   :END:
+
+# install.packages(c("readr", "latticeExtra", "tfarima"))
+# library(readr)
+# library(ggplot2)
+# install.packages("pastecs")
+# install.packages("orgutils")
+
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+#+BEGIN_SRC jupyter-R :results silent :exports code
+# cargamos algunas librerías de R
+library(tfarima)      # librería de José Luis Gallego para Time Series
+library(readr)        # para leer ficheros CSV
+library(ggplot2)      # para el scatterplot (alternaticamente library(tidyverse))
+library(ggfortify)    # para pintar series temporales
+library(jtools)       # para representación resultados estimación
+library(zoo)          # para generar objetos ts (time series)
+# y fijamos el tamaño de las figuras que se generan en el notebook
+options(repr.plot.width = 12, repr.plot.height = 4, repr.plot.res = 200)
+#+END_SRC
+
+
+* Identificación y diagnosis
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+
+- Combinando las herramientas gráficas y estadísticas que hemos visto,
+  se puede inferir el modelo subyacente a los datos.
+
+- Este proceso de especificación empírica del modelo es conocido como
+  "/identificación/"
+
+El proceso de identificación puede estructurarse como una secuencia de
+preguntas:
+
+1) ¿Es estacionaria la serie?
+2) ¿Tiene una media significativa?
+3) ¿Es persistente la ACF? ¿sigue alguna pauta reconocible?
+4) ¿Es persistente la PACF? ¿sigue alguna pauta reconocible?
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+- La identificación se basa en estadísticos, como la media muestral o
+  las autocorrelaciones, cuya representatividad respecto de los
+  momentos teóricos depende de la estacionariedad (y la ergodicidad).
+
+- Tras inducir la estacionariedad, especificamos un modelo tentativo
+  decidiendo cuál de las funciones ACF o PACF es finita y cuál es
+  persistente
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{3.4cm}p{5.4cm}p{5.4cm}
+|                    | *ACF finita*                                             | *ACF persistente*                |
+|--------------------+----------------------------------------------------------+----------------------------------|
+| *PACF finita*      | _Ruido blanco_: retardos conjuntamente NO significativos | _AR_: orden indicado por la PACF |
+| *PACF persistente* | _MA_: orden indicado por la ACF                          | _ARMA_                           |
+
+La parametrización de mayor orden en modelos ARMA con series
+económicas suele ser ARMA($2,1$)
+
+** Instrumentos de identificación
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{2.3cm}p{5.5cm}p{7.2cm}
+|                                                         | Instrumento                                                                                                                        | Objetivo y observaciones                                                                                                            |
+|---------------------------------------------------------+------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------|
+| Transf. @@latex:\mbox{@@logarítmica@@latex:}@@          | Gráficos rango-media y serie temporal                                                                                              | Conseguir independizar la variabilidad de los datos de su nivel. Las series económicas necesitan esta transformación frecuentemente |
+| $d$, orden de @@latex:\mbox{@@diferenciación@@latex:}@@ | Gráfico de la serie temporal. ACF (caída lenta y lineal). @@latex:\mbox{@@Contrastes@@latex:}@@ de raíz unitaria (DF o ADF y KPSS) | Conseguir que los datos fluctúen en torno a una media estable. En series económicas, $d$ suele ser 0, 1 ó 2                         |
+| Constante                                               | Media de la serie transformada. @@latex:\mbox{@@Desviación@@latex:}@@ típica de la media                                           | Si la media de la serie transformada es significativa, el modelo debe incluir un término constante                                  |
+| $p$, orden AR                                           | Si PACF de orden $p$ y ACF infinita                                                                                                | En series económicas $p$ suele ser $\leq2$                                                                                          |
+| $q$, orden MA                                           | Si ACF de orden $q$ y PACF infinita                                                                                                | En series económicas q suele ser $\leq1$                                                                                            |
+
+** Instrumentos de diagnosis
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{2.3cm}p{5.5cm}p{7.2cm}
+|                                                         | Instrumento                                               | Posible diagnóstico                                                                                             |
+|---------------------------------------------------------+-----------------------------------------------------------+-----------------------------------------------------------------------------------------------------------------|
+| $d$, orden de @@latex:\mbox{@@diferenciación@@latex:}@@ | /Proximidad a 1/ de alguna raíz de los polinomios AR o MA | Conviene diferenciar si la raíz es AR; o quitar una diferencia si es MA (/salvo si hay tendencia determinista/) |
+| $d$, orden de @@latex:\mbox{@@diferenciación@@latex:}@@ | Gráfico de los residuos                                   | Si muestra rachas largas de residuos positivos o negativos, puede ser necesaria una diferencia adicional.       |
+| Constante                                               | Media de los residuos                                     | Si es significativa: añadir una  constante                                                                      |
+| Constante                                               | Constante estimada                                        | Si NO es significativa: el modelo mejorará quitando el término constante                                        |
+| $p$ y $q$,                                              | Contrastes de significación de los parámetros estimados   | Pueden sugerir eliminar parámetros irrelevantes                                                                 |
+| $p$ y $q$,                                              | ACF/PACF residuos. Test Q de Ljung-Box                    | Indican posibles pautas de autocorrelación no modelizadas                                                       |
+| $p$ y $q$,                                              | Correlaciones elevadas entre los parámetros estimados     | Puede ser síntoma de sobreparametrización                                                                       |
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Aún, una vez superadas las pruebas de diagnostico, se puede aplicar un
+análisis exploratorio consistente en añadir parámetros AR y/o MA, para
+comprobar si resultan significativos y mejoran el modelo
+ 
+
+* Raíces unitarias
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+** Notación: operadores retardo y diferencia y modelos ARIMA
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+El operador diferencia $\nabla$ se define a partir del operador retardo como $\nabla=(1 - \mathsf{B})$:
+$$\nabla Y_t = (1 - \mathsf{B})Y_t = Y_t - Y_{t-1}$$
+El operador diferencia estacional es 
+${\nabla}_{_S} = (1 - \mathsf{B}^S)$:
+$$\nabla_{_S}Y_t = (1 - \mathsf{B}^S)Y_t = Y_t - Y_{t-S}$$
+
+*** Notación: ARIMA
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+Extendemos la notación a procesos con raíces autorregresivas unitarias
+Con ``ARIMA($p,d,q$)''; donde $d$ indica el número de diferencias que
+la serie necesita para ser $I(0)$,
+$$\boldsymbol{\phi}_p*\nabla^d*\boldsymbol{Y} = \boldsymbol{\theta}_q*
+\boldsymbol{U}$$ es decir $$\boldsymbol{\phi}_p(\mathsf{B})\nabla^d
+Y_t = \boldsymbol{\theta}_q(\mathsf{B}) U_t; \quad t\in\mathbb{Z}$$
+
+** Raíces unitarias en los polinomios AR y MA
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+   
+Cuando un polinomio tiene alguna raíz igual a uno se dice que tiene
+“raíces unitarias”.
+
+Si el polinomio AR estimado tiene alguna raíz "próxima a uno" es 
+síntoma de infradiferenciación.
+
+Si el polinomio MA estimado tiene alguna raíz "próxima a uno" es
+síntoma de sobrediferenciación.
+# a) sobrediferenciación... salvo cuando...
+# b) antes de diferenciar hubiera una tendencia determinista (que podemos comprobar, por ejemplo, con un test ADF).
+
+Ejemplos:
+# que ilustran los tres casos:
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{7cm}p{7cm}
+| Modelo expresado con raíces unitarias en $\boldsymbol{\phi}$ o $\boldsymbol{\theta}$ | Modelo equivalente sin raíces unitarias en $\boldsymbol{\phi}$ o $\boldsymbol{\theta}$ |
+|--------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------|
+| $(1-1.5\mathsf{B}+.5\mathsf{B}^2) Y_t = U_t$                                         | ${\color{blue}{(1-0.5\mathsf{B})\nabla Y_t=U_t}}$                                      |
+| $(1-.5\mathsf{B}+0.7\mathsf{B}^2)\nabla^2Y_t=(1-\mathsf{B})U_t$                      | ${\color{blue}{(1-.5\mathsf{B}+0.7\mathsf{B}^2)\nabla Y_t =  U_t}}$                    |
+| $\nabla Y_t = \beta+          (1-\mathsf{B}) U_t$                                    | ${\color{blue}{Y_t = \beta t + U_t}}\quad$ (¡no estacionario!)                         |
+
+** Paseos aleatorios
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+
+Un paseo aleatorio representa una variable cuyos cambios son ruido
+blanco: $$Y_t = \mu + Y_{t-1} + U_t$$
+
+Cuando $\mu\ne0$ se denomina /paseo aleatorio con deriva/: $\;\nabla Y_t = \mu +  U_t$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file ACF-RWcd.png :exports code :results none
+options(repr.plot.width = 12, repr.plot.height = 4, repr.plot.res = 200)
+rwcd <- um(i = "(1 - B)",
+           mu=.25)
+ide(sim(rwcd, n = 500),
+    lag.max = 20,
+    graphs = c("plot", "acf", "pacf", "pgram"),
+    main = "Paseo aleatorio con deriva (mu=0.25)")
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/ACF-RWcd.png]]
+
+El proceso tiene mayor inercia cuanto mayor es $|\mu|$. El signo de
+$\mu$ determina el signo de la pendiente global.
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Cuando $\mu=0$ se denomina sencillamente /paseo aleatorio/: $\;\nabla Y_t =  U_t$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file ACF-RW.png :exports code :results none
+options(repr.plot.width = 12, repr.plot.height = 4, repr.plot.res = 200)
+rw <- um(i = "(1 - B)")
+ide(sim(rw, n = 500), lag.max = 20, graphs = c("plot", "acf", "pacf", "pgram"), main = "Paseo aleatorio")
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/ACF-RW.png]]
+
+
+
+
+
+* Modelos ARIMA estacionales (SARIMA)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+   
+El período estacional $S$ es el número mínimo de observaciones
+necesarias para recorrer un ciclo estacional completo. Por ejemplo,
+$S=12$ para datos mensuales, $S=4$ para datos trimestrales, $S=24$
+para datos horarios, etc.
+
+Describiremos comportamientos estacionales con modelos
+ARIMA$(p,d,q)\times(P,D,Q)_S$ 
+# $$\boldsymbol{\phi}_p*\boldsymbol{\Phi}_P*\nabla_{_S}^D*\nabla^d*\boldsymbol{Y} = \boldsymbol{\Theta}_Q*\boldsymbol{\theta}_q* \boldsymbol{U}$$ es decir
+$$\boldsymbol{\phi}_p(\mathsf{B})\boldsymbol{\Phi}_P(\mathsf{B}^S)\nabla^d\nabla_{_S}^D
+Y_t =
+\boldsymbol{\theta}_q(\mathsf{B})\boldsymbol{\Theta}_q(\mathsf{B}^S)
+U_t; \quad t\in\mathbb{Z}$$ donde
+\begin{align*}
+\boldsymbol{\Phi}_P(\mathsf{B}^S)  = & 1-\Phi_1\mathsf{B}^{1\cdot S}-\Phi_2\mathsf{B}^{2\cdot S}-\cdots-\Phi_P\mathsf{B}^{P\cdot S}\\
+\boldsymbol{\Theta}_Q(\mathsf{B}^S)  = & 1-\Theta_1\mathsf{B}^{1\cdot S}-\Theta_2\mathsf{B}^{2\cdot S}-\cdots-\Theta_Q\mathsf{B}^{Q\cdot S}\\
+{\nabla}_{_S}^D = & (1 - \mathsf{B}^S)^D
+\end{align*}
+Es decir, el modelo consta de polinomios autorregresivos y de media
+móvil tanto regulares (en minúsculas) como estacionales (en
+mayúsculas).
+#+latex: \medskip
+ 
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Veamos un ejemplo de un modelo MA($1$) estacional y otro de un modelo
+AR($1$) estacional...
+
+** MA(1) estacional con raíz positiva
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file ACF-SMA1p.png :exports code :results none 
+options(repr.plot.width = 12, repr.plot.height = 2, repr.plot.res = 200)
+SMA1 <- um(ma = "(1 - 0.9B12)")
+display(list(SMA1), lag.max = 50, byrow = TRUE)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+MA($1$) estacional:
+$\quad\boldsymbol{\Theta}=1-0.9z^{12}\quad\Rightarrow\quad X_t= (1-0.9
+\mathsf{B}^{12})U_t$
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/ACF-SMA1p.png]]
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :exports result  :results value table pp :results none 
+roots(SMA1)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+1. 
+   |          Real |     Imaginary |  Modulus |  Frequency | Period | Mult. |
+   |---------------+---------------+----------+------------+--------+-------|
+   |  1.008819e+00 |  1.082287e-14 | 1.008819 | 0.00000000 |    Inf |     1 |
+   |  8.736626e-01 |  5.044094e-01 | 1.008819 | 0.08333333 |   12.0 |     1 |
+   |  8.736626e-01 | -5.044094e-01 | 1.008819 | 0.08333333 |   12.0 |     1 |
+   |  5.044094e-01 | -8.736626e-01 | 1.008819 | 0.16666667 |    6.0 |     1 |
+   |  5.044094e-01 |  8.736626e-01 | 1.008819 | 0.16666667 |    6.0 |     1 |
+   |  1.288336e-14 | -1.008819e+00 | 1.008819 | 0.25000000 |    4.0 |     1 |
+   | -2.057493e-17 |  1.008819e+00 | 1.008819 | 0.25000000 |    4.0 |     1 |
+   | -5.044094e-01 | -8.736626e-01 | 1.008819 | 0.33333333 |    3.0 |     1 |
+   | -5.044094e-01 |  8.736626e-01 | 1.008819 | 0.33333333 |    3.0 |     1 |
+   | -8.736626e-01 | -5.044094e-01 | 1.008819 | 0.41666667 |    2.4 |     1 |
+   | -8.736626e-01 |  5.044094e-01 | 1.008819 | 0.41666667 |    2.4 |     1 |
+   | -1.008819e+00 | -1.257046e-14 | 1.008819 | 0.50000000 |    2.0 |     1 |
+   #+caption: A matrix: 12 × 6 of type dbl
+:END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file Sim-SMA1p.png :exports code :results none
+options(repr.plot.width = 12, repr.plot.height = 5, repr.plot.res = 200)
+ide(sim(SMA1, n = 500),
+    lag.max = 50,
+    lags.at = 12,
+    graphs = c("plot", "acf", "pacf", "pgram"))
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/Sim-SMA1p.png]]
+
+** AR(1) estacional con raíz positiva
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file ACF-SAR1p.png :exports code :results none 
+options(repr.plot.width = 12, repr.plot.height = 2, repr.plot.res = 200)
+SAR1 <- um(ar = "(1 - 0.9B12)")
+display(list(SAR1), lag.max = 50, byrow = TRUE)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+AR($1$) estacional:
+$\quad\boldsymbol{\Phi}=1-0.9z^{12}\quad\Rightarrow\quad (1-0.9
+\mathsf{B}^{12})X_t= U_t$
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/ACF-SAR1p.png]]
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :exports result  :results value table pp :results none 
+roots(SAR1)
+#+END_SRC
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+Evidentemente las raíces son iguales a las del caso anterior (aunque ahora corresponden al polinomio autorregresivo).
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file Sim-SAR1p.png :exports code :results none
+options(repr.plot.width = 12, repr.plot.height = 5, repr.plot.res = 200)
+ide(sim(SAR1, n = 500),
+    lag.max = 50,
+    lags.at = 12,
+    graphs = c("plot", "acf", "pacf", "pgram"))
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/Sim-SAR1p.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Con estos dos ejemplos hemos podido apreciar que:
+- las pautas de autocorrelación son análogas a las de los MA(1) y
+  AR(2), pero ahora los retardos significativos corresponden a los
+  retardos estacionales, es decir, a múltiplos del período estacional
+  $S$.
+
+- En estos ejemplos, en los que $S=12$, los retardos estacionales son:
+  12, 24, 36, 48, 60,...
+
+- las correlaciones correspondientes a los “retardos regulares” (es
+  decir, todos menos menos los estacionales) son no significativas en
+  general.
+#+latex:\bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Veamos ahora un par de ejemplos de modelos estacionales
+multiplicativos (i.e., con parte regular y parte estacional).
+
+** ARIMA$(0,0,1)\times(0,0,1)_{12}$ 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file ACF-MA1SMA1.png :exports code :results none 
+options(repr.plot.width = 12, repr.plot.height = 2, repr.plot.res = 200)
+MA1SMA1 <- um(ma = "(1 - 0.9B)(1 - 0.9B12)")
+display(list(MA1SMA1), lag.max = 50, byrow = TRUE)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . slide)))
+ARIMA$(0,0,1)\times(0,0,1)_{12}$:
+$\quad X_t= (1-0.9 \mathsf{B})(1-0.9 \mathsf{B}^{12})U_t$
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/ACF-MA1SMA1.png]]
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file Sim-MA1SMA1.png :exports code :results none
+options(repr.plot.width = 12, repr.plot.height = 5, repr.plot.res = 200)
+ide(sim(MA1SMA1, n = 500),
+    lag.max = 50,
+    lags.at = 12,
+    graphs = c("plot", "acf", "pacf", "pgram"))
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/Sim-MA1SMA1.png]]
+
+** ARIMA$(1,0,0)\times(0,0,1)_{12}$ 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file ACF-AR1SMA1.png :exports code :results none 
+options(repr.plot.width = 12, repr.plot.height = 2, repr.plot.res = 200)
+AR1SMA1 <- um(ar = "(1 - 0.9B)", ma = "(1 - 0.9B12)")
+display(list(AR1SMA1), lag.max = 50, byrow = TRUE)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+ARIMA$(1,0,0)\times(0,0,1)_{12}$:
+$\quad (1-0.9 \mathsf{B})X_t= (1-0.9 \mathsf{B}^{12})U_t$
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/ACF-AR1SMA1.png]]
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file Sim-AR1SMA1.png :exports code :results none 
+options(repr.plot.width = 12, repr.plot.height = 5, repr.plot.res = 200)
+ide(sim(AR1SMA1, n = 500),
+    lag.max = 50,
+    lags.at = 12,
+    graphs = c("plot", "acf", "pacf", "pgram"))
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/Sim-AR1SMA1.png]]
+
+** ARIMA$(1,0,0)\times(1,0,0)_{12}$ 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file ACF-AR1SAR1.png :exports code :results none 
+options(repr.plot.width = 12, repr.plot.height = 2, repr.plot.res = 200)
+AR1SAR1 <- um(ar = "(1 - 0.9B)(1 - 0.9B12)")
+display(list(AR1SAR1), lag.max = 50, byrow = TRUE, log.spec = TRUE)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+ARIMA$(1,0,0)\times(1,0,0)_{12}$:
+$\quad (1-0.9 \mathsf{B})(1-0.9 \mathsf{B}^{12})X_t= U_t$
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/ACF-AR1SAR1.png]]
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file Sim-AR1SAR1.png :exports code :results none
+options(repr.plot.width = 12, repr.plot.height = 5, repr.plot.res = 200)
+ide(sim(AR1SAR1, n = 500),
+    lag.max = 50,
+    lags.at = 12,
+    graphs = c("plot", "acf", "pacf", "pgram"))
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/Sim-AR1SAR1.png]]
+
+** ARIMA$(0,0,1)\times(1,0,0)_{12}$ 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file ACF-MA1SAR1.png :exports code :results none 
+options(repr.plot.width = 12, repr.plot.height = 2, repr.plot.res = 200)
+MA1SAR1 <- um(ar = "(1 - 0.9B12)", ma = "(1 - 0.9)")
+display(list(MA1SAR1), lag.max = 50, byrow = TRUE, log.spec = TRUE)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+ARIMA$(0,0,1)\times(1,0,0)_{12}$:
+$\quad (1-0.9 \mathsf{B}^{12})X_t= (1-0.9 \mathsf{B})U_t$
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/ACF-MA1SAR1.png]]
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc08/ :file Sim-MA1SAR1.png :exports code :results none 
+options(repr.plot.width = 12, repr.plot.height = 5, repr.plot.res = 200)
+ide(sim(MA1SAR1, n = 500),
+    lag.max = 50,
+    lags.at = 12,
+    graphs = c("plot", "acf", "pacf", "pgram"))
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc08/Sim-MA1SAR1.png]]
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+En estos cuatro ejemplos hemos podido apreciar que
+- en el entorno de los retardos estacionales surgen una serie de
+  coeficientes significativos (“satélites”) que proceden de la
+  interacción entre las estructuras regular y estacional
+- Estos satélites son útiles para identificar en qué retardos
+  estacionales hay autocorrelaciones no nulas, pero no requieren una
+  parametrización especial.
+
+
+* Resumen del análisis univariante de series temporales 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+** Ideas principales respecto a la modelización univariante
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+- Son modelos sin variables exógenas 
+- Resumen la interdependencia temporal con polinomios de órdenes
+  reducidos.
+- Está especialmente indicada para hacer predicción.
+- Parte de dos supuestos sobre el proceso estocástico subyacente:
+  a) es débilmente estacionario
+  b) tiene representación como proceso lineal:
+     $Y_t=\mu+\sum_{j=0}^\infty a_j U_{t-j}$ con
+     $\;\mu\in\mathbb{R},\;$ $\boldsymbol{a}\in\ell^2\;$ y
+     $\;\boldsymbol{U}\sim WN(0,\sigma^2)$
+- (Además se suele asumir normalidad en $U_t$)
+- Utiliza múltiples instrumentos: (a) gráficos (b) función de
+  autocorrelación (c) función de autocorrelación parcial, (d)
+  estadístico Q de Ljung-Box, etc...
+- Si la serie original no "parece" débilmente estacionaria, se induce
+  esta propiedad mediante las transformaciones adecuadas
+
+# Los procesos lineales tienen pautas de autocorrelación teórica características y reconocibles
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{3.4cm}p{5.4cm}p{5.4cm}
+|                    | *ACF finita*                                             | *ACF persistente*                |
+|--------------------+----------------------------------------------------------+----------------------------------|
+| *PACF finita*      | _Ruido blanco_: retardos conjuntamente NO significativos | _AR_: orden indicado por la PACF |
+| *PACF persistente* | _MA_: orden indicado por la ACF                          | _ARMA_                           |
+
+** Metodología
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+   
+Tres fases:
+- Identificación :: Elija una especificación provisional para el
+  proceso estocástico generador de los datos en base a las
+  características medibles de los datos: “dejar que los datos hablen”
+- Estimación :: suele requerir métodos iterativos (/Gretl se encarga de esto/)
+- Diagnosis :: de la calidad estadística del modelo ajustado. Algunos
+  controles estándar son:
+  - Significatividad de los parámetros estimados
+  - Estacionariedad y homocedasticidad de los residuos
+  - ¿Existe un patrón de autocorrelación residual que podría ser
+    modelado? ¿O hemos logrado que los residuos sean */"ruido blanco"/*?
+
+Si la diagnosis no es satisfactoria, se vuelve a la primera fase.
+
+Si la diagnosis es satisfactoria... ¡hemos logrado un modelo
+aceptable!
+
+

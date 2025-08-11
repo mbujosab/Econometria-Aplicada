@@ -1,0 +1,2148 @@
+#+TITLE: Lección 2. Conceptos algebraicos 
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+
+# +OPTIONS: toc:nil
+
+#+TAGS: noexport pdfs
+#+EXCLUDE_TAGS: noexport
+
+#+startup: shrink
+
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/readtheorg_inline.theme
+# ###########
+
+#+latex_class: article
+# +LATEX_CLASS_OPTIONS: [a4paper,11pt,twoside,twocolumn]
+
+#+LATEX_HEADER_EXTRA: \usepackage{fullpage}
+
+#+LATEX_HEADER_EXTRA: \usepackage[spanish]{babel}
+#+LATEX_HEADER_EXTRA: \usepackage{lmodern}
+#+LATEX_HEADER_EXTRA: \usepackage{tabularx}
+#+LATEX_HEADER_EXTRA: \usepackage{booktabs}
+# +LATEX_HEADER: \hypersetup{colorlinks=true, linkcolor=blue}
+
+#+latex_header: \usepackage{natbib}
+
+#+LaTeX_HEADER: \newcommand{\lag}{\mathsf{B}}
+#+LaTeX_HEADER: \newcommand{\Sec}[1]{\boldsymbol{#1}}
+#+LaTeX_HEADER: \newcommand{\Pol}[1]{\boldsymbol{#1}}
+
+#+LATEX_HEADER: \usepackage{amsthm,amsmath}
+#+LATEX_HEADER: \usepackage[appendix=append]{apxproof}
+# +LATEX_HEADER: \usepackage[appendix=inline]{apxproof}
+# +LATEX_HEADER: \usepackage[appendix=strip]{apxproof}
+#+LATEX_HEADER: \renewcommand{\appendixsectionformat}[2]{Demos de la Sección {#1} (#2)}
+#+LATEX_HEADER: \newtheoremrep{theorem}{Teorema} % [section]
+#+LATEX_HEADER: \newtheoremrep{lemma}[theorem]{Lema}
+#+LATEX_HEADER: \newtheoremrep{prop}[theorem]{Proposición}
+#+LATEX_HEADER: \usepackage{marginnote}
+# +LATEX_HEADER: \renewcommand{\mainbodyrepeatedtheorem}{\textup{($\star$) \marginnote{($\star$): Demo en el apéndice}}}
+#+LATEX_HEADER: \renewcommand{\mainbodyrepeatedtheorem}{\textup{\marginnote{\tiny Demo en apéndice}}}
+#+latex_header: \newtheorem{definition}[theorem]{Definición}
+#+latex_header: \newtheorem*{definition*}{Definición}
+# +LATEX_HEADER: \newtheorem{prop}[theorem]{Proposición}
+#+latex_header: \newtheorem{corollary}[theorem]{Corolario}
+#+latex_header: \newtheorem*{corollary*}{Corolario}
+
+#+LATEX_HEADER: \usepackage[indent]{parskip}
+
+
+#+LATEX: \maketitle
+
+#+PROPERTY: header-args:emacs-lisp :eval export
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+BEGIN_SRC emacs-lisp :exports none :results silent
+(use-package ox-ipynb
+  :load-path (lambda () (expand-file-name "ox-ipynb" scimax-dir)))
+(use-package htmlize)
+#+END_SRC
+
+
+#+begin_abstract
+Hoy veremos conceptos algebraicos usados en la modelización ARIMA de series temporales.
+#+end_abstract
+
+- ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc02.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones/Lecc02.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/pdfs/Lecc02.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc02.ipynb][mybinder]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/implementacion_series_formales.ipynb][implementacion_series_formales]])
+
+# - [[https://mbujosab.github.io/EconometriaAplicada-SRC/Lecc04.html][lección en html]]
+# - [[https://mybinder.org/v2/gh/mbujosab/EconometriaAplicada-SRC/HEAD?labpath=Lecc04.ipynb][lección en mybinder]]
+
+***** COMMENT para Jupyter-Notebook                               :noexport:
+\(
+\newcommand{\lag}{\mathsf{B}}
+\newcommand{\Sec}[1]{\boldsymbol{#1}}
+\newcommand{\Pol}[1]{\boldsymbol{#1}}
+\)
+
+
+* Secuencias o sucesiones de números
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+** El espacio vectorial de las secuencias infinitas $\big({\mathbb{R}}^\mathbb{Z},+,\cdot\big)$
+
+Consideremos el conjunto ${\mathbb{R}}^\mathbb{Z}$ de secuencias infinitas de números reales\\
+\[
+ \boldsymbol{x} 
+ \quad = \quad
+ (\ldots,\ x_{-2},\ x_{-1},\ x_{0},\ x_{1},\ x_{2},\ldots) 
+ \quad = \quad
+ (x_t \mid t\in\mathbb{Z}) 
+\]
+Estas secuencias se pueden sumar o multiplicar por escalares.
+Si $\;\boldsymbol{x},\boldsymbol{y}\in{\mathbb{R}}^\mathbb{Z}\;$ y $\;a\in\mathbb{R}$:
+$$\boldsymbol{x}+\boldsymbol{y}=(x_t+y_t \mid t\in\mathbb{Z})$$
+$$a\cdot\boldsymbol{x}=\big(a\cdot x_t \mid t\in\mathbb{Z}\big)$$
+El conjunto ${\mathbb{R}}^\mathbb{Z}$ junto con la suma elemento a elemento $(+)$ y el producto por escalares $(\cdot)$ constituye un *espacio vectorial*.
+
+*** Notación mediante funciones generatrices
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+Como estas secuencias son infinitas (en ambas direcciones), no hay un primer elemento. 
+
+Por eso añadimos subíndices que indiquen la posición de los elementos en la secuencia.
+\[
+ \boldsymbol{x} 
+ \quad = \quad
+ (\ldots,\ x_{-2},\ x_{-1},\ x_{0},\ x_{1},\ x_{2},\ldots) 
+ \quad = \quad
+ (x_t \mid t\in\mathbb{Z}) 
+\]
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Pero al escribir una secuencia concreta 
+\[\boldsymbol{a} = (\ldots,\ 0,\ 1,\ 4,\ 9,\ 2,\ 0,\ldots)\]
+no hay una indicación de la posición absoluta de los elementos (notación poco precisa).
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+*Las /funciones generatrices/ resuelven esta imprecisión*. En ellas, los elementos se separan con el símbolo ``$+$'' y la posición es indicada como potencia del símbolo ``$z$''.
+\[
+ \boldsymbol{a}(z) 
+ \; = \;
+ \cdots + 0z^{-2} + 1z^{-1} + 4z^{0}+ 9z + 2z^{2} + 0z^{3}+\cdots.
+ %\;\equiv\;
+ %1z^{-1} + 4z^{0}+ 9z + 2z^{2}.
+\] 
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Así podemos denotar la secuencia $\boldsymbol{x}$ de manera muy compacta del siguiente modo
+\[
+ \boldsymbol{x}(z)
+ \quad = \quad  
+ \sum_{t=-\infty}^\infty x_t z^t.
+\]
+Nótese que *esta expresión no es una suma*; solo es un modo de expresar una secuencia. Dicha expresión se denomina /función generatriz/.
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+La sucesión $\;\boldsymbol{0}=\sum_{t=-\infty}^\infty 0 z^t\;$ se denomina /sucesión nula/.
+
+Además, denotaremos con $\boldsymbol{1}$ la secuencia constante uno: \((\ldots,1,1,1,\ldots)=\sum_{t\in\mathbb{Z}}1 z^t.\)
+
+*** Características de algunas secuencias
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+En una sucesión $\boldsymbol{a}$ _no nula_ llamamos:
+- Grado :: al menor índice entero que verifica la propiedad: $$j >  grado(\boldsymbol{a}) \Rightarrow a_j=0.$$ 
+  Diremos que el grado de $\boldsymbol{0}$ es menos infinito $\;(grado(\boldsymbol{0}) = -\infty)$.
+- Cogrado :: al mayor índice entero que verifica la propiedad: $$j < cogrado(\boldsymbol{a}) \Rightarrow a_j=0.$$ 
+  Diremos que el cogrado de $\boldsymbol{0}$ es infinito $\;(cogrado(\boldsymbol{0}) = \infty)$.
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Una sucesión $\boldsymbol{a}$ es:
+- Absolutamente sumable ($\ell^1$) :: si $\quad\sum_{t=-\infty}^\infty |a_t| < \infty$ src_latex{(véase Cor. \ref{cor:SumabilidadYConvergenciaAbsoluta})} {{{results(@@latex:(véase Cor. \ref{cor:SumabilidadYConvergenciaAbsoluta})@@)}}}
+- De cuadrado sumable ($\ell^2$) ::   si $\quad\sum_{t=-\infty}^\infty a_t^2 < \infty$
+Una sucesión absolutamente sumable siempre es de cuadrado sumable, $\ell^1\subset \ell^2$. src_latex{(Prop. \ref{prop:l1dentrodel2})} {{{results(@@latex:(Prop. \ref{prop:l1dentrodel2})@@)}}}
+
+*** Algunos subespacios vectoriales de $\big({\mathbb{R}}^\mathbb{Z},+,\cdot\big)$
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+BEGIN_EXPORT latex
+Los siguientes tipos de subconjuntos de secuencias (con la suma y producto por escalares indicados más arriba) resultan ser subespacios vectoriales de  ${\mathbb{R}}^\mathbb{Z}$ .
+#+END_EXPORT
+
+- Secuencias con final :: aquellas con grado (a partir de cierto índice son cero).
+  $$\boldsymbol{a}(z) = (\ldots,\ a_{p-3},\ a_{p-2},\ a_{p-1},\ a_{p},\ 0,\ 0,\ 0,\ldots) = \sum_{t=-\infty}^p a_t z^t;\qquad p\in\mathbb{Z}$$
+- Secuencias con principio :: tienen cogrado (antes de cierto índice son cero).  
+  $$\boldsymbol{a}(z) = (\ldots,\ 0,\ 0,\ 0,\ a_{k},\ a_{k+1},\ a_{k+2},\ a_{k+3},\ldots) = \sum_{t=k}^\infty a_t z^t;\qquad k\in\mathbb{Z}$$
+  + [[https://en.wikipedia.org/wiki/Formal_power_series][Series formales]] :: aquellas con cogrado $\geq 0$.
+    $$\boldsymbol{a}(z) = (\ldots,\ 0,\ 0,\ 0,\ a_{0},\ a_{1},\ a_{2},\ a_{3},\ldots) = \sum_{t=k}^\infty a_t z^t;\qquad k\geq0$$
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Los *polinomios* son series formales con grado finito: $\quad\sum_{t=k}^p a_t z^t;\qquad k\geq0$.
+- Por ejemplo $\;a_0+a_1z+a_2z^2\;$ es un polinomio de grado 2.
+
+
+* Producto convolución
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Sean $\boldsymbol{a}$ y $\boldsymbol{b}$ sucesiones _con principio_ (con cogrado). 
+Su producto convolución es la sucesión cuyo elemento /t/-ésimo es:
+$$(\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}$$
+
+El cogrado de $\boldsymbol{a}*\boldsymbol{b}$ es la suma de los respectivos cogrados.
+src_latex{(Prop. \ref{prop:convolucionConPrincipio})} {{{results(@@latex:(Prop. \ref{prop:convolucionConPrincipio})@@)}}}
+
+La convolución también está definida entre sucesiones:
+- _con final_ (con grado); y el grado es la suma de los respectivos grados. src_latex{(Prop. \ref{prop:convolucionConFinal})} {{{results(@@latex:(Prop. \ref{prop:convolucionConFinal})@@)}}}
+
+- _absolutamente sumables_ ($\ell^1$). $\quad\sum\limits_{t\in\mathbb{Z}} |a_t| < \infty$ src_latex{(Prop \ref{prop:convolucionSeriesSumables})} {{{results(@@latex:(Prop \ref{prop:convolucionSeriesSumables})@@)}}}
+
+
+* Anillos conmutativos y cuerpos
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+** Anillos conmutativos
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :ID:       55e36116-24fa-4928-ba66-9ce9a3f16105
+   :END:
+
+Un *anillo conmutativo* es un conjunto $\mathsf{S}$ equipado con dos
+operaciones binarias, la suma $+$ y el producto $*$ que satisfacen
+tres conjuntos de axiomas (/todos familiares/).
+
+En cuanto a la suma 
+ - $(\boldsymbol{a} + \boldsymbol{b}) + \boldsymbol{c} = \boldsymbol{a} + (\boldsymbol{b} + \boldsymbol{c})\;$ para todo $\boldsymbol{a}, \boldsymbol{b}, \boldsymbol{c}$ en $\mathsf{S}\qquad$ (i.e. $+$ es asociativa).
+ - $\boldsymbol{a} + \boldsymbol{b} = \boldsymbol{b} + \boldsymbol{a}\;$ para todo $\boldsymbol{a}, \boldsymbol{b}$ en $\mathsf{S}\qquad$ (i.e. $+$ es conmutativa).
+ - Existe un elemento $\boldsymbol{0}$ tal que $\boldsymbol{a} + \boldsymbol{0} = \boldsymbol{a}$ para todo $\boldsymbol{a}\in \mathsf{S}$.
+ - Para cada $\boldsymbol{a}\in \mathsf{S}$ existe $-\boldsymbol{a}\in \mathsf{S}$ tal que $\boldsymbol{a} + (-\boldsymbol{a}) = \boldsymbol{0}$.
+ 
+En cuanto al producto 
+ - $(\boldsymbol{a} * \boldsymbol{b}) * \boldsymbol{c} = \boldsymbol{a} * (\boldsymbol{b} * \boldsymbol{c})\;$ para todo $\boldsymbol{a}, \boldsymbol{b}, \boldsymbol{c}$ en $\mathsf{S}\qquad$ (i.e. $*$ es asociativo). 
+ - $\boldsymbol{a} * \boldsymbol{b} = \boldsymbol{b} * \boldsymbol{a}\;$ para todo $\boldsymbol{a}, \boldsymbol{b}$ en $\mathsf{S}\qquad$ (i.e. $*$ es conmutativo).
+ - Existe un elemento ${{1}}$ tal que $\boldsymbol{a} * {{1}} = \boldsymbol{a}$ para todo $\boldsymbol{a}\in \mathsf{S}$.
+
+#+BEGIN_EXPORT latex
+\noindent
+El elemento ${{1}}$ es la secuencia cuyos elementos son cero excepto un 1 en la posición cero:
+\begin{displaymath}
+{{1}}\;=\;1z^0\;=\;(\ldots,0,0,\fbox{\({\color{blue}{1}}\)},0,0,\ldots)
+\end{displaymath}
+#+END_EXPORT
+
+El producto es distributivo respecto de la suma: Para todo $\boldsymbol{a}, \boldsymbol{b}, \boldsymbol{c}$ en $\mathsf{S}$
+ - \(\boldsymbol{a}*(\boldsymbol{b}+\boldsymbol{c})=(\boldsymbol{a}*\boldsymbol{b})+(\boldsymbol{a}*\boldsymbol{c})\;\) 
+ - \((\boldsymbol{b}+\boldsymbol{c})*\boldsymbol{a}=(\boldsymbol{b}*\boldsymbol{a})+(\boldsymbol{c}*\boldsymbol{a})\;\)
+
+# https://en.wikipedia.org/wiki/Ring_(mathematics)
+# https://math.stackexchange.com/questions/141249/what-is-difference-between-a-ring-and-a-field
+
+# La terna $(\ell^1, +, *)$ es un anillo conmutativo. src_latex{(Prop \ref{prop:SeriesSumablesSonUnAnillo})}
+
+** Cuerpos
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+Un *cuerpo* es un anillo conmutativo que adicionalmente satisface:
+
+# - ${{1}}\ne\boldsymbol{0}$
+- Para cada $\boldsymbol{a}\in \mathsf{S}$ no nulo
+  ($\boldsymbol{a}\ne\boldsymbol{0}$), existe $\boldsymbol{b}\in \mathsf{S}$
+  tal que $\boldsymbol{a}*\boldsymbol{b}={{1}}$.
+
+  (/Todo elemento no nulo del conjunto tiene una inversa en dicho
+  conjunto/)
+
+Entonces se dice que $\boldsymbol{b}$ es el inverso de $\boldsymbol{a}$; 
+y que $\boldsymbol{a}$ es el inverso de $\boldsymbol{b}$.
+
+
+* Clasificación de subconjuntos de sucesiones 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+- Son anillos el conjunto de :: [[https://en.wikipedia.org/wiki/Formal_power_series][series formales]] (cogrado $\geq0$), [[https://en.wikipedia.org/wiki/Polynomial_ring][polinomios]] y
+  $\ell^1$ src_latex{(Prop \ref{prop:SeriesSumablesSonUnAnillo}).} {{{results(@@latex:(Prop \ref{prop:SeriesSumablesSonUnAnillo}).@@)}}}
+
+  (/En estos conjuntos las operaciones funcionan tal y como está acostumbrado/).
+
+  Pero estas sucesiones o /no tienen inversa; o son sucesiones de otro tipo/ 
+  (p.e. las inversas de polinomios no son polinomios en general).
+
+- Son cuerpos el conjunto de :: secuencias con principio src_latex{(cuerpo de fracciones de series formales: Prop \ref{prop:CuerpoFraccionesSeriesFormales})} {{{results(@@latex:(cuerpo de fracciones de series formales: Prop \ref{prop:CuerpoFraccionesSeriesFormales})@@)}}}, {{{results(@@latex:(cuerpo de fracciones de series formales: Prop \ref{prop:CuerpoFraccionesSeriesFormales})\,@@)}}} las secuencias con final src_latex{(la demo es similar)} {{{results(@@latex:(la demo es similar)@@)}}} y las [[id:8ec2ce9b-036c-4410-8d8d-76d144e37c15][fracciones de polinomios]].
+
+  Con $\boldsymbol{a}^{-\triangleright}\equiv\frac{1}{\boldsymbol{a}}{\scriptstyle{\triangleright}}$ denotamos la inversa de $\boldsymbol{a}$ con principio (con cogrado).
+
+  Con $\boldsymbol{a}^{\blacktriangleleft-}\equiv{\scriptstyle{\blacktriangleleft}}\frac{1}{\boldsymbol{a}}$ denotamos la inversa de $\boldsymbol{a}$ con final (con grado).
+
+  Cuando una de estas dos inversas es una secuencia absolutamente sumable, dicha inversa se denota habitualmente con $\boldsymbol{a}^{-1}\equiv\frac{1}{\boldsymbol{a}}$.
+
+
+* Inversas
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+** Inversas de secuencias con principio
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Supongamos que $\boldsymbol{a}\ne\boldsymbol{0}$ y que $k = cogrado(\boldsymbol{a})$.
+Definimos $\boldsymbol{b}$ del siguiente modo:
+\[b_j=
+\begin{cases}
+   0 & \text{ si } j<-k\\
+   \frac{1}{a_k} & \text{ si } j=-k\\
+   \frac{-1}{a_k}\sum_{r=-k}^{j-1}b_r a_{j+k-r} & \text{ si } j>-k
+\end{cases}\]
+Por construcción, $cogrado(\boldsymbol{b})=-k$ y en consecuencia $(\boldsymbol{a}*\boldsymbol{b})_j=0$ si $j<0$.
+Obviamente, $(\boldsymbol{a}*\boldsymbol{b})_0=1$; y además $(\boldsymbol{a}*\boldsymbol{b})_j=0$ si $j>0$.
+
+#+BEGIN_EXPORT latex
+Es así ya que
+\begin{align*}
+(\boldsymbol{a}*\boldsymbol{b})_j 
+= & \sum_{r+s=j}a_ rb_s = \sum_{r=-k}^{j-k}a_{j-r}b_r \\
+= & \sum_{r=-k}^{j-k-1}a_{j-r}b_r + a_k b_{j-k} \\ 
+= & \sum_{r=-k}^{j-k-1}a_{j-r}b_r + a_k \Big(\frac{-1}{a_k}\sum_{r=-k}^{j-k-1}b_r a_{j-k+k-r}\big) \\
+= & \sum_{r=-k}^{j-k-1}a_{j-r}b_r - \sum_{r=-k}^{j-k-1}b_r a_{j-r} = 0
+\end{align*}
+#+END_EXPORT
+
+
+# +attr_ipynb: (slideshow . ((slide_type . fragment)))
+*Ejemplo*: Para el polinomio $1-az$
+
+$$(1-az)^{-\triangleright}=\text{inversa con principio de }(1-az)=
+\begin{cases}
+0 & \text{ si } j<0\\
+1 & \text{ si } j=0\\
+a^{j} & \text{ si } j>0
+\end{cases}$$
+es decir
+$(\ldots,0,\ \fbox{\({\color{blue}{1}}\)},\ a,\ a^2,\ a^3,\ldots)=\sum_{j=0}^\infty a^j z^j;\quad$
+(donde la posición $j=0$ está recuadrada).
+
+#+BEGIN_EXPORT latex
+Comprobación: 
+\begin{align*}
+(1-az)\sum_{j=0}^\infty a^j z^j 
+= & \sum_{j=0}^\infty a^j z^j-az\sum_{j=0}^\infty a^j z^j \\
+= & \sum_{j=0}^\infty a^j z^j - \sum_{j=1}^\infty a^j z^j \\
+= & a^0 z^0 + \sum_{j=1}^\infty (a^j-a^j) z^j \\
+= & 1z^0 + \sum_{j=1}^\infty 0 z^j = {{1}}.
+\end{align*}
+#+END_EXPORT
+# $$(1-az)\sum_{j=0}^\infty a^j z^j=\sum_{j=0}^\infty a^j z^j-az\sum_{j=0}^\infty a^j z^j=\sum_{j=0}^\infty a^j z^j-\sum_{j=1}^\infty a^j z^j=a^0 z^0+\sum_{j=1}^\infty (a^j-a^j) z^j=1z^0+\sum_{j=1}^\infty 0 z^j={{1}}$$
+
+** Inversas de secuencias con final
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Supongamos que $\boldsymbol{a}\ne\boldsymbol{0}$ y que $p =
+grado(\boldsymbol{a})$. Definimos $\boldsymbol{b}$ del siguiente modo:
+$$b_j=
+\begin{cases}
+0 & \text{ si } j>-p\\
+\frac{1}{a_p} & \text{ si } j=-p\\
+\frac{-1}{a_p}\sum_{r=j-1}^{-p}b_r a_{j+p-r} & \text{ si } j<-p
+\end{cases}\qquad\Rightarrow\quad grado(\boldsymbol{b}) = -p$$
+
+# +attr_ipynb: (slideshow . ((slide_type . fragment)))
+*Ejemplo*: Para el polinomio $1-az$
+
+$$(1-az)^{\blacktriangleleft-}=\text{inversa con final de }(1-az)=
+\begin{cases}
+0 & \text{ si } j>-1\\
+\frac{-1}{a} & \text{ si } j=-1\\
+\frac{-1}{a^j} & \text{ si } j<-1
+\end{cases}$$
+es decir
+$\;(\ldots,\ \frac{-1}{a^3},\ \frac{-1}{a^2},\ \frac{-1}{a},\fbox{\({\color{blue}{0}}\)},\ldots)=\sum_{j=-\infty}^{-1} -a^j z^j.\;$ 
+
+#+BEGIN_EXPORT latex
+Comprobación:  
+\begin{align*}
+(1-az)\sum_{j=-\infty}^{-1} -a^j z^j 
+= & \sum_{j=-\infty}^{-1} -a^j z^j + (-az)\sum_{j=-\infty}^{-1} -a^j z^j \\
+= & \sum_{j=-\infty}^{-1} -a^j z^j + \sum_{j=-\infty}^{0} a^j z^j \\
+= & \sum_{j=-\infty}^{-1} -a^j z^j + \sum_{j=-\infty}^{-1} a^j z^j +a^0 z^0 \\
+= & \sum_{j=-\infty}^{-1} (a^j-a^j) z^j + 1 z^0={{1}}
+\end{align*}
+% $$(1-az)\sum_{j=-\infty}^{-1} -a^j z^j=\sum_{j=-\infty}^{-1} -a^j z^j + (-az)\sum_{j=-\infty}^{-1} -a^j z^j=\sum_{j=-\infty}^{-1} -a^j z^j + \sum_{j=-\infty}^{0} a^j z^j=\sum_{j=-\infty}^{-1} -a^j z^j + \sum_{j=-\infty}^{-1} a^j z^j +a^0 z^0=\sum_{j=-\infty}^{-1} (a^j-a^j) z^j + 1 z^0={{1}}$$
+#+END_EXPORT
+
+#+BEGIN_EXPORT latex
+Si definimos la función \emph{reverso} entre secuencias
+$R:\mathbb{R}^\mathbb{Z}\to\mathbb{R}^\mathbb{Z}$ tal que
+$R(a_j)=a_{-j}$:
+$$R\big(\boldsymbol{a}(z)\big)=\boldsymbol{a}(z^{-1})$$ se puede
+demostrar que para toda secuencia con final $\boldsymbol{a}$
+$$\boldsymbol{a}^{\blacktriangleleft-}=R\left(\big(R(\boldsymbol{a})\big)^{-\triangleright}\right).$$
+#+END_EXPORT
+
+** Inversas de polinomios
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Todo polinomio
+- por tener cogrado :: tiene una inversa con cogrado (con principio)
+- por tener grado :: tiene una inversa con grado (con final)
+#  Dichas inversas son de la forma $\;\sum_{t=k}^\infty a_t z^t\;$ ó $\;\sum_{t=-\infty}^k a_t z^t\;$ (i.e., no son polinomios).
+#+LATEX: \bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Para el polinomio $\;1-az\;$ estas inversas son:
+
+$(1-az)^{-\triangleright}=\sum\limits_{j=0}^\infty a^j z^j \quad=\quad (\ldots,0,\ \fbox{\({\color{blue}{1}}\)},\ a,\ a^2,\ a^3,\ldots)$
+
+$(1-az)^{\blacktriangleleft-}=\sum\limits_{j=-\infty}^{-1} -a^j z^j \quad=\quad (\ldots,\ \frac{-1}{a^3},\ \frac{-1}{a^2},\ \frac{-1}{a},\fbox{\({\color{blue}{0}}\)},\ldots)$
+
+Es evidente que si $|a|\ne1$ una de las inversas está en $\ell^1$ y la
+otra no.
+
+Pero si $|a|=1$ ninguna de las inversas pertenece a $\ell^1$ (hay infinitos unos).
+
+[[file:~/SynologyDrive/ReposGH/Docencia/EconometriaAplicada.kk/src/implementacion_series_formales.slides.html][Implementación en Python]]
+
+#+BEGIN_EXPORT latex
+Además, por el \href{https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra}{Teorema fundamental del Álgebra} también sabemos que:
+
+\begin{quote}
+\em
+Todo polinomio univariante no nulo con coeficientes reales puede factorizarse como
+$${\displaystyle c\cdot\boldsymbol{p}_{1}*\cdots* \boldsymbol{p}_{k},}$$ 
+donde $c$ es un número real y cada ${\displaystyle \boldsymbol{p}_{i}}$ es un polinomio mónico (i.e., el coeficiente de $z^0$ es $1$) de grado 
+a lo sumo dos con coeficientes reales. 
+Más aún, se puede suponer que los factores de grado dos no tienen ninguna raíz real.
+\end{quote}
+#+END_EXPORT
+# https://en.wikipedia.org/wiki/Fundamental_theorem_of_algebra#Equivalent_statements
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Podemos factorizar un polinomio $\boldsymbol{a}$ sin raíces de módulo $1$ como
+$$\boldsymbol{a}=\boldsymbol{b}*\boldsymbol{c}$$
+- donde $\boldsymbol{b}$ es un polinomio con las raíces de módulo menor que $1$ y
+- donde $\boldsymbol{c}$ es un polinomio con las raíces de módulo mayor que $1$
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Como tanto los polinomios $\boldsymbol{a}$, $\boldsymbol{b}$ y
+$\boldsymbol{c}$ como las inversas
+$\boldsymbol{b}^{\blacktriangleleft-}$ y
+$\boldsymbol{c}^{-\triangleright}$ pertenecen al anillo $\ell^1$,
+$$\boldsymbol{a}*(\boldsymbol{b}^{\blacktriangleleft-}*\boldsymbol{c}^{-\triangleright})
+=(\boldsymbol{b}*\boldsymbol{c})*(\boldsymbol{b}^{\blacktriangleleft-}*\boldsymbol{c}^{-\triangleright})
+=\boldsymbol{b}*\boldsymbol{b}^{\blacktriangleleft-}*\boldsymbol{c}*\boldsymbol{c}^{-\triangleright}={{1}}*{{1}}={{1}}.$$
+La secuencia
+$\;(\boldsymbol{b}^{\blacktriangleleft-}*\boldsymbol{c}^{-\triangleright})\;$
+es /la inversa/ de $\boldsymbol{a}$ en $\ell^1$.
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+En general, dicha inversa no tiene grado ni cogrado finitos y se
+denota con $\boldsymbol{a}^{-1}=\frac{1}{\boldsymbol{a}}$.\\
+@@latex:\noindent @@ (/es la inversa que aparece en los libros de
+series temporales/)
+
+Evidentemente dicha inversa no existe si $\boldsymbol{a}$ tiene alguna raíz de módulo $1$.
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+En los manuales de /series temporales/ se dice que un polinomio $\boldsymbol{a}$ *es invertible* si 
+# la inversa con cogrado pertenece a $\ell^1$; es decir, si 
+$$\text{(la inversa con principio) }\;\boldsymbol{a}^{-\triangleright}=\boldsymbol{a}^{-1}\; \text{ (la inversa absolutamente sumable)}.$$
+(y solo es posible /si sus raíces están fuera del círculo unidad/).
+#+latex:\bigskip
+
+#+BEGIN_EXPORT latex
+% #+attr_ipynb: (slideshow . ((slide_type . subslide)))
+{\bf Hay infinitas inversas}. Si una secuencia tiene dos inversas,
+entonces tiene infinitas.
+
+Sean $\boldsymbol{a}$, $\boldsymbol{b}$ y $\boldsymbol{d}$ secuencias
+tales que $\;\boldsymbol{a}*\boldsymbol{b}={{1}}\;$ y
+$\;\boldsymbol{a}*\boldsymbol{d}={{1}};\;$ y sean $\beta$ y
+$\delta$ dos escalares tales que $\beta+\delta=1$. Entonces
+
+$$\boldsymbol{a}*\big(\beta\boldsymbol{b}+\delta\boldsymbol{d}\big)=
+\beta(\boldsymbol{a}*\boldsymbol{b})+\delta(\boldsymbol{a}*\boldsymbol{d})=
+\beta{{1}}+\delta{{1}}=
+(\beta+\delta){{1}}={{1}}$$
+
+Así, para cualesquiera $\beta$ y $\delta$ tales que $\beta+\delta=1$, sabemos
+que $\big(\beta\boldsymbol{b}+\delta\boldsymbol{d}\big)$ es otra
+inversa de $\boldsymbol{a}$.
+#+END_EXPORT
+
+** COMMENT Implementación en Python
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+BEGIN_SRC jupyter-python :results silent
+%run -i ./src/implementacion_series_formales.py
+#+END_SRC
+
+#+BEGIN_SRC jupyter-python :results silent
+from sympy import symbols
+a = symbols('a')
+#+END_SRC
+
+#+BEGIN_SRC jupyter-python #:display text/latex
+p=SerieConPrincipio([1,-a],0)
+p
+#+END_SRC
+
+#+BEGIN_SRC jupyter-python 
+p.inversa(10)
+#+END_SRC
+
+
+** Cuerpo de fracciones de polinomios
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+   
+El /cuerpo de fracciones de polinomios/ 
+\[\left\{\boldsymbol{p}*\boldsymbol{q}^{-\triangleright} \mid \boldsymbol{p} \text{ y } \boldsymbol{q} \text{ son polinomios y } \boldsymbol{q}\ne\boldsymbol{0} \right\};\]
+es un subcuerpo del cuerpo de las sucesiones con principio (i.e., con cogrado finito)
+
+#+BEGIN_EXPORT latex
+\emph{Toda fracción de sucesiones con grado y cogrado (con principio y
+final) pertenece al cuerpo de fracciones de polinomios},
+pues  toda sucesión con grado $-k$ y cogrado es
+de la forma $\boldsymbol{p}*(z^k)^{-\triangleright}$, donde
+$\boldsymbol{p}$ es un polinomio.
+
+#+END_EXPORT
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Cuando las raíces del polinomio $\boldsymbol{q}$ están fuera del
+circulo unidad (i.e.,
+$\;\boldsymbol{q}^{-\triangleright}=\boldsymbol{q}^{-1}$) es habitual
+denotar la secuencia $\boldsymbol{p}*\boldsymbol{q}^{-\triangleright}$
+así $\frac{\boldsymbol{p}}{\boldsymbol{q}}$
+ $$(\boldsymbol{p}*\boldsymbol{q}^{-\triangleright})(z)=\frac{\boldsymbol{p}(z)}{\boldsymbol{q}(z)}$$
+
+Este conjunto de sucesiones es uno de los pilares en la modelización ARIMA. 
+
+
+* Operador retardo $\mathsf{B}{}$ y secuencias sumables.
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Es habitual usar el operador retardo $\mathsf{B}$:
+\[\mathsf{B} x_t = x_{t-1},\quad \text{para } t\in\mathbb{Z}.\]
+
+Aplicando el operador $\mathsf{B}{}$ repetidamente tenemos
+\[\mathsf{B}^k x_t = x_{t-k},\quad \text{para } t,z\in\mathbb{Z}.\]
+
+Así, si la secuencia \(\boldsymbol{x}(z)=\sum_{t=-\infty}^\infty x_t z^t\) es sumable, entonces la expresión 
+\[\boldsymbol{x}(\mathsf{B})=\sum_{t=-\infty}^\infty x_t \mathsf{B}^t\;=\;\cdots+x_{-2}+x_{-1}+x_{0}+x_{1}+\cdots\]
+tiene sentido como suma.
+
+** Polinomios y secuencias en el operador retardo $\boldsymbol{a}(\mathsf{B}{})$ actuando sobre secuencias
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+Así, para el polinomio $\boldsymbol{a}(z)=a_0+a_1z+a_2z^2+a_3z^3$, y la
+secuencia $\boldsymbol{y}$, tenemos
+\begin{align*}
+\boldsymbol{a}(\mathsf{B})y_t 
+& = (a_0+a_1\mathsf{B}+a_2\mathsf{B}^2+a_3\mathsf{B}^3) y_t \\
+& = a_0 y_t + a_1 \mathsf{B}^1 y_t + a_2 \mathsf{B}^2 y_t + a_3 \mathsf{B}^3 y_t \\
+& = a_0y_t+a_1y_{t-1}+a_2y_{t-2}+a_3y_{t-3} \\
+& =\sum\nolimits_{r=0}^3 a_r y_{t-r} \\
+& =(\boldsymbol{a}*\boldsymbol{y})_t
+\end{align*}
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Y en general, si $\boldsymbol{a}$ e $\boldsymbol{y}$ son secuencias sumables, entonces
+\begin{align*}
+\boldsymbol{a}(\mathsf{B})y_t 
+& = (\cdots+a_{-2}\mathsf{B}^{-2}+a_{-1}\mathsf{B}^{-1}+a_0+a_1\mathsf{B}+a_2\mathsf{B}^2+\cdots) y_t \\
+% & = a_0 y_t + a_1 \mathsf{B}^1 y_t + a_2 \mathsf{B}^2 y_t + a_3 \mathsf{B}^3 y_t \\
+& = \cdots+a_{-2}y_{t+2}+a_{-1}y_{t+1}+a_0y_t+a_1y_{t-1}+a_2y_{t-2}+\cdots \\
+% & =\sum\nolimits_{r=0}^3 a_r y_{t-r} \\
+& =(\boldsymbol{a}*\boldsymbol{y})_t
+\end{align*}
+
+** El operador retardo y el producto convolución de una secuencia $\boldsymbol{x}$ por $z$
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Del mismo modo que denotamos con ${1}$ la secuencia
+\[1=(\ldots,0,0,\fbox{$\color{blue}{1}$},0,0,\ldots)=1 z^0,\]
+denotamos con ${z}$ la secuencia
+\[z=(\ldots,0,0,\fbox{$\color{blue}{0}$},1,0,\ldots)=1 z^1;\]
+y con ${z^{-1}}$ la secuencia
+\[z^{-1}=(\ldots,0,1,\fbox{$\color{blue}{0}$},0,0,\ldots)=1 z^{-1}.\]
+Evidentemente
+\[z^2=z*z=(\ldots,0,0,\fbox{$\color{blue}{0}$},0,1,\ldots)=1 z^{2}.\]
+De ese modo 
+\[\boldsymbol{x}*z^k=\sum_{t\in\mathbb{Z}}x_t z^{t+k}=(\mathsf{B}^kx_t\mid t\in\mathbb{Z}).\]
+# =\sum_{t\in\mathbb{Z}}x_{t-k}z^t
+
+
+# +latex: \pagebreak
+# +latex: \appendix
+
+
+* Convolución de una serie formal con el "/reverso/" de otra
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Por último, si tenemos dos series formales $\boldsymbol{a}$ y
+$\boldsymbol{b}$, entonces
+\begin{align*}
+\boldsymbol{a}(z)*\boldsymbol{b}(z^{-1})
+=&(a_0z^0+a_1z^1+a_2z^2+\cdots)(\cdots+b_2z^{-2}+b_1z^{-1}+b_0z^0)\\
+=&\Big(\ldots,
+\sum_{j\in\mathbb{Z}}a_{j+2}b_j,\; 
+\sum_{j\in\mathbb{Z}}a_{j-1}b_j,\;
+\fbox{\({\color{blue}{\sum_{j\in\mathbb{Z}}a_jb_j}}\)},\;
+\sum_{j\in\mathbb{Z}}a_{j+1}b_j,\;
+\sum_{j\in\mathbb{Z}}a_{j+2}b_j,\ldots\Big)\\
+=&\Big(\sum_{j\in\mathbb{Z}}a_{j+k}b_j\mid k\in\mathbb{Z}\Big)
+\end{align*}
+es decir,
+\begin{equation}
+ \label{eqConvolucionConSuReverso}
+ \Big(\boldsymbol{a}(z)*\boldsymbol{b}(z^{-1})\Big)_k=\sum_{j\in\mathbb{Z}}a_{j+k}b_{j}.
+\end{equation}
+
+
+* Resultados preliminares sobre series sumables
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+BEGIN_EXPORT html
+<p style="color:red;"><strong>
+Esta sección contiene las demostraciones de los resultados empleados en la lección; y solo se puede ver de manera completa en la versión pdf de la lección.
+</strong></p>
+#+END_EXPORT
+
+#+BEGIN_EXPORT latex
+Los manuales de series temporales que conozco no presentan un tratamiento sistemático de las secuencias de números; pese a ser una herramienta fundamental en la modelización ARIMA. Esta sección tiene por objeto servir de referencia donde encontrar la demostración de un conjunto de resultados que, sin aportar una demostración formal, son empleados en los manuales de series temporales. 
+#+END_EXPORT
+
+** Introducción y motivación del enfoque elegido
+
+#+BEGIN_EXPORT latex
+En el capítulo primero de \emph{Mathematics for the Physical Sciences}, Laurent Schwartz ofrece una introducción al concepto de {\bf serie sumable} que se aleja del tratamiento habitualmente encontrado en cursos introductorios de cálculo o análisis.
+#+END_EXPORT
+
+*** Lo usual es interpretar las series como sumas ordenadas
+   :PROPERTIES:
+   :UNNUMBERED: notoc
+   :END:
+
+#+BEGIN_EXPORT latex
+La mayoría de manuales presentan una serie infinita como una suma \emph{ordenada}: 
+\[
+  \sum\limits_{n=1}^{\infty} u_n = \lim_{N \to \infty} \sum_{n=1}^{N} u_n,
+\] 
+donde los términos están indexados por los números naturales y se suman uno tras otro. 
+El foco está puesto en la convergencia del límite de las sumas parciales, es decir, en el \emph{ordenamiento natural} de los términos; de manera que lo que se hace es considerar la sucesión de sumas parciales:
+\[ 
+ S_N = \sum_{n=1}^N u_n, 
+\]
+y se dice que la serie converge a $S$ si
+\[
+ \lim_{N \to \infty} S_N = S.
+\]
+Como el conjunto de índices $\mathbb{N}$ es {\bf ordenado}, tiene sentido ir sumando los términos ``uno tras otro''.
+#+END_EXPORT
+
+*** La propuesta de Schwartz: independencia del orden
+   :PROPERTIES:
+   :UNNUMBERED: notoc
+   :END:
+
+#+BEGIN_EXPORT latex
+Lo que propone Schwartz es una \emph{generalización} del concepto de suma infinita: considera familias de números indexadas por cualquier conjunto (no necesariamente los naturales), y define la suma de cada familia como un \emph{límite uniforme sobre los subconjuntos finitos}. Veamos cómo.
+\bigskip
+
+
+Consideremos que el conjunto de índices, en lugar de ser \(\mathbb{N}\), es un conjunto arbitrario \(I\) sin un orden natural. En este contexto surge la cuestión de cómo sumar cuando ya no se pueden recorrer los elementos uno por uno (pues no hay un orden para hacerlo). Schwartz lo logra definiendo la suma como un \emph{límite sobre subconjuntos finitos de \(I\)}. Es decir:
+\begin{itemize}
+\item Considera todos los subconjuntos finitos \(K \subset I\).
+\item Para cada uno de ellos, calcula la suma finita \(S_K = \sum_{i \in K} u_i\).
+\item Y dice que la familia \(\{u_i \mid i \in I\}\) es \emph{sumable con suma \(S\)} si existe un subconjunto finito \(K\) que contiene los elementos necesarios de \(I\) para que \(S_K\) \emph{esté próximo a \(S\)} dentro de un margen arbitrario \(\varepsilon > 0\).
+\end{itemize}
+
+Para formalizar esta idea, se introduce el concepto de \emph{límite uniforme sobre subconjuntos finitos}, que significa lo siguiente:  
+\begin{quote}
+  Para todo $\varepsilon > 0$, existe un subconjunto finito $J \subset I$ tal que para \textbf{todo subconjunto finito} $K \supset J$, se cumple:
+ \[
+   \left| \sum_{i \in K} u_i - S \right| < \varepsilon.
+ \]
+\end{quote}
+
+
+\noindent
+\textbf{Intuición:}  
+Existe un subconjunto finito de índices \(J \subset I\) tal que, una vez sumados los elementos correspondientes a \(J\), la suma parcial ya se encuentra suficientemente cerca del valor total \(S\). A partir de ese punto, cualquier conjunto \(K\) que contenga a \(J\) (y sea también finito) produce una suma cuya distancia al valor límite \(S\) es inferior a \(\varepsilon\).  
+
+
+Este límite se denomina \emph{uniforme} porque \emph{el mismo \(J\)} sirve para \emph{todos} los \(K\) que lo contienen. Es decir, no se trata de una convergencia punto a punto como en secuencias, sino de una condición \emph{uniforme} sobre un universo más grande (todos los subconjuntos finitos que contienen \(J\)).
+Esto recuerda a la \emph{convergencia uniforme} en análisis, donde no basta con que la función converja punto a punto, sino que se quiere un control simultáneo sobre toda una familia.
+
+Por tanto, cuando decimos que la suma de una familia \(\{u_i \mid i \in I\}\) es el \emph{límite uniforme sobre los subconjuntos finitos}, estamos
+diciendo que:
+\begin{itemize}
+\item No importa el orden de los índices.
+\item No se necesita un índice numerable.
+\item Lo que importa es que se puede \emph{aproximar el valor total \(S\)} usando \emph{cualquier subconjunto finito suficientemente grande}.
+\end{itemize}
+
+El enfoque de Schwartz, aunque más abstracto, nos permite considerar \textbf{estructuras matemáticas flexibles} aplicables en contextos donde la noción de suma debe extenderse más allá de lo habitual, como los procesos ARIMA (no estacionarios). Por ello, he preferido presentar este enfoque en lugar del tradicional.  
+
+---
+
+El contenido de la siguiente subsección está sacado íntegramente del capítulo 1 del libro de Laurent Schwartz \emph{Mathematics for the Physical Sciences} \nocite{schwartz2008mathematics}, y demuestra una serie de resultados que son necesarios en la exposición de esta lección.
+#+END_EXPORT
+
+** Series sumables
+
+#+BEGIN_SRC latex 
+La idea de sumabilidad es una extensión de la idea de convergencia absoluta al caso en que los términos de la serie dependen de un conjunto cualquiera de índices, y por tanto los términos de la serie no están ordenados.
+Los términos de la serie pueden ser números reales o complejos; por simplicidad, se supondrán reales.
+
+\begin{definition}[Serie sumable]
+  \textit{Si $I$ es un conjunto de índices cualquiera, y $\{u_i\mid i \in I\}$ es una familia de números complejos definida por el conjunto de índices $I$, se dice que la serie $\sum_{i \in I} u_i$ es sumable y su suma es $S$, y se escribe:}
+  \begin{equation}
+    \sum_{i \in I} u_i = S
+  \end{equation}
+  \textit{si, cualquiera que sea $\epsilon > 0$, existe un subconjunto finito de índices $J \subset I$ tal que, para todo subconjunto finito de índices $K \subset J$ se tiene:}
+  \begin{equation}
+    |S - S_K| \leq \epsilon
+  \end{equation}
+  con
+  \begin{equation}
+    S_K = \sum_{i \in K} u_i.
+  \end{equation}
+\end{definition}
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{definition}[Serie sumable]
+  \textit{Si $I$ es un conjunto de índices cualquiera, y $\{u_i\mid i \in I\}$ es una familia de números complejos definida por el conjunto de índices $I$, se dice que la serie $\sum_{i \in I} u_i$ es sumable y su suma es $S$, y se escribe:}
+  \begin{equation}
+    \sum_{i \in I} u_i = S
+  \end{equation}
+  \textit{si, cualquiera que sea $\epsilon > 0$, existe un subconjunto finito de índices $J \subset I$ tal que, para todo subconjunto finito de índices $K \subset J$ se tiene:}
+  \begin{equation}
+    |S - S_K| \leq \epsilon
+  \end{equation}
+  con
+  \begin{equation}
+    S_K = \sum_{i \in K} u_i.
+  \end{equation}
+\end{definition}
+#+end_export
+
+#+BEGIN_SRC latex 
+\textbf{Nota} \textit{Cualquiera que sea el conjunto de índices $I$, si todos los $u_i$ son nulos, $\sum_{i \in I} u_i$ es sumable y la suma $S$ es nula.}
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\textbf{Nota} \textit{Cualquiera que sea el conjunto de índices $I$, si todos los $u_i$ son nulos, $\sum_{i \in I} u_i$ es sumable y la suma $S$ es nula.}
+#+end_export
+
+*** Propiedades de las series sumables
+
+#+BEGIN_SRC latex :results export
+\begin{prop}[Unicidad de la suma]
+  \label{prop:inicidad}
+  Si \;
+  \(\sum_{i \in I} u_i = S \; \text{y} \; \sum_{i \in I} u_i = S'\),
+  entonces \(S = S'\).
+\end{prop}
+\begin{proof}
+  Para cualquier $\varepsilon > 0$ existe $J_1 \subset I$ tal que $K \supset J_1$ implica $|S - S_K| \leq \varepsilon$ y también $J_2 \subset I$ tal que $K \supset J_2$ implica $|S' - S_K| \leq \varepsilon$. Entonces, si $K = J_1 \cup J_2$, tenemos tanto $|S - S_K| \leq \varepsilon$ como $|S' - S_K| \leq \varepsilon$. Así, $|S - S'| \leq 2\varepsilon$ y, como $\varepsilon$ es arbitrario, se concluye que $S = S'$. \hfill
+\end{proof}
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}[Unicidad de la suma]
+  \label{prop:inicidad}
+  Si \;
+  \(\sum_{i \in I} u_i = S \; \text{y} \; \sum_{i \in I} u_i = S'\),
+  entonces \(S = S'\).
+\end{prop}
+\begin{proof}
+  Para cualquier $\varepsilon > 0$ existe $J_1 \subset I$ tal que $K \supset J_1$ implica $|S - S_K| \leq \varepsilon$ y también $J_2 \subset I$ tal que $K \supset J_2$ implica $|S' - S_K| \leq \varepsilon$. Entonces, si $K = J_1 \cup J_2$, tenemos tanto $|S - S_K| \leq \varepsilon$ como $|S' - S_K| \leq \varepsilon$. Así, $|S - S'| \leq 2\varepsilon$ y, como $\varepsilon$ es arbitrario, se concluye que $S = S'$. \hfill
+\end{proof}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{prop}
+  \label{prop:combinacionLineal}
+  Si $\sum_{i \in I} u_i$ y $\sum_{i \in I} v_i$ son dos series sumables, cuyas sumas son $S$ y $T$ respectivamente, entonces la serie $\sum_{i \in I} (\lambda u_i + \mu v_i)$, donde $\lambda$ y $\mu$ son constantes, es sumable y tiene por suma $\lambda S + \mu T$.
+\end{prop}
+\begin{proof}
+  Para cualquier $\varepsilon > 0$, existe un conjunto finito de índices $J_1 \subset I$ tal que, para cualquier conjunto finito de índices $K_1 \supset J_1$,
+  \[
+    |S - S_{K_1}| \leq \frac{\varepsilon}{(|\lambda| + |\mu|)}.
+  \]
+  También existe un conjunto finito de índices $J_2 \subset I$ tal que, para cualquier conjunto finito de índices $K_2 \supset J_2$,
+  \[
+    |T - T_{K_2}| \leq \frac{\varepsilon}{(|\lambda| + |\mu|)}.
+  \]
+  Se deduce que, para cualquier conjunto finito de índices $K \supset J_1 \cup J_2$,
+  \[
+    |\lambda S - \lambda S_K| \leq \frac{|\lambda| \varepsilon}{(|\lambda| + |\mu|)} \qquad \text{y} \qquad |\mu T - \mu T_K| \leq \frac{|\mu| \varepsilon}{(|\lambda| + |\mu|)},
+  \]
+  y por lo tanto
+  \(
+  \; |(\lambda S + \mu T) - (\lambda S_K + \mu T_K)| \leq \varepsilon.
+  \hfill
+  \)
+\end{proof}
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}
+  \label{prop:combinacionLineal}
+  Si $\sum_{i \in I} u_i$ y $\sum_{i \in I} v_i$ son dos series sumables, cuyas sumas son $S$ y $T$ respectivamente, entonces la serie $\sum_{i \in I} (\lambda u_i + \mu v_i)$, donde $\lambda$ y $\mu$ son constantes, es sumable y tiene por suma $\lambda S + \mu T$.
+\end{prop}
+\begin{proof}
+  Para cualquier $\varepsilon > 0$, existe un conjunto finito de índices $J_1 \subset I$ tal que, para cualquier conjunto finito de índices $K_1 \supset J_1$,
+  \[
+    |S - S_{K_1}| \leq \frac{\varepsilon}{(|\lambda| + |\mu|)}.
+  \]
+  También existe un conjunto finito de índices $J_2 \subset I$ tal que, para cualquier conjunto finito de índices $K_2 \supset J_2$,
+  \[
+    |T - T_{K_2}| \leq \frac{\varepsilon}{(|\lambda| + |\mu|)}.
+  \]
+  Se deduce que, para cualquier conjunto finito de índices $K \supset J_1 \cup J_2$,
+  \[
+    |\lambda S - \lambda S_K| \leq \frac{|\lambda| \varepsilon}{(|\lambda| + |\mu|)} \qquad \text{y} \qquad |\mu T - \mu T_K| \leq \frac{|\mu| \varepsilon}{(|\lambda| + |\mu|)},
+  \]
+  y por lo tanto
+  \(
+  \; |(\lambda S + \mu T) - (\lambda S_K + \mu T_K)| \leq \varepsilon.
+  \hfill
+  \)
+\end{proof}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{prop}[Series de términos positivos]
+  \label{prop:SeriesTerminosPositivos}
+  Si todos los $u_i \geq 0$, entonces
+  \[
+    \sum_{i \in I} u_i
+  \]
+  es sumable si y sólo si todas las sumas parciales $S_K$, correspondientes a subconjuntos finitos $K$ de $I$, están acotadas por un número fijo $M > 0$; en este caso\footnote{$\sup$ significa supremo o cota superior mínima. $\inf$ significa ínfimo o cota inferior máxima.}
+  \[
+    \sum_{i \in I} u_i = \sup_{K \text{finito }} (S_K).
+  \]
+\end{prop}
+
+\begin{proof}
+  Comenzamos asumiendo que la serie es sumable. Entonces, para $\varepsilon = 1$, por ejemplo, corresponde un subconjunto finito $J \subset I$ tal que, para todo $K \supset J$ finito,
+  \[
+    S_K \leq S + 1.
+  \]
+  Si $K$ es cualquier conjunto finito de índices, entonces poniendo $K_1 = J \cup K$, tenemos
+  \[
+    S_K \leq S_{K_1} \leq S + 1
+  \]
+  de modo que todas las sumas $S_K$ están acotadas. Recíprocamente, supongamos que todos los $S_K$ están acotados por $B$ como su supremo. Entonces, para cualquier $\varepsilon > 0$, existe un subconjunto finito $J \subset I$ tal que
+  \[
+    B - \varepsilon \leq S_J \leq B.
+  \]
+  Para todo $K \supset J$ finito,
+  \[
+    B - \varepsilon \leq S_K \leq B,
+  \]
+  de modo que $\sum_{i \in I} u_i$ es sumable con suma $B$.
+\end{proof}
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}[Series de términos positivos]
+  \label{prop:SeriesTerminosPositivos}
+  Si todos los $u_i \geq 0$, entonces
+  \[
+    \sum_{i \in I} u_i
+  \]
+  es sumable si y sólo si todas las sumas parciales $S_K$, correspondientes a subconjuntos finitos $K$ de $I$, están acotadas por un número fijo $M > 0$; en este caso\footnote{$\sup$ significa supremo o cota superior mínima. $\inf$ significa ínfimo o cota inferior máxima.}
+  \[
+    \sum_{i \in I} u_i = \sup_{K \text{finito }} (S_K).
+  \]
+\end{prop}
+
+\begin{proof}
+  Comenzamos asumiendo que la serie es sumable. Entonces, para $\varepsilon = 1$, por ejemplo, corresponde un subconjunto finito $J \subset I$ tal que, para todo $K \supset J$ finito,
+  \[
+    S_K \leq S + 1.
+  \]
+  Si $K$ es cualquier conjunto finito de índices, entonces poniendo $K_1 = J \cup K$, tenemos
+  \[
+    S_K \leq S_{K_1} \leq S + 1
+  \]
+  de modo que todas las sumas $S_K$ están acotadas. Recíprocamente, supongamos que todos los $S_K$ están acotados por $B$ como su supremo. Entonces, para cualquier $\varepsilon > 0$, existe un subconjunto finito $J \subset I$ tal que
+  \[
+    B - \varepsilon \leq S_J \leq B.
+  \]
+  Para todo $K \supset J$ finito,
+  \[
+    B - \varepsilon \leq S_K \leq B,
+  \]
+  de modo que $\sum_{i \in I} u_i$ es sumable con suma $B$.
+\end{proof}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{theorem}[Criterio de Cauchy]
+  \label{thm:CriterioCauchy}
+  \(
+  \sum_{i \in I} u_i
+  \)
+  es sumable si y sólo si los $u_i$ satisfacen el criterio de Cauchy:
+  \begin{quote}
+    {Para cualquier $\varepsilon > 0$ existe un subconjunto finito $J \subset I$ tal que, para cualquier subconjunto finito de índices $K$ disjunto de $J$,\footnote{Es decir, tal que $K \cap J = \varnothing$.} se tiene}
+  \(
+    |S_K| \leq \varepsilon.
+  \)
+  \end{quote}
+\end{theorem}
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{theorem}[Criterio de Cauchy]
+  \label{thm:CriterioCauchy}
+  \(
+  \sum_{i \in I} u_i
+  \)
+  es sumable si y sólo si los $u_i$ satisfacen el criterio de Cauchy:
+  \begin{quote}
+    {Para cualquier $\varepsilon > 0$ existe un subconjunto finito $J \subset I$ tal que, para cualquier subconjunto finito de índices $K$ disjunto de $J$,\footnote{Es decir, tal que $K \cap J = \varnothing$.} se tiene}
+  \(
+    |S_K| \leq \varepsilon.
+  \)
+  \end{quote}
+\end{theorem}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{theorem}[Consecuencia del criterio de Cauchy]
+  \label{thm:ConsecuenciacriterioCauchy}
+  {Si la serie}
+  \(
+   \ \sum_{i \in I} u_i \
+  \)
+  {es sumable, entonces toda serie parcial}
+  \[
+    \sum_{i \in J} u_i,
+  \]
+  {donde $J$ es cualquier subconjunto de $I$, es sumable.}
+  
+  {Si $J$ es un subconjunto finito de $I$ tal que, para cada conjunto finito $K \supset J$,}
+  \[
+    |S - S_K| \leq \varepsilon,
+  \]
+  {entonces la misma desigualdad es válida para cualquier $K$ infinito tal que $K \supset J$.}
+  
+  {Si $J_1, J_2, \ldots, J_n \subset I$ son subconjuntos mutuamente disjuntos y si $J = J_1 \cup J_2 \cup \cdots \cup J_n$, entonces}
+  \[
+    S_J = S_{J_1} + S_{J_2} + \cdots + S_{J_n}
+  \]
+  {siempre que uno de los dos lados tenga sentido.}
+\end{theorem}
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{theorem}[Consecuencia del criterio de Cauchy]
+  \label{thm:ConsecuenciacriterioCauchy}
+  {Si la serie}
+  \(
+   \ \sum_{i \in I} u_i \
+  \)
+  {es sumable, entonces toda serie parcial}
+  \[
+    \sum_{i \in J} u_i,
+  \]
+  {donde $J$ es cualquier subconjunto de $I$, es sumable.}
+  
+  {Si $J$ es un subconjunto finito de $I$ tal que, para cada conjunto finito $K \supset J$,}
+  \[
+    |S - S_K| \leq \varepsilon,
+  \]
+  {entonces la misma desigualdad es válida para cualquier $K$ infinito tal que $K \supset J$.}
+  
+  {Si $J_1, J_2, \ldots, J_n \subset I$ son subconjuntos mutuamente disjuntos y si $J = J_1 \cup J_2 \cup \cdots \cup J_n$, entonces}
+  \[
+    S_J = S_{J_1} + S_{J_2} + \cdots + S_{J_n}
+  \]
+  {siempre que uno de los dos lados tenga sentido.}
+\end{theorem}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{theorem}[Corolario al criterio de Cauchy]
+  \label{thm:CorolarioCriterioCauchy}
+  Para que $\sum_{i \in I} u_i$ sea sumable es necesario y suficiente que $\sum_{i \in I} |u_i|$ sea sumable; además,
+  \begin{equation}
+    \left| \sum_{i \in I} u_i \right| \leq \sum_{i \in I} |u_i|.
+    \label{(I, 1; 12)}
+  \end{equation}
+  Si $\sum_{i \in I} v_i$ es una serie sumable de términos positivos y si 
+  \[
+    |u_i| \leq v_i,
+  \]
+  entonces la serie $\sum_{i \in I} u_i$ es sumable y
+  \begin{equation}
+    \left| \sum_{i \in I} u_i \right| \leq \sum_{i \in I} v_i.
+    \label{(I, 1; 14)}
+  \end{equation}
+\end{theorem}
+
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{theorem}[Corolario al criterio de Cauchy]
+  \label{thm:CorolarioCriterioCauchy}
+  Para que $\sum_{i \in I} u_i$ sea sumable es necesario y suficiente que $\sum_{i \in I} |u_i|$ sea sumable; además,
+  \begin{equation}
+    \left| \sum_{i \in I} u_i \right| \leq \sum_{i \in I} |u_i|.
+    \label{(I, 1; 12)}
+  \end{equation}
+  Si $\sum_{i \in I} v_i$ es una serie sumable de términos positivos y si 
+  \[
+    |u_i| \leq v_i,
+  \]
+  entonces la serie $\sum_{i \in I} u_i$ es sumable y
+  \begin{equation}
+    \left| \sum_{i \in I} u_i \right| \leq \sum_{i \in I} v_i.
+    \label{(I, 1; 14)}
+  \end{equation}
+\end{theorem}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{proof}[Demostración de los Teoremas 5, 6 y 7]\mbox{\ }
+  
+  \begin{enumerate}
+  \item El criterio de Cauchy se satisface si $\sum_{i \in I} u_i$ es sumable. Para cualquier $\varepsilon > 0$ existe un conjunto finito $J \subset I$ tal que si $K$ es finito y no tiene ningún elemento en común con $J$, entonces
+    \[
+      |S_J - S| \leq \frac{\varepsilon}{2} \qquad \text{y} \qquad |S_{J \cup K} - S| \leq \frac{\varepsilon}{2}, %\qquad (I, 1; 15)
+    \]
+    y por lo tanto
+    \[
+      |S_{J \cup K} - S_J| \leq \varepsilon. %\qquad (I, 1; 16)
+    \]
+    Sin embargo,
+    \[
+      S_{J \cup K} - S_J = S_K %\qquad (I, 1; 17)
+    \]
+    así que
+    \[
+      |S_K| \leq \varepsilon. %\qquad (I, 1; 18)
+    \]
+    
+  \item Si el criterio de Cauchy es satisfecho por una serie, entonces es evidente \textit{a fortiori} que es satisfecho por cualquier serie parcial. En particular, esto incluye las series parciales formadas por los $u_i \geq 0$ o las series parciales formadas por los $u_i \leq 0$.
+    
+  \item Una serie de términos $\geq 0$ (o de términos $\leq 0$) es sumable si satisface el criterio de Cauchy. De hecho, se puede ver de inmediato que sus sumas parciales están acotadas y la sumabilidad entonces se deduce del Teorema 3.
+    
+    Combinando 2 y 3, se sigue inmediatamente que si una serie satisface el criterio de Cauchy, entonces la serie de sus términos positivos y la serie de sus términos $\leq 0$ son ambas sumables. Definamos, para cualquier número real $x$,
+    \[
+      x^+ = x \quad \text{si } x \geq 0, \qquad x^+ = 0 \quad \text{si } x \leq 0, 
+    \]
+    \[
+      x^- = -x \quad \text{si } x \leq 0, \qquad x^- = 0 \quad \text{si } x \geq 0,
+    \]
+    así que
+    \[
+      x^+ \geq 0, \qquad x^- \geq 0, \qquad x = x^+ - x^-, \qquad |x| = x^+ + x^-.
+    \]
+    Entonces, los resultados recién obtenidos pueden expresarse diciendo que, si $\sum_{i \in I} u_i$ satisface el criterio de Cauchy, $\sum_{i \in I} u_i^+$ y $\sum_{i \in I} u_i^-$ son ambas sumables. Se sigue por la Proposición~\ref{prop:combinacionLineal} que su diferencia $\sum_{i \in I} u_i$ es sumable. Junto con 1., esto prueba el Teorema~\ref{thm:CriterioCauchy}. También se sigue que la suma $\sum_{i \in I} |u_i|$ es sumable y que la desigualdad \eqref{(I, 1; 12)} se satisface.
+    
+    Recíprocamente, si $\sum_{i \in I} |u_i|$ es sumable, entonces las sumas parciales están acotadas y por lo tanto $\sum_{i \in I} u_i^+$, $\sum_{i \in I} u_i^-$ y su diferencia $\sum_{i \in I} u_i$ son sumables, lo cual prueba la primera parte del Teorema~\ref{thm:CorolarioCriterioCauchy}; la segunda parte es entonces obvia, pues si $\sum_{i \in I} v_i$ es sumable, sus sumas parciales están acotadas y por lo tanto, \textit{a fortiori}, también las de $\sum_{i \in I} u_i$. La desigualdad \eqref{(I, 1; 14)} se deduce entonces de \eqref{(I, 1; 12)}.
+    
+  \item Aún queda por demostrar el Teorema~\ref{thm:ConsecuenciacriterioCauchy}. Si la serie $\sum_{i \in I} u_i$ es sumable, satisface el criterio de Cauchy y, \textit{a fortiori}, las series parciales también lo hacen (ver 2.) y son por tanto sumables. Sea $J$ un conjunto de índices tal que, para cada $K_1 \supset J$ finito,
+    \[
+      |S - S_{K_1}| \leq \varepsilon.
+    \]
+    Entonces, si $K$ es un conjunto infinito de índices que contiene a $J$, existe para cualquier $\eta > 0$ un conjunto finito de índices $K_1$ tal que $J \subset K_1 \subset K$, tal que
+    \[
+      |S_K - S_{K_1}| \leq \eta
+    \]
+    (definición de sumabilidad de $\sum_{i \in K} u_i$). Entonces
+    \[
+      |S_K - S_{K_1}| \leq \eta, \qquad |S - S_{K_1}| \leq \varepsilon,
+    \]
+    y por lo tanto
+    \[
+      |S - S_K| \leq \varepsilon + \eta.
+    \]
+    Así, como $\eta$ es arbitrario,
+    \[
+      |S - S_K| \leq \varepsilon
+    \]
+    (con $K$ infinito).
+    
+    Finalmente, la parte del Teorema~\ref{thm:ConsecuenciacriterioCauchy} que trata con una descomposición
+    \[
+      J = J_1 \cup J_2 \cup \ldots \cup J_n
+    \]
+    es ahora obvia.
+  \end{enumerate}
+    
+  \textit{Nota.} Sea $k$ un elemento de $I$ tal que $k \notin J$. Aplicando el criterio de Cauchy al conjunto $K = \{k\}$, tenemos $|S_k| = |u_k| \leq \varepsilon$. Por lo tanto:
+  \begin{quote}
+    \textit{Si} $\sum_{i \in I} u_i$ \textit{es sumable, entonces para cualquier} $\varepsilon > 0$ \textit{existe un subconjunto finito} $J$ \textit{de} $I$ \textit{tal que, para cada} $k \notin J$, $|u_k| \leq \varepsilon$.
+  \end{quote}
+  Esto puede expresarse diciendo que:
+  \begin{quote}
+    \textit{Si} $\sum_{i \in I} u_i$ \textit{es sumable, el término general} $u_i$ \textit{tiende a cero}. Esta idea es, por tanto, independiente del orden de los términos.
+  \end{quote}
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{proof}[Demostración de los Teoremas 5, 6 y 7]\mbox{\ }
+  
+  \begin{enumerate}
+  \item El criterio de Cauchy se satisface si $\sum_{i \in I} u_i$ es sumable. Para cualquier $\varepsilon > 0$ existe un conjunto finito $J \subset I$ tal que si $K$ es finito y no tiene ningún elemento en común con $J$, entonces
+    \[
+      |S_J - S| \leq \frac{\varepsilon}{2} \qquad \text{y} \qquad |S_{J \cup K} - S| \leq \frac{\varepsilon}{2}, %\qquad (I, 1; 15)
+    \]
+    y por lo tanto
+    \[
+      |S_{J \cup K} - S_J| \leq \varepsilon. %\qquad (I, 1; 16)
+    \]
+    Sin embargo,
+    \[
+      S_{J \cup K} - S_J = S_K %\qquad (I, 1; 17)
+    \]
+    así que
+    \[
+      |S_K| \leq \varepsilon. %\qquad (I, 1; 18)
+    \]
+    
+  \item Si el criterio de Cauchy es satisfecho por una serie, entonces es evidente \textit{a fortiori} que es satisfecho por cualquier serie parcial. En particular, esto incluye las series parciales formadas por los $u_i \geq 0$ o las series parciales formadas por los $u_i \leq 0$.
+    
+  \item Una serie de términos $\geq 0$ (o de términos $\leq 0$) es sumable si satisface el criterio de Cauchy. De hecho, se puede ver de inmediato que sus sumas parciales están acotadas y la sumabilidad entonces se deduce del Teorema 3.
+    
+    Combinando 2 y 3, se sigue inmediatamente que si una serie satisface el criterio de Cauchy, entonces la serie de sus términos positivos y la serie de sus términos $\leq 0$ son ambas sumables. Definamos, para cualquier número real $x$,
+    \[
+      x^+ = x \quad \text{si } x \geq 0, \qquad x^+ = 0 \quad \text{si } x \leq 0, 
+    \]
+    \[
+      x^- = -x \quad \text{si } x \leq 0, \qquad x^- = 0 \quad \text{si } x \geq 0,
+    \]
+    así que
+    \[
+      x^+ \geq 0, \qquad x^- \geq 0, \qquad x = x^+ - x^-, \qquad |x| = x^+ + x^-.
+    \]
+    Entonces, los resultados recién obtenidos pueden expresarse diciendo que, si $\sum_{i \in I} u_i$ satisface el criterio de Cauchy, $\sum_{i \in I} u_i^+$ y $\sum_{i \in I} u_i^-$ son ambas sumables. Se sigue por la Proposición~\ref{prop:combinacionLineal} que su diferencia $\sum_{i \in I} u_i$ es sumable. Junto con 1., esto prueba el Teorema~\ref{thm:CriterioCauchy}. También se sigue que la suma $\sum_{i \in I} |u_i|$ es sumable y que la desigualdad \eqref{(I, 1; 12)} se satisface.
+    
+    Recíprocamente, si $\sum_{i \in I} |u_i|$ es sumable, entonces las sumas parciales están acotadas y por lo tanto $\sum_{i \in I} u_i^+$, $\sum_{i \in I} u_i^-$ y su diferencia $\sum_{i \in I} u_i$ son sumables, lo cual prueba la primera parte del Teorema~\ref{thm:CorolarioCriterioCauchy}; la segunda parte es entonces obvia, pues si $\sum_{i \in I} v_i$ es sumable, sus sumas parciales están acotadas y por lo tanto, \textit{a fortiori}, también las de $\sum_{i \in I} u_i$. La desigualdad \eqref{(I, 1; 14)} se deduce entonces de \eqref{(I, 1; 12)}.
+    
+  \item Aún queda por demostrar el Teorema~\ref{thm:ConsecuenciacriterioCauchy}. Si la serie $\sum_{i \in I} u_i$ es sumable, satisface el criterio de Cauchy y, \textit{a fortiori}, las series parciales también lo hacen (ver 2.) y son por tanto sumables. Sea $J$ un conjunto de índices tal que, para cada $K_1 \supset J$ finito,
+    \[
+      |S - S_{K_1}| \leq \varepsilon.
+    \]
+    Entonces, si $K$ es un conjunto infinito de índices que contiene a $J$, existe para cualquier $\eta > 0$ un conjunto finito de índices $K_1$ tal que $J \subset K_1 \subset K$, tal que
+    \[
+      |S_K - S_{K_1}| \leq \eta
+    \]
+    (definición de sumabilidad de $\sum_{i \in K} u_i$). Entonces
+    \[
+      |S_K - S_{K_1}| \leq \eta, \qquad |S - S_{K_1}| \leq \varepsilon,
+    \]
+    y por lo tanto
+    \[
+      |S - S_K| \leq \varepsilon + \eta.
+    \]
+    Así, como $\eta$ es arbitrario,
+    \[
+      |S - S_K| \leq \varepsilon
+    \]
+    (con $K$ infinito).
+    
+    Finalmente, la parte del Teorema~\ref{thm:ConsecuenciacriterioCauchy} que trata con una descomposición
+    \[
+      J = J_1 \cup J_2 \cup \ldots \cup J_n
+    \]
+    es ahora obvia.
+  \end{enumerate}
+    
+  \textit{Nota.} Sea $k$ un elemento de $I$ tal que $k \notin J$. Aplicando el criterio de Cauchy al conjunto $K = \{k\}$, tenemos $|S_k| = |u_k| \leq \varepsilon$. Por lo tanto:
+  \begin{quote}
+    \textit{Si} $\sum_{i \in I} u_i$ \textit{es sumable, entonces para cualquier} $\varepsilon > 0$ \textit{existe un subconjunto finito} $J$ \textit{de} $I$ \textit{tal que, para cada} $k \notin J$, $|u_k| \leq \varepsilon$.
+  \end{quote}
+  Esto puede expresarse diciendo que:
+  \begin{quote}
+    \textit{Si} $\sum_{i \in I} u_i$ \textit{es sumable, el término general} $u_i$ \textit{tiende a cero}. Esta idea es, por tanto, independiente del orden de los términos.
+  \end{quote}
+\end{proof}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{theorem}
+  \label{thm:sumaSucesionSubconjuntos}
+  Si $J_n$ ($n = 0, 1, 2, \ldots$) es una sucesión de subconjuntos finitos o infinitos de $I$ tal que, para cualquier subconjunto finito $J \subset I$, el subconjunto $J_n$ contiene a $J$ para todo $n$ suficientemente grande, y si
+  \[
+    \sum_{i \in I} u_i
+  \]
+  es sumable con suma $S$, entonces $S_{J_n}$ converge a $S$ cuando $n \to \infty$.
+\end{theorem}
+
+\begin{proof}
+  Para cualquier $\varepsilon > 0$, existe un subconjunto finito $J \subset I$ tal que, para todo subconjunto finito o infinito $K \supset J$,
+  \[
+    |S - S_K| \leq \varepsilon.
+  \]
+  Por hipótesis, existe un número $n_0$ tal que para $n \geq n_0$, $J_n$ contiene a $J$. Así, para $n \geq n_0$,
+  \[
+    |S - S_{J_n}| \leq \varepsilon.
+  \]
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{theorem}
+  \label{thm:sumaSucesionSubconjuntos}
+  Si $J_n$ ($n = 0, 1, 2, \ldots$) es una sucesión de subconjuntos finitos o infinitos de $I$ tal que, para cualquier subconjunto finito $J \subset I$, el subconjunto $J_n$ contiene a $J$ para todo $n$ suficientemente grande, y si
+  \[
+    \sum_{i \in I} u_i
+  \]
+  es sumable con suma $S$, entonces $S_{J_n}$ converge a $S$ cuando $n \to \infty$.
+\end{theorem}
+
+\begin{proof}
+  Para cualquier $\varepsilon > 0$, existe un subconjunto finito $J \subset I$ tal que, para todo subconjunto finito o infinito $K \supset J$,
+  \[
+    |S - S_K| \leq \varepsilon.
+  \]
+  Por hipótesis, existe un número $n_0$ tal que para $n \geq n_0$, $J_n$ contiene a $J$. Así, para $n \geq n_0$,
+  \[
+    |S - S_{J_n}| \leq \varepsilon.
+  \]
+\end{proof}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{theorem}[Sumabilidad y convergencia absoluta]
+  \label{thm:SumabilidadYConvergenciaAbsoluta}
+  Si el conjunto de índices \( I \) es el conjunto \( \mathbb{N} \) de los enteros positivos y el cero, entonces la serie \( \sum_{i \in I} u_i \) es sumable si y solo si es absolutamente convergente, y la suma tal como se define en la teoría de series sumables es idéntica a la suma tal como se define en la teoría de series convergentes.
+\end{theorem}
+
+\begin{proof}
+  Supongamos que \( \sum_{i \in I} u_i \) es sumable. Entonces \( \sum_{i \in I} |u_i| \) también es sumable. Denotando por \( J_n \) el subconjunto de enteros \( 0, 1, 2, \dots, n \), el Teorema~\ref{thm:sumaSucesionSubconjuntos} aplicado a \( \sum_{i \in I} |u_i| \) muestra que los números
+  \[
+    \sum_{0 \leq v \leq n} |u_v|
+  \]
+  tienden a un límite cuando \( n \to \infty \), de modo que la serie es absolutamente convergente.
+  
+  El mismo Teorema~\ref{thm:sumaSucesionSubconjuntos} aplicado a \( \sum_{i \in I} u_i \) da
+  \[
+    \lim_{n \to \infty} S_{J_n} = S,
+  \]
+  mostrando que las sumas tal como se definen en las dos teorías son las mismas. (\( S_{J_n} \) denota la suma en la teoría de series convergentes.)
+  
+  Recíprocamente, supongamos que la serie es absolutamente convergente. Entonces las sumas parciales
+  \[
+    \sum_{0 \leq v \leq n} |u_v|
+  \]
+  están acotadas, y se sigue inmediatamente que todas las sumas parciales \( S_J \) (con \( J \subset I \) finito) relativas a la serie \( \sum_{i \in I} |u_i| \) están acotadas. Así, la serie \( \sum_{i \in I} |u_i| \) es sumable y se deduce que \( \sum_{i \in I} u_i \) es sumable.
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{theorem}[Sumabilidad y convergencia absoluta]
+  \label{thm:SumabilidadYConvergenciaAbsoluta}
+  Si el conjunto de índices \( I \) es el conjunto \( \mathbb{N} \) de los enteros positivos y el cero, entonces la serie \( \sum_{i \in I} u_i \) es sumable si y solo si es absolutamente convergente, y la suma tal como se define en la teoría de series sumables es idéntica a la suma tal como se define en la teoría de series convergentes.
+\end{theorem}
+
+\begin{proof}
+  Supongamos que \( \sum_{i \in I} u_i \) es sumable. Entonces \( \sum_{i \in I} |u_i| \) también es sumable. Denotando por \( J_n \) el subconjunto de enteros \( 0, 1, 2, \dots, n \), el Teorema~\ref{thm:sumaSucesionSubconjuntos} aplicado a \( \sum_{i \in I} |u_i| \) muestra que los números
+  \[
+    \sum_{0 \leq v \leq n} |u_v|
+  \]
+  tienden a un límite cuando \( n \to \infty \), de modo que la serie es absolutamente convergente.
+  
+  El mismo Teorema~\ref{thm:sumaSucesionSubconjuntos} aplicado a \( \sum_{i \in I} u_i \) da
+  \[
+    \lim_{n \to \infty} S_{J_n} = S,
+  \]
+  mostrando que las sumas tal como se definen en las dos teorías son las mismas. (\( S_{J_n} \) denota la suma en la teoría de series convergentes.)
+  
+  Recíprocamente, supongamos que la serie es absolutamente convergente. Entonces las sumas parciales
+  \[
+    \sum_{0 \leq v \leq n} |u_v|
+  \]
+  están acotadas, y se sigue inmediatamente que todas las sumas parciales \( S_J \) (con \( J \subset I \) finito) relativas a la serie \( \sum_{i \in I} |u_i| \) están acotadas. Así, la serie \( \sum_{i \in I} |u_i| \) es sumable y se deduce que \( \sum_{i \in I} u_i \) es sumable.
+\end{proof}
+#+end_export
+
+
+#+begin_src latex :results none
+\begin{corollary}
+  Si una serie es absolutamente convergente, permanece absolutamente convergente y tiene la misma suma si se cambia el orden de los términos.
+  Porque entonces es sumable, y tanto la propiedad de sumabilidad como el valor de la suma son independientes del orden de los términos.
+\end{corollary}
+#+end_src
+
+
+#+BEGIN_SRC latex
+\begin{theorem}[Suma por paquetes o asociatividad]
+  \label{thm:SumacionPorPaquetesOAsociatividad}
+  {Supongamos que el conjunto de índices \( I \) es la unión de una familia de subconjuntos mutuamente disjuntos\footnote{Esto también puede expresarse del siguiente modo: \( I_\alpha \cap I_\beta = \emptyset \) siempre que \( \alpha \ne \beta \).} \( I_\alpha \) (\( \alpha \in A \)):}
+  \[
+    I = \bigcup_{\alpha \in I} I_\alpha.
+  \]
+  Entonces, si la serie \( \sum\limits_{i \in I} u_i \) es sumable, cada una de las series \( \sum\limits_{i \in I_\alpha} u_i \) es sumable, con suma \(\sigma_\alpha\),
+  la serie $\sum\limits_{\alpha \in A} \sigma_\alpha$ es sumable y
+  $$\sum_{i \in I} u_i = \sum_{\alpha \in A} \sigma_\alpha = \sum_{\alpha \in A} \left( \sum_{i \in I_\alpha} u_i \right).$$
+\end{theorem}
+\begin{proof}
+  Por el Teorema~\ref{thm:ConsecuenciacriterioCauchy}, cada serie $\sum\limits_{i \in I_\alpha} u_i$ es sumable. Dado que $\sum\limits_{i \in I} u_i$ es sumable, existe, para cualquier $\varepsilon>0$, un conjunto finito de índices $J \subset I$ tal que para cualquier conjunto finito o infinito de índices $K$ que contenga a $J$,
+  $$ |S - S_K| \leq \varepsilon. $$
+  Sea $B$ el subconjunto finito de $A$ que consiste en todos los índices $\alpha \in A$ tales que $I_\alpha \cap J \neq \emptyset$. Entonces, para cualquier subconjunto finito $C$ de $A$ que contenga a $B$, $\bigcup\limits_{\alpha \in C} I_\alpha$ es un subconjunto $K$ de $I$ que contiene a $J$. Por lo tanto,
+  $$ \left|S - \sum_{i \in \bigcup\limits_{\alpha \in C} I_\alpha} u_i \right| \leq \varepsilon. $$
+  Sin embargo, por la última parte del Teorema~\ref{thm:ConsecuenciacriterioCauchy}, dado que $C$ es finito,
+  $$ \sum\limits_{i \in \bigcup_{\alpha \in C} I_\alpha} u_i = \sum_{\alpha \in C} \sigma_\alpha. $$
+  Por lo tanto,
+  $$ \left|S - \sum_{\alpha \in C} \sigma_\alpha \right| \leq \varepsilon $$
+  de modo que $\sum\limits_{\alpha \in A} \sigma_\alpha$ es sumable con la suma $S$. \hfill
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{theorem}[Suma por paquetes o asociatividad]
+  \label{thm:SumacionPorPaquetesOAsociatividad}
+  {Supongamos que el conjunto de índices \( I \) es la unión de una familia de subconjuntos mutuamente disjuntos\footnote{Esto también puede expresarse del siguiente modo: \( I_\alpha \cap I_\beta = \emptyset \) siempre que \( \alpha \ne \beta \).} \( I_\alpha \) (\( \alpha \in A \)):}
+  \[
+    I = \bigcup_{\alpha \in I} I_\alpha.
+  \]
+  Entonces, si la serie \( \sum\limits_{i \in I} u_i \) es sumable, cada una de las series \( \sum\limits_{i \in I_\alpha} u_i \) es sumable, con suma \(\sigma_\alpha\),
+  la serie $\sum\limits_{\alpha \in A} \sigma_\alpha$ es sumable y
+  $$\sum_{i \in I} u_i = \sum_{\alpha \in A} \sigma_\alpha = \sum_{\alpha \in A} \left( \sum_{i \in I_\alpha} u_i \right).$$
+\end{theorem}
+\begin{proof}
+  Por el Teorema~\ref{thm:ConsecuenciacriterioCauchy}, cada serie $\sum\limits_{i \in I_\alpha} u_i$ es sumable. Dado que $\sum\limits_{i \in I} u_i$ es sumable, existe, para cualquier $\varepsilon>0$, un conjunto finito de índices $J \subset I$ tal que para cualquier conjunto finito o infinito de índices $K$ que contenga a $J$,
+  $$ |S - S_K| \leq \varepsilon. $$
+  Sea $B$ el subconjunto finito de $A$ que consiste en todos los índices $\alpha \in A$ tales que $I_\alpha \cap J \neq \emptyset$. Entonces, para cualquier subconjunto finito $C$ de $A$ que contenga a $B$, $\bigcup\limits_{\alpha \in C} I_\alpha$ es un subconjunto $K$ de $I$ que contiene a $J$. Por lo tanto,
+  $$ \left|S - \sum_{i \in \bigcup\limits_{\alpha \in C} I_\alpha} u_i \right| \leq \varepsilon. $$
+  Sin embargo, por la última parte del Teorema~\ref{thm:ConsecuenciacriterioCauchy}, dado que $C$ es finito,
+  $$ \sum\limits_{i \in \bigcup_{\alpha \in C} I_\alpha} u_i = \sum_{\alpha \in C} \sigma_\alpha. $$
+  Por lo tanto,
+  $$ \left|S - \sum_{\alpha \in C} \sigma_\alpha \right| \leq \varepsilon $$
+  de modo que $\sum\limits_{\alpha \in A} \sigma_\alpha$ es sumable con la suma $S$. \hfill
+\end{proof}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\textbf{Nota} \textit{El recíproco no es cierto}. Puede ocurrir que cada serie $\sum_{i \in I_\alpha} u_i$ sea
+sumable con suma $\sigma_\alpha$, y $\sum_{\alpha \in A} \sigma_\alpha$ sea sumable pero $\sum_{i \in I} u_i$ no sea sumable. En
+este caso, si $B$ es otro conjunto de índices y $\{I_\beta \mid \beta \in B\}$ otra partición de $I$
+en subconjuntos, ninguno de los cuales tiene un elemento común, es posible que
+ambas expresiones
+$$ \sum_{\alpha \in A} \left( \sum_{i \in I_\alpha} u_i \right), \quad \sum_{\beta \in B} \left( \sum_{i \in I_\beta} u_i \right) $$
+estén definidan pero no sean iguales.
+
+\vspace{1em}
+\textbf{Ejemplo.} $A$ es el conjunto de los enteros $n \ge 0$. Para cada $\alpha = n$, $I_\alpha$ consta de
+dos elementos, $n$ y $-n$ (excepto para $n=0$ donde solo hay un elemento).
+$I = \bigcup\limits_\alpha I_\alpha$ es, por lo tanto, el conjunto de todos los enteros positivos y negativos. Para cada
+entero $i \in I$, sea $u_i = i$. Entonces $\sum_{i \in I} u_i$ no es sumable ya que
+$$ \sum_{i \ge 0} u_i = 0 + 1 + 2 + \dots = +\infty. $$
+Pero
+$$ \sum_{i \in I_\alpha} u_i = \alpha - \alpha = 0 = \sigma_\alpha. $$
+Por lo tanto,
+$$ \sum_{\alpha \in A} \sigma_\alpha = \sum_{\alpha \in A} 0 = 0. $$
+Cada serie $\sum\limits_{i \in I_\alpha} u_i$ es, por consiguiente, sumable con suma 0; de ahí que $\sum\limits_{\alpha \in A} \sigma_\alpha = \sum_{\alpha \in A} 0 = 0$
+sea sumable aunque $\sum\limits_{i \in I} u_i$ no lo sea.
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\textbf{Nota} \textit{El recíproco no es cierto}. Puede ocurrir que cada serie $\sum_{i \in I_\alpha} u_i$ sea
+sumable con suma $\sigma_\alpha$, y $\sum_{\alpha \in A} \sigma_\alpha$ sea sumable pero $\sum_{i \in I} u_i$ no sea sumable. En
+este caso, si $B$ es otro conjunto de índices y $\{I_\beta \mid \beta \in B\}$ otra partición de $I$
+en subconjuntos, ninguno de los cuales tiene un elemento común, es posible que
+ambas expresiones
+$$ \sum_{\alpha \in A} \left( \sum_{i \in I_\alpha} u_i \right), \quad \sum_{\beta \in B} \left( \sum_{i \in I_\beta} u_i \right) $$
+estén definidan pero no sean iguales.
+
+\vspace{1em}
+\textbf{Ejemplo.} $A$ es el conjunto de los enteros $n \ge 0$. Para cada $\alpha = n$, $I_\alpha$ consta de
+dos elementos, $n$ y $-n$ (excepto para $n=0$ donde solo hay un elemento).
+$I = \bigcup\limits_\alpha I_\alpha$ es, por lo tanto, el conjunto de todos los enteros positivos y negativos. Para cada
+entero $i \in I$, sea $u_i = i$. Entonces $\sum_{i \in I} u_i$ no es sumable ya que
+$$ \sum_{i \ge 0} u_i = 0 + 1 + 2 + \dots = +\infty. $$
+Pero
+$$ \sum_{i \in I_\alpha} u_i = \alpha - \alpha = 0 = \sigma_\alpha. $$
+Por lo tanto,
+$$ \sum_{\alpha \in A} \sigma_\alpha = \sum_{\alpha \in A} 0 = 0. $$
+Cada serie $\sum\limits_{i \in I_\alpha} u_i$ es, por consiguiente, sumable con suma 0; de ahí que $\sum\limits_{\alpha \in A} \sigma_\alpha = \sum_{\alpha \in A} 0 = 0$
+sea sumable aunque $\sum\limits_{i \in I} u_i$ no lo sea.
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{theorem}[Caso particular en el que el recíproco del Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad} es válido]
+  \label{thm:CasoParticular}
+  Si todos los $u_i \ge 0$ y si acordamos designar $+\infty$ como la
+  suma de una serie divergente de términos $\ge 0$, entonces siempre
+  es cierto que
+  $$ \sum_{i \in I} u_i = \sum_{x \in A} \left( \sum_{i \in I_x} u_i \right), $$
+  siendo el valor de ambos lados finito o $+\infty$.
+\end{theorem}
+\begin{proof}  
+  Lo siguiente es el recíproco parcial al Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad}: si $u_i \ge 0$, $\sum_{i \in I} u_i$
+  es sumable con suma $\sigma$, y si $\sum_{x \in A} \sigma_x$ es sumable, entonces $\sum_{i \in I} u_i$ es sumable.
+  Para ello, sea $\sigma_x = \sum_{i \in I_x} u_i$. Poniendo $\sum_{x \in A} \sigma_x = \sigma$, toda suma finita $\sum_{x \in C} \sigma_x$ está acotada superiormente por $\sigma$.
+  Sea $J$ cualquier subconjunto finito de $I$, y $C$ el conjunto (finito) de elementos $x$ de $A$
+  tales que $I_x \cap J \neq \emptyset$. Dado que $C$ es finito, la última parte del Teorema~\ref{thm:ConsecuenciacriterioCauchy} da
+  $$ \sum_{i \in \bigcup_{x \in C} I_x} u_i = \sum_{x \in C} \sigma_x. $$
+  Pero $S_J \le \sum_{i \in \bigcup_{x \in C} I_x} u_i$ y $\sum_{x \in C} \sigma_x \le \sigma$, de modo que $S_J \le \sigma$.
+  Así, todas las sumas $S_J$ están acotadas superiormente por $\sigma$ y, por la Proposición~\ref{prop:SeriesTerminosPositivos}, $\sum_{i \in I} u_i$
+  es sumable.
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{theorem}[Caso particular en el que el recíproco del Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad} es válido]
+  \label{thm:CasoParticular}
+  Si todos los $u_i \ge 0$ y si acordamos designar $+\infty$ como la
+  suma de una serie divergente de términos $\ge 0$, entonces siempre
+  es cierto que
+  $$ \sum_{i \in I} u_i = \sum_{x \in A} \left( \sum_{i \in I_x} u_i \right), $$
+  siendo el valor de ambos lados finito o $+\infty$.
+\end{theorem}
+\begin{proof}  
+  Lo siguiente es el recíproco parcial al Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad}: si $u_i \ge 0$, $\sum_{i \in I} u_i$
+  es sumable con suma $\sigma$, y si $\sum_{x \in A} \sigma_x$ es sumable, entonces $\sum_{i \in I} u_i$ es sumable.
+  Para ello, sea $\sigma_x = \sum_{i \in I_x} u_i$. Poniendo $\sum_{x \in A} \sigma_x = \sigma$, toda suma finita $\sum_{x \in C} \sigma_x$ está acotada superiormente por $\sigma$.
+  Sea $J$ cualquier subconjunto finito de $I$, y $C$ el conjunto (finito) de elementos $x$ de $A$
+  tales que $I_x \cap J \neq \emptyset$. Dado que $C$ es finito, la última parte del Teorema~\ref{thm:ConsecuenciacriterioCauchy} da
+  $$ \sum_{i \in \bigcup_{x \in C} I_x} u_i = \sum_{x \in C} \sigma_x. $$
+  Pero $S_J \le \sum_{i \in \bigcup_{x \in C} I_x} u_i$ y $\sum_{x \in C} \sigma_x \le \sigma$, de modo que $S_J \le \sigma$.
+  Así, todas las sumas $S_J$ están acotadas superiormente por $\sigma$ y, por la Proposición~\ref{prop:SeriesTerminosPositivos}, $\sum_{i \in I} u_i$
+  es sumable.
+\end{proof}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{corollary}[de Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad}]
+  \label{cor:sumaDeLaConvolucionEnl1}
+  Si las series
+  $$ \sum_{i \in I} u_i \quad \text{y} \quad \sum_{j \in J} v_j $$
+  son sumables, con las sumas respectivas $U$ y $V$, entonces la serie producto
+  $$ \sum_{(i, j) \in I \times J} u_i v_j $$
+  es sumable con la suma
+  $$ W = UV. $$
+\end{corollary}
+  
+\begin{proof}
+  Ya que la suma por paquetes da
+  $$ \sum_{(i, j) \in I \times J} u_i v_j = \sum_{i \in I} \left( \sum_{j \in J} u_i v_j \right) = \sum_{i \in I} \left( u_i \sum_{j \in J} v_j \right) = \sum_{i \in I} (u_i V) = V \sum_{i \in I} u_i = VU, $$
+  lo cual muestra que si la suma por paquetes puede realizarse, entonces la serie
+  $\sum\limits_{(i, j) \in I \times J} u_i v_j$ tiene de hecho la suma $UV$. Pero para que la suma por paquetes
+  sea legítima, primero es necesario saber que la serie $\sum\limits_{(i, j) \in I \times J} u_i v_j$ es
+  sumable.
+
+  No obstante, el teorema es verdadero cuando todos los $u_i$ y $v_j$ son $\ge 0$, ya que
+  la suma por paquetes es entonces siempre legítima, por el Teorema~\ref{thm:CasoParticular}.
+  Si los $u_i$ y $v_j$ pueden tomar cualquier signo, es necesario considerar $|u_i|$ y $|v_j|$.
+  Por el Teorema~\ref{thm:CorolarioCriterioCauchy}, $\sum\limits_{i \in I} |u_i|$ y $\sum\limits_{j \in J} |v_j|$ son sumables de modo que $\sum\limits_{(i, j) \in I \times J} |u_i v_j|$ es
+  sumable con la suma $\left( \sum\limits_{i \in I} |u_i| \right) \left( \sum\limits_{j \in J} |v_j| \right)$. Por lo tanto, $\sum\limits_{(i, j) \in I \times J} u_i v_j$ también es
+  sumable.
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{corollary}[de Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad}]
+  \label{cor:sumaDeLaConvolucionEnl1}
+  Si las series
+  $$ \sum_{i \in I} u_i \quad \text{y} \quad \sum_{j \in J} v_j $$
+  son sumables, con las sumas respectivas $U$ y $V$, entonces la serie producto
+  $$ \sum_{(i, j) \in I \times J} u_i v_j $$
+  es sumable con la suma
+  $$ W = UV. $$
+\end{corollary}
+  
+\begin{proof}
+  Ya que la suma por paquetes da
+  $$ \sum_{(i, j) \in I \times J} u_i v_j = \sum_{i \in I} \left( \sum_{j \in J} u_i v_j \right) = \sum_{i \in I} \left( u_i \sum_{j \in J} v_j \right) = \sum_{i \in I} (u_i V) = V \sum_{i \in I} u_i = VU, $$
+  lo cual muestra que si la suma por paquetes puede realizarse, entonces la serie
+  $\sum\limits_{(i, j) \in I \times J} u_i v_j$ tiene de hecho la suma $UV$. Pero para que la suma por paquetes
+  sea legítima, primero es necesario saber que la serie $\sum\limits_{(i, j) \in I \times J} u_i v_j$ es
+  sumable.
+
+  No obstante, el teorema es verdadero cuando todos los $u_i$ y $v_j$ son $\ge 0$, ya que
+  la suma por paquetes es entonces siempre legítima, por el Teorema~\ref{thm:CasoParticular}.
+  Si los $u_i$ y $v_j$ pueden tomar cualquier signo, es necesario considerar $|u_i|$ y $|v_j|$.
+  Por el Teorema~\ref{thm:CorolarioCriterioCauchy}, $\sum\limits_{i \in I} |u_i|$ y $\sum\limits_{j \in J} |v_j|$ son sumables de modo que $\sum\limits_{(i, j) \in I \times J} |u_i v_j|$ es
+  sumable con la suma $\left( \sum\limits_{i \in I} |u_i| \right) \left( \sum\limits_{j \in J} |v_j| \right)$. Por lo tanto, $\sum\limits_{(i, j) \in I \times J} u_i v_j$ también es
+  sumable.
+\end{proof}
+#+end_export
+
+
+* Demostraciones de algunos resultados sobre series en general
+
+** Sumabilidad y convergencia absoluta
+
+#+BEGIN_SRC latex
+El capítulo 1 del libro de Laurent Schwartz contempla el caso en que los índices son el conjunto de enteros positivos \( \mathbb{N} \). Pero el resultado de la sumabilidad y convergencia absoluta se puede extender al conjunto de enteros \( \mathbb{Z} \).
+
+\begin{corollary}[del Teorema \ref{thm:SumabilidadYConvergenciaAbsoluta}]
+  \label{cor:SumabilidadYConvergenciaAbsoluta}
+  Si el conjunto de índices \( I \) es el conjunto \( \mathbb{Z} \) de números enteros, entonces la serie \( \sum_{i \in I} u_i \) es sumable si y solo si es absolutamente convergente, y la suma tal como se define en la teoría de series sumables es idéntica a la suma tal como se define en la teoría de series convergentes.
+\end{corollary}
+
+\begin{proof}
+  La demostración es exactamente igual a la del Teorema \ref{thm:SumabilidadYConvergenciaAbsoluta}, pero aplicada a la suma de dos series: una con los índices negativos y la otra con los índices mayores o iguales a cero, pues:
+  \[\sum_{i \in \mathbb{Z}} u_i = \sum_{i < 0} u_i \,+\,  \sum_{i \geq 0} u_i.\]
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{corollary}[del Teorema \ref{thm:SumabilidadYConvergenciaAbsoluta}]
+  \label{cor:SumabilidadYConvergenciaAbsoluta}
+  Si el conjunto de índices \( I \) es el conjunto \( \mathbb{Z} \) de números enteros, entonces la serie \( \sum_{i \in I} u_i \) es sumable si y solo si es absolutamente convergente, y la suma tal como se define en la teoría de series sumables es idéntica a la suma tal como se define en la teoría de series convergentes.
+\end{corollary}
+
+\begin{proof}
+  La demostración es exactamente igual a la del Teorema \ref{thm:SumabilidadYConvergenciaAbsoluta}, pero aplicada a la suma de dos series: una con los índices negativos y la otra con los índices mayores o iguales a cero, pues:
+  \[\sum_{i \in \mathbb{Z}} u_i = \sum_{i < 0} u_i \,+\,  \sum_{i \geq 0} u_i.\]
+\end{proof}
+#+end_export
+
+** Relación entre series absolutamente sumables y series de cuadrado sumable
+
+
+#+BEGIN_SRC latex
+\begin{prop}
+  \label{prop:l1dentrodel2}
+  Una sucesión absolutamente sumable siempre es de cuadrado sumable, $\ell^1\subset \ell^2$.
+\end{prop}
+\begin{proof}
+  Como $\sum\limits_{i \in \mathbb{Z}} a_i$ es sumable, también lo es $\sum\limits_{(i,j) \in \mathbb{Z} \times \mathbb{Z}} a_i a_j$. 
+  Ahora bien, como $\mathbb{Z} \times \mathbb{Z} = (I_{\neq} \cup I_{=})$, 
+  donde $I_{\neq} = \{(i,j) \in \mathbb{Z} \times \mathbb{Z} \mid i \neq j\}$ y $I_{=} = $  $\{(i,j) \in \mathbb{Z} \times \mathbb{Z} \mid i = j\}$ e $I_{\neq} \cap I_{=} = \emptyset$, 
+  sabemos que son sumables $\sum\limits_{(i,j) \in I_{\neq}} a_i a_j$ y $\sum\limits_{(i,j) \in I_{=} } a_i a_j$. 
+  Pero esto último es $\sum_{i \in \mathbb{Z}} a_i^2$ y consiguientemente $\sum_{i \in \mathbb{Z}} |a_i^2|$ es sumable (Teorema~\ref{thm:CorolarioCriterioCauchy}). 
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}
+  \label{prop:l1dentrodel2}
+  Una sucesión absolutamente sumable siempre es de cuadrado sumable, $\ell^1\subset \ell^2$.
+\end{prop}
+\begin{proof}
+  Como $\sum\limits_{i \in \mathbb{Z}} a_i$ es sumable, también lo es $\sum\limits_{(i,j) \in \mathbb{Z} \times \mathbb{Z}} a_i a_j$. 
+  Ahora bien, como $\mathbb{Z} \times \mathbb{Z} = (I_{\neq} \cup I_{=})$, 
+  donde $I_{\neq} = \{(i,j) \in \mathbb{Z} \times \mathbb{Z} \mid i \neq j\}$ y $I_{=} = $  $\{(i,j) \in \mathbb{Z} \times \mathbb{Z} \mid i = j\}$ e $I_{\neq} \cap I_{=} = \emptyset$, 
+  sabemos que son sumables $\sum\limits_{(i,j) \in I_{\neq}} a_i a_j$ y $\sum\limits_{(i,j) \in I_{=} } a_i a_j$. 
+  Pero esto último es $\sum_{i \in \mathbb{Z}} a_i^2$ y consiguientemente $\sum_{i \in \mathbb{Z}} |a_i^2|$ es sumable (Teorema~\ref{thm:CorolarioCriterioCauchy}). 
+\end{proof}
+#+end_export
+
+** Convolución de series con principio. Convolución de series con final
+
+#+BEGIN_SRC latex
+\begin{prop}
+  \label{prop:convolucionConPrincipio}
+  Sean $\boldsymbol{a}$ y $\boldsymbol{b}$ sucesiones \underline{con principio} (con cogrado). 
+  Su producto convolución es la sucesión cuyo elemento $t$-ésimo es:
+  $$(\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}$$
+  
+  Además, el cogrado de $\boldsymbol{a}*\boldsymbol{b}$ es la suma de los respectivos cogrados.
+\end{prop}
+\begin{proof}
+  Si $\boldsymbol{a}$ o $\boldsymbol{b}$ son nulas, el resultado es trivial.
+  Sean $\boldsymbol{a}$ y $\boldsymbol{b}$ dos sucesiones con principio y sea  $\gamma_a=cogrado(\boldsymbol{a})$ y $\gamma_b=cogrado(\boldsymbol{b})$.
+  \begin{enumerate}
+  \item El conjunto de índices $I_j=\{(r,s)\in\mathbb{Z}\times\mathbb{Z}\mid r+s=j\ \text{ y }\ a_jb_j\ne0\}$ es finito pues
+    \[I_j \subset   \{(r,s)\in\mathbb{Z}\times\mathbb{Z}\mid r+s=j\ \text{ y }\ r\geq\gamma_{a},\ s\geq\gamma_{b} \}\]
+    \[\qquad\qquad\quad\subset \{(\gamma_{a},\ \gamma_{b}+\alpha),\ (\gamma_{a}+1,\ \gamma_{b}+\alpha-1),\ldots,\ (\gamma_{a}+\alpha,\ \gamma_{b})\},\]
+    donde $\alpha=j-\gamma_a-\gamma_b$.
+    
+    Por consiguiente, la suma $\sum_{r+s=j} a_rb_s$ está definida para todo $j$.
+  \item Si $j<\gamma_a+\gamma_b$,\; entonces $(\boldsymbol{a}*\boldsymbol{b})_j=0$, ya que en este caso $r<\gamma_a$ ó $s<\gamma_b$. 
+    Si $j=\gamma_a+\gamma_b$,\;entonces $(\boldsymbol{a}*\boldsymbol{b})_j=a_{\gamma_a}b_{\gamma_b}\ne0$.
+  \end{enumerate}
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}
+  \label{prop:convolucionConPrincipio}
+  Sean $\boldsymbol{a}$ y $\boldsymbol{b}$ sucesiones \underline{con principio} (con cogrado). 
+  Su producto convolución es la sucesión cuyo elemento $t$-ésimo es:
+  $$(\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}$$
+  
+  Además, el cogrado de $\boldsymbol{a}*\boldsymbol{b}$ es la suma de los respectivos cogrados.
+\end{prop}
+\begin{proof}
+  Si $\boldsymbol{a}$ o $\boldsymbol{b}$ son nulas, el resultado es trivial.
+  Sean $\boldsymbol{a}$ y $\boldsymbol{b}$ dos sucesiones con principio y sea  $\gamma_a=cogrado(\boldsymbol{a})$ y $\gamma_b=cogrado(\boldsymbol{b})$.
+  \begin{enumerate}
+  \item El conjunto de índices $I_j=\{(r,s)\in\mathbb{Z}\times\mathbb{Z}\mid r+s=j\ \text{ y }\ a_jb_j\ne0\}$ es finito pues
+    \[I_j \subset   \{(r,s)\in\mathbb{Z}\times\mathbb{Z}\mid r+s=j\ \text{ y }\ r\geq\gamma_{a},\ s\geq\gamma_{b} \}\]
+    \[\qquad\qquad\quad\subset \{(\gamma_{a},\ \gamma_{b}+\alpha),\ (\gamma_{a}+1,\ \gamma_{b}+\alpha-1),\ldots,\ (\gamma_{a}+\alpha,\ \gamma_{b})\},\]
+    donde $\alpha=j-\gamma_a-\gamma_b$.
+    
+    Por consiguiente, la suma $\sum_{r+s=j} a_rb_s$ está definida para todo $j$.
+  \item Si $j<\gamma_a+\gamma_b$,\; entonces $(\boldsymbol{a}*\boldsymbol{b})_j=0$, ya que en este caso $r<\gamma_a$ ó $s<\gamma_b$. 
+    Si $j=\gamma_a+\gamma_b$,\;entonces $(\boldsymbol{a}*\boldsymbol{b})_j=a_{\gamma_a}b_{\gamma_b}\ne0$.
+  \end{enumerate}
+\end{proof}
+#+end_export
+
+
+#+BEGIN_SRC latex
+\begin{prop}
+  \label{prop:convolucionConFinal}
+  Sean $\boldsymbol{a}$ y $\boldsymbol{b}$ sucesiones \underline{con final} (con grado). 
+  Su producto convolución es la sucesión cuyo elemento $t$-ésimo es:
+  $$(\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}$$
+  
+  Además, el grado de $\boldsymbol{a}*\boldsymbol{b}$ es la suma de los respectivos grados.
+\end{prop}
+\begin{proof}
+  Similar a la de las sucesiones con principio
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}
+  \label{prop:convolucionConFinal}
+  Sean $\boldsymbol{a}$ y $\boldsymbol{b}$ sucesiones \underline{con final} (con grado). 
+  Su producto convolución es la sucesión cuyo elemento $t$-ésimo es:
+  $$(\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}$$
+  
+  Además, el grado de $\boldsymbol{a}*\boldsymbol{b}$ es la suma de los respectivos grados.
+\end{prop}
+\begin{proof}
+  Similar a la de las sucesiones con principio
+\end{proof}
+#+end_export
+
+** Convolución de series absolutamente sumables.
+
+
+#+BEGIN_SRC latex
+\begin{prop}
+  \label{prop:convolucionSeriesSumables}
+  Sean $\boldsymbol{a}$ y $\boldsymbol{b}$ sucesiones de $\ell^1$.
+  Su producto convolución 
+  $$(\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}$$
+  está bien definido, y es una la sucesión absolutamente sumable (es decir, $\boldsymbol{a}*\boldsymbol{b} \in \ell^1$).
+\end{prop}
+\begin{proof}
+  $\boldsymbol{a}, \boldsymbol{b} \in l_1$ implica que $\sum\limits_{(i,j) \in \mathbb{Z} \times \mathbb{Z}} a_i b_j$ es sumable (Colorario~\ref{cor:sumaDeLaConvolucionEnl1}). Por
+  tanto, si definimos $I_n = \{(x,y) \in \mathbb{Z} \times \mathbb{Z} \mid x+y=n\}$ tenemos que
+  $$ \bigcup_{n \in \mathbb{Z}} I_n = \mathbb{Z} \times \mathbb{Z} \quad \text{y si } n \neq n' \quad \text{entonces} \quad I_n \cap I_{n'} = \emptyset. $$
+  
+  Por el Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad}:
+  $$ \text{Para todo } n \in \mathbb{Z} \sum_{(i,j) \in I_n} a_i b_j = \sum_{i+j=n} a_i b_j \text{ es sumable,} $$
+  luego $\boldsymbol{a}*\boldsymbol{b}$ está definido. Y de nuevo por el Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad} también
+  es sumable
+  $$ \sum_{n \in \mathbb{Z}} \left( \sum_{(i,j) \in I_n} a_i b_j \right) = \sum_{n \in \mathbb{Z}} (\boldsymbol{a}*\boldsymbol{b})_n, $$
+  luego $\boldsymbol{a}*\boldsymbol{b} \in \ell^1$.
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}
+  \label{prop:convolucionSeriesSumables}
+  Sean $\boldsymbol{a}$ y $\boldsymbol{b}$ sucesiones de $\ell^1$.
+  Su producto convolución 
+  $$(\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}$$
+  está bien definido, y es una la sucesión absolutamente sumable (es decir, $\boldsymbol{a}*\boldsymbol{b} \in \ell^1$).
+\end{prop}
+\begin{proof}
+  $\boldsymbol{a}, \boldsymbol{b} \in l_1$ implica que $\sum\limits_{(i,j) \in \mathbb{Z} \times \mathbb{Z}} a_i b_j$ es sumable (Colorario~\ref{cor:sumaDeLaConvolucionEnl1}). Por
+  tanto, si definimos $I_n = \{(x,y) \in \mathbb{Z} \times \mathbb{Z} \mid x+y=n\}$ tenemos que
+  $$ \bigcup_{n \in \mathbb{Z}} I_n = \mathbb{Z} \times \mathbb{Z} \quad \text{y si } n \neq n' \quad \text{entonces} \quad I_n \cap I_{n'} = \emptyset. $$
+  
+  Por el Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad}:
+  $$ \text{Para todo } n \in \mathbb{Z} \sum_{(i,j) \in I_n} a_i b_j = \sum_{i+j=n} a_i b_j \text{ es sumable,} $$
+  luego $\boldsymbol{a}*\boldsymbol{b}$ está definido. Y de nuevo por el Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad} también
+  es sumable
+  $$ \sum_{n \in \mathbb{Z}} \left( \sum_{(i,j) \in I_n} a_i b_j \right) = \sum_{n \in \mathbb{Z}} (\boldsymbol{a}*\boldsymbol{b})_n, $$
+  luego $\boldsymbol{a}*\boldsymbol{b} \in \ell^1$.
+\end{proof}
+#+end_export
+
+** El conjunto de series absolutamente sumables es un anillo conmutativo.
+
+#+BEGIN_SRC latex
+\begin{prop}
+  \label{prop:SeriesSumablesSonUnAnillo}
+  La terna $(\ell^1, +, *)$ es un anillo conmutativo.
+\end{prop}
+\begin{proof}
+  Sabemos que: por el Colorario~\ref{cor:sumaDeLaConvolucionEnl1} es sumable $\sum\limits_{(i,j) \in \mathbb{Z} \times \mathbb{Z}} a_i b_j$, por el Colorario~\ref{cor:sumaDeLaConvolucionEnl1}
+  es sumable $\sum\limits_{(i,j,k) \in \mathbb{Z} \times \mathbb{Z} \times \mathbb{Z}} a_i b_j c_k$ y por el Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad} es sumable
+  $\sum\limits_{i+j+k=n} a_i b_j c_k$. Si llamamos $I_r = \{(i,j,k) \mid i+j+k=n \quad \text{y} \quad i=r\}$
+  tenemos que $\bigcup\limits_{r \in \mathbb{Z}} I_r = \{(i,j,k) \mid i+j+k=n\}$ y $r \neq r'$ implica que
+  $I_r \cap I_{r'} = \emptyset$, luego
+  \[
+    \sum_{i+r+s=n} a_i b_r c_s
+    = \sum_{r \in \mathbb{Z}} \sum_{(i,j,k) \in I_r} a_i b_j c_k 
+    = \sum_{i \in \mathbb{Z}} \sum_{j+k=n-i} a_i b_j c_k 
+  \]
+  \[
+    \qquad\qquad\qquad
+    = \sum_{i \in \mathbb{Z}} a_i \sum_{j+k=n-i} b_j c_k 
+    = \sum_{i \in \mathbb{Z}} a_i (\boldsymbol{c}*\boldsymbol{c})_{n-i} = [\boldsymbol{a} * (\boldsymbol{c}*\boldsymbol{c})]_n.
+  \]
+  De manera análoga se ve que $\sum\limits_{i+r+s=n} a_i b_r c_s = [(\boldsymbol{a} * \boldsymbol{c})*\boldsymbol{c}]_n$.
+
+  Además, por la Proposición~\ref{prop:combinacionLineal}
+  $$ \sum_{i+j=n} a_i b_j + \sum_{i+j=n} a_i c_j = \sum_{i+j=n} (a_i b_j + a_i c_j) = \sum_{i+j=n} a_i (b+c)_j. $$
+  El resto de propiedades son triviales.
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}
+  \label{prop:SeriesSumablesSonUnAnillo}
+  La terna $(\ell^1, +, *)$ es un anillo conmutativo.
+\end{prop}
+\begin{proof}
+  Sabemos que: por el Colorario~\ref{cor:sumaDeLaConvolucionEnl1} es sumable $\sum\limits_{(i,j) \in \mathbb{Z} \times \mathbb{Z}} a_i b_j$, por el Colorario~\ref{cor:sumaDeLaConvolucionEnl1}
+  es sumable $\sum\limits_{(i,j,k) \in \mathbb{Z} \times \mathbb{Z} \times \mathbb{Z}} a_i b_j c_k$ y por el Teorema~\ref{thm:SumacionPorPaquetesOAsociatividad} es sumable
+  $\sum\limits_{i+j+k=n} a_i b_j c_k$. Si llamamos $I_r = \{(i,j,k) \mid i+j+k=n \quad \text{y} \quad i=r\}$
+  tenemos que $\bigcup\limits_{r \in \mathbb{Z}} I_r = \{(i,j,k) \mid i+j+k=n\}$ y $r \neq r'$ implica que
+  $I_r \cap I_{r'} = \emptyset$, luego
+  \[
+    \sum_{i+r+s=n} a_i b_r c_s
+    = \sum_{r \in \mathbb{Z}} \sum_{(i,j,k) \in I_r} a_i b_j c_k 
+    = \sum_{i \in \mathbb{Z}} \sum_{j+k=n-i} a_i b_j c_k 
+  \]
+  \[
+    \qquad\qquad\qquad
+    = \sum_{i \in \mathbb{Z}} a_i \sum_{j+k=n-i} b_j c_k 
+    = \sum_{i \in \mathbb{Z}} a_i (\boldsymbol{c}*\boldsymbol{c})_{n-i} = [\boldsymbol{a} * (\boldsymbol{c}*\boldsymbol{c})]_n.
+  \]
+  De manera análoga se ve que $\sum\limits_{i+r+s=n} a_i b_r c_s = [(\boldsymbol{a} * \boldsymbol{c})*\boldsymbol{c}]_n$.
+
+  Además, por la Proposición~\ref{prop:combinacionLineal}
+  $$ \sum_{i+j=n} a_i b_j + \sum_{i+j=n} a_i c_j = \sum_{i+j=n} (a_i b_j + a_i c_j) = \sum_{i+j=n} a_i (b+c)_j. $$
+  El resto de propiedades son triviales.
+\end{proof}
+#+end_export
+
+** El conjunto de series con principio es un cuerpo
+
+#+BEGIN_SRC latex
+El conjunto de series con principio se denota con $\mathbb{C}((z))$
+
+\begin{prop}
+  \label{prop:CuerpoFraccionesSeriesFormales}
+  El conjunto de series con principio $\mathbb{C}((z))$ (con las operaciones suma y producto convolución) tiene estructura de cuerpo (se denomina cuerpo de fracciones de series formales).
+\end{prop}
+\begin{proof}
+  \mbox{\ }
+  \begin{enumerate}
+  \item Evidentemente $(\mathbb{C}((z)), +)$ es un grupo conmutativo.\footnote{\href{https://en.wikipedia.org/wiki/Abelian_group}{Véase \emph{Abelian group} en Wikipedia}.}
+  \item $*$ es asociativa: $\boldsymbol{a} \ast (\boldsymbol{b} \ast \boldsymbol{c}) = (\boldsymbol{a} \ast \boldsymbol{b}) \ast \boldsymbol{c}$
+    \[
+      [\boldsymbol{a} \ast (\boldsymbol{b} \ast \boldsymbol{c})]_j 
+      = \sum_{r + s = j} a_r (\boldsymbol{b} \ast \boldsymbol{c})_s 
+      = \sum_{r + s = j} a_r \sum_{t + u = s} b_t c_u
+    \]
+    \[
+      = \sum_{r + s = j} \sum_{t + u = s} a_r b_t c_u
+      = \sum_{r + s = j} \sum_{t + u = s} a_r b_t c_u
+      = \sum_{r + t + u = j} a_r b_t c_u
+    \]
+    y análogamente $[(\boldsymbol{a} \ast \boldsymbol{b}) \ast \boldsymbol{c}]_j = \sum_{r + t + u = j} a_r b_t c_u$.
+    
+  \item $\ast$ es distributiva respecto a $+$: $\boldsymbol{a} \ast (\boldsymbol{b} + \boldsymbol{c}) = \boldsymbol{a} \ast \boldsymbol{b} + \boldsymbol{a} \ast \boldsymbol{c}$
+    \[
+      [\boldsymbol{a} \ast (\boldsymbol{b} + \boldsymbol{c})]_j 
+      = \sum_{r + s = j} a_r (\boldsymbol{b} + \boldsymbol{c})_s 
+      = \sum_{r + s = j} a_r b_s + a_r c_s
+    \]
+    \[
+      = \sum_{r + s = j} a_r b_s + \sum_{r + s = j} a_r c_s 
+      = (\boldsymbol{a} \ast \boldsymbol{b})_j + (\boldsymbol{a} \ast \boldsymbol{c})_j
+    \]
+    
+  \item $\ast$ es conmutativa: $\boldsymbol{a} \ast \boldsymbol{b} = \boldsymbol{b} \ast \boldsymbol{a}$
+    \[
+      (\boldsymbol{a} \ast \boldsymbol{b})_j = \sum_{r + s = j} a_r b_s = \sum_{r + s = j} b_s a_r = (\boldsymbol{b} \ast \boldsymbol{a})_j
+    \]
+    
+  \item $\ast$ tiene elemento neutro: $\boldsymbol{a} \ast \boldsymbol{1} = \boldsymbol{a}$
+    \[
+      (\boldsymbol{a} \ast \boldsymbol{1})_j = \sum_{r + s = j} a_r 1_s = a_j 1_0 + \sum_{\substack{r + s = j\\ s \ne 0}} a_r 1_s = a_j
+    \]
+    puesto que $\forall s \ne 0$, $1_s = 0$.
+    
+  \item \textbf{Todo elemento no nulo tiene inverso en $\mathbb{C}((z))$:}
+    
+    Supongamos que $\boldsymbol{a} \neq \boldsymbol{0}$ y que $k = \operatorname{cogrado}(\boldsymbol{a})$. Definimos $\boldsymbol{b}$ del siguiente modo:
+    \begin{description}
+    \item[Para $j<-k$:\;] $b_j = 0$
+    \item[Para $j=-k$:\;] $b_j = 1$
+    \item[Para $j>-k$:\;] $b_j = -\frac{1}{a_k} \sum_{r = -k}^{j - 1} b_r a_{j + k - r}$
+    \end{description}
+    \[
+      b_j = 
+      \begin{cases}
+        0 & \text{si } j < -k \\
+        \frac{1}{a_k} & \text{si } j = -k \\
+        -\frac{1}{a_k} \sum_{r = -k}^{j - 1} b_r a_{j + k - r} & \text{si } j > -k
+      \end{cases}
+    \]
+    
+    Por construcción, $\operatorname{cogrado}(\boldsymbol{b}) = -k$ y en consecuencia si $j < 0$, $(\boldsymbol{a} \ast \boldsymbol{b})_j = 0$.
+    
+    Obviamente también $(\boldsymbol{a} \ast \boldsymbol{b})_0 = 1$, y si $j > 0$:
+    \[
+      (\boldsymbol{a} \ast \boldsymbol{b})_j 
+      = \sum_{r + s = j} a_r b_s = \sum_{r = k}^{j + k} a_r b_{j - r} 
+      = \sum_{r = -k}^{j - k} a_{j - r} b_r = \sum_{r = -k}^{j - k - 1} a_{j - r} b_r + a_k b_{j - k} 
+    \]
+    \[
+      = \sum_{r = -k}^{j - k - 1} a_{j - r} b_r + \frac{1}{a_k} \sum_{r = -k}^{j - k - 1} b_r a_{j - k + k - r} = 0
+    \]
+    Por consiguiente $\boldsymbol{b}$ es inverso de $\boldsymbol{a}$.
+  \end{enumerate}
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}
+  \label{prop:CuerpoFraccionesSeriesFormales}
+  El conjunto de series con principio $\mathbb{C}((z))$ (con las operaciones suma y producto convolución) tiene estructura de cuerpo (se denomina cuerpo de fracciones de series formales).
+\end{prop}
+\begin{proof}
+  \mbox{\ }
+  \begin{enumerate}
+  \item Evidentemente $(\mathbb{C}((z)), +)$ es un grupo conmutativo.\footnote{\href{https://en.wikipedia.org/wiki/Abelian_group}{Véase \emph{Abelian group} en Wikipedia}.}
+  \item $*$ es asociativa: $\boldsymbol{a} \ast (\boldsymbol{b} \ast \boldsymbol{c}) = (\boldsymbol{a} \ast \boldsymbol{b}) \ast \boldsymbol{c}$
+    \[
+      [\boldsymbol{a} \ast (\boldsymbol{b} \ast \boldsymbol{c})]_j 
+      = \sum_{r + s = j} a_r (\boldsymbol{b} \ast \boldsymbol{c})_s 
+      = \sum_{r + s = j} a_r \sum_{t + u = s} b_t c_u
+    \]
+    \[
+      = \sum_{r + s = j} \sum_{t + u = s} a_r b_t c_u
+      = \sum_{r + s = j} \sum_{t + u = s} a_r b_t c_u
+      = \sum_{r + t + u = j} a_r b_t c_u
+    \]
+    y análogamente $[(\boldsymbol{a} \ast \boldsymbol{b}) \ast \boldsymbol{c}]_j = \sum_{r + t + u = j} a_r b_t c_u$.
+    
+  \item $\ast$ es distributiva respecto a $+$: $\boldsymbol{a} \ast (\boldsymbol{b} + \boldsymbol{c}) = \boldsymbol{a} \ast \boldsymbol{b} + \boldsymbol{a} \ast \boldsymbol{c}$
+    \[
+      [\boldsymbol{a} \ast (\boldsymbol{b} + \boldsymbol{c})]_j 
+      = \sum_{r + s = j} a_r (\boldsymbol{b} + \boldsymbol{c})_s 
+      = \sum_{r + s = j} a_r b_s + a_r c_s
+    \]
+    \[
+      = \sum_{r + s = j} a_r b_s + \sum_{r + s = j} a_r c_s 
+      = (\boldsymbol{a} \ast \boldsymbol{b})_j + (\boldsymbol{a} \ast \boldsymbol{c})_j
+    \]
+    
+  \item $\ast$ es conmutativa: $\boldsymbol{a} \ast \boldsymbol{b} = \boldsymbol{b} \ast \boldsymbol{a}$
+    \[
+      (\boldsymbol{a} \ast \boldsymbol{b})_j = \sum_{r + s = j} a_r b_s = \sum_{r + s = j} b_s a_r = (\boldsymbol{b} \ast \boldsymbol{a})_j
+    \]
+    
+  \item $\ast$ tiene elemento neutro: $\boldsymbol{a} \ast \boldsymbol{1} = \boldsymbol{a}$
+    \[
+      (\boldsymbol{a} \ast \boldsymbol{1})_j = \sum_{r + s = j} a_r 1_s = a_j 1_0 + \sum_{\substack{r + s = j s \ne 0}} a_r 1_s = a_j
+    \]
+    puesto que $\forall s \ne 0$, $1_s = 0$.
+    
+  \item \textbf{Todo elemento no nulo tiene inverso en $\mathbb{C}((z))$:}
+    
+    Supongamos que $\boldsymbol{a} \neq \boldsymbol{0}$ y que $k = \operatorname{cogrado}(\boldsymbol{a})$. Definimos $\boldsymbol{b}$ del siguiente modo:
+    \begin{description}
+    \item[Para $j<-k$:\;] $b_j = 0$
+    \item[Para $j=-k$:\;] $b_j = 1$
+    \item[Para $j>-k$:\;] $b_j = -\frac{1}{a_k} \sum_{r = -k}^{j - 1} b_r a_{j + k - r}$
+    \end{description}
+    \[
+      b_j = 
+      \begin{cases}
+        0 & \text{si } j < -k 
+        \frac{1}{a_k} & \text{si } j = -k 
+        -\frac{1}{a_k} \sum_{r = -k}^{j - 1} b_r a_{j + k - r} & \text{si } j > -k
+      \end{cases}
+    \]
+    
+    Por construcción, $\operatorname{cogrado}(\boldsymbol{b}) = -k$ y en consecuencia si $j < 0$, $(\boldsymbol{a} \ast \boldsymbol{b})_j = 0$.
+    
+    Obviamente también $(\boldsymbol{a} \ast \boldsymbol{b})_0 = 1$, y si $j > 0$:
+    \[
+      (\boldsymbol{a} \ast \boldsymbol{b})_j 
+      = \sum_{r + s = j} a_r b_s = \sum_{r = k}^{j + k} a_r b_{j - r} 
+      = \sum_{r = -k}^{j - k} a_{j - r} b_r = \sum_{r = -k}^{j - k - 1} a_{j - r} b_r + a_k b_{j - k} 
+    \]
+    \[
+      = \sum_{r = -k}^{j - k - 1} a_{j - r} b_r + \frac{1}{a_k} \sum_{r = -k}^{j - k - 1} b_r a_{j - k + k - r} = 0
+    \]
+    Por consiguiente $\boldsymbol{b}$ es inverso de $\boldsymbol{a}$.
+  \end{enumerate}
+\end{proof}
+#+end_export
+
+** El conjunto de fracciones de polinomios $\mathbb{C}(z)$ es un cuerpo
+:PROPERTIES:
+:ID:       8ec2ce9b-036c-4410-8d8d-76d144e37c15
+:END:
+
+# https://doi.org/10.1007/978-1-4612-6101-8
+
+#+BEGIN_SRC latex
+El \emph{cuerpo de fracciones de polinomios} es, de todos los cuerpos \(\mathbb{K}\) contenidos en  \(\mathbb{C}((z))\), el menor cuerpo\footnote{Aunque esta definición no coincide con la usual, podemos ver que es equivalente utilizando el \href{https://link.springer.com/content/pdf/10.1007/978-1-4612-6101-8.pdf\#page=164}{Colorario 4.6. del Capı́tulo III de Hungerford (1974)}; en el que se establece que si un cuerpo \(E\) contiene a un dominio de integridad \(R\) entonces existe otro cuerpo \(F\) isomorfo al cuerpo de fracciones de \(R\) de modo que \(R \subset F \subset E\). A partir de esto, como en nuestra definición no permite intercalar un cuerpo entre \(\mathbb{C}[z]\) y \(\mathbb{C}(z)\), necesariamente \(\mathbb{C}(z)\) es isomorfo al cuerpo de fracciones de los polinomios.} que contiene al \href{https://en.wikipedia.org/wiki/Polynomial\_ring}{anillo de los polinomios \(\mathbb{C}[z]\)}.
+
+\nocite{hungerford-1974-algeb}
+
+\begin{prop}
+Si $R$ es un subanillo de $(A, +, \cdot)$ tal que:
+\begin{enumerate}
+\item $(A, +, \cdot)$ es conmutativo y unitario.
+\item $R \neq \{0\}$.
+\item $\forall q \in R - \{0\}, \exists q^{-1} \in A$,
+\end{enumerate}
+entonces el siguiente conjunto es el cuerpo de fracciones de $R$:
+\[
+  K_R = \{p \cdot q^{-1} \mid p, q \in R \text{ y } q \neq 0\}.
+\]
+\end{prop}
+
+\begin{proof}
+  \mbox{\ }
+  \begin{enumerate}
+  \item $0 \in K_R \; y \; 1 \in K_R$ \\
+    Tomemos $q$ no nulo de $R$, entonces, $0 = 0 \cdot q^{-1}$, y $1 = q \cdot q^{-1}$.
+    
+  \item Si $a, b \in K_R$, entonces $a + b \in K_R \; y \; a \cdot b \in K_R$. \\
+    Sea $a = \frac{p}{q}$ y $b = \frac{r}{s}$, entonces,
+    \[
+      a + b = \frac{p}{q} + \frac{r}{s} = p \cdot q^{-1} + r \cdot s^{-1} = 
+      p \cdot q^{-1} \cdot s \cdot s^{-1} + r \cdot s^{-1} \cdot q \cdot q^{-1} = 
+      (p \cdot s + r \cdot q) \cdot (q \cdot s)^{-1} \in K_R,
+    \]
+    puesto que $(p \cdot s + r \cdot q) \in R$ y $0 \neq (q \cdot s) \in R$. Además,
+    \[
+      a \cdot b = \frac{p}{q} \cdot \frac{r}{s} = p \cdot q^{-1} \cdot r \cdot s^{-1} = 
+      (p \cdot r) \cdot (q \cdot s)^{-1} \in K_R,
+    \]
+    pues $(p \cdot r) \in R$ y $0 \neq (q \cdot s) \in R$.
+    
+  \item Si $a \in K_R$ entonces $-a \in K_R$. \\
+    Ya que $a = \frac{p}{q} \Rightarrow -a = (-p) \cdot q^{-1}$, donde $-p \in R$ y $q^{-1} \in R$.
+    
+  \item Si $a \neq 0 \in K_R$ entonces $a^{-1} \in K_R$. \\
+    Puesto que $a = p \cdot q^{-1} \Rightarrow a^{-1} = p^{-1} \cdot (q^{-1})^{-1} = q \cdot p^{-1}$, donde $q \in R$ y $p^{-1} \in R$. \\
+    Por lo tanto, hemos visto que $K_R$ es un cuerpo.
+    
+  \item Si $R \subset K \subset A$ y $K$ es un cuerpo, necesariamente $K = K_R$. \\
+    Supongamos que $a \in K$, entonces existen $p$ y $q$ en $R$ tales que $a = p \cdot q^{-1}$. Como $K$ contiene a $R$ y $K$ es cuerpo, necesariamente $a = p \cdot q^{-1} \in K_R$.
+  \end{enumerate}
+\end{proof}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{prop}
+Si $R$ es un subanillo de $(A, +, \cdot)$ tal que:
+\begin{enumerate}
+\item $(A, +, \cdot)$ es conmutativo y unitario.
+\item $R \neq \{0\}$.
+\item $\forall q \in R - \{0\}, \exists q^{-1} \in A$,
+\end{enumerate}
+entonces el siguiente conjunto es el cuerpo de fracciones de $R$:
+\[
+  K_R = \{p \cdot q^{-1} \mid p, q \in R \text{ y } q \neq 0\}.
+\]
+\end{prop}
+
+\begin{proof}
+  \mbox{\ }
+  \begin{enumerate}
+  \item $0 \in K_R \; y \; 1 \in K_R$ 
+    Tomemos $q$ no nulo de $R$, entonces, $0 = 0 \cdot q^{-1}$, y $1 = q \cdot q^{-1}$.
+    
+  \item Si $a, b \in K_R$, entonces $a + b \in K_R \; y \; a \cdot b \in K_R$. 
+    Sea $a = \frac{p}{q}$ y $b = \frac{r}{s}$, entonces,
+    \[
+      a + b = \frac{p}{q} + \frac{r}{s} = p \cdot q^{-1} + r \cdot s^{-1} = 
+      p \cdot q^{-1} \cdot s \cdot s^{-1} + r \cdot s^{-1} \cdot q \cdot q^{-1} = 
+      (p \cdot s + r \cdot q) \cdot (q \cdot s)^{-1} \in K_R,
+    \]
+    puesto que $(p \cdot s + r \cdot q) \in R$ y $0 \neq (q \cdot s) \in R$. Además,
+    \[
+      a \cdot b = \frac{p}{q} \cdot \frac{r}{s} = p \cdot q^{-1} \cdot r \cdot s^{-1} = 
+      (p \cdot r) \cdot (q \cdot s)^{-1} \in K_R,
+    \]
+    pues $(p \cdot r) \in R$ y $0 \neq (q \cdot s) \in R$.
+    
+  \item Si $a \in K_R$ entonces $-a \in K_R$. 
+    Ya que $a = \frac{p}{q} \Rightarrow -a = (-p) \cdot q^{-1}$, donde $-p \in R$ y $q^{-1} \in R$.
+    
+  \item Si $a \neq 0 \in K_R$ entonces $a^{-1} \in K_R$. 
+    Puesto que $a = p \cdot q^{-1} \Rightarrow a^{-1} = p^{-1} \cdot (q^{-1})^{-1} = q \cdot p^{-1}$, donde $q \in R$ y $p^{-1} \in R$. 
+    Por lo tanto, hemos visto que $K_R$ es un cuerpo.
+    
+  \item Si $R \subset K \subset A$ y $K$ es un cuerpo, necesariamente $K = K_R$. 
+    Supongamos que $a \in K$, entonces existen $p$ y $q$ en $R$ tales que $a = p \cdot q^{-1}$. Como $K$ contiene a $R$ y $K$ es cuerpo, necesariamente $a = p \cdot q^{-1} \in K_R$.
+  \end{enumerate}
+\end{proof}
+#+end_export
+
+#+BEGIN_SRC latex
+\begin{corollary}
+  El \emph{cuerpo de fracciones de polinomios}
+  $$\mathbb{C}(z) = \left\{\boldsymbol{p}*\boldsymbol{q}^{-\triangleright} \mid
+    \boldsymbol{p} \text{ y } \boldsymbol{q} \text{ son polinomios y }
+    \boldsymbol{q}\ne\boldsymbol{0} \right\};$$ es un subcuerpo del cuerpo
+  de las series sucesiones con principio (i.e., con cogrado finito).
+\end{corollary}
+#+END_SRC
+
+#+RESULTS:
+#+begin_export latex
+\begin{corollary}
+  El \emph{cuerpo de fracciones de polinomios}
+  $$\mathbb{C}(z) = \left\{\boldsymbol{p}*\boldsymbol{q}^{-\triangleright} \mid
+    \boldsymbol{p} \text{ y } \boldsymbol{q} \text{ son polinomios y }
+    \boldsymbol{q}\ne\boldsymbol{0} \right\};$$ es un subcuerpo del cuerpo
+  de las series sucesiones con principio (i.e., con cogrado finito).
+\end{corollary}
+#+end_export
+
+
+bibliographystyle:plainnat
+bibliography:bibliografia.bib
+
+
+* COMMENT El producto elemento a elemento de dos secuencias        :noexport:
+
+El producto elemento a elemento (o producto Hadamard) de $\boldsymbol{a}$ y $\boldsymbol{b}$ es la secuencia
+$$\boldsymbol{a}\odot\boldsymbol{b}=(a_tb_t\mid
+t\in\mathbb{Z})=\sum_{t\in\mathbb{Z}}a_tb_t z^t.$$ Por tanto
+$$\boldsymbol{x}\odot(\boldsymbol{y}*z^k)=(x_t y_{t-k}\mid
+t\in\mathbb{Z})=\sum_{t\in\mathbb{Z}}x_t y_{t-k} z^t;$$ y si
+$\boldsymbol{\phi}$ es el polinomio $\;1-\phi_1 z^1-\cdots-\phi_p
+z^p$,
+$$(\boldsymbol{\phi}*\boldsymbol{x})\odot(\boldsymbol{y}*z^k)=\Big(\big(\boldsymbol{\phi}(\mathsf{B})x_t\big)
+y_{t-k}\mid
+t\in\mathbb{Z}\Big)=\sum_{t\in\mathbb{Z}}\big(\boldsymbol{\phi}(\mathsf{B})x_t\big)
+y_{t-k} z^t,$$ donde
+\begin{align*}
+\big(\boldsymbol{\phi}(\mathsf{B})x_t\big) y_{t-k}
+= & \big(x_t-\phi_1x_{t-1}-\cdots-\phi_px_{t-p}\big)y_{t-k}\\
+= & x_ty_{t-k}-\phi_1x_{t-1}y_{t-k}-\cdots-\phi_px_{t-p}y_{t-k}.
+\end{align*}
+#+latex: \bigskip
+
+* COMMENT build                                                    :noexport:
+
+See the org version. 
+
+# #+BEGIN_SRC emacs-lisp :results silent
+# (require 'org-ref-natbib-bbl-citeproc)
+# (let ((org-export-before-parsing-hook '(org-ref-bbl-preprocess)))
+#   (org-org-export-as-org))
+# #+END_SRC
+
+# [[./bbl-authoryear.bbl]]
+
+# [[./Lecc02.bbl]]
+
+# #+BEGIN_SRC emacs-lisp :results silent
+# (let ((org-export-before-parsing-hook '(org-ref-bbl-preprocess)))
+#   (org-open-file (org-html-export-to-html)))
+# #+END_SRC
+
+* COMMENT ipynb y slides                                           :noexport:
+
+#+BEGIN_SRC emacs-lisp :results silent
+(require 'ox-ipynb)
+(ox-ipynb-export-org-file-to-ipynb-file "Lecc02.org")
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent
+#jupyter nbconvert --execute --inplace Lecc02.ipynb
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent
+#jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc02.ipynb
+#+END_SRC
+

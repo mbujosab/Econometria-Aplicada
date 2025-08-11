@@ -1,0 +1,1105 @@
+#+TITLE: Lección 3. Modelos lineales
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+
+# +OPTIONS: toc:nil
+
+# +EXCLUDE_TAGS: pngoutput noexport
+
+#+startup: shrink
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/readtheorg_inline.theme
+# ###########
+
+#+LATEX_HEADER_EXTRA: \usepackage{fullpage}
+
+#+LATEX_HEADER_EXTRA: \usepackage[spanish]{babel}
+#+LATEX_HEADER_EXTRA: \usepackage{lmodern}
+#+LATEX_HEADER_EXTRA: \usepackage{tabularx}
+#+LATEX_HEADER_EXTRA: \usepackage{booktabs}
+
+#+LaTeX_HEADER: \newcommand{\lag}{\mathsf{B}}
+#+LaTeX_HEADER: \newcommand{\Sec}[1]{\boldsymbol{#1}}
+#+LaTeX_HEADER: \newcommand{\Pol}[1]{\boldsymbol{#1}}
+
+
+#+latex_header: \usepackage{natbib}
+
+#+LaTeX_HEADER: \newcommand{\lag}{\mathsf{B}}
+#+LaTeX_HEADER: \newcommand{\Sec}[1]{\boldsymbol{#1}}
+#+LaTeX_HEADER: \newcommand{\Pol}[1]{\boldsymbol{#1}}
+
+#+LATEX_HEADER: \usepackage{amsthm,amsmath}
+#+LATEX_HEADER: \usepackage[appendix=append]{apxproof}
+# +LATEX_HEADER: \usepackage[appendix=inline]{apxproof}
+# +LATEX_HEADER: \usepackage[appendix=strip]{apxproof}
+#+LATEX_HEADER: \renewcommand{\appendixsectionformat}[2]{Demos de la Sección {#1} (#2)}
+#+LATEX_HEADER: \newtheoremrep{theorem}{Teorema} % [section]
+#+LATEX_HEADER: \newtheoremrep{lemma}[theorem]{Lema}
+#+LATEX_HEADER: \newtheoremrep{prop}[theorem]{Proposición}
+#+LATEX_HEADER: \usepackage{marginnote}
+# +LATEX_HEADER: \renewcommand{\mainbodyrepeatedtheorem}{\textup{($\star$) \marginnote{($\star$): Demo en el apéndice}}}
+#+LATEX_HEADER: \renewcommand{\mainbodyrepeatedtheorem}{\textup{\marginnote{\tiny Demo en apéndice}}}
+#+latex_header: \newtheorem{definition}[theorem]{Definición}
+#+latex_header: \newtheorem*{definition*}{Definición}
+# +LATEX_HEADER: \newtheorem{prop}[theorem]{Proposición}
+#+latex_header: \newtheorem{corollary}[theorem]{Corolario}
+#+latex_header: \newtheorem*{corollary*}{Corolario}
+
+#+LATEX_HEADER: \usepackage[indent]{parskip}
+
+
+#+LATEX: \maketitle
+
+
+#+PROPERTY: header-args:emacs-lisp :eval export
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+BEGIN_SRC emacs-lisp :exports none :results silent
+(use-package ox-ipynb
+  :load-path (lambda () (expand-file-name "ox-ipynb" scimax-dir)))
+(use-package htmlize)
+#+END_SRC
+
+
+#+begin_abstract
+Esta lección veremos las dificultades que ocasiona la correlación serial y algunos tipos de procesos \emph{débilmente estacionarios} que nos permitirán lidiar con ella. En particular veremos los procesos lineales, su valor esperado y su función de autocovarianzas, la función de covarianzas cruzadas entre dos procesos lineales, y las ecuaciones de Yule-Walker.
+#+end_abstract
+
+- [[https://mbujosab.github.io/EconometriaAplicada-SRC/Lecc05.html][lección en html]]
+- [[https://mybinder.org/v2/gh/mbujosab/EconometriaAplicada-SRC/HEAD?labpath=Lecc05.ipynb][lección en mybinder]]
+
+***  Carga de algunos módulos de python y creación de directorios auxiliares
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: notoc
+   :END:
+
+   
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results none
+# Para trabajar con los datos y dibujarlos necesitamos cargar algunos módulos de python
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib as mpl
+# definimos parámetros para mejorar los gráficos
+mpl.rc('text', usetex=False)
+import matplotlib.pyplot as plt   # data visualization
+#+END_SRC
+
+**** Creación del directorio auxiliar para albergar las figuras de la lección 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: t 
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Para publicar la lección como pdf y como página web, necesito los gráficos en forma de ficheros ~.png~ alojados en un directorio específico:
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+imagenes_leccion = "./img/lecc03" # directorio para las imágenes de la lección
+import os
+os.makedirs(imagenes_leccion, exist_ok=True) # crea el directorio si no existe
+#+END_SRC
+
+
+************** COMMENT Codigo aux
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: t 
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Con el siguiente código mejoro los gráficos y logro transformar las tablas con formato $\LaTeX{}$ en ficheros png.
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results none
+# definimos parámetros para mejorar los gráficos
+mpl.rc('text', usetex=True)
+mpl.rc('text.latex', preamble=r'\usepackage{amsmath}')
+
+# transformaré salidas en \LaTeX{} de statsmodels a ficheros png que incluiré en las transparencias
+import dataframe_image as dfi
+from sympy.printing.preview import preview
+def repr_png(tex, ImgFile):
+    preamble = "\\documentclass[preview]{standalone}\n" \
+        "\\usepackage{booktabs,amsmath,amsfonts}\\begin{document}"    
+    preview(tex, filename=ImgFile, viewer='file', preamble=preamble, dvioptions=['-D','250'])
+#+END_SRC
+
+
+
+* Series temporales vs datos de sección cruzada
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Corresponden a observaciones de un mismo objeto a lo largo del
+tiempo. El índice indica el instante de cada medición. /El orden
+cronológico puede ser crucial/ al modelar los datos.
+
+- El motivo es que frecuentemente el valor medido en un instante de
+  tiempo está relacionado con otras mediciones próximas en el tiempo
+  (/correlación serial/).
+
+- Si es así, ya no deberíamos asumir que las variables aleatorias del
+  proceso estocástico subyacente, $\boldsymbol{X}=(X_t\mid
+  t\in\mathbb{Z})$, son independientes entre sí.
+
+Esto tiene importantes implicaciones en las técnicas de análisis y
+los modelos a utilizar.
+#+latex: \bigskip
+
+Veamos algunos ejemplos de series temporales...
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+path = '../datos/'
+df1 = pd.read_csv(path+'PoblacionAustralia.csv')
+df2 = pd.read_csv(path+'PIB_UEM.csv')
+df3 = pd.read_csv(path+'Retiro.txt')
+df4 = pd.read_csv(path+'IBEX35.csv')
+#+END_SRC
+# print(df1.head())
+
+**** Población en Australia
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file PoblacionAustralia.png :exports code :results silent
+PoblacionAustralia_ts = as.ts( read.zoo('datos/PoblacionAustralia.csv', 
+                                        header=TRUE,
+                                        index.column = 1, 
+                                        sep=",", 
+                                        FUN = as.yearmon))
+p <- autoplot(PoblacionAustralia_ts)
+p <- p + labs(y = "Habitantes", x = "Años") + ggtitle("Población australiana (datos anuales)")
+p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 20))
+p 
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/PoblacionAustralia.png]]
+
+**** PIB UEM
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file PIB_UEM.png :exports code :results silent
+PIB_UEM_df <- read_csv("datos/PIB_UEM.csv",
+                     show_col_types = FALSE)
+fmt <- "%YQ%q"
+PIB_UEM_df$Time <- as.yearqtr(PIB_UEM_df$obs, format = fmt)
+# head(PIB_UEM_df,3)
+P <- ggplot(PIB_UEM_df, aes(Time, PIB))
+P <- P + geom_point() + geom_line()
+P <- P + scale_x_continuous(breaks = scales::pretty_breaks(n = 15))
+P <- P + labs(y = "Miles de millones de euros", x = "Años")
+P <- P + ggtitle("PIB UEM a precios corrientes (datos trimestrales). Fuente Banco de España")
+P
+#+END_SRC
+# p <- p +scale_x_yearqtr(format = fmt)
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/PIB_UEM.png]]
+
+**** Temperatura media en el Parque del Retiro. Madrid
+   :PROPERTIES:
+   :Metadata: (slideshow . ((slide_type . subslide)))
+   :ID:       2bfa7ff3-6149-4abb-9623-6b939381ea7e
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file TemperaturaReriro.png :exports code :results silent
+TemperaturaRetiro_df <- read_csv("datos/Retiro.txt", show_col_types = FALSE)
+# Añadimos fechas
+TemperaturaRetiro_df$Time <- as.yearmon(1985 + seq(0, nrow(TemperaturaRetiro_df)-1)/12)
+
+P <- ggplot(TemperaturaRetiro_df, aes(Time, TemperaturaMedia))
+P <- P + geom_line() # + geom_point() 
+P <- P + scale_x_continuous(breaks = scales::pretty_breaks(n = 25))
+P <- P + labs(y = "Grados Celsius", x = "Años") 
+P <- P + ggtitle("Temperatura media mensual en el Parque del Retiro. Fuente: Comunidad de Madrid")
+P
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/TemperaturaReriro.png]]
+
+**** Rendimiento porcentual diario del IBEX 35 (std)
+   :PROPERTIES:
+   :Metadata: (slideshow . ((slide_type . subslide)))
+   :ID:       2bfa7ff3-6149-4abb-9623-6b939381ea7e
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file IBEX35.png :exports code :results silent
+IBEX35_ts = as.ts( read.csv.zoo("datos/IBEX35.csv", 
+                                strip.white = TRUE))
+P <- autoplot(IBEX35_ts) + scale_y_continuous(breaks = scales::pretty_breaks(n = 12))
+p <- P + labs(y = "Desviaciones típicas", x = "Días")
+p <- P + ggtitle("Rendimiento porcentual diario del IBEX 35 (std.). Fuente: Archivo Prof. Miguel Jerez")
+p 
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/IBEX35.png]]
+
+- Datos centrados y estandarizados, i.e. el eje vertical está en desviaciones típicas.
+- Los /volatility clustering/ son característicos de series financieras de alta frecuencia.
+
+**** Producción de cemento
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file ProduccionCemento.png :exports code :results silent
+ProduccionCemento_df <- read_csv("datos/ProduccionCemento.csv",
+                     show_col_types = FALSE)
+fmt <- "%YM%m"
+ProduccionCemento_df$Time <- as.yearmon(ProduccionCemento_df$obs, format = fmt)
+# head(ProduccionCemento_df,3)
+P <- ggplot(ProduccionCemento_df, aes(Time, ProduccionCemento))
+P <- P + geom_line() # + geom_point() 
+P <- P + scale_x_continuous(breaks = scales::pretty_breaks(n = 25))
+P <- P + labs(y = "Miles de Toneladas métricas", x = "Años")
+P <- P + ggtitle("Producción de cemento (Datos mensuales). Fuente Banco de España")
+P
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ProduccionCemento.png]]
+
+
+** Correlación serial vs muestreo aleatorio simple
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :ID:       59d7b543-b898-4cf8-8ca9-f0f5e4734121
+   :END:
+
+
+#  [[./Lecc01.slides.html#/1/1/0][Procesos estocásticos y datos de series temporales]]
+
+Con datos de
+- sección cruzada :: solemos asumir que el muestreo es aleatorio
+  simple
+  + i.e., los datos son realizaciones de variables aleatorias i.i.d.
+
+- series temporales :: dicha asunción resulta generalmente errónea
+  + con frecuencia el nivel esperado (o la volatilidad) parece cambiar con $t$
+  + con frecuencia hay dependencia temporal (correlación serial).
+
+  *Ejemplo*: no parece aceptable asumir que $ProdCemento_{1960M01}$ se
+  distribuye igual que $ProdCemento_{2000M04}$ (ni que sea
+  independiente de $ProdCemento_{1959M01}$).
+#+LATEX: \medskip
+
+Veamos por qué esto genera dificultades...
+#+LATEX: \bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Consideremos el proceso estocástico $$\boldsymbol{X}=(X_t \mid
+t=0,\pm1,\pm2,\ldots).$$ Caracterizar su distribución conjunta (todos
+los momentos) es demasiado ambicioso.
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Así que, tentativamente, vamos a fijarnos /solo/ en los dos primeros
+momentos:
+
+$$E(X_t)={\color{blue}{ \mu_t}}\quad\text{ y }\quad
+Cov(X_t,X_k)=E\big[(X_t-\mu_t)(X_k-\mu_k)\big]={\color{blue}{\gamma_{t,k}}};\quad t,k\in\mathbb{Z}$$
+
+#+LATEX: \noindent
+(si $\;k=t\;$ entonces $\;\gamma_{t,t}=Var(X_t)=\sigma^2_t$).
+#+LATEX: \medskip
+
+Si el proceso $\boldsymbol{X}$ fuera gaussiano, conocer estos
+/parámetros/ bastaría para caracterizar la distribución conjunta. Pero
+aún así...
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+- necesitaríamos para cada $X_t$ una muestra suficiente para estimar los parámetros 
+  + pero en una serie temporal $\boldsymbol{x}$ tenemos una sola realización de cada $X_t$.  
+
+- Además... para cada variable aleatoria $X_t$ hay infinitos parámetros.
+
+** Simplificación del escenario
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+Si $\boldsymbol{X}$ es [[./Lecc01.slides.html#/3/1][débilmente estacionario]] se reduce drásticamente el número de parámetros:
+\begin{eqnarray}
+  E(X_t)  & = \mu \\
+  Cov(X_t,X_{t-k}) & = \gamma_k
+\end{eqnarray}
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+El desafío para el analista es (y nótese el abuso de lenguaje)
+- primero :: transformar los datos para lograr que sean "*/estacionarios/*".
+  - (Algo vimos en la lección 1)) 
+- después :: transformar los datos estacionarios en "*/ruido blanco/*"
+  - (Es lo que iniciaremos en esta lección y las siguientes)
+
+Todo este proceso constituye la especificación y ajuste de un modelo a
+la serie temporal.
+#+latex: \bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Antes de atacar los temas de especificación y ajuste de modelos,
+debemos estudiar un poco los procesos estocásticos débilmente
+estacionarios que vamos a utilizar.
+
+
+* Procesos estocásticos de segundo orden
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+El ambiente natural para estudiar las propiedades de segundo orden de
+una colección de variables aleatorias es el espacio de variables
+aleatorias $X$ definidas en un espacio de probabilidad tales que
+$$E(X)=0 \quad\text{y}\quad E(X^2)<\infty$$ donde $E$ es el operador
+esperanza. Denotaremos este espacio con $H$.
+
+** Un poco de geometría
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+El espacio, dotado de producto escalar y norma $$\langle X \mid Y
+\rangle=E(XY),\qquad \lVert X \rVert= \sqrt{E(X^2)},\qquad X,Y \in
+H,$$ es un espacio de Hilbert,
+
+Nótese que como las variables de $H$ tienen esperanza cero, el
+producto escalar entre $X,Y\in H$ también es $$\langle X \mid Y
+\rangle=Cov(X,Y).$$ Por tanto, en este espacio $H$ la noción
+geométrica de ortogonalidad coincide con la noción estadística de /no
+correlación/. Por tanto, en este contexto los términos producto
+escalar, covarianza y esperanza del producto serán intercambiables
+(esto deja de ser cierto cuando hay variables aleatorias con esperanza
+no nula).
+#+latex: \medskip
+
+Una colección de variables aleatorias pertenecientes a $H$
+$$\boldsymbol{X}=(X_t\mid t\in\mathbb{Z}) \;\text{ con }\; X_t\in H$$
+se denomina /proceso estocástico de segundo orden/.
+
+Si $\boldsymbol{Y}=(Y_t\mid t\in\mathbb{Z})$ es tal que
+$E(Y_t)=\mu\ne0$, entonces $\boldsymbol{Y}$ no es de segundo orden.
+
+Pero basta restar $\mu$ de cada $Y_t$ para tener un proceso
+$(\boldsymbol{Y}-\mu\boldsymbol{1})$ de segundo orden.
+
+/Por ello siempre asumiremos/ (sin pérdida de generalidad) /que las
+variables aleatorias de los procesos estocásticos de esta lección/ (y
+la siguiente) /tienen esperanza cero/.
+
+
+** Primeros momentos de procesos estocásticos de segundo orden
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Si $E(X_t)<\infty$ para $t\in\mathbb{Z}$, entonces $E(\boldsymbol{X})$ es
+la secuencia $$E(\boldsymbol{X})=\big(E(X_t)\mid
+t\in\mathbb{Z}\big)=\sum\nolimits_{t\in\mathbb{Z}} E(X_t)
+z^t=\big(\ldots,\;E(X_{-1}),\;E(X_{0}),\;E(X_{1}),\ldots\big)$$
+
+# +attr_ipynb: (slideshow . ((slide_type . fragment)))
+Si $\boldsymbol{X}$ tiene segundos momentos finitos, la secuencia de
+autocovarianzas _de orden $k$_ es
+\begin{align*}
+%Cov(\boldsymbol{X},\boldsymbol{X}*z^k) = &
+%E\Big(\big[\boldsymbol{X}-E(\boldsymbol{X})\big]\odot\big[(\boldsymbol{X}-E(\boldsymbol{X}))*z^k\big]\Big)\\
+\left.\Big(Cov(X_t,X_{t-k})\right| t\in\mathbb{Z}\Big)
+= & 
+%\left.\Big(E\big[\big(X_t-E(X_t)\big)\big(X_{t-k}-E(X_{t-k})\big)\big]\; \right| t\in\mathbb{Z}\Big)\\
+%=&
+% \sum_{t\in\mathbb{Z}} \gamma_{_{k,t}} z^t
+(\gamma_{_{k,t}}\mid t\in\mathbb{Z})\\ % \;=\;
+= &
+(\ldots,\,\gamma_{_{k,-1}},\,{\color{blue}{\gamma_{_{k,0}}}},\,\gamma_{_{k,1}},\,\gamma_{_{k,2}},\ldots);\quad k\in\mathbb{Z}.
+\end{align*}
+#+latex: \noindent
+(la secuencia solo contiene la covarianza de orden $k$... pero en distintos instantes $t$).
+#+latex: \medskip
+
+Así, para cada par $(k,t)$, tenemos la covarianza $\gamma_{k,t}$ entre
+$X_t$ y $X_{t-k}$. Por tanto, en general, tenemos una esperanza para
+cada $t$ y una covarianza de orden $k$ para cada $t$. Dado que $t$
+recorre todos los números enteros, ¡esto son muchos momentos!  _Por
+eso necesitamos reducir el número de parámetros restringiéndonos a
+procesos estocásticos débilmente estacionarios_.
+
+** Procesos estocásticos (débilmente) estacionarios y la ACF
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Un proceso estocástico de segundo orden $\boldsymbol{X}$ se dice que
+es /débilmente estacionario/ @@latex:(estacionario en covarianza o,
+sencillamente, estacionario)@@ si $E(X_t)=\mu$ para todo
+$t\in\mathbb{Z}$ y la covarianza entre $X_s$ y $X_t$ solo depende de
+la diferencia $s-t$ para todo $s,t\in\mathbb{Z}$.
+
+En tal caso, definimos la _función de autocovarianzas_ como:
+$$\boldsymbol{\gamma} = (\gamma_{k}\mid k\in\mathbb{Z}) =
+(\ldots,\,\gamma_{-1},\,{\color{blue}{\gamma_{0}}},\,\gamma_{1},\,\gamma_{2},\ldots)
+\;=\;\sum_{-\infty}^{\infty} \gamma_k z^k.$$
+#+BEGIN_EXPORT latex
+\noindent
+(nótese que esta secuencia sí incluye covarianzas de \underline{todos} los órdenes).
+\medskip
+
+Y se denomina matriz de autocovarianzas de
+$\boldsymbol{X}$ a la matriz simétrica 
+$$\boldsymbol{\Gamma}= \begin{bmatrix}
+\gamma_{0}&\gamma_{1}&\gamma_{2}&\cdots\\ 
+\gamma_{1}&\gamma_{0}&\gamma_{1}&\cdots\\ 
+\gamma_{2}&\gamma_{1}&\gamma_{0}&\cdots\\ 
+\vdots&\vdots&\vdots&\ddots
+\end{bmatrix}.$$ 
+
+Tanto la secuencia $\boldsymbol{\gamma}$ como la matriz $\boldsymbol{\Gamma}$ son *definidas positivas*; es decir, para todos los enteros $n\geq1$ y escalares $c_1,c_2,\ldots,c_n$
+
+$$\sum_{i=1}^n\sum_{j=1}^n c_i c_j \gamma_{i-j}\geq0$$
+ya que
+$$%\sum_{i=1}^n\sum_{j=1}^n c_i c_j \gamma_{i-j}=
+\sum_{i=1}^n\sum_{j=1}^n c_i c_j Cov(X_i,X_j)=
+Cov
+\left(
+\sum_{i=1}^n c_i X_i,\;
+\sum_{j=1}^n c_j X_j
+\right)=
+\left< \sum_{i=1}^n c_i X_i \mid \sum_{i=1}^n c_i X_i \right>=
+\left\lVert \sum_{i=1}^n c_i X_i \right\rVert ^2\geq0.
+$$
+Esto es equivalente a que las submatrices principales de $\boldsymbol{\Gamma}$ son definidas positivas.
+\bigskip
+
+Es más, una secuencia $\boldsymbol{\gamma}$ es definida positiva si y solo si existe un espacio de Hilbert $H$ y un proceso estocástico estacionario $\boldsymbol{X}$ con $X_t\in H$ tales que $\gamma_k=Cov(X_t, X_{t-k})$ para todo $t,k\in\mathbb{Z}$ (Kolmogorov, 1941).
+\pagebreak[3]
+#+END_EXPORT
+
+*Propiedades* de la función de autocovarianzas $\boldsymbol{\gamma}$ (ACF):
+- $\gamma_0\geq0$
+- $\boldsymbol{\gamma}$ _es definida positiva_; y por tanto,
+  - $\boldsymbol{\gamma}$ es simétrica: $\gamma_k=\gamma_{-k}$
+  - $\boldsymbol{\gamma}$ es acotada: $|\gamma_k|\leq\gamma_0$
+
+Y@@latex:, si $\gamma_0>0$,@@ llamamos /función de autocorrelación/ (ACF) a la
+secuencia:
+$\;\boldsymbol{\rho}=\frac{1}{\gamma_0}(\boldsymbol{\gamma})
+=\sum\limits_{k\in\mathbb{Z}}\frac{\gamma_k}{\gamma_0}z^k$.
+
+
+* Notación: convolución y el operador retardo
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+#+BEGIN_EXPORT latex
+Los procesos estocásticos se pueden sumar elemento a elemento y se
+pueden multiplicar por escalares. Si $\boldsymbol{X}$ e
+$\boldsymbol{Y}$ son dos procesos estocásticos y $\;a\in\mathbb{R}$,
+entonces $$\boldsymbol{X}+\boldsymbol{Y}=(X_t+Y_t \mid
+t\in\mathbb{Z})\qquad\text{y}\qquad a\boldsymbol{X}=\big(a(X_t) \mid
+t\in\mathbb{Z}\big).$$ El conjunto de procesos estocásticos con la
+suma y el producto por escalares es un espacio vectorial.
+\smallskip
+#+END_EXPORT
+
+# +attr_ipynb: (slideshow . ((slide_type . subslide)))
+Sea $\boldsymbol{a}$ una secuencia de números y sea $\boldsymbol{X}$ un
+proceso estocástico tales que _la suma_
+$$\sum\limits_{k=-\infty}^{\infty}a_kX_{t-k}\;$$ _converge_ para todo
+$t.\;$ Entonces:
+#+latex:\smallskip
+
+Definimos el producto convolución (\(*\)) de $\boldsymbol{a}$ con
+$\boldsymbol{X}$ como el proceso estocástico:
+$$\boldsymbol{a}*\boldsymbol{X}=\left(\left.\sum_{r+s=t} a_r X_s
+\right| t\in\mathbb{Z}\right)$$ es decir
+$$(\boldsymbol{a}*\boldsymbol{X})_t=\sum_{r+s=t} a_r X_s,\quad
+\text{para } t\in\mathbb{Z}.$$ Por tanto, cada elemento de
+$(\boldsymbol{a}*\boldsymbol{X})$ es una combinación de variables
+aleatorias de $\boldsymbol{X}$
+#+latex:\smallskip
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Podemos aplicar el operador $\mathsf{B}$ sobre los elementos de un proceso estocástico $\boldsymbol{X}$.
+$$\mathsf{B} X_t = X_{t−1},\quad \text{para } t\in\mathbb{Z}.$$
+
+Aplicando el operador $\mathsf{B}$ repetidamente tenemos $$\mathsf{B}^k X_t =
+X_{t−k},\quad \text{para } t,z\in\mathbb{Z}$$ 
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Así, para el polinomio $\boldsymbol{a}(z)=a_0+a_1z+a_2z^2+a_3z^3$, y el proceso estocástico $\boldsymbol{Y}$
+\begin{align*}
+\boldsymbol{a}(\mathsf{B})Y_t 
+& = (a_0+a_1\mathsf{B}+a_2\mathsf{B}^2+a_3\mathsf{B}^3) Y_t \\
+% & = a_0 Y_t + a_1 \mathsf{B}^1 Y_t + a_2 \mathsf{B}^2 Y_t + a_3 \mathsf{B}^3 Y_t \\
+& = a_0Y_t+a_1Y_{t-1}+a_2Y_{t-2}+a_3Y_{t-3} \\
+% & =\sum\nolimits_{r=0}^3 a_r Y_{t-r} \\
+& =(\boldsymbol{a}*\boldsymbol{Y})_t,\quad \text{para } t\in\mathbb{Z}
+\end{align*}
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Y en general, si la suma $\sum\limits_{k=-\infty}^{\infty}a_kY_{t-k}$
+converge para todo $t$, entonces
+# si \(\fbox{$\boldsymbol{a}\in \ell^1$}\), entonces
+\begin{align*}
+\boldsymbol{a}(\mathsf{B})Y_t 
+& = (\cdots+a_{-2}\mathsf{B}^{-2}+a_{-1}\mathsf{B}^{-1}+a_0+a_1\mathsf{B}+a_2\mathsf{B}^2+\cdots) Y_t \\
+% & = a_0 Y_t + a_1 \mathsf{B}^1 Y_t + a_2 \mathsf{B}^2 Y_t + a_3 \mathsf{B}^3 Y_t \\
+& = \cdots+a_{-2}Y_{t+2}+a_{-1}Y_{t+1}+a_0Y_t+a_1Y_{t-1}+a_2Y_{t-2}+\cdots \\
+% & =\sum\nolimits_{r=0}^3 a_r Y_{t-r} \\
+& =(\boldsymbol{a}*\boldsymbol{Y})_t,\quad \text{para } t\in\mathbb{Z}
+\end{align*}
+
+
+* Ejemplos de procesos (débilmente) estacionarios
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+** Proceso de ruido blanco
+
+Una secuencia $\boldsymbol{U}=(U_t\mid t\in\mathbb{Z})$ de variables
+aleatorias *incorreladas* y tales que $$E(U_t)=0\quad\text{ y }\quad
+Var(U_t)=E(U_t^2)=\sigma^2$$ para $\;t\in\mathbb{Z}\;$ y
+$\;0<\sigma^2<\infty\;$ se llama /proceso de ruido blanco/.
+$\quad\boldsymbol{U}\sim WN(0,\sigma^2)$.
+#+latex:\medskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Al ser variables aleatorias incorreladas, su función de
+autocovarianzas es $$\boldsymbol{\gamma}(z)\;=\;\sigma^2
+z^0\;=\;(\ldots,0,0,\sigma^2,0,0,\ldots)$$
+
+- Es el proceso estacionario (no trivial) más sencillo.
+- Este proceso es el pilar sobre el que definiremos el resto de
+  ejemplos.
+
+# #+attr_ipynb: (slideshow . ((slide_type . fragment)))
+# Si el proceso $\boldsymbol{U}$ de ruido blanco está formado por
+# variables independientes e idénticamente distribuidas se denota con
+# $\;\boldsymbol{U}\sim IID(0,\sigma^2)$.
+
+** Procesos lineales
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+Sea $\boldsymbol{U}\sim WN(0,\sigma^2)$ y sea $\boldsymbol{b}\in
+\ell^2$; @@latex: es decir,@@ una secuencia de _cuadrado sumable_
+$\;\sum\limits_{j\in\mathbb{Z}}{b}_j^2<\infty$.
+#+latex:\medskip
+
+Denominamos /proceso lineal/ al proceso estocástico
+$\boldsymbol{X}=\boldsymbol{b}*\boldsymbol{U}$ cuyos elementos son $$X_t
+\;=\;(\boldsymbol{b}*\boldsymbol{U})_t
+\;=\;\boldsymbol{b}(B)U_t \;=\;\sum_{j=-\infty}^\infty {b}_j
+U_{t-j};\qquad t\in\mathbb{Z}.$$
+#+BEGIN_EXPORT html
+Este proceso es estacionario (véase la demo en los apuntes en pdf)
+#+END_EXPORT
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+$\boldsymbol{b}(B)$ se denomina /función de transferencia/ del
+filtro lineal que relaciona $X_t$ con $U_t$.
+#+latex:\medskip
+
+#+BEGIN_EXPORT latex
+El proceso está bien definido puesto que la serie infinita converge en norma por el Teorema de Riesz-Fisher (Pourahmadi, M. 2001, Teorema 9.7).
+Y el proceso es estacionario porque, usando la continuidad de los productos escalares (Pourahmadi, M. 2001, Teorema 9.2),
+\begin{align*}
+\gamma_k=Cov(X_{t+k},X_t)=\langle X_{t+k}\mid X_{t}\rangle 
+& = \lim_{m,n\to\infty} 
+\left\langle \sum_{i=-m}^m {b}_i U_{t+k-i}\mid \sum_{j=-n}^n {b}_j U_{t-j}\right\rangle\\
+& = \sum_{i=-\infty}^\infty \sum_{j=-\infty}^\infty {b}_i {b}_j \langle U_{t+k-i}\mid  U_{t-j} \rangle \\
+& = \sigma^2 \sum_{i=-\infty}^\infty \sum_{j=-\infty}^\infty {b}_i {b}_j \delta_{t+k-i,t-j}\\ 
+& = \sigma^2 \sum_{i=-\infty}^\infty {b}_i {b}_{i+k}
+\; = \; \sigma^2 (\boldsymbol{b}(z)*\boldsymbol{b}(z^{-1}))_k
+\end{align*}
+que solo depende de $k$ (en la tercera línea, $\delta_{p,q}$ es la delta de Kronecker; y en la cuarta  hemos usado la última ecuación de la Lección 4).
+\medskip
+
+#+END_EXPORT
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+El proceso lineal es /``causal''/ si además $\boldsymbol{b}$ es una
+_serie formal_ (i.e., $cogrado(\boldsymbol{b})\geq{\color{blue}{0}}$)
+$$X_t=\sum_{j=0}^\infty {b}_j U_{t-j};\qquad t\in\mathbb{Z}$$ 
+(pues cada $X_t$ es una suma de variables "/del presente y/o el pasado/").
+#+latex:\medskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+La clase de *procesos lineales causales* incluye muchas e importantes
+subclases de procesos, algunas de las cuales son objeto principal de
+estudio de este curso.
+
+*** Media móvil infinita. MA($\infty$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Sea $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y sea
+$\;\boldsymbol{\psi}\in \ell^2\;$ una serie formal con _infinitos
+términos NO nulos_; entonces el proceso estocástico
+$\boldsymbol{\psi}*\boldsymbol{U}$, cuyos elementos son $$X_t
+\;=\;(\boldsymbol{\psi}*\boldsymbol{U})_t
+\;=\;\boldsymbol{\psi}(B)U_t \;=\;\sum_{j=0}^\infty \psi_j
+U_{t-j};\qquad t\in\mathbb{Z}$$ se denomina proceso de /media móvil
+infinita/ MA($\infty$).
+#+latex:\bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . slide)))
+Algunas clases de procesos lineales causales tienen una representación
+parsimoniosa, pues basta un número finito de parámetros para
+representarlos completamente. Por ejemplo, cuando
+$\boldsymbol{\psi}$ tiene un número finito de términos no nulos...
+
+*** Proceso de media móvil de orden $q$. MA($q$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . fragment)))
+   :END:
+
+Sea $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y sea
+$\;\boldsymbol{\theta}\;$ un _polinomio de grado $q$_ con
+${\color{#008000}{\theta_{0}=1}}$; entonces el proceso estocástico
+$\boldsymbol{\theta}*\boldsymbol{U}$, cuyos elementos son $$X_t
+\;=\;(\boldsymbol{\theta}*\boldsymbol{U})_t
+\;=\;\boldsymbol{\theta}(B)U_t \;=\;\sum_{j=0}^q\theta_j
+U_{t-j};\qquad t\in\mathbb{Z}$$ se denomina proceso de /media móvil/
+MA($q$).
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Es decir, si $\;\boldsymbol{\theta}=(1-\theta_1z-\cdots-\theta_qz^q)\;$:
+$$ X_t = U_t - \theta_1 U_{t-1} - \cdots - \theta_q U_{t-q}.$$
+
+
+#+attr_ipynb: (slideshow . ((slide_type . slide)))
+Hay otros procesos lineales con representación parsimoniosa.
+
+*** Proceso autorregresivo de orden $p$. AR($p$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . fragment)))
+   :END:
+
+Sea $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$, se denomina /proceso
+autorregresivo de orden $p$/ a aquel proceso estocástico
+/estacionario/ $\;\boldsymbol{X}\;$ que es la solución de la siguiente
+ecuación en diferencias
+$$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U}$$ donde
+$\;\boldsymbol{\phi}\;$ un _polinomio de grado $p$_ con
+${\color{#008000}{\phi_{0}=1}}$;
+#+latex:\medskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Por tanto, $$(\boldsymbol{\phi}*\boldsymbol{X})_t=
+\boldsymbol{\phi}(\mathsf{B})X_t= \sum_{j=0}^p \phi_j X_{t-j} = U_t.$$
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+
+Si $\;\boldsymbol{\phi}=(1-\phi_1z-\cdots-\phi_pz^p)\;$ entonces
+$\boldsymbol{X}=(X_t\mid t\in\mathbb{Z})$ es solución de la ecuación:
+$$X_t - \phi_1 X_{t-1} - \cdots -\phi_q X_{t-q} = U_t.$$
+#+latex:\medskip
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+El problema con la anterior definición es que la ecuación
+$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U}$ no tiene solución
+única (y en algunos casos ninguna solución es
+estacionaria). Despejemos $\boldsymbol{X}$ para verlo.
+
+Multiplicando ambos lados de la ecuación por una inversa de
+$\boldsymbol{\phi}$ tenemos
+$$\boldsymbol{X}=inversa(\boldsymbol{\phi})*\boldsymbol{U}.$$ Y si
+denotamos la secuencia $inversa(\boldsymbol{\phi})$ con
+$\boldsymbol{a}$ entonces
+$$X_t=\boldsymbol{a}(\mathsf{B})U_t=\sum_{j\in\mathbb{Z}} a_j
+U_{t-j}.$$
+#+latex:\medskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Pero... ¿Qué secuencia $\boldsymbol{a}$ usamos como inversa de
+$\boldsymbol{\phi}$? Recuerde que hay infinitas y la mayoría no son
+sumables (si el polinomio $\boldsymbol{\phi}$ tiene raíces unitarias
+ninguna lo es).
+
+#+begin_center
+En tal caso la expresión
+$\;\boldsymbol{a}(\mathsf{B})U_t=\sum\limits_{j=-\infty}^\infty a_j
+U_{t-j}\;$ carece de sentido (pues no converge).
+#+end_center
+#+latex:\medskip
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+*Requisitos* sobre el polinomio autorregresivo $\boldsymbol{\phi}.\;$ Para que el proceso AR exista y sea:
+
+1) _lineal y estacionario_, exigiremos que $\boldsymbol{\phi}$
+   _no tenga raíces de módulo 1_.
+
+   Entonces existe una única inversa absolutamente sumable: $\boldsymbol{\phi}^{-1} \in
+   \ell^1\subset\ell^2$.
+
+   La inversa $\boldsymbol{a}=\boldsymbol{\phi}^{-1}$ corresponde a la
+   única solución /estacionaria/ de
+   $\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U}$.  (Si
+   $\boldsymbol{\phi}$ tuviera raíces de módulo 1 no existiría ni
+   $\boldsymbol{\phi}^{-1}$, ni la solución estacionaria).
+
+   $$X_t=\boldsymbol{\phi}^{-1}(\mathsf{B})U_t=\sum_{j=-\infty}^\infty a_j U_{t-j}$$
+
+2) _causal_ exigiremos que las raíces de $\boldsymbol{\phi}$ sean
+   mayores que 1 en valor absoluto (_raíces fuera del círculo
+   unidad_):
+   $\boldsymbol{\phi}^{-1}=\boldsymbol{\phi}^{-\triangleright}\;$
+   (*serie formal* $\in\ell^1\subset\ell^2$).
+
+   $$X_t=\boldsymbol{\phi}^{-1}(\mathsf{B})U_t=\sum_{j=0}^\infty a_j U_{t-j}$$
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+   (¡de nuevo un proceso lineal causal!)
+#+latex:\bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+El siguiente modelo lineal es una combinación (o generalización) de
+los dos anteriores.
+
+*** Proceso autorregresivo de media móvil. ARMA($p,q$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Sea $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$, se denomina /proceso
+autorregresivo de media móvil $(p,q)$/ al proceso estocástico
+estacionario $\;\boldsymbol{X}\;$ que es la solución de la ecuación en
+diferencias:
+$$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}$$
+donde el polinomio /autorregresivo/ $\;\boldsymbol{\phi}\;$ tiene
+_grado $p$_ con ${\color{#008000}{\phi_{0}=1}}$ y con todas sus raíces
+fuera del círculo unidad (/por los motivos anteriormente vistos/); y
+el polinomio /de media móvil/ $\;\boldsymbol{\theta}\;$ es _de grado
+$q$_ con ${\color{#008000}{\theta_{0}=1}}$; 
+# y donde $\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ no tienen raíces comunes
+#+latex:\medskip
+
+$$\text{es decir,}\qquad
+\boldsymbol{X}=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}*\boldsymbol{U};
+\qquad\text{donde}\;
+\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}\equiv\boldsymbol{\phi}^{-1}*\boldsymbol{\theta}$$
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Tanto $\boldsymbol{\phi}^{-1}$ como $\boldsymbol{\theta}$ son series
+formales absolutamente sumables y como $\ell^1$ y las series formales
+son anillos,
+$\boldsymbol{\phi}^{-1}*\boldsymbol{\theta}\equiv\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}\in\ell^1$
+también es una serie formal absolutamente sumable (y por tanto de
+cuadrado sumable). Consecuentemente el proceso estocástico es un
+proceso lineal causal.
+$$X_t=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}(\mathsf{B})U_t=\sum_{j=0}^\infty
+a_j U_{t-j}$$ donde
+$\boldsymbol{a}=\boldsymbol{\phi}^{-1}*\boldsymbol{\theta}$.
+#+latex:\bigskip
+
+*** Proceso autorregresivo de media móvil con media no nula
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+Consideremos un proceso $\boldsymbol{Y}$ con media
+distinta de cero, es decir, $$E(Y_t)=\mu\ne0$$ y definamos la
+secuencia constante $\boldsymbol{\mu}=\sum\limits_{j\in\mathbb{Z}} \mu
+z^j=(\ldots,\mu,\mu,\mu,\ldots)$. 
+\medskip
+
+Decimos que $\boldsymbol{Y}$ es un proceso ARMA($p,q$) con media
+distinta de cero si $\boldsymbol{X}$ es ARMA($p,q$)
+$$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}$$
+donde $\boldsymbol{X}=\boldsymbol{Y}-\boldsymbol{\mu}$ es
+evidentemente un proceso de media cero.  Por tanto
+\begin{align*}
+\boldsymbol{\phi}*(\boldsymbol{Y}-\boldsymbol{\mu})=&\boldsymbol{\theta}*\boldsymbol{U}\\
+\boldsymbol{\phi}*\boldsymbol{Y}-\boldsymbol{\phi}*\boldsymbol{\mu}=&\boldsymbol{\theta}*\boldsymbol{U}\\
+\boldsymbol{\phi}*\boldsymbol{Y}=&\boldsymbol{\phi}*\boldsymbol{\mu}+ \boldsymbol{\theta}*\boldsymbol{U}\\
+\end{align*}
+Es decir, si $\boldsymbol{\phi}(\mathsf{B})$ es
+$\;1-\phi_1\mathsf{B}-\phi_2\mathsf{B}^2-\cdots-\phi_p\mathsf{B}^p,\;$
+entonces $$\boldsymbol{\phi}(B){Y_t}=c+\boldsymbol{\theta}(B){U_t}$$
+donde $$\;c=(1-\phi_1-\phi_2-\cdots-\phi_p)\mu\;$$ y donde
+$\;\mu=E(Y_t)$, es un proceso autorregresivo de media móvil
+ARMA($p,q$) /con media no nula/.
+
+
+* Primeros momentos de procesos lineales causales
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+
+** Esperanza y autocovarianzas de un proceso lineal causal
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Sea $\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U},\;$ donde
+$\boldsymbol{\psi}$ es una serie formal de cuadrado sumable
+@@latex:($\boldsymbol{\psi}\in\ell^2$)@@ y donde $\;\boldsymbol{U}\sim
+WN(0,\sigma^2).\quad$ Recordando que la convolución es una operación
+lineal: $$E(\boldsymbol{X}) =E(\boldsymbol{\psi}*\boldsymbol{U})
+=\boldsymbol{\psi}*E(\boldsymbol{U})
+=\boldsymbol{\psi}*\boldsymbol{0}=\boldsymbol{0}.$$ Consecuentemente,
+la covarianza de orden $k$ para cada $X_t$ es
+\begin{align*}
+\gamma_{_{k,t}} = & E\Big[\big(\boldsymbol{\psi}(\mathsf{B})X_t\big)\cdot \big(\boldsymbol{\psi}(\mathsf{B}) X_{t-k}\big)\Big] 
+\\ = &
+E\Big[
+ (\psi_0U_{t}+\psi_1U_{t-1}+\psi_2U_{t-2}\cdots)
+ (\psi_0U_{t-k}+\psi_1U_{t-k-1}+\psi_2U_{t-k-2}\cdots)\Big]
+\\ = &
+\sigma^2\sum\nolimits_{j\in\mathbb{Z}}\psi_{j+k}\psi_j
+\qquad \text{ ya que }\; E(U_hU_j)=0\; \text{ si } \;j\ne h,
+\end{align*}
+que no depende de $t$ ($\boldsymbol{X}$ es estacionario). Es más, por
+la última ecuación de la lección 4 $$\;\gamma_k \;=\;
+\sigma^2\sum\nolimits_{j\in\mathbb{Z}}\psi_{j+k}\psi_j \;=\;
+\sigma^2\big(\boldsymbol{\psi}(z)*\boldsymbol{\psi}(z^{-1})\big)_k
+\qquad \text{ para } k\in\mathbb{Z}.$$ Y, por tanto
+\begin{equation}
+ \label{eqAutoCovarianzaProcesoLineal}
+ \boldsymbol{\gamma}=\sigma^2\boldsymbol{\psi}(z)*\boldsymbol{\psi}(z^{-1})
+\end{equation}
+con grado igual al grado de $\boldsymbol{\psi}$ y cogrado igual a
+menos el grado de $\boldsymbol{\psi}$.
+
+# $$\fbox{\(\)}$$
+# \begin{align*}
+# Cov(\boldsymbol{X},\boldsymbol{X}*z^k) 
+# =&E\Big[\boldsymbol{X}\odot(\boldsymbol{X}*z^k)\Big]
+# \;=\;
+# E\Big[(\boldsymbol{\psi}*\boldsymbol{U})\odot(\boldsymbol{\psi}*\boldsymbol{U}*z^k)\Big]
+# \\ = &
+# \Big(
+# E\Big[
+#  (\phi_0U_{t}+\phi_1U_{t-1}+\phi_2U_{t-2}\cdots)
+#  (\phi_0U_{t-k}+\phi_1U_{t-k-1}\cdots)\Big]
+# \,\Big|\, t\in\mathbb{Z}
+# \Big)
+# \\ = &
+# \Big(\sigma^2\sum_{j\in\mathbb{Z}}\phi_{j+k}\phi_j \;\Big|\; t\in\mathbb{Z} \Big)
+# \quad \text{ ya que }\; E(U_hU_j)=0\; \text{ si } \;j\ne h
+# \end{align*}
+
+** Covarianza cruzada entre dos procesos lineales causales
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Sean $\;\boldsymbol{W}=\boldsymbol{\theta}*\boldsymbol{U}\quad$ e
+$\quad\boldsymbol{Y}=\boldsymbol{\psi}*\boldsymbol{U},\quad$ donde
+$\boldsymbol{\theta}$ y $\boldsymbol{\psi}$ son series formales de
+cuadrado sumable y donde $\;\boldsymbol{U}\sim
+WN(0,\sigma^2)$.
+
+#+BEGIN_EXPORT latex
+Entonces la covarianza cruzada (de orden $k\in\mathbb{Z}$) entre $W_t$
+e $Y_{t-k}$ es
+\begin{align*}
+E\Big[W_t\cdot Y_{t-k}\Big] = &
+E\Big[\big(\boldsymbol{\theta}(\mathsf{B})U_t\big)\cdot \big(\boldsymbol{\psi}(\mathsf{B}) U_{t-k}\big)\Big] 
+\\ = &
+E\Big[
+ (\theta_0U_{t}+\theta_1U_{t-1}+\theta_2U_{t-2}\cdots)
+ (\psi_0U_{t-k}+\psi_1U_{t-k-1}+\psi_2U_{t-k-2}\cdots)\Big]
+\\ = &
+\sigma^2\sum\nolimits_{j\in\mathbb{Z}}\theta_{j+k}\psi_j
+\qquad \text{ ya que }\; E(U_hU_j)=0\; \text{ si } \;j\ne h
+\end{align*}
+que tampoco depende de $t$. Es más, por la última ecuación de la lección 4
+$$\;\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}(k) =
+\sigma^2\sum\nolimits_{j\in\mathbb{Z}}\theta_{j+k}\psi_j =
+\sigma^2\big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\big)_k\quad
+\text{ para todo } k\in\mathbb{Z}.$$ Es decir...
+#+END_EXPORT
+
+Repitiendo los mismos pasos que en el caso de la autocovarianza,
+llegamos a que la _función de covarianzas cruzadas_ es la secuencia
+\begin{equation}
+ \label{eqCovarianzaCruzadaProcesosLineales}
+ \boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}} =
+ \sigma^2 \boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})
+\end{equation}
+con grado igual al grado de $\boldsymbol{\theta}$ y cogrado igual a menos
+el grado de $\boldsymbol{\psi}$.
+
+# $$\fbox{\(\)}$$
+
+** Las Ecuaciones de Yule-Walker para un AR($p$) estacionario
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+#+latex: \noindent
+/Por una parte/ (lado izquierdo):
+
+Si $\boldsymbol{X}$ es un proceso (débilmente) estacionario con
+$E(\boldsymbol{X})=\boldsymbol{0}\;$ y $\;\boldsymbol{\phi}$ es una serie
+formal absolutamente sumable; entonces para $t,k\in\mathbb{Z}$
+\begin{equation}
+  E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot X_{t-k}\Big]
+  \quad = \quad
+  \boldsymbol{\phi}(\mathsf{B})E\big(X_t\cdot X_{t-k}\big)
+  \quad = \quad
+  \boldsymbol{\phi}(\mathsf{B})\gamma_k
+  \label{eqnLadoIzquierdoYW}
+\end{equation}
+que no depende de $t$, por ser $\boldsymbol{X}$ es un proceso
+(débilmente) estacionario.
+#+latex: \medskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+latex: \noindent
+/Por otra parte/ (lado derecho):
+
+Si $\boldsymbol{X}$ tiene representación
+$\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U}$ donde
+$\;\boldsymbol{U}\sim WN(0,\sigma^2)$ y $\boldsymbol{\psi}\in\ell^2$ es una
+serie formal con $\psi_0=1$; es decir, si es un proceso lineal causal
+# Sea un AR($p$) estacionario:
+# $\;\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U};\;$ entonces $\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U}$ 
+# con $\boldsymbol{\psi}=\frac{1}{\boldsymbol{\phi}}$ y $\psi_0=1$.
+# # donde $\boldsymbol{U}\sim WN(0,\sigma^2)$.
+#+latex: \noindent
+$$\quad X_t=U_t + \sum\nolimits_{j=1}^\infty \psi_j U_{t-j},$$
+entonces para $t,k\in\mathbb{Z}$
+\begin{equation}
+  E[U_t\cdot X_{t-k}] = E\Big[U_t\Big(U_{t-k} + \sum\nolimits_{j=1}^\infty \psi_j U_{t-k-j}\Big) \Big]=
+  \begin{cases}
+  \sigma^2 & \text{cuando } k=0\\
+  0 & \text{cuando } k\ne0
+  \end{cases}
+  \label{eqnLadoDerechoYW}
+\end{equation}
+#+latex: \bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Sea un AR($p$) estacionario:
+$\;\;\boldsymbol{\phi}(\mathsf{B})X_t=U_t\;\;$ donde
+$\;\;\boldsymbol{\phi}(z)=1-\phi_1z^1-\cdots-\phi_pz^p.\;$
+Multiplicando por $X_{t-k}$ y tomando esperanzas:
+$$E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot X_{t-k}\Big] =
+E[U_t\cdot X_{t-k}]$$
+
+*para $k=0$:* $\quad$ (por $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$)
+$$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_0=\sigma^2\)}
+\quad\Rightarrow\quad
+\gamma_0-\phi_1\gamma_1-\cdots-\phi_p\gamma_p=\sigma^2
+\quad\Rightarrow\quad \sigma^2=\gamma_0-\sum\nolimits_{j=1}^p\phi_j\gamma_j.$$
+Dividiendo por $\gamma_0$ (y recordando que $\rho_0=1$):
+$$\boldsymbol{\phi}(\mathsf{B})\rho_0=\frac{\sigma^2}{\gamma_0}
+\quad\Rightarrow\quad
+\fbox{\(\gamma_0=\frac{\sigma^2}{\boldsymbol{\phi}(\mathsf{B})\rho_0}\)}
+\quad\Rightarrow\quad
+\gamma_0=\frac{\sigma^2}{1-\sum\nolimits_{j=1}^p\phi_j\rho_j}.$$ 
+  
+*para $k>0$:* $\quad$ (por $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$)
+$$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_k=0\)}
+\quad\Rightarrow\quad
+\gamma_k-\phi_1\gamma_{k-1}-\cdots-\phi_p\gamma_{k-p}=0
+\quad\Rightarrow\quad \gamma_k=\sum\nolimits_{j=1}^p\phi_j\gamma_{k-j}.$$ 
+Dividiendo por $\gamma_0$:
+$$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\rho_k=0\)}
+\quad\Rightarrow\quad
+\rho_k-\phi_1\rho_{k-1}-\cdots-\phi_p\rho_{k-p}=0
+\quad\Rightarrow\quad \rho_k=\sum\nolimits_{j=1}^p\phi_j\rho_{k-j}.$$
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+Por tanto, la estructura autorregresiva del proceso impone que las
+autocovarianzas (y las autocorrelaciones) verifiquen las ecuaciones de
+Yule-Walker.
+
+** Función de autocovarianzas para un ARMA($p,q$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+# donde $$\boldsymbol{\phi}(z)=1-\phi_1z^1\cdots-\phi_pz^p \quad\text{y}\quad \boldsymbol{\theta}(z)=1-\theta_1z^1\cdots-\theta_qz^q.$$
+
+Sea un ARMA($p,q$) estacionario:
+$\boldsymbol{\phi}(\mathsf{B}){X_t}=\boldsymbol{\theta}(\mathsf{B}){U_t}\;$
+donde $\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ no tienen raíces
+comunes. Multiplicando por $X_{t-k}$, tomando esperanzas y
+sustituyendo $X_{t-k}$ por su representación MA($\infty$), donde
+$\boldsymbol{\psi}=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}$:
+$$\underbrace{E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot
+X_{t-k}\Big]}_{\boldsymbol{\phi}(\mathsf{B})\gamma_k\;(\text{por
+\ref{eqnLadoIzquierdoYW}})} =
+E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot X_{t-k}\Big]
+\;=\;
+\underbrace{E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot
+\Big(\boldsymbol{\psi}(\mathsf{B})U_{t-k}\Big)\Big]}_{\boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)}$$
+Donde hemos usando $\eqref{eqnLadoIzquierdoYW}$ y renombrando
+$\;\boldsymbol{\theta}(\mathsf{B})U_t=\boldsymbol{W}\;$ y
+$\;\boldsymbol{\psi}(\mathsf{B})U_t=\boldsymbol{Y}.\;$ Así:
+\begin{align*}
+  \boldsymbol{\phi}(\mathsf{B})\gamma_k & = \boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)\\
+  & =  \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{por } \eqref{eqCovarianzaCruzadaProcesosLineales}
+\end{align*}
+Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogrado $-\infty$
+\begin{equation}
+  \boldsymbol{\phi}(\mathsf{B})\gamma_k = 
+  \begin{cases}
+     0 & k > q\quad \text{(como en un AR)}\\
+    \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & k\leq q
+   \quad \text{(que depende de $\boldsymbol{\theta}$ y $\boldsymbol{\phi}$)}
+  \end{cases}
+\end{equation}
+
+
+** COMMENT Esperanza y autocovarianzas de un proceso de ruido blanco :noexports:
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Un proceso de ruido blanco $\boldsymbol{U}\sim WN(0,\sigma^2)$ es un
+proceso /débilmente estacionario/ (o estacionario de segundo orden)
+tal que: $$E(U_t)=0;\qquad t\in\mathbb{Z}$$ y $$\boldsymbol{\gamma} =
+(\ldots,\,0,\,0,\,{\color{blue}{\sigma^2}},\,0,\,0,\ldots)=\sigma^2
+z^0;$$ es decir, $\;\gamma_0=\sigma^2\;$ y $\;\gamma_k=0\;$ para todo
+$k\ne0$.
+#
+
+Consideremos el proceso estocástico: $\quad\boldsymbol{X}=(X_t \mid
+t=0,\pm1,\pm2,\ldots).\quad$ Lo podemos denotar con una función
+generatriz (como hicimos con las secuencias) $$\boldsymbol{X} \quad =
+\quad \sum_{t=-\infty}^\infty X_t z^t \quad\equiv\quad
+\boldsymbol{X}(z)$$ Recuerde que esto no es una suma; es una secuencia
+de variables aleatorias $$\sum_{t=-\infty}^\infty X_t z^t = (\ldots,\
+X_{-2},\ X_{-1},\ X_{0},\ X_{1},\ X_{2},\ldots)$$

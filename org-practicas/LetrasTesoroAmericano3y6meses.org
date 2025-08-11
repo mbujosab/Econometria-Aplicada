@@ -1,0 +1,648 @@
+#    -*- mode: org -*-
+
+#+title: Tipos de interés a 3 y 6 meses en EEUU
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+#+OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+INFOJS_OPT: view:overview
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+
+# +SETUPFILE: simple_inlineUCM.theme  
+# +SETUPFILE: white_clean.theme  
+#+SETUPFILE: ../css/bigblow_inline.theme
+# +SETUPFILE: readtheorg_inline.theme
+# +SETUPFILE: darksun.theme
+# ###########
+
+#+LATEX_HEADER: \usepackage[spanish]{babel}
+#+LATEX_HEADER: \usepackage{fontspec}
+#+latex_class_options: [10pt]
+
+#+LATEX: \maketitle
+
+
+#+NAME: if-no-guiones-makedir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+name: gretl
+#+BEGIN_SRC sh :exports none :results silent :tangle no
+rm -fr $(pwd)/LetrasTesoroAmericano3y6meses
+mkdir -p $(pwd)/LetrasTesoroAmericano3y6meses 
+DIRECTORIO="$(pwd)/LetrasTesoroAmericano3y6meses" gretlcli -b $(pwd)/guiones/LetrasTesoroAmericano3y6meses.inp 
+#+END_SRC
+# echo "$(pwd)/guiones/LetrasTesoroAmericano3y6meses" > directorioDeTrabajo
+# gretlcli -c -b $(pwd)/guiones/LetrasTesoroAmericano3y6meses.inp
+
+#+BEGIN_SRC sh  :exports none :results silent :tangle no :eval no
+zip LetrasTesoroAmericano3y6meses LetrasTesoroAmericano3y6meses* LetrasTesoroAmericano3y6meses/*#
+#+END_SRC
+
+#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :exports none
+# Necesario para que gretl guarde los ficheros en el directorio de la práctica.
+# Si no funciona, comente la primera línea y descomente la segunda:
+
+string directory = getenv("DIRECTORIO")
+#string directory = $(pwd) ~ "/LetrasTesoroAmericano3y6meses" 
+set workdir "@directory"
+ 
+#+end_src
+
+
+* Datos
+
+Datos semanales desde el 12 de diciembre de 1958 al 6 de agosto de
+2004 (en total 2383 observaciones). /Fuente/: ejemplo 8.6.5 del libro
+de Ruey S. Tsay, /Multivariate Time Series Analysis and its
+applications/ ([[https://www.chicagobooth.edu/-/media/faculty/ruey-s-tsay/teaching/fts2/w-tb3n6ms.txt][w-tb3n6ms.txt]]).
+- =TB3= :: 3-month Treasury Bill
+- =TB6= :: 6-month Treasury Bill
+
+
+#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+open ../datos/LetrasTesoroAmericano3y6meses.gdt
+gnuplot TB3 TB6  --time-series --with-lines --output="TB3yTB6.png"
+#+end_src
+
+#+ATTR_LATEX: :width 0.35\textwidth :center
+[[./LetrasTesoroAmericano3y6meses/TB3yTB6.png]]
+
+- Ficheros 
+# [[https://github.com/mbujosab/EconometriaAplicada-SRC/tree/main/Ejercicios]]
+   - Versión en [[https://mbujosab.github.io/Econometria-Aplicada/pdfs/Practicas/LetrasTesoroAmericano3y6meses.pdf][pdf]]
+   - Datos: [[https://mbujosab.github.io/Econometria-Aplicada/datos/LetrasTesoroAmericano3y6meses.gdt]]
+   - Guión de gretl: [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones/Practicas/guiones/lecc01-airlinePass.inp][LetrasTesoroAmericano3y6meses.inp]]
+
+
+# +latex: \newpage
+
+* Letras a tres meses
+** Gráfico y correlograma de la serie temporal TB3
+
+#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+gnuplot TB3 --time-series --with-lines --output="TB3.png"
+corrgm TB3 --plot="TB3ACF-PACF.png"
+#+end_src
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.5\textwidth :center 
+[[./LetrasTesoroAmericano3y6meses/TB3.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[./LetrasTesoroAmericano3y6meses/TB3ACF-PACF.png]] 
+#+END_CENTER
+
+** Regresión auxiliar para TB3
+
+Consideremos la regresión $$\nabla TB3_{t} = \nu + \delta TB3_{t-1} +
+\sum_{j=1}^3 \pi_j \nabla TB3_{t-j} + U_t.$$ Y consideremos la
+siguiente hipótesis nula acerca del parámetro $\delta$:
+#+BEGIN_QUOTE
+$\,H_0: \delta = 0$, frente a $H_1: \delta < 0$
+#+END_QUOTE
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+diff TB3
+RegresionAUX_TB3 <- ols d_TB3 0 TB3(-1) d_TB3(-1) d_TB3(-2) d_TB3(-3) 
+#+END_SRC
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet RegresionAUX_TB3.txt
+    ols d_TB3 0 TB3(-1) d_TB3(-1) d_TB3(-2) d_TB3(-3) 
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./LetrasTesoroAmericano3y6meses/RegresionAUX_TB3.txt example
+#+latex: }
+
+*** Contraste de la hipótesis nula 
+
+Respecto al contraste de la hipótesis nula sobre el parámetro $\delta$
+de la anterior regresión auxiliar:
+#+BEGIN_QUOTE
+$\,H_0: \delta = 0$, frente a $H_1: \delta < 0$
+#+END_QUOTE
+Para el tamaño muestral considerado, y bajo la hipótesis nula, el
+valor crítico del contraste para un nivel de significación del 5% es
+=-2.86=
+
+** Contraste aumentado de Dickey Fuller sobre la existencia de una raíz unitaria para TB3
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+adf 3 TB3 --c
+#+END_SRC
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet adf_TB3.txt
+    adf 3 TB3 --c
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./LetrasTesoroAmericano3y6meses/adf_TB3.txt example
+#+latex: }
+
+** Conteste KPSS de estacionariedad para TB3
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+kpss 3 TB3
+#+END_SRC
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet kpss_TB3.txt
+    kpss 3 TB3
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./LetrasTesoroAmericano3y6meses/kpss_TB3.txt example
+#+latex: }
+
+
+* Letras a seis meses
+** Gráfico y correlograma de la serie temporal TB6
+
+#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+gnuplot TB6 --time-series --with-lines --output="TB6.png"
+corrgm TB6 --plot="TB6ACF-PACF.png"
+#+end_src
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.5\textwidth :center 
+[[./LetrasTesoroAmericano3y6meses/TB6.png]] 
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[./LetrasTesoroAmericano3y6meses/TB6ACF-PACF.png]] 
+#+END_CENTER
+
+** Regresión auxiliar para TB6
+
+Consideremos la regresión $$\nabla TB6_{t} = \nu + \delta TB6_{t-1} +
+\sum_{j=1}^3 \pi_j \nabla TB6_{t-j} + U_t.$$ Y consideremos la
+siguiente hipótesis nula acerca del parámetro $\delta$:
+#+BEGIN_QUOTE
+$\,H_0: \delta = 0$, frente a $H_1: \delta < 0$
+#+END_QUOTE
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+diff TB6
+RegresionAUX_TB6 <- ols d_TB6 0 TB6(-1) d_TB6(-1) d_TB6(-2) d_TB6(-3) 
+#+END_SRC
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet RegresionAUX_TB6.txt
+    ols d_TB6 0 TB6(-1) d_TB6(-1) d_TB6(-2) d_TB6(-3) 
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./LetrasTesoroAmericano3y6meses/RegresionAUX_TB6.txt example
+#+latex: }
+
+*** Contraste de la hipótesis nula 
+
+Respecto al contraste de la hipótesis nula sobre el parámetro $\delta$
+de la anterior regresión auxiliar:
+#+BEGIN_QUOTE
+$\,H_0: \delta = 0$, frente a $H_1: \delta < 0$
+#+END_QUOTE
+Para el tamaño muestral considerado, y bajo la hipótesis nula, el
+valor crítico del contraste para un nivel de significación del 5% es
+=-2.86=
+
+** Contraste aumentado de Dickey Fuller sobre la existencia de una raíz unitaria para TB6
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+adf 3 TB6 --c
+#+END_SRC
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet adf_TB6.txt
+    adf 3 TB6 --c
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./LetrasTesoroAmericano3y6meses/adf_TB6.txt example
+#+latex: }
+
+** Conteste KPSS de estacionariedad para TB6
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+kpss 3 TB6
+#+END_SRC
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet kpss_TB6.txt
+    kpss 3 TB6
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./LetrasTesoroAmericano3y6meses/kpss_TB6.txt example
+#+latex: }
+
+
+* Contraste de cointegración de Engle y Granger
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+coint 3 TB3 TB6
+#+END_SRC
+
+#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet test_cointegracion.txt
+    coint 3 TB3 TB6
+end outfile
+#+end_src
+
+#+latex: {\footnotesize
+#+include: ./LetrasTesoroAmericano3y6meses/test_cointegracion.txt example
+#+latex: }
+
+
+* COMMENT Contraste de cointegración de Johansen                   :noexport:
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+johansen 3 TB3 TB6 --rc
+#+END_SRC
+
+#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet test_cointegracion_Johansen.txt
+    johansen 3 TB3 TB6 --rc
+end outfile
+#+end_src
+
+
+
+* Regresión de los tipos a 3 meses sobre los tipos a 6 meses
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+MCO3sobre6 <- ols TB3 0 TB6
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 1 --quiet
+#+END_SRC
+
+# P-valor Durbin-Watson
+# scalar dwpval = $dwpval
+# print dwpval 
+
+#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet modeloMCO.txt
+  ols TB3 0 TB6
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 1 --quiet
+end outfile
+#+end_src
+
+#+latex: {\footnotesize
+#+include: ./LetrasTesoroAmericano3y6meses/modeloMCO.txt example
+#+latex: }
+
+
+* Regresión en primeras diferencias
+
+#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+diff TB3 TB6
+MCO3sobre6_en_Diff <- ols d_TB3 0 d_TB6
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 2 --quiet
+#+END_SRC
+
+#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+outfile --quiet modeloMCO_en_diff.txt
+  ols d_TB3 0 d_TB6
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 2 --quiet
+end outfile
+
+#+end_src
+
+#+latex: {\footnotesize
+#+include: ./LetrasTesoroAmericano3y6meses/modeloMCO_en_diff.txt example
+#+latex: }
+
+
+# +latex: \newpage
+
+* Preguntas
+
+
+** Pregunta 1
+
+Discuta de todas las formas posibles si las series temporales de
+letras del tesoro norteamericano a tres meses (=TB3=) y a seis meses
+(=TB6=) son estacionarias en media (i.e., son la realización de
+procesos estocásticos estacionarios en media), usando para ello los
+resultados de los apartados [[Letras a tres meses]] y [[Letras a seis meses]]
+así como sus subapartados.
+
+([[Respuesta 1]])
+
+** Pregunta 2
+
+Discuta si las series temporales =TB3= y =TB6= están cointegradas, a
+partir de los resultados del apartado [[Contraste de cointegración de
+Engle y Granger]].
+
+([[Respuesta 2]])
+
+** Pregunta 3
+
+¿Qué relación existe entre el contraste de la hipótesis $H_0: \delta =
+0$ para la [[Regresión auxiliar para TB3]] y el [[Contraste aumentado
+de Dickey Fuller sobre la existencia de una raíz unitaria para TB3]]?
+
+¿Qué relación existe entre el contraste de la hipótesis $H_0: \delta =
+0$ para la [[Regresión auxiliar para TB6]] y el [[Contraste aumentado
+de Dickey Fuller sobre la existencia de una raíz unitaria para TB6]]?
+
+([[Respuesta 3]])
+
+** Pregunta 4
+
+Los listados de la [[Regresión de los tipos a 3 meses sobre los tipos a
+6 meses]] y la [[Regresión en primeras diferencias]] muestran los
+principales resultados obtenidos al estimar por MCO dos modelos de
+regresión.
+
+Resuma y comente los resultados de estimación y diagnosis que le
+parezcan más relevantes para cada uno de los modelos (el primero en
+niveles y el segundo en diferencias).
+
+¿Detecta alguna desviación del cumplimiento de las hipótesis
+habituales en dichos modelos?
+
+([[Respuesta 4]])
+
+#+latex: \newpage
+
+* Respuestas
+
+
+** Respuesta 1
+
+Ambas series (=TB3= y =TB6=) parecen ser NO
+estacionarias en media,
+- Analizando los gráficos de las series, ambas parecen tener una
+  tendencia estocástica sin deriva. 
+  # Además la media en ambos casos parece ser distinta de cero.
+
+- Ambas funciones de autocorrelación (FAC) muestran persistencia (sus
+  coeficientes decrecen despacio y a un ritmo aproximadamente lineal);
+  y el primer coeficiente de la PACF está próximo a uno en ambos
+  casos.
+
+- En ambos casos el contraste Dickey-Fuller aumentado no rechaza la
+  hipótesis nula de existencia de una raíz unitaria ni al 1%, ni al
+  5%, ni tampoco al 10% de significación.
+
+- En consonancia con lo anterior, en ambos casos el test KPSS rechaza
+  contundentemente que las series sean estacionarias.
+
+- Además (aunque el enunciado no hace referencia a la sección
+  "[[Contraste de cointegración de Engle y Granger]]"), los test ADF
+  calculados en las etapas 1 y 2 no rechazan la hipótesis (raíz
+  unitaria) pues, de hecho, son los mismos test mostrados más arriba.
+
+#+BEGIN_QUOTE
+*Aclaraciones a algunas respuestas incorrectas en los exámenes*:
+
+- Las regresiones auxiliares corresponden al contraste Dickey-Fuller
+  (en este caso Dickey-Fuller /aumentado/ por incluir tanto un término
+  constante como tres retardos de la variable). *De este contraste
+  solo nos interesa el ratio* $t$ (parámetro estimado dividido por
+  desviación típica) para $\delta$ (la pendiente correspondiente al
+  primer retardo de la variable). 
+
+  Dicho ratio, bajo la $H_0$ de que la serie es $I(1)$, no tiene la
+  habitual distribución /t/-student. Por eso se compara el ratio con
+  unas tablas especiales (las del Dickey-Fuller aumentado con
+  constante, tres retardos y en tamaño muestral correspondiente) que
+  para una significación del 5% arrojan un valor crítico de =-2.86=
+  como se indica tras los resultados de la regresión.
+
+  *El valor de $R^2$ o los criterios de información, o cualquier otro
+  estadístico no nos importan* (esta regresión auxiliar no trata de
+  encontrar un modelo para la serie, solo pretende contrastar si hay
+  una raíz unitaria, es decir, contrastar si $\delta=0$). Por último,
+  *que el $R^2$ sea bajo NO indica ni que la serie sea estacionaria ni
+  que no lo sea*.
+
+#+END_QUOTE
+
+
+([[Pregunta 1]])
+
+** Respuesta 2
+
+El resumen de las distintas etapas del test de cointegración son:
+- Etapa 1 :: El test ADF no rechaza que la serie =TB3= sea
+  I(1) para niveles de significación inferiores al 13% (p-valor
+  asintótico =0,1312=).
+- Etapa 2 :: El test ADF no rechaza que la serie =TB6= sea
+  I(1) para niveles de significación inferiores al 13% (p-valor
+  asintótico =0,1308=).
+- Etapa 3 :: En la regresión (cointegrante) de las letras a 3 meses
+  sobre las letras a 6 meses la pendiente es muy significativa, y el
+  $R^2$ está próximo a 1.
+- Etapa 4 :: El test ADF rechaza *contundentemente* que los residuos
+  de la regresión cointegrante sean I(1) a casi cualquier nivel
+  de significación (p-valor asintótico =0.000000000000355=)
+
+Por lo que podemos concluir que, siendo las series =TB3= y =TB6= no
+estacionarias (etapas 1 y 2), la regresión cointegrante muestra que
+existe una estrecha y significativa relación entre ellas (etapa 3) con
+residuos estacionarios (etapa 4). En otras palabras, aunque =TB3= y
+=TB6= no son estacionarias en media, la diferencia entre ellas
+$TB3-\widehat{\beta_2}TB6$ sí es estacionaria en
+media. Consecuentemente, _el test NO rechaza la cointegración de los
+tipos de interés a 3 y 6 meses_.
+
+#+BEGIN_QUOTE
+*Aclaraciones a algunas respuestas incorrectas en los exámenes*:
+
+- La etapa 3 es tan importante como el resto de etapas (en dicha etapa
+  3 lo importante es que la pendiente sea significativa y el ajuste
+  elevado, pues indica que una serie ajusta los datos de la otra). Las
+  otras etapas añaden que ambas series son no estacionarias en media,
+  pero los residuos sí son estacionarios, es decir, que
+  $y_t-\widehat{cte}-\widehat{\beta_2} x_t$ (i.e. los residuos) es una
+  serie estacionaria en media.
+- En la regresión cointegrante, la interpretación de la constante es
+  que, en media, el tipo de interés =TB3= es =-0,227230= puntos más
+  bajo que el =TB6=. Si se fija en la primera gráfica con ambas series
+  se puede apreciar que en casi todo el periodo muestral =TB3= (en
+  verde) se encuentra ligeramente por debajo de =TB6= (en naranja). Es
+  decir, su interpretación *NO ES* que la media de =TB3= sea negativa
+  (basta mirar el gráfico para constatar que su media no es negativa).
+#+END_QUOTE
+
+([[Pregunta 2]])
+
+** Respuesta 3
+
+Precisamente, ambas regresiones auxiliares son las que se han empleado
+en los respectivos contrastes ADF (en este caso incluyendo tres
+retardos) $$\nabla Y_{t} = \nu + \delta Y_{t-1} + \sum_{j=1}^3 \pi_j
+\nabla Y_{t-j} + U_t,$$ un $\delta=0$ implica, bajo la hipótesis de que
+la serie $Y_t$ es $I(1)$, que la primera diferencia es estacionaria en
+media, pues $$Y_{t}-Y_{t-1} = \nu + \underbrace{\sum_{j=1}^3 \pi_j
+\nabla Y_{t-j}}_{I(0)} + U_t.$$
+
+Bajo la hipótesis $H_0$ de que la serie $Y_t$ es $I(1)$, el ratio $t$
+correspondiente al parámetro $\delta$ no se distribuye como una
+/t/-student, por lo que el estadístico /t/ y el correspondiente
+p-valor mostrados en las regresiones auxiliares no son válidos. Por
+eso el contraste ADF emplea unos valores críticos distintos (en este
+ejemplo =-2.86=). Como los ratios /t/ (=-2,438= y =-2,440=) no superan
+el valor crítico, no se rechaza la hipótesis nula $\delta=0$, es
+decir, no se rechaza que las series sean $I(0)$ (nótese que la
+hipótesis alternativa es $\delta<0$, y que por tanto el contraste es
+de una sola cola: la cola izquierda; por tanto, para rechazar la
+hipótesis el ratio debería tomar valores a la izquierda de =-2.86=).
+
+([[Pregunta 3]])
+
+** Respuesta 4
+
+- [[Regresión de los tipos a 3 meses sobre los tipos a 6 meses]] :: Los
+  coeficientes estimados son muy significativos. El ajuste del modelo,
+  medido por el valor del \(R^2\) es muy elevado, pero los contrastes
+  rechazan las hipótesis habituales de distribución normal,
+  homocedasticidad y ausencia de autocorrelación en los residuos.
+
+- [[Regresión en primeras diferencias]] :: El único coeficiente
+  significativo es la pendiente (es decir, al diferenciar las series
+  NO desaparece la relación entre ellas; como cabe esperar entre
+  series cointegradas), y el ajuste del modelo, medido por el valor
+  del \(R^2\), es superior al 80%. Los contrastes residuales rechazan
+  las hipótesis habituales de distribución normal, homocedasticidad y
+  ausencia de autocorrelación en los residuos.
+
+#+BEGIN_QUOTE
+*Aclaraciones a algunas respuestas incorrectas en los exámenes*
+
+- Un coeficiente de determinación ($R^2$) muy elevado indica un buen
+  *ajuste* de los datos. Eso no significa una buena /explicación/ (no
+  confunda lo que es un /ajuste/ con lo que es una /explicación/... si
+  no lo entiende, repase el concepto de correlación espuria).
+- En un modelo con constante, el coeficiente de determinación ($R^2$)
+  indica el porcentaje de la varianza de los datos del regresando que
+  es replicada por los datos de los regresores (es una medida de
+  /ajuste de los datos/).
+- La lectura de los criterios de información o del coeficiente de
+  determinación /ajustado/ es diferente al del $R^2$. Dichos
+  estadísticos sirven para comparar modelos con el mismo
+  regresando. Por eso no tiene sentido comparar dichos estadísticos
+  para un modelo de =TB3= y otro para su primera diferencia =d_TB3=
+  (al ser regresandos distintos, no cabe la comparación). Fíjese que
+  en mi respuesta solo indico la magnitud del $R^2$ en cada modelo,
+  pero no los comparo entre si.
+
+  Los valores de los criterios de información no nos indican la
+  calidad del modelo; es la comparación de dichos valores entre
+  modelos distintos la que nos indica comparativamente determinadas
+  cualidades de dichos modelos.
+
+- Las hipótesis habituales y que se han contrastado como hipótesis
+  nulas ($H_0$) en las salidas de Gretl son:
+  1. *Distribución normal* (o gaussiana) de las perturbaciones
+  2. *Homocedasticidad* (que la varianza de las perturbaciones es
+     constante a lo largo de la muestra). Cuando las perturbaciones no
+     son homocedásticas se dice que son /heterocedásticas/. Por tanto
+     la $H_0$ es la /homocedasticidad/ (igual varianza) y NO la
+     /heterocedasticidad/.
+  3. */Ausencia/ de autocorrelación* en las perturbaciones (es decir
+     que no hay autocorrelación). Por tanto, rechazar esta $H_0$
+     significa que vamos a asumir que hay autocorrelación.
+- El teorema de Gauss-Markov NO exige la distribución normal... pero
+  SI exige homocedasticidad y ausencia de autocorrelación. Por tanto
+  las estimaciones de las dos regresiones NO son eficientes en el
+  sentido de Gauss-Markov (tampoco en el máximo-verosímil).
+#+END_QUOTE
+
+([[Pregunta 4]])
+
+
+#+BEGIN_QUOTE
+*Aclaraciones generales*
+
+- En un contraste de hipótesis NO se rechaza ni el test, ni el
+  contraste, ni el p-valor, etc. *Se rechaza una hipótesis nula*, y
+  cada contraste corresponde a una hipótesis particular. Por tanto,
+  siempre se debe enunciar en qué consiste la hipótesis en cuestión.
+  Limitarse a decir que se rechaza la hipótesis nula *no indica nada
+  si no se explicita cuál es la hipótesis*... del mismo modo que
+  tampoco estoy informando de nada a quien me pregunta por el destino
+  de mi último viaje si le contesto... "pues es donde estuve").
+
+
+- Hablar de la significatividad de un parámetro es un modo abreviado
+  de decir que se rechaza la hipótesis de que el parámetro sea
+  cero. Así que decir que un parámetro es no significativo es un modo
+  de decir /no rechazamos la hipótesis de que sea cero/.
+
+  La significatividad se refiere a un parámetro, hablar de la
+  significatividad de un /p/-valor NO TIENE NINGÚN SENTIDO (el
+  /p/-valor es una probabilidad y no un parámetro). Afirmar que los
+  datos son (estadísticamente) significativos tiene el mismo sentido
+  que decir que un atardecer es muy esdrújulo o un teorema muy
+  longevo.
+
+
+- La significación (o nivel de significación) $\alpha$ es una
+  probabilidad fijada a priori que sirve para estableces los valores
+  críticos de un contraste limitando la probabilidad de cometer el
+  error tipo I bajo la hipótesis nula del contraste. Decir que la
+  variable de un modelo tiene un alto nivel de significación NO TIENE
+  NINGÚN SENTIDO (pero decir que es estadísticamente significativa
+  SÍ).
+
+
+- Correlación (tiene que ver con los momentos de una variable) y
+  regresión (es un modelo) son conceptos muy
+  distintos. Consecuentemente también lo son autocorrelación (entre
+  variables) y la expresión AR(p) (que es una abreviatura de modelo
+  autorregresivo de orden $p$). Así pues, las variables pueden mostrar
+  autocorrelación (PERO NO AUTORREGRESIÓN), y se contrasta la ausencia
+  de autocorrelación (NO AUTORREGRESIÓN). En el correlograma, el
+  primer palote representa la magnitud de la autocorrelación de orden
+  1 (eso NO ES UN AR(1)... recuerde que un AR(1) es un modelo y el
+  palote representa el valor de un parámetro).
+
+
+- Un proceso estocástico cuyo modelo univariante posee un polinomio AR
+  (o polinomio autorregresivo) con raíces en el círculo unidad no es
+  estacionario. Pero un proceso no estacionario no tiene por que tener
+  un modelo con raíces autorregresivas en el círculo unidad (su modelo
+  puede no tener nada que ver con los modelos ARIMA). El curso solo ha
+  tratado con modelos univariantes ARIMA, pero dichos modelos no
+  cubren todos los posibles procesos estocásticos.
+
+
+- En las salidas de Gretl aparecen expresiones como =(1-L)=, en dichas
+  expresiones, =L= es el operador retardo (que en otros programas o
+  libros también se denota con =B=). Por tanto el símbolo =L= NADA
+  TIENE QUE VER CON LOS LOGARITMOS.
+
+
+
+
+#+END_QUOTE
