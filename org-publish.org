@@ -71,6 +71,7 @@ $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	cp -a $< $(LECCIONES_tmp)
 	echo "EJECUCION DEL NOTEBOOK DE ORG: $(LECCIONES_tmp)/$(@F:.ipynb=.org)..."
 	emacs -Q -l ~/Software/scimax/init.el $(LECCIONES_tmp)/$(@F:.ipynb=.org) --batch --eval "(org-babel-execute-buffer)" --eval "(save-buffer)" --kill
+	emacs -Q -l ~/Software/scimax/init.el $(LECCIONES_tmp)/$(@F:.ipynb=.org) --batch --eval "(org-babel-execute-buffer)" --eval "(save-buffer)" --kill
 	echo "FICHEROS EN ./lecciones?..."
 	find $(LECCIONES_tmp)
 	echo "FICHEROS EN ./docs/Lecciones-html/img?..."
@@ -555,7 +556,7 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :base-directory  "./Lecciones-tmp/"
                    :base-extension "org"
                    :publishing-directory ,(concat base-directory "docs/Lecciones-html")
-                   :exclude "Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
                    :recursive t
                    :publishing-function org-html-publish-to-html
                    :auto-preamble t

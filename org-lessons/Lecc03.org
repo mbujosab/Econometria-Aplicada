@@ -1,3 +1,5 @@
+#    -*- mode: org -*-
+
 #+TITLE: Lección 3. Modelos lineales
 #+author: Marcos Bujosa
 #+LANGUAGE: es
@@ -53,7 +55,6 @@
 
 #+LATEX: \maketitle
 
-
 #+PROPERTY: header-args:emacs-lisp :eval export
 
 #+begin_src emacs-lisp :results silent :exports none
@@ -71,11 +72,18 @@
 
 
 #+begin_abstract
-Esta lección veremos las dificultades que ocasiona la correlación serial y algunos tipos de procesos \emph{débilmente estacionarios} que nos permitirán lidiar con ella. En particular veremos los procesos lineales, su valor esperado y su función de autocovarianzas, la función de covarianzas cruzadas entre dos procesos lineales, y las ecuaciones de Yule-Walker.
+Esta lección veremos las dificultades que ocasiona la *correlación serial* y algunos tipos de procesos débilmente estacionarios que nos permitirán lidiar con ella. En particular veremos los *procesos lineales*: su valor esperado y su función de autocovarianzas, la función de covarianzas cruzadas entre dos procesos lineales, y las ecuaciones de Yule-Walker.
 #+end_abstract
 
-- [[https://mbujosab.github.io/EconometriaAplicada-SRC/Lecc05.html][lección en html]]
-- [[https://mybinder.org/v2/gh/mbujosab/EconometriaAplicada-SRC/HEAD?labpath=Lecc05.ipynb][lección en mybinder]]
+- ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc03.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc03.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc03.ipynb][mybinder]])
+
+***** COMMENT para Jupyter-Notebook                               :noexport:
+\(
+\newcommand{\lag}{\mathsf{B}}
+\newcommand{\Sec}[1]{\boldsymbol{#1}}
+\newcommand{\Pol}[1]{\boldsymbol{#1}}
+\)
+
 
 ***  Carga de algunos módulos de python y creación de directorios auxiliares
    :PROPERTIES:
@@ -102,7 +110,7 @@ import matplotlib.pyplot as plt   # data visualization
    :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-Para publicar la lección como pdf y como página web, necesito los gráficos en forma de ficheros ~.png~ alojados en un directorio específico:
+Para publicar la lección como pdf o página web, necesito los gráficos como ficheros ~.png~ alojados algún directorio específico:
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results silent
 imagenes_leccion = "./img/lecc03" # directorio para las imágenes de la lección
@@ -166,8 +174,10 @@ df1 = pd.read_csv(path+'PoblacionAustralia.csv')
 df2 = pd.read_csv(path+'PIB_UEM.csv')
 df3 = pd.read_csv(path+'Retiro.txt')
 df4 = pd.read_csv(path+'IBEX35.csv')
+df5 = pd.read_csv(path+'ProduccionCemento.csv')
 #+END_SRC
 # print(df1.head())
+
 
 **** Población en Australia
    :PROPERTIES:
@@ -176,48 +186,58 @@ df4 = pd.read_csv(path+'IBEX35.csv')
 
 
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
-#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file PoblacionAustralia.png :exports code :results silent
-PoblacionAustralia_ts = as.ts( read.zoo('datos/PoblacionAustralia.csv', 
-                                        header=TRUE,
-                                        index.column = 1, 
-                                        sep=",", 
-                                        FUN = as.yearmon))
-p <- autoplot(PoblacionAustralia_ts)
-p <- p + labs(y = "Habitantes", x = "Años") + ggtitle("Población australiana (datos anuales)")
-p <- p + scale_x_continuous(breaks = scales::pretty_breaks(n = 20))
-p 
+#+BEGIN_SRC jupyter-python :results file :file ./img/lecc03/PIB_UEM.png :results silent
+df1.plot(x='obs',xlabel='Años',ylabel='Habitantes',figsize=(15,4)).set_title('Población australiana (datos anuales)',fontsize=18)
+plt.savefig('./img/lecc03/PoblacionAustralia.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
 #+attr_org: :width 800
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
-[[./img/lecc05/PoblacionAustralia.png]]
+[[./img/lecc03/PoblacionAustralia.png]]
+
 
 **** PIB UEM
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . subslide)))
    :END:
 
+
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
-#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file PIB_UEM.png :exports code :results silent
-PIB_UEM_df <- read_csv("datos/PIB_UEM.csv",
-                     show_col_types = FALSE)
-fmt <- "%YQ%q"
-PIB_UEM_df$Time <- as.yearqtr(PIB_UEM_df$obs, format = fmt)
-# head(PIB_UEM_df,3)
-P <- ggplot(PIB_UEM_df, aes(Time, PIB))
-P <- P + geom_point() + geom_line()
-P <- P + scale_x_continuous(breaks = scales::pretty_breaks(n = 15))
-P <- P + labs(y = "Miles de millones de euros", x = "Años")
-P <- P + ggtitle("PIB UEM a precios corrientes (datos trimestrales). Fuente Banco de España")
-P
+#+BEGIN_SRC jupyter-python :results file :file ./img/lecc03/PIB_UEM.png :results silent
+# Crear el gráfico
+fig, ax = plt.subplots(figsize=(15, 4))
+df2.plot(x='obs', xlabel='Trimestres', ylabel='Miles de millones de euros', ax=ax)
+ax.set_title('PIB UEM a precios corrientes (datos trimestrales). Fuente Banco de España', fontsize=18)
+
+# Agregar líneas verticales con diferente grosor
+for i, obs in enumerate(df2['obs']):
+    if obs.endswith('Q1'):  # Primer trimestre
+        ax.axvline(x=i, color='gray', linestyle='--', linewidth=1.5)  # Más gruesa
+    else:  # Otros trimestres
+        ax.axvline(x=i, color='gray', linestyle='--', linewidth=0.5)  # Más fina
+
+# Personalizar las etiquetas del eje X
+ticks = []
+labels = []
+for i, obs in enumerate(df2['obs']):
+    if obs.endswith('Q1'):  # Etiquetas solo en los primeros trimestres
+        ticks.append(i)  # Usar el índice como posición
+        labels.append(obs)
+
+ax.set_xticks(ticks)  # Configurar las posiciones de las etiquetas
+ax.set_xticklabels(labels, rotation=45)  # Configurar las etiquetas correspondientes
+
+# Asegurar que todas las líneas y etiquetas se muestren
+plt.tight_layout()
+plt.savefig('./img/lecc03/PIB_UEM.png', dpi=300, bbox_inches='tight')
 #+END_SRC
-# p <- p +scale_x_yearqtr(format = fmt)
 
 #+attr_org: :width 800
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
-[[./img/lecc05/PIB_UEM.png]]
+[[./img/lecc03/PIB_UEM.png]]
+
 
 **** Temperatura media en el Parque del Retiro. Madrid
    :PROPERTIES:
@@ -226,23 +246,48 @@ P
    :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file TemperaturaReriro.png :exports code :results silent
-TemperaturaRetiro_df <- read_csv("datos/Retiro.txt", show_col_types = FALSE)
-# Añadimos fechas
-TemperaturaRetiro_df$Time <- as.yearmon(1985 + seq(0, nrow(TemperaturaRetiro_df)-1)/12)
+#+BEGIN_SRC jupyter-python :results file :file ./img/lecc03/TemperaturaReriro.png :results silent
+# Generar una columna de fechas desde enero de 1985
+df3['Fecha'] = pd.date_range(start='1985-01', periods=len(df3), freq='M')
 
-P <- ggplot(TemperaturaRetiro_df, aes(Time, TemperaturaMedia))
-P <- P + geom_line() # + geom_point() 
-P <- P + scale_x_continuous(breaks = scales::pretty_breaks(n = 25))
-P <- P + labs(y = "Grados Celsius", x = "Años") 
-P <- P + ggtitle("Temperatura media mensual en el Parque del Retiro. Fuente: Comunidad de Madrid")
-P
+# Configurar la columna de fechas como índice
+df3.set_index('Fecha', inplace=True)
+
+# Crear el gráfico
+fig, ax = plt.subplots(figsize=(15, 4))
+ax.plot(df3.index, df3['TemperaturaMedia'], label='Temperatura Media Mensual')
+ax.set_title('Temperatura media mensual en el Parque del Retiro. Fuente: Comunidad de Madrid', fontsize=18)
+ax.set_xlabel('Meses')
+ax.set_ylabel('Temperatura Media')
+ax.legend()
+
+# Agregar barras verticales en enero de cada año
+for fecha in df3.index:
+    if fecha.month == 1:  # Mes de enero
+        ax.axvline(x=fecha, color='gray', linestyle='--', linewidth=0.8)
+
+# Agregar etiquetas en todos los eneros
+ticks = []
+labels = []
+for fecha in df3.index:
+    if fecha.month == 1:  # Enero
+        ticks.append(fecha)
+        labels.append(f'Ene {fecha.year}')  # Formato: "Ene Año" (ej. "Ene 1985")
+
+ax.set_xticks(ticks)  # Configurar las posiciones de las etiquetas
+ax.set_xticklabels(labels, rotation=45)  # Configurar las etiquetas correspondientes
+
+# Asegurar que todas las líneas y etiquetas se muestren
+plt.tight_layout()
+# Guardar el gráfico
+plt.savefig('./img/lecc03/TemperaturaRetiro.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
 #+attr_org: :width 800
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
-[[./img/lecc05/TemperaturaReriro.png]]
+[[./img/lecc03/TemperaturaReriro.png]]
+
 
 **** Rendimiento porcentual diario del IBEX 35 (std)
    :PROPERTIES:
@@ -251,22 +296,16 @@ P
    :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
-#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file IBEX35.png :exports code :results silent
-IBEX35_ts = as.ts( read.csv.zoo("datos/IBEX35.csv", 
-                                strip.white = TRUE))
-P <- autoplot(IBEX35_ts) + scale_y_continuous(breaks = scales::pretty_breaks(n = 12))
-p <- P + labs(y = "Desviaciones típicas", x = "Días")
-p <- P + ggtitle("Rendimiento porcentual diario del IBEX 35 (std.). Fuente: Archivo Prof. Miguel Jerez")
-p 
+#+BEGIN_SRC jupyter-python :results file :file ./img/lecc03/IBEX35.png :results silent
+df4.plot(x='obs',xlabel='Días',ylabel='Desviaciones típicas',figsize=(15,4)).set_title('Rendimiento porcentual diario del IBEX 35 (std.). Fuente: Archivo Prof. Miguel Jerez',fontsize=18)
+plt.savefig('./img/lecc03/IBEX35.png', dpi=300, bbox_inches='tight')
 #+END_SRC
+
 
 #+attr_org: :width 800
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
-[[./img/lecc05/IBEX35.png]]
-
-- Datos centrados y estandarizados, i.e. el eje vertical está en desviaciones típicas.
-- Los /volatility clustering/ son característicos de series financieras de alta frecuencia.
+[[./img/lecc03/IBEX35.png]]
 
 **** Producción de cemento
    :PROPERTIES:
@@ -274,24 +313,43 @@ p
    :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
-#+BEGIN_SRC jupyter-R :results file :output-dir ./img/lecc05/ :file ProduccionCemento.png :exports code :results silent
-ProduccionCemento_df <- read_csv("datos/ProduccionCemento.csv",
-                     show_col_types = FALSE)
-fmt <- "%YM%m"
-ProduccionCemento_df$Time <- as.yearmon(ProduccionCemento_df$obs, format = fmt)
-# head(ProduccionCemento_df,3)
-P <- ggplot(ProduccionCemento_df, aes(Time, ProduccionCemento))
-P <- P + geom_line() # + geom_point() 
-P <- P + scale_x_continuous(breaks = scales::pretty_breaks(n = 25))
-P <- P + labs(y = "Miles de Toneladas métricas", x = "Años")
-P <- P + ggtitle("Producción de cemento (Datos mensuales). Fuente Banco de España")
-P
+#+BEGIN_SRC jupyter-python :results file :file ./img/lecc03/ProduccionCemento.png :results silent
+fig, ax = plt.subplots(figsize=(15, 4))
+df5.plot(x='obs', xlabel='Meses', ylabel='Miles de Toneladas métricas', ax=ax)
+ax.set_title('Producción de cemento (Datos mensuales). Fuente Banco de España', fontsize=18)
+
+# Agregar líneas verticales con diferente grosor para años pares e impares
+for i, obs in enumerate(df5['obs']):
+    if obs.endswith('M01'):  # Enero
+        year = int(obs.split('M')[0])  # Extraer el año
+        if year % 2 == 0:  # Años pares
+            ax.axvline(x=i, color='gray', linestyle='--', linewidth=1.5)  # Más gruesa
+        else:  # Años impares
+            ax.axvline(x=i, color='gray', linestyle='--', linewidth=0.8)  # Más fina
+
+# Personalizar las etiquetas del eje X para eneros de años pares
+ticks = []
+labels = []
+for i, obs in enumerate(df5['obs']):
+    if obs.endswith('M01'):  # Enero
+        year = int(obs.split('M')[0])  # Extraer el año
+        if year % 2 == 0:  # Solo años pares
+            ticks.append(i)  # Usar el índice como posición
+            labels.append(obs)  # Etiqueta completa (ej. "1986M01")
+
+ax.set_xticks(ticks)  # Configurar las posiciones de las etiquetas
+ax.set_xticklabels(labels, rotation=45)  # Configurar las etiquetas correspondientes
+
+# Asegurar que todas las líneas y etiquetas se muestren
+plt.tight_layout()
+plt.savefig('./img/lecc03/ProduccionCemento.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
 #+attr_org: :width 800
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
-[[./img/lecc05/ProduccionCemento.png]]
+[[./img/lecc03/ProduccionCemento.png]]
+
 
 
 ** Correlación serial vs muestreo aleatorio simple
@@ -299,7 +357,6 @@ P
    :metadata: (slideshow . ((slide_type . slide)))
    :ID:       59d7b543-b898-4cf8-8ca9-f0f5e4734121
    :END:
-
 
 #  [[./Lecc01.slides.html#/1/1/0][Procesos estocásticos y datos de series temporales]]
 
@@ -322,12 +379,11 @@ Veamos por qué esto genera dificultades...
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 Consideremos el proceso estocástico $$\boldsymbol{X}=(X_t \mid
-t=0,\pm1,\pm2,\ldots).$$ Caracterizar su distribución conjunta (todos
-los momentos) es demasiado ambicioso.
+t=0,\pm1,\pm2,\ldots).$$ Caracterizar su distribución conjunta (*todos
+los momentos*) es demasiado ambicioso.
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
-Así que, tentativamente, vamos a fijarnos /solo/ en los dos primeros
-momentos:
+Por ello, limitémonos /solo/ a los dos primeros momentos.
 
 $$E(X_t)={\color{blue}{ \mu_t}}\quad\text{ y }\quad
 Cov(X_t,X_k)=E\big[(X_t-\mu_t)(X_k-\mu_k)\big]={\color{blue}{\gamma_{t,k}}};\quad t,k\in\mathbb{Z}$$
@@ -359,7 +415,7 @@ Si $\boldsymbol{X}$ es [[./Lecc01.slides.html#/3/1][débilmente estacionario]] s
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
 El desafío para el analista es (y nótese el abuso de lenguaje)
-- primero :: transformar los datos para lograr que sean "*/estacionarios/*".
+- primero :: transformar los datos para lograr que sean "*/débilmente estacionarios/*".
   - (Algo vimos en la lección 1)) 
 - después :: transformar los datos estacionarios en "*/ruido blanco/*"
   - (Es lo que iniciaremos en esta lección y las siguientes)
@@ -1103,3 +1159,20 @@ generatriz (como hicimos con las secuencias) $$\boldsymbol{X} \quad =
 \boldsymbol{X}(z)$$ Recuerde que esto no es una suma; es una secuencia
 de variables aleatorias $$\sum_{t=-\infty}^\infty X_t z^t = (\ldots,\
 X_{-2},\ X_{-1},\ X_{0},\ X_{1},\ X_{2},\ldots)$$
+
+
+* COMMENT ipynb y slides                                           :noexport:
+
+#+BEGIN_SRC emacs-lisp :results silent
+(require 'ox-ipynb)
+(ox-ipynb-export-org-file-to-ipynb-file "Lecc03.org")
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent
+#jupyter nbconvert --execute --inplace Lecc03.ipynb
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent
+#jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc03.ipynb
+#+END_SRC
+
