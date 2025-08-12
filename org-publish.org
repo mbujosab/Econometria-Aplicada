@@ -30,7 +30,7 @@ Genera el directorio público =docs= con los ficheros para GitPages con subdirec
 
 #+BEGIN_SRC makefile :noweb no-export :results silent :tangle makefile
 LECCIONES_SRC = ./org-lessons
-LECCIONES_tmp = ./Lecciones
+LECCIONES_tmp = ./Lecciones-tmp
 DOCS = ./docs
 CUADERNOS = $(DOCS)/CuadernosElectronicos
 TRANSPARENCIAS = $(DOCS)/Transparencias
@@ -73,15 +73,15 @@ $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	emacs -Q -l ~/Software/scimax/init.el $(LECCIONES_tmp)/$(@F:.ipynb=.org) --batch --eval "(org-babel-execute-buffer)" --eval "(save-buffer)" --kill
 	echo "FICHEROS EN ./lecciones?..."
 	find $(LECCIONES_tmp)
-	echo "FICHEROS EN ./docs/Lecciones/img?..."
-	cp -a $(LECCIONES_tmp)/img $(DOCS)/Lecciones
-	find $(DOCS)/Lecciones/img
+	echo "FICHEROS EN ./docs/Lecciones-html/img?..."
+	cp -a $(LECCIONES_tmp)/img $(DOCS)/Lecciones-html
+	find $(DOCS)/Lecciones-html/img
 	echo "Contenido de img tras notebook:"
 	find $(LECCIONES_tmp)/img
 	echo "COPIO LO QUE SE HA GENERADO (.ipynb sin ejecutar y las imágenes) A ./docs..."
 	cp -a $(LECCIONES_tmp)/$(@F) $(CUADERNOS)
-	ln -snf -r $(DOCS)/Lecciones/img/ $(TRANSPARENCIAS)/
-	ln -snf -r $(DOCS)/Lecciones/img/ $(CUADERNOS)/
+	ln -snf -r $(DOCS)/Lecciones-html/img/ $(TRANSPARENCIAS)/
+	ln -snf -r $(DOCS)/Lecciones-html/img/ $(CUADERNOS)/
 #	# Ejecutar el notebook con jupyter nbconvert
 	echo "EJECUCION DEL NOTEBOOK DE JUPYTER..."
 	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/$(@F) 
@@ -137,23 +137,23 @@ $(LECCIONES_tmp)/src/implementacion_series_formales.org: $(LECCIONES_SRC)/src/im
 	emacs -q --batch \
 	  --load ~/Software/scimax/init.el \
 	  --eval "(require 'ox-ipynb)" \
-	  --eval "(ox-ipynb-export-org-file-to-ipynb-file \"Lecciones/src/implementacion_series_formales.org\")"
+--eval "(ox-ipynb-export-org-file-to-ipynb-file \"Lecciones-tmp/src/implementacion_series_formales.org\")"
 	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb
 	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb
 	jupyter nbconvert --execute --to html $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb
 	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb $(CUADERNOS)
 	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.slides.html $(TRANSPARENCIAS)
-	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.html $(DOCS)/Lecciones/src/
+	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.html $(DOCS)/Lecciones-html/src/
 	echo "TERMINADO IMPLEMENTACION_SERIES_FORMALES.ipynb..."
 
 directorios:
 	mkdir -v -p .github/workflows
 	mkdir -v -p $(LECCIONES_tmp)/src
 	mkdir -v -p $(LECCIONES_tmp)/img
-	mkdir -v -p $(DOCS)/pdfs
+	mkdir -v -p $(DOCS)/Lecciones-pdf
 	mkdir -v -p $(DOCS)/.binder
-	mkdir -v -p $(DOCS)/Lecciones/img
-	mkdir -v -p $(DOCS)/Lecciones/src
+	mkdir -v -p $(DOCS)/Lecciones-html/img
+	mkdir -v -p $(DOCS)/Lecciones-html/src
 	mkdir -v -p $(TRANSPARENCIAS)
 	mkdir -v -p $(CUADERNOS)/src
 	cp -a ./css $(LECCIONES_tmp)/
@@ -178,7 +178,7 @@ cleanAll: clean
 
 ** Aclaraciones
 
-El directorio =./Lecciones= es temporal (en el fichero ~makefile~ se hace referencia a él con =$(LECCIONES_tmp)=). En dicho directorio se ejecutan los notebooks. Los ficheros creados se copian en distintos subdirectorios del directorio de publicación =./docs= (en el fichero ~makefile~ es referenciado con =$(DOCS)= ). El subdirectorio =./docs= es el directorio de donde "cuelgan" las páginas web; dichas páginas se distribuyen desde la rama =gh-pages= del repositorio.
+El directorio =./Lecciones-tmp= es temporal (en el fichero ~makefile~ se hace referencia a él con =$(LECCIONES_tmp)=). En dicho directorio se ejecutan los notebooks. Los ficheros creados se copian en distintos subdirectorios del directorio de publicación =./docs= (en el fichero ~makefile~ es referenciado con =$(DOCS)= ). El subdirectorio =./docs= es el directorio de donde "cuelgan" las páginas web; dichas páginas se distribuyen desde la rama =gh-pages= del repositorio.
 
 
 * Fichero =build.yml=
@@ -272,8 +272,8 @@ jobs:
 
     - name: Inspección tras notebooksYslides
       run: |
-        echo "Contenido de ./Lecciones:"
-        find ./Lecciones
+        echo "Contenido de ./Lecciones-tmp:"
+        find ./Lecciones-tmp
         echo "Contenido de ./docs:"
         find ./docs
 
@@ -281,8 +281,8 @@ jobs:
       run: |
         set -e
         make practicas
-        echo "Contenido de ./Lecciones/Practicas:"
-        find ./Lecciones/Practicas
+        echo "Contenido de ./Lecciones-tmp/Practicas:"
+        find ./Lecciones-tmp/Practicas
 
     - name: Execute Makefile calendario
       run: |
@@ -541,7 +541,21 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :base-directory ,base-directory
                    :base-extension "org"
                    :publishing-directory ,(concat base-directory "docs")
-                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|docs\\|Lecciones-tmp\\|org-publish.org\\|README.org"
+                   :recursive t
+                   :publishing-function org-html-publish-to-html
+                   :auto-preamble t
+                   :auto-sitemap nil
+                   :with-author nil
+                   :with-creator nil
+                   :with-toc t
+                   :section-numbers nil)
+
+                  ("html"
+                   :base-directory  "./Lecciones-tmp/"
+                   :base-extension "org"
+                   :publishing-directory ,(concat base-directory "docs/Lecciones-html")
+                   :exclude "Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
                    :recursive t
                    :publishing-function org-html-publish-to-html
                    :auto-preamble t
@@ -552,23 +566,24 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :section-numbers nil)
 
                   ("pdf"
-                   :base-directory "./Lecciones/"
+                   :base-directory "./Lecciones-tmp/"
                    :base-extension "org"
-                   :publishing-directory ,(concat base-directory "docs/pdfs")
+                   :publishing-directory ,(concat base-directory "docs/Lecciones-pdf")
                    :exclude "src\\|org-lessons\\|org-practicas"
                    :recursive t
+                   :auto-sitemap nil
                    :publishing-function my-org-latex-publish-to-pdf
                    :auto-preamble t)
 
                   ("static-index"
                    :base-directory ,base-directory
-                   :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|dat\\|mov\\|txt\\|svg\\|aiff\\|inp"
+                   :base-extension "css\\|js\\|png\\|jpg\\|gif\\|dat\\|mov\\|txt\\|svg\\|aiff\\|inp"
                    :publishing-directory ,(concat base-directory "docs")
-                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|docs\\|chatCopilot.*\\|org-publish.*\\|README.org"
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|docs\\|chatCopilot.*\\|org-publish.*\\|README.org"
                    :recursive t
                    :publishing-function org-publish-attachment)
 
-                  ("web-repositorio" :components ("index" "pdf" "static-index")))))
+                  ("web-repositorio" :components ("index" "html" "pdf" "static-index")))))
 
   (message "🟢 Iniciando publicación del índice (web-repositorio)...")
   (org-publish "web-repositorio" t)
