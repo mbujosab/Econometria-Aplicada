@@ -71,7 +71,8 @@ $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	cp -a $< $(LECCIONES_tmp)
 	echo "EJECUCION DEL NOTEBOOK DE ORG: $(LECCIONES_tmp)/$(@F:.ipynb=.org)..."
 	emacs -Q -l ~/Software/scimax/init.el $(LECCIONES_tmp)/$(@F:.ipynb=.org) --batch --eval "(org-babel-execute-buffer)" --eval "(save-buffer)" --kill
-	emacs -Q -l ~/Software/scimax/init.el $(LECCIONES_tmp)/$(@F:.ipynb=.org) --batch --eval "(org-babel-execute-buffer)" --eval "(save-buffer)" --kill
+	echo "EJECUCION DEL NOTEBOOK DE JUPYTER..."
+	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/$(@F) 
 	echo "FICHEROS EN ./lecciones?..."
 	find $(LECCIONES_tmp)
 	echo "FICHEROS EN ./docs/Lecciones-html/img?..."
@@ -84,13 +85,10 @@ $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	ln -snf -r $(DOCS)/Lecciones-html/img/ $(TRANSPARENCIAS)/
 	ln -snf -r $(DOCS)/Lecciones-html/img/ $(CUADERNOS)/
 #	# Ejecutar el notebook con jupyter nbconvert
-	echo "EJECUCION DEL NOTEBOOK DE JUPYTER..."
-	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/$(@F) 
 	echo "CREACIÓN DE LAS SLIDES..."
 	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/$(@F) 
 	echo "➡️ FICHEROS EN docs/ TRAS GENERAR SLIDES Y NOTEBOOKS DE JUPYTER..."
 	find $(DOCS)
-
 
 # Lista de archivos fuente .org en org-practicas
 PRACTICAS_SRC = $(wildcard org-practicas/*.org)
