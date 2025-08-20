@@ -73,7 +73,7 @@
 
 
 #+begin_abstract
-Analizaremos las dificultades que plantea la *correlación serial* y veremos cómo la estacionariedad en sentido débil los simplifica. Nos centraremos en los *procesos lineales*, estudiando su valor esperado, su función de autocovarianza, las covarianzas cruzadas entre ellos y las ecuaciones de Yule–Walker.
+Analizaremos las dificultades que plantea la *correlación serial* y veremos cómo la estacionariedad en sentido débil los simplifica. Nos centraremos en los *procesos lineales*, estudiando su valor esperado, su función de autocovarianza, las covarianzas cruzadas entre ellos.
 #+end_abstract
 
 - ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc03.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc03.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc03.ipynb][mybinder]])
@@ -964,6 +964,8 @@ Y, por tanto
  \label{eqAutoCovarianzaProcesoLineal}
  \boldsymbol{\gamma}=\sigma^2\boldsymbol{\psi}(z)*\boldsymbol{\psi}(z^{-1}).
 \end{equation}
+con grado igual al grado de $\boldsymbol{\theta}$ y cogrado igual a menos
+el grado de $\boldsymbol{\theta}$.
 
 # \begin{align*}
 # \gamma_{_{k,t}} = & E\Big[\big(\boldsymbol{\psi}(\mathsf{B})X_t\big)\cdot \big(\boldsymbol{\psi}(\mathsf{B}) X_{t-k}\big)\Big] 
@@ -1047,127 +1049,6 @@ con grado igual al grado de $\boldsymbol{\theta}$ y cogrado igual a menos
 el grado de $\boldsymbol{\psi}$.
 
 # $$\fbox{\(\)}$$
-
-** Las Ecuaciones de Yule-Walker para un AR($p$) estacionario
-   :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . slide)))
-   :END:
-
-#+latex: \noindent
-/Por una parte/ (lado izquierdo):
-
-Si $\boldsymbol{X}$ es un proceso (débilmente) estacionario con
-$E(\boldsymbol{X})=\boldsymbol{0}\;$ y $\;\boldsymbol{\phi}$ es una serie
-formal absolutamente sumable; entonces para $t,k\in\mathbb{Z}$
-\begin{equation}
-  E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot X_{t-k}\Big]
-  \quad = \quad
-  \boldsymbol{\phi}(\mathsf{B})E\big(X_t\cdot X_{t-k}\big)
-  \quad = \quad
-  \boldsymbol{\phi}(\mathsf{B})\gamma_k
-  \label{eqnLadoIzquierdoYW}
-\end{equation}
-que no depende de $t$, por ser $\boldsymbol{X}$ es un proceso
-(débilmente) estacionario.
-#+latex: \medskip
-
-#+attr_ipynb: (slideshow . ((slide_type . fragment)))
-#+latex: \noindent
-/Por otra parte/ (lado derecho):
-
-Si $\boldsymbol{X}$ tiene representación
-$\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U}$ donde
-$\;\boldsymbol{U}\sim WN(0,\sigma^2)$ y $\boldsymbol{\psi}\in\ell^2$ es una
-serie formal con $\psi_0=1$; es decir, si es un proceso lineal causal
-# Sea un AR($p$) estacionario:
-# $\;\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U};\;$ entonces $\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U}$ 
-# con $\boldsymbol{\psi}=\frac{1}{\boldsymbol{\phi}}$ y $\psi_0=1$.
-# # donde $\boldsymbol{U}\sim WN(0,\sigma^2)$.
-#+latex: \noindent
-$$\quad X_t=U_t + \sum\nolimits_{j=1}^\infty \psi_j U_{t-j},$$
-entonces para $t,k\in\mathbb{Z}$
-\begin{equation}
-  E[U_t\cdot X_{t-k}] = E\Big[U_t\Big(U_{t-k} + \sum\nolimits_{j=1}^\infty \psi_j U_{t-k-j}\Big) \Big]=
-  \begin{cases}
-  \sigma^2 & \text{cuando } k=0\\
-  0 & \text{cuando } k\ne0
-  \end{cases}
-  \label{eqnLadoDerechoYW}
-\end{equation}
-#+latex: \bigskip
-
-#+attr_ipynb: (slideshow . ((slide_type . subslide)))
-Sea un AR($p$) estacionario:
-$\;\;\boldsymbol{\phi}(\mathsf{B})X_t=U_t\;\;$ donde
-$\;\;\boldsymbol{\phi}(z)=1-\phi_1z^1-\cdots-\phi_pz^p.\;$
-Multiplicando por $X_{t-k}$ y tomando esperanzas:
-$$E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot X_{t-k}\Big] =
-E[U_t\cdot X_{t-k}]$$
-
-*para $k=0$:* $\quad$ (por $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$)
-$$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_0=\sigma^2\)}
-\quad\Rightarrow\quad
-\gamma_0-\phi_1\gamma_1-\cdots-\phi_p\gamma_p=\sigma^2
-\quad\Rightarrow\quad \sigma^2=\gamma_0-\sum\nolimits_{j=1}^p\phi_j\gamma_j.$$
-Dividiendo por $\gamma_0$ (y recordando que $\rho_0=1$):
-$$\boldsymbol{\phi}(\mathsf{B})\rho_0=\frac{\sigma^2}{\gamma_0}
-\quad\Rightarrow\quad
-\fbox{\(\gamma_0=\frac{\sigma^2}{\boldsymbol{\phi}(\mathsf{B})\rho_0}\)}
-\quad\Rightarrow\quad
-\gamma_0=\frac{\sigma^2}{1-\sum\nolimits_{j=1}^p\phi_j\rho_j}.$$ 
-  
-*para $k>0$:* $\quad$ (por $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$)
-$$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_k=0\)}
-\quad\Rightarrow\quad
-\gamma_k-\phi_1\gamma_{k-1}-\cdots-\phi_p\gamma_{k-p}=0
-\quad\Rightarrow\quad \gamma_k=\sum\nolimits_{j=1}^p\phi_j\gamma_{k-j}.$$ 
-Dividiendo por $\gamma_0$:
-$$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\rho_k=0\)}
-\quad\Rightarrow\quad
-\rho_k-\phi_1\rho_{k-1}-\cdots-\phi_p\rho_{k-p}=0
-\quad\Rightarrow\quad \rho_k=\sum\nolimits_{j=1}^p\phi_j\rho_{k-j}.$$
-
-#+attr_ipynb: (slideshow . ((slide_type . notes)))
-Por tanto, la estructura autorregresiva del proceso impone que las
-autocovarianzas (y las autocorrelaciones) verifiquen las ecuaciones de
-Yule-Walker.
-
-** Función de autocovarianzas para un ARMA($p,q$)
-   :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . slide)))
-   :END:
-
-# donde $$\boldsymbol{\phi}(z)=1-\phi_1z^1\cdots-\phi_pz^p \quad\text{y}\quad \boldsymbol{\theta}(z)=1-\theta_1z^1\cdots-\theta_qz^q.$$
-
-Sea un ARMA($p,q$) estacionario:
-$\boldsymbol{\phi}(\mathsf{B}){X_t}=\boldsymbol{\theta}(\mathsf{B}){U_t}\;$
-donde $\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ no tienen raíces
-comunes. Multiplicando por $X_{t-k}$, tomando esperanzas y
-sustituyendo $X_{t-k}$ por su representación MA($\infty$), donde
-$\boldsymbol{\psi}=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}$:
-$$\underbrace{E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot
-X_{t-k}\Big]}_{\boldsymbol{\phi}(\mathsf{B})\gamma_k\;(\text{por
-\ref{eqnLadoIzquierdoYW}})} =
-E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot X_{t-k}\Big]
-\;=\;
-\underbrace{E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot
-\Big(\boldsymbol{\psi}(\mathsf{B})U_{t-k}\Big)\Big]}_{\boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)}$$
-Donde hemos usando $\eqref{eqnLadoIzquierdoYW}$ y renombrando
-$\;\boldsymbol{\theta}(\mathsf{B})U_t=\boldsymbol{W}\;$ y
-$\;\boldsymbol{\psi}(\mathsf{B})U_t=\boldsymbol{Y}.\;$ Así:
-\begin{align*}
-  \boldsymbol{\phi}(\mathsf{B})\gamma_k & = \boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)\\
-  & =  \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{por } \eqref{eqCovarianzaCruzadaProcesosLineales}
-\end{align*}
-Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogrado $-\infty$
-\begin{equation}
-  \boldsymbol{\phi}(\mathsf{B})\gamma_k = 
-  \begin{cases}
-     0 & k > q\quad \text{(como en un AR)}\\
-    \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & k\leq q
-   \quad \text{(que depende de $\boldsymbol{\theta}$ y $\boldsymbol{\phi}$)}
-  \end{cases}
-\end{equation}
 
 
 ** COMMENT Esperanza y autocovarianzas de un proceso de ruido blanco :noexports:
