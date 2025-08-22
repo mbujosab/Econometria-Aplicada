@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-08-20 Wed 20:47 -->
+<!-- 2025-08-22 Fri 12:08 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 4. ACF, PACF y densidad espectral de modelos MA</title>
@@ -66,43 +66,39 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0d0a3b4">Funciones de autocovarianzas y de autocorrelación (ACF)</a></li>
-<li><a href="#orgffe58e4">Función de autocorrelación parcial  (PACF)</a></li>
-<li><a href="#org0996006">Densidad espectral</a></li>
-<li><a href="#org8ad8872">ACF, PACF y densidad espectral de algunos modelos lineales</a>
+<li><a href="#org8268059">Funciones de autocovarianzas y de autocorrelación (ACF)</a></li>
+<li><a href="#org86ea126">Función de autocorrelación parcial  (PACF)</a></li>
+<li><a href="#org558604b">Densidad espectral</a></li>
+<li><a href="#orgb6aec59">ACF, PACF y densidad espectral de algunos modelos lineales</a>
 <ul>
-<li><a href="#org3ab2221">Procesos lineales causales</a></li>
-<li><a href="#orgc136f3d">Proceso de Ruido Blanco</a></li>
-<li><a href="#orgdee2be7">Proceso de media móvil MA(\(q\))</a></li>
-<li><a href="#org938ff5c">Proceso de media móvil MA(\(1\))</a>
+<li><a href="#org2b75fa3">Procesos lineales causales</a></li>
+<li><a href="#org6aab5fc">Proceso de Ruido Blanco</a></li>
+<li><a href="#org157fdfa">Proceso de media móvil MA(\(q\))</a></li>
+<li><a href="#orgdf23f4f">Proceso de media móvil MA(\(1\))</a>
 <ul>
-<li><a href="#org26d8bc2">MA(1) con raíz positiva</a></li>
-<li><a href="#orgc2a3063">MA(1) con raíz negativa</a></li>
+<li><a href="#orgb2c5e82">MA(1) con raíz positiva</a></li>
+<li><a href="#orge65a9c8">MA(1) con raíz negativa</a></li>
 </ul>
 </li>
-<li><a href="#orgab6e530">Proceso de media móvil MA(\(2\))</a>
+<li><a href="#orgadb917d">Proceso de media móvil MA(\(2\))</a>
 <ul>
-<li><a href="#org5bae163">MA(2) con dos parámetros positivos (\(+\), \(+\))</a></li>
-<li><a href="#org9ed74e3">MA(2) con parámetros de distinto signo (\(-\), \(+\))</a></li>
-<li><a href="#org0e7dcb5">MA(2) con dos parámetros negativos (\(-\), \(-\))</a></li>
-<li><a href="#orgc7935e6">MA(2) con parámetros de distinto signo (\(+\), \(-\))</a></li>
-<li><a href="#org5b773f0">MA(2) con dos raíces reales, una positiva y la otra negativa</a></li>
-<li><a href="#org980e9c3">MA(2) con un par de raíces complejas</a></li>
-<li><a href="#org3328e3d">MA(2) con dos raíces reales y negativas</a></li>
-<li><a href="#org7d550e1">MA(2) con dos raíces reales y positivas</a></li>
+<li><a href="#org7027e8b">MA(2) con dos parámetros positivos (\(+\), \(+\))</a></li>
+<li><a href="#org35c0cf9">MA(2) con parámetros de distinto signo (\(-\), \(+\))</a></li>
+<li><a href="#orgfe77d48">MA(2) con dos parámetros negativos (\(-\), \(-\))</a></li>
+<li><a href="#org36c0226">MA(2) con parámetros de distinto signo (\(+\), \(-\))</a></li>
+<li><a href="#org279a65b">MA(2) con dos raíces reales, una positiva y la otra negativa</a></li>
+<li><a href="#orgfc8c522">MA(2) con un par de raíces complejas</a></li>
+<li><a href="#org7513084">MA(2) con dos raíces reales y negativas</a></li>
+<li><a href="#orgec669d6">MA(2) con dos raíces reales y positivas</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgbd16069">(Resumen) características de procesos MA(\(q\))</a>
-<ul>
-<li><a href="#orga7a9a39">Gráfico raíces MA(2)</a></li>
-</ul>
-</li>
+<li><a href="#org1a47f00">(Resumen) características de procesos MA(\(q\))</a></li>
 </ul>
 </div>
 </div>
-<div class="abstract" id="org56a6b53">
+<div class="abstract" id="orgbbf04f2">
 <p>
 Veremos tres funciones que describen las características correspondientes a los momentos de segundo orden de los procesos lineales: la función de autocorrelación (ACF), la función de autocorrelación parcial (PACF) y la densidad espectral (estas tres funciones son transformaciones de la función de autocovarianzas del proceso). Veremos la estructura de estas funciones en procesos lineales genéricos y hoy lo particularizaremos a procesos de ruido blanco y procesos MA(\(q\)).
 </p>
@@ -117,9 +113,9 @@ Veremos tres funciones que describen las características correspondientes a los
 <style>
 .reveal  td {font-size: 60%;}
 </style>
-<div id="outline-container-orge07082c" class="outline-4">
-<h4 id="orge07082c">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-orge07082c">
+<div id="outline-container-orge93139c" class="outline-4">
+<h4 id="orge93139c">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-orge93139c">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python
 </span><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra
@@ -132,8 +128,8 @@ Veremos tres funciones que describen las características correspondientes a los
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org7200670"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
-<div class="outline-text-5" id="text-org7200670">
+<li><a id="org101132e"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
+<div class="outline-text-5" id="text-org101132e">
 <p>
 para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
@@ -147,219 +143,23 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 </li>
 </ul>
 </div>
-<div id="outline-container-org81ae9f1" class="outline-4">
-<h4 id="org81ae9f1">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
-<div class="outline-text-4" id="text-org81ae9f1">
-<div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">M&#243;dulos necesarios
-</span><span style="font-weight: bold;">import</span> statsmodels.api <span style="font-weight: bold;">as</span> sm
-<span style="font-weight: bold;">from</span> statsmodels.tsa.arima_process <span style="font-weight: bold;">import</span> ArmaProcess
-<span style="font-weight: bold;">from</span> scipy <span style="font-weight: bold;">import</span> signal
-<span style="font-weight: bold;">from</span> scipy.signal <span style="font-weight: bold;">import</span> freqz
-<span style="font-weight: bold;">from</span> numpy.polynomial <span style="font-weight: bold;">import</span> Polynomial
-<span style="font-weight: bold;">import</span> math
-</code></pre>
-</div>
-
-
+<div id="outline-container-orga3c5ec6" class="outline-4">
+<h4 id="orga3c5ec6">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
+<div class="outline-text-4" id="text-orga3c5ec6">
 <p>
-La siguiente función que calcula la PACF a partir de la ACF resolviendo las <a href="./Lecc05.html#org392fab2">ecuaciones de Yule-Walker</a> recursivamente con el algoritmo <a href="https://en.wikipedia.org/wiki/Levinson_recursion">Levinson-Durbin</a>; véase <i>Pourahmadi, M. (2001, Capítulo 7)</i> o <i>Brockwell &amp; Davis (1991, Capitulo 5)</i>). 
+Cargamos las funciones auxiliares (véase la carpeta <code>src/</code>)
 </p>
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">theoretical_pacf_from_acf</span>(acf_vals):
-    <span style="font-style: italic;">"""
-    Calcula la PACF te&#243;rica (para lags &gt;= 0) de forma param&#233;trica usando el algoritmo de Durbin-Levinson.
-    Se asume que acf_vals es un array tal que acf_vals[0] corresponde a lag 0.
-    
-    Retorna un array donde el coeficiente en la posici&#243;n k corresponde a la PACF en el lag k.
-    """</span>
-    <span style="font-weight: bold; font-style: italic;">nlags</span> = <span style="font-weight: bold;">len</span>(acf_vals)-1
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Matriz para almacenar los coeficientes (phi)
-</span>    <span style="font-weight: bold; font-style: italic;">phi</span> = np.zeros((nlags+1, nlags+1))
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">v guarda la varianza de error en cada paso
-</span>    <span style="font-weight: bold; font-style: italic;">v</span> = np.zeros(nlags+1)
-    <span style="font-weight: bold; font-style: italic;">pacf</span> = np.zeros(nlags+1)
-    <span style="font-weight: bold; font-style: italic;">v</span>[0] = acf_vals[0]
-    <span style="font-weight: bold; font-style: italic;">pacf</span>[0] = 1.0  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Por convenci&#243;n, PACF(0)=1.
-</span>    
-    <span style="font-weight: bold;">for</span> k <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(1, nlags+1):
-        <span style="font-weight: bold;">if</span> k == 1:
-            <span style="font-weight: bold; font-style: italic;">phi</span>[1,1] = acf_vals[1] / acf_vals[0]
-            <span style="font-weight: bold; font-style: italic;">pacf</span>[1] = phi[1,1]
-            <span style="font-weight: bold; font-style: italic;">v</span>[1] = v[0]*(1 - phi[1,1]**2)
-        <span style="font-weight: bold;">else</span>:
-            <span style="font-weight: bold; font-style: italic;">sum_val</span> = 0.0
-            <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Sumar phi[k-1,j]*acf_vals[k-j] para j=1,...,k-1.
-</span>            <span style="font-weight: bold;">for</span> j <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(1, k):
-                <span style="font-weight: bold; font-style: italic;">sum_val</span> += phi[k-1, j] * acf_vals[k - j]
-            <span style="font-weight: bold; font-style: italic;">phi</span>[<span style="font-weight: bold; font-style: italic;">k</span>, <span style="font-weight: bold; font-style: italic;">k</span>] = (acf_vals[k] - sum_val) / v[k-1]
-            <span style="font-weight: bold; font-style: italic;">pacf</span>[k] = phi[k, k]
-            <span style="font-weight: bold;">for</span> j <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(1, k):
-                <span style="font-weight: bold; font-style: italic;">phi</span>[<span style="font-weight: bold; font-style: italic;">k</span>, <span style="font-weight: bold; font-style: italic;">j</span>] = phi[k-1, j] - phi[k, k] * phi[k-1, k - j]
-            <span style="font-weight: bold; font-style: italic;">v</span>[k] = v[k-1] * (1 - phi[k, k]**2)
-    <span style="font-weight: bold;">return</span> pacf  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Incluye PACF en lag 0 con valor 1.</span>
-</code></pre>
-</div>
-
-<p>
-La siguiente función pinta las ACF, PACF y densidad espectral teóricas.
-</p>
-<div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_parametric_diagnostics</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20):
-    <span style="font-style: italic;">"""
-    Genera y retorna una figura con tres subgr&#225;ficas para un modelo ARMA:
-      - ACF te&#243;rica (omitiendo retardo 0)
-      - PACF te&#243;rica param&#233;trica (calculada v&#237;a el algoritmo de Durbin-Levinson, omitiendo retardo 0)
-      - Densidad espectral te&#243;rica
-    
-    Par&#225;metros:
-      ar_params : array-like
-          Coeficientes del polinomio AR (incluye el 1 inicial).
-      ma_params : array-like
-          Coeficientes del polinomio MA (incluye el 1 inicial).
-      sigma2 : float
-          Varianza del ruido U&#8348;.
-      lags : int, opcional
-          N&#250;mero de retardos considerados (por defecto 20).
-    
-    Retorna:
-      fig : objeto matplotlib.figure.Figure
-    """</span>
-    <span style="font-weight: bold; font-style: italic;">phi</span>   = Polynomial(ar_params, symbol=<span style="font-style: italic;">'B'</span>)
-    <span style="font-weight: bold; font-style: italic;">theta</span> = Polynomial(ma_params, symbol=<span style="font-style: italic;">'B'</span>)
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el proceso ARMA
-</span>    <span style="font-weight: bold; font-style: italic;">arma_process</span> = ArmaProcess(ar=phi.coef, ma=theta.coef)
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">1. Calcular la ACF te&#243;rica
-</span>    <span style="font-weight: bold; font-style: italic;">acf_theo</span> = arma_process.acf(lags=lags)
-    <span style="font-weight: bold; font-style: italic;">lags_theo</span> = np.arange(<span style="font-weight: bold;">len</span>(acf_theo))
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Omitir el retardo 0 para gr&#225;ficos de ACF y PACF:
-</span>    <span style="font-weight: bold; font-style: italic;">acf_plot</span> = acf_theo[1:]
-    <span style="font-weight: bold; font-style: italic;">lags_plot</span> = lags_theo[1:]
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">2. Calcular la PACF te&#243;rica de forma param&#233;trica a partir de la ACF
-</span>    <span style="font-weight: bold; font-style: italic;">pacf_theo</span> = theoretical_pacf_from_acf(acf_theo)
-    <span style="font-weight: bold; font-style: italic;">pacf_plot</span> = pacf_theo[1:]
-    <span style="font-weight: bold; font-style: italic;">lags_pacf</span> = np.arange(<span style="font-weight: bold;">len</span>(pacf_theo))[1:]
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">3. Calcular la densidad espectral te&#243;rica usando freqz
-</span>    <span style="font-weight: bold; font-style: italic;">w</span>, <span style="font-weight: bold; font-style: italic;">h</span> = freqz(theta.coef, phi.coef, worN=1024)
-    <span style="font-weight: bold; font-style: italic;">freq</span> = w / (2 * np.pi)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Conversi&#243;n de radianes/muestra a ciclos/muestra
-</span>    <span style="font-weight: bold; font-style: italic;">spectrum</span> = (sigma2 / (2 * np.pi)) * np.<span style="font-weight: bold;">abs</span>(h)**2
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">4. Graficar los tres subgr&#225;ficos
-</span>    <span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">axs</span> = plt.subplots(1, 3, figsize=(18, 3))
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ACF te&#243;rica
-</span>    axs[0].stem(lags_plot, acf_plot, basefmt=<span style="font-style: italic;">" "</span>)
-    axs[0].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
-    axs[0].set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-    axs[0].set_ylabel(<span style="font-style: italic;">'ACF'</span>)
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">PACF te&#243;rica param&#233;trica
-</span>    axs[1].stem(lags_pacf, pacf_plot, basefmt=<span style="font-style: italic;">" "</span>)
-    axs[1].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
-    axs[1].set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-    axs[1].set_ylabel(<span style="font-style: italic;">'PACF'</span>)
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Densidad espectral te&#243;rica
-</span>    axs[2].plot(freq, spectrum)
-    axs[2].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
-    axs[2].set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
-    axs[2].set_ylabel(<span style="font-style: italic;">'Densidad Espectral'</span>)
-    
-    plt.tight_layout()
-    plt.close(fig)
-    <span style="font-weight: bold;">return</span> fig
-</code></pre>
-</div>
-
-<p>
-Breve explicación de la anterior función <code>plot_arma_parametric_diagnostics</code>:
-</p>
-
-<ol class="org-ol">
-<li>La función recibe los parámetros del modelo ARMA y el número de retardos.</li>
-<li>Se calcula la ACF teórica y a partir de ella la PACF con <code>theoretical_pacf_from_acf</code>; en la gráfica se omite el retardo cero.</li>
-<li><p>
-La densidad espectral teórica \( S(\omega) \) se obtiene mediante la función freqz y la fórmula \[S(\omega)=\frac{\sigma^2}{2\pi}\Biggl|\frac{\sum_{j=0}^{q}\theta_j e^{-i2\pi \omega\,j}}{\sum_{k=0}^{p}\phi_k e^{-i2\pi \omega\,k}}\Biggr|^2.\]
-Donde:
-</p>
-<ul class="org-ul">
-<li>\(\sigma^2\) es la varianza del término de error (innovación) del modelo.</li>
-<li>\((\theta_j \mid j=0:q)\) son los coeficientes del polinomio de medias móviles (MA), de modo que el polinomio MA es: 
-\(\theta(z) = \sum_{j=0}^{q}\theta_j\,z^j\).</li>
-
-<li>\((\phi_k \mid k=0:p)\) son los coeficientes del polinomio autorregresivo (AR), de modo que el polinomio AR es:
-\(\phi(z) = \sum_{k=0}^{p}\phi_k\,z^k\).</li>
-
-<li>Al evaluar estos polinomios en \(z = e^{-i\,2\pi \omega}\) se obtiene la respuesta en frecuencia del modelo:
-\[H(e^{-i\,2\pi \omega})=\frac{\theta\bigl(e^{-i\,2\pi \omega}\bigr)}{\phi\bigl(e^{-i\,2\pi \omega}\bigr)}.\]</li>
-
-<li>El módulo al cuadrado de \( H(e^{-i\,2\pi \omega}) \) multiplicado por \(\frac{\sigma^2}{2\pi}\) es la densidad espectral.</li>
-</ul>
-
-<p>
-Esta fórmula es fundamental porque permite conocer la distribución de la varianza del proceso a lo largo de las diferentes frecuencias, lo cual es clave para analizar las propiedades dinámicas en modelos ARMA.
-</p></li>
-
-<li>Se crean tres subgráficos, y se añade una línea horizontal en y=0 en cada uno (<code>axhline</code>).</li>
-<li>Por último, la función retorna el objeto figura.</li>
-</ol>
-
-
-<p>
-Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y densidad espectral estimadas con los datos simulados.
-</p>
-<div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_analysis</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20, n=400, seed=0):
-
-    <span style="font-weight: bold; font-style: italic;">lags</span>=math.floor(n/2) <span style="font-weight: bold;">if</span> n/2 &lt; lags <span style="font-weight: bold;">else</span> lags
-    
-    <span style="font-weight: bold; font-style: italic;">phi</span>   = Polynomial(ar_params, symbol=<span style="font-style: italic;">'B'</span>)
-    <span style="font-weight: bold; font-style: italic;">theta</span> = Polynomial(ma_params, symbol=<span style="font-style: italic;">'B'</span>)
-    <span style="font-weight: bold; font-style: italic;">arma_process</span> = sm.tsa.ArmaProcess(phi.coef, theta.coef)
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Simulaci&#243;n de la serie temporal
-</span>    <span style="font-weight: bold;">if</span> seed:
-        np.random.seed(seed)
-    <span style="font-weight: bold; font-style: italic;">data</span> = arma_process.generate_sample(nsample=n)
-       
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura
-</span>    <span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal
-</span>    <span style="font-weight: bold; font-style: italic;">ax1</span> = fig.add_subplot(2, 1, 1)
-    ax1.plot(data, color=<span style="font-style: italic;">'blue'</span>)
-    ax1.set_xlabel(<span style="font-style: italic;">'t'</span>)
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear una fila de 3 subgr&#225;ficos para ACF, PACF y periodograma
-</span>    <span style="font-weight: bold; font-style: italic;">ax2</span> = fig.add_subplot(2, 3, 4)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 1
-</span>    sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title=<span style="font-style: italic;">'ACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
-    ax2.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-
-    <span style="font-weight: bold; font-style: italic;">ax3</span> = fig.add_subplot(2, 3, 5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 2
-</span>    sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title=<span style="font-style: italic;">'PACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
-    ax3.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-    
-    <span style="font-weight: bold; font-style: italic;">ax4</span> = fig.add_subplot(2, 3, 6)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 3
-</span>    <span style="font-weight: bold; font-style: italic;">f</span>, <span style="font-weight: bold; font-style: italic;">Pxx</span> = signal.welch(data, fs=1, nperseg=256)
-    ax4.plot(f, Pxx, color=<span style="font-style: italic;">'purple'</span>)
-    ax4.set_title(<span style="font-style: italic;">'Periodograma Estimado'</span>)
-    ax4.set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
-    <span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ax4.set_ylabel('Densidad Espectral')
-</span>    ax4.set_xlim(0, 0.5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Limitar el eje x a 0.5
-</span>
-    plt.tight_layout()
-    plt.close(fig)    
-    <span style="font-weight: bold;">return</span> fig
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold;">import</span> warnings
+warnings.filterwarnings(<span style="font-style: italic;">"ignore"</span>, category=<span style="font-weight: bold; text-decoration: underline;">UserWarning</span>)
+%run -i ./src/analisis_armas.py
 </code></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org0d0a3b4" class="outline-2">
-<h2 id="org0d0a3b4">Funciones de autocovarianzas y de autocorrelación (ACF)</h2>
-<div class="outline-text-2" id="text-org0d0a3b4">
+<div id="outline-container-org8268059" class="outline-2">
+<h2 id="org8268059">Funciones de autocovarianzas y de autocorrelación (ACF)</h2>
+<div class="outline-text-2" id="text-org8268059">
 <p>
 Si un proceso estocástico es estacionario, la covarianza entre \(X_t\) y \(X_{t+k}\) no depende de \(t\); tan solo depende de la distancia temporal \(k\) entre ambas variables aleatorias: \(\;Cov(X_t,X_{t-k})=\gamma_k.\;\) 
 </p>
@@ -384,9 +184,9 @@ proceso estocástico.
 </p>
 </div>
 </div>
-<div id="outline-container-orgffe58e4" class="outline-2">
-<h2 id="orgffe58e4">Función de autocorrelación parcial  (PACF)</h2>
-<div class="outline-text-2" id="text-orgffe58e4">
+<div id="outline-container-org86ea126" class="outline-2">
+<h2 id="org86ea126">Función de autocorrelación parcial  (PACF)</h2>
+<div class="outline-text-2" id="text-org86ea126">
 <p>
 La <i>correlación parcial</i> entre dos variables \(X_t\) y \(X_{t-k}\) de un
 proceso estacionario \(\boldsymbol{X}\) mide su correlación una vez
@@ -446,7 +246,7 @@ Es decir, es posible reconstruir una de las secuencias a partir de la
 otra (por ejemplo resolviendo las <a href="./Lecc05.html#org392fab2">ecuaciones de Yule-Walker</a>
 recursivamente con el algoritmo <a href="https://en.wikipedia.org/wiki/Levinson_recursion">Levinson-Durbin</a>; véase
 <i>Pourahmadi, M. (2001, Capítulo 7)</i> o <i>Brockwell &amp; Davis (1991,
-Capitulo 5)</i>)
+Capítulo 5)</i>)
 </p>
 
 <p>
@@ -459,9 +259,9 @@ arrojará luz sobre las propiedades de un proceso estocástico.
 </p>
 </div>
 </div>
-<div id="outline-container-org0996006" class="outline-2">
-<h2 id="org0996006">Densidad espectral</h2>
-<div class="outline-text-2" id="text-org0996006">
+<div id="outline-container-org558604b" class="outline-2">
+<h2 id="org558604b">Densidad espectral</h2>
+<div class="outline-text-2" id="text-org558604b">
 <p>
 Si \(\boldsymbol{X}\) es un proceso estocástico con función de
 autocovarianzas \(\boldsymbol{\gamma}\in\ell^1\), es decir, con función
@@ -518,13 +318,13 @@ modelos lineales concretos.
 </p>
 </div>
 </div>
-<div id="outline-container-org8ad8872" class="outline-2">
-<h2 id="org8ad8872">ACF, PACF y densidad espectral de algunos modelos lineales</h2>
-<div class="outline-text-2" id="text-org8ad8872">
+<div id="outline-container-orgb6aec59" class="outline-2">
+<h2 id="orgb6aec59">ACF, PACF y densidad espectral de algunos modelos lineales</h2>
+<div class="outline-text-2" id="text-orgb6aec59">
 </div>
-<div id="outline-container-org3ab2221" class="outline-3">
-<h3 id="org3ab2221">Procesos lineales causales</h3>
-<div class="outline-text-3" id="text-org3ab2221">
+<div id="outline-container-org2b75fa3" class="outline-3">
+<h3 id="org2b75fa3">Procesos lineales causales</h3>
+<div class="outline-text-3" id="text-org2b75fa3">
 <p>
 Sea \(\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U},\;\)
 donde \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y
@@ -557,9 +357,9 @@ A partir de \(\boldsymbol{\gamma}\) obtenemos las otras tres funciones:
 </p>
 </div>
 </div>
-<div id="outline-container-orgc136f3d" class="outline-3">
-<h3 id="orgc136f3d">Proceso de Ruido Blanco</h3>
-<div class="outline-text-3" id="text-orgc136f3d">
+<div id="outline-container-org6aab5fc" class="outline-3">
+<h3 id="org6aab5fc">Proceso de Ruido Blanco</h3>
+<div class="outline-text-3" id="text-org6aab5fc">
 <p>
 Sea \(\boldsymbol{X}=1*\boldsymbol{U}\),
 donde \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;;\) es decir \(X_t=U_t\) para
@@ -592,7 +392,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACFwhitenoise.png'</
 </div>
 
 
-<div id="org4ea9dc6" class="figure">
+<div id="org4106525" class="figure">
 <p><img src="./img/lecc04/ACFwhitenoise.png" alt="ACFwhitenoise.png" width="900px" />
 </p>
 </div>
@@ -605,15 +405,26 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/SimulWhitenoise.png'
 
 
 
-<div id="orgc996e4f" class="figure">
+<div id="org31045d4" class="figure">
 <p><img src="./img/lecc04/SimulWhitenoise.png" alt="SimulWhitenoise.png" width="900px" />
 </p>
 </div>
+
+
+
+<div id="orgb07abb4" class="figure">
+<p><img src="./img/lecc04/colores.png" alt="colores.png" />
+</p>
+</div>
+
+<p>
+En la luz blanca todos los colores (frecuencias) aparecen por igual (por eso se ve blanco).
+</p>
 </div>
 </div>
-<div id="outline-container-orgdee2be7" class="outline-3">
-<h3 id="orgdee2be7">Proceso de media móvil MA(\(q\))</h3>
-<div class="outline-text-3" id="text-orgdee2be7">
+<div id="outline-container-org157fdfa" class="outline-3">
+<h3 id="org157fdfa">Proceso de media móvil MA(\(q\))</h3>
+<div class="outline-text-3" id="text-org157fdfa">
 <p>
 Sea \(\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}\), con \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y donde \(\boldsymbol{\theta}\) es un polinomio de orden \(q>0\), con \(\theta_0=1\) y con todas sus raíces fuera del círculo unidad \((\boldsymbol{\theta}^{-\triangleright}\in\ell^1)\), es decir \[X_t=\sum_{j=1}^q\theta_j U_{t-j}+U_t.\]
 </p>
@@ -661,9 +472,9 @@ unidad
 </p>
 </div>
 </div>
-<div id="outline-container-org938ff5c" class="outline-3">
-<h3 id="org938ff5c">Proceso de media móvil MA(\(1\))</h3>
-<div class="outline-text-3" id="text-org938ff5c">
+<div id="outline-container-orgdf23f4f" class="outline-3">
+<h3 id="orgdf23f4f">Proceso de media móvil MA(\(1\))</h3>
+<div class="outline-text-3" id="text-orgdf23f4f">
 <p>
 Sea \(\boldsymbol{X}=(1-\theta z)*\boldsymbol{U}\) con \(|\theta|<1\) y
 con \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\), es decir \[X_t=U_t-\theta
@@ -689,51 +500,13 @@ U_{t-1}.\]
 <li>\(\boldsymbol{\pi} \;=\; \sum\limits_{k\in\mathbb{Z}}{  \frac{-\theta^k(1-\theta^2)}{1-\theta^{2(k+1)}} z^k}\)</li>
 </ul>
 </div>
-<div id="outline-container-org26d8bc2" class="outline-4">
-<h4 id="org26d8bc2">MA(1) con raíz positiva</h4>
-<div class="outline-text-4" id="text-org26d8bc2">
+<div id="outline-container-orgb2c5e82" class="outline-4">
+<h4 id="orgb2c5e82">MA(1) con raíz positiva</h4>
+<div class="outline-text-4" id="text-orgb2c5e82">
 <p>
 \[\boldsymbol{\theta}(z)=1-0.9z\quad\Rightarrow\quad X_t=
 (1-0.9 \mathsf{B})U_t\qquad {\color{blue}{(\theta>0)}}\]
 </p>
-
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">1.111111</td>
-<td class="org-right">0.0</td>
-<td class="org-right">1.111111</td>
-<td class="org-right">0.0</td>
-<td class="org-right">Inf</td>
-<td class="org-right">1</td>
-</tr>
-</tbody>
-</table>
 
 
 <div class="org-src-container">
@@ -746,72 +519,33 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA1p.png'</span>
 
 
 
-<div id="org9f99359" class="figure">
+<div id="orgec7391c" class="figure">
 <p><img src="./img/lecc04/ACF-MA1p.png" alt="ACF-MA1p.png" width="900px" />
 </p>
 </div>
 
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ejemplo de uso
-</span><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA1p.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
 
-<div id="org7eb1d28" class="figure">
+<div id="org205b869" class="figure">
 <p><img src="./img/lecc04/Sim-MA1p.png" alt="Sim-MA1p.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc2a3063" class="outline-4">
-<h4 id="orgc2a3063">MA(1) con raíz negativa</h4>
-<div class="outline-text-4" id="text-orgc2a3063">
+<div id="outline-container-orge65a9c8" class="outline-4">
+<h4 id="orge65a9c8">MA(1) con raíz negativa</h4>
+<div class="outline-text-4" id="text-orge65a9c8">
 <p>
 \[\boldsymbol{\theta}(z)=1+0.9z\quad\Rightarrow\quad X_t=
 (1+0.9 \mathsf{B})U_t\qquad {\color{blue}{(\theta<0)}}\]
 </p>
-
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">-1.111111</td>
-<td class="org-right">0.0</td>
-<td class="org-right">1.111111</td>
-<td class="org-right">0.5</td>
-<td class="org-right">2.0</td>
-<td class="org-right">1.0</td>
-</tr>
-</tbody>
-</table>
 
 
 <div class="org-src-container">
@@ -824,29 +558,28 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA1n.png'</span>
 
 
 
-<div id="orgee5ed7b" class="figure">
+<div id="orgb778873" class="figure">
 <p><img src="./img/lecc04/ACF-MA1n.png" alt="ACF-MA1n.png" width="900px" />
 </p>
 </div>
 
-
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA1n.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
-<div id="org21355ed" class="figure">
+<div id="org6532cfb" class="figure">
 <p><img src="./img/lecc04/Sim-MA1n.png" alt="Sim-MA1n.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-orgab6e530" class="outline-3">
-<h3 id="orgab6e530">Proceso de media móvil MA(\(2\))</h3>
-<div class="outline-text-3" id="text-orgab6e530">
+<div id="outline-container-orgadb917d" class="outline-3">
+<h3 id="orgadb917d">Proceso de media móvil MA(\(2\))</h3>
+<div class="outline-text-3" id="text-orgadb917d">
 <p>
 Sea \(\boldsymbol{X}=(1-\theta_1 z-\theta_2 z^2)*\boldsymbol{U}\), con
 \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y con
@@ -880,15 +613,20 @@ decae paulatinamente.</li>
 </ul>
 
 
-<div id="org5d7f79d" class="figure">
-<p><img src="./img/lecc04/MA2roots.png" alt="MA2roots.png" width="600px" />
+<div id="org3453152" class="figure">
+<p><img src="img/lecc04/MA2roots.png" alt="MA2roots.png" width="600px" />
 </p>
-<p><span class="figure-number">Figura 1: </span>El interior del triángulo es la región paramétrica donde un MA(2) es invertible.</p>
+<p><span class="figure-number">Figura 1: </span>El interior del triángulo es la región paramétrica donde un MA(2) es invertible. Por debajo de la parábola las raíces son complejas. El signo del parámetro \(\theta_1\) determina el signo del primer retardo de la ACF y \(\theta_2\) el signo del segundo. Las regiones 1, 2, 3, y 4 determinan cómo decae la PACF.</p>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><code>RegionParametrica(<span style="font-style: italic;">'MA'</span>).savefig(<span style="font-style: italic;">'./img/lecc04/MA2roots.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
+</code></pre>
 </div>
 </div>
-<div id="outline-container-org5bae163" class="outline-4">
-<h4 id="org5bae163">MA(2) con dos parámetros positivos (\(+\), \(+\))</h4>
-<div class="outline-text-4" id="text-org5bae163">
+<div id="outline-container-org7027e8b" class="outline-4">
+<h4 id="org7027e8b">MA(2) con dos parámetros positivos (\(+\), \(+\))</h4>
+<div class="outline-text-4" id="text-org7027e8b">
 <p>
 \[
 \boldsymbol{\theta}(z) = 1-0.6z -0.3z^2
@@ -899,52 +637,6 @@ X_t=(1-0.6\mathsf{B}-0.3\mathsf{B}^2)U_t
 \]
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">1.081666</td>
-<td class="org-right">0.0</td>
-<td class="org-right">1.081666</td>
-<td class="org-right">0.0</td>
-<td class="org-right">Inf</td>
-<td class="org-right">1</td>
-</tr>
-
-<tr>
-<td class="org-right">-3.081666</td>
-<td class="org-right">0.0</td>
-<td class="org-right">3.081666</td>
-<td class="org-right">0.5</td>
-<td class="org-right">2.0</td>
-<td class="org-right">1</td>
-</tr>
-</tbody>
-</table>
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1,]
@@ -955,29 +647,36 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2thpp.png'</sp
 </div>
 
 
-<div id="org571ac3a" class="figure">
+
+<div id="org32a9102" class="figure">
 <p><img src="./img/lecc04/ACF-MA2thpp.png" alt="ACF-MA2thpp.png" width="900px" />
 </p>
 </div>
 
 
+<pre class="example">
+d921f978-150e-45c1-8a9b-2a3980898d6d
+</pre>
+
+
+
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2thpp.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
 
-<div id="org1f08bc7" class="figure">
+<div id="org95219e2" class="figure">
 <p><img src="./img/lecc04/Sim-MA2thpp.png" alt="Sim-MA2thpp.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org9ed74e3" class="outline-4">
-<h4 id="org9ed74e3">MA(2) con parámetros de distinto signo (\(-\), \(+\))</h4>
-<div class="outline-text-4" id="text-org9ed74e3">
+<div id="outline-container-org35c0cf9" class="outline-4">
+<h4 id="org35c0cf9">MA(2) con parámetros de distinto signo (\(-\), \(+\))</h4>
+<div class="outline-text-4" id="text-org35c0cf9">
 <p>
 \[
 \boldsymbol{\theta}(z)=1+0.6z -0.3z^2
@@ -987,55 +686,6 @@ X_t=(1+0.6\mathsf{B}-0.3\mathsf{B}^2)U_t
 \]
 </p>
 
-<p>
-#: 79133a7c-9a4e-439f-aac2-9d8737653e65
-</p>
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">3.081666</td>
-<td class="org-right">0.0</td>
-<td class="org-right">3.081666</td>
-<td class="org-right">0.0</td>
-<td class="org-right">Inf</td>
-<td class="org-right">1</td>
-</tr>
-
-<tr>
-<td class="org-right">-1.081666</td>
-<td class="org-right">0.0</td>
-<td class="org-right">1.081666</td>
-<td class="org-right">0.5</td>
-<td class="org-right">2.0</td>
-<td class="org-right">1</td>
-</tr>
-</tbody>
-</table>
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1,]
@@ -1046,28 +696,35 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2thnp.png'</sp
 </div>
 
 
-<div id="org2392f4a" class="figure">
+
+<div id="org6f2735e" class="figure">
 <p><img src="./img/lecc04/ACF-MA2thnp.png" alt="ACF-MA2thnp.png" width="900px" />
 </p>
 </div>
 
+
+<pre class="example">
+d5be9b6c-33c4-4b45-8b22-76942ae33ca3
+</pre>
+
+
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2thnp.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
 
-<div id="org4047360" class="figure">
+<div id="org3e35f21" class="figure">
 <p><img src="./img/lecc04/Sim-MA2thnp.png" alt="Sim-MA2thnp.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org0e7dcb5" class="outline-4">
-<h4 id="org0e7dcb5">MA(2) con dos parámetros negativos (\(-\), \(-\))</h4>
-<div class="outline-text-4" id="text-org0e7dcb5">
+<div id="outline-container-orgfe77d48" class="outline-4">
+<h4 id="orgfe77d48">MA(2) con dos parámetros negativos (\(-\), \(-\))</h4>
+<div class="outline-text-4" id="text-orgfe77d48">
 <p>
 \[
 \boldsymbol{\theta}(z) = 1+0.9z +0.9z^2
@@ -1077,54 +734,6 @@ X_t=(1+0.9\mathsf{B}+0.9\mathsf{B}^2)U_t
 {\color{blue}{(\theta_1<0 \;\text{y}\; \theta_2<0)}}
 \]
 </p>
-
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">-0.5</td>
-<td class="org-right">-0.927961</td>
-<td class="org-right">1.054093</td>
-<td class="org-right">0.328657</td>
-<td class="org-right">3.042687</td>
-<td class="org-right">1.0</td>
-</tr>
-
-<tr>
-<td class="org-right">-0.5</td>
-<td class="org-right">0.927961</td>
-<td class="org-right">1.054093</td>
-<td class="org-right">0.328657</td>
-<td class="org-right">3.042687</td>
-<td class="org-right">1.0</td>
-</tr>
-</tbody>
-</table>
-
 
 
 <div class="org-src-container">
@@ -1136,29 +745,35 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2thnn.png'</sp
 </div>
 
 
-<div id="org2ea22ff" class="figure">
+
+<div id="orgc3cbf6a" class="figure">
 <p><img src="./img/lecc04/ACF-MA2thnn.png" alt="ACF-MA2thnn.png" width="900px" />
 </p>
 </div>
 
 
+<pre class="example">
+d00d4dff-be2e-40e4-b423-0ff1e22f21fa
+</pre>
+
+
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2thnn.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
 
-<div id="orgddd2e5b" class="figure">
+<div id="orgf4483e0" class="figure">
 <p><img src="./img/lecc04/Sim-MA2thnn.png" alt="Sim-MA2thnn.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc7935e6" class="outline-4">
-<h4 id="orgc7935e6">MA(2) con parámetros de distinto signo (\(+\), \(-\))</h4>
-<div class="outline-text-4" id="text-orgc7935e6">
+<div id="outline-container-org36c0226" class="outline-4">
+<h4 id="org36c0226">MA(2) con parámetros de distinto signo (\(+\), \(-\))</h4>
+<div class="outline-text-4" id="text-org36c0226">
 <p>
 \[
 \boldsymbol{\theta}(z)=1-1.1z +0.9z^2
@@ -1168,52 +783,6 @@ X_t=(1-1.1\mathsf{B}+0.9\mathsf{B}^2)U_t
 \]
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">0.611111</td>
-<td class="org-right">-0.858868</td>
-<td class="org-right">1.054093</td>
-<td class="org-right">0.151575</td>
-<td class="org-right">6.597397</td>
-<td class="org-right">1.0</td>
-</tr>
-
-<tr>
-<td class="org-right">0.611111</td>
-<td class="org-right">0.858868</td>
-<td class="org-right">1.054093</td>
-<td class="org-right">0.151575</td>
-<td class="org-right">6.597397</td>
-<td class="org-right">1.0</td>
-</tr>
-</tbody>
-</table>
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1,]
@@ -1224,28 +793,36 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2thpn.png'</sp
 </div>
 
 
-<div id="orga08a5d0" class="figure">
+
+<div id="org4652779" class="figure">
 <p><img src="./img/lecc04/ACF-MA2thpn.png" alt="ACF-MA2thpn.png" width="900px" />
 </p>
 </div>
 
+
+<pre class="example">
+66b2a19b-9374-4fe2-a3b5-e25170953a57
+</pre>
+
+
+
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2thpn.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
 
-<div id="orgbcdf6b1" class="figure">
+<div id="org3e497b4" class="figure">
 <p><img src="./img/lecc04/Sim-MA2thpn.png" alt="Sim-MA2thpn.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org5b773f0" class="outline-4">
-<h4 id="org5b773f0">MA(2) con dos raíces reales, una positiva y la otra negativa</h4>
-<div class="outline-text-4" id="text-org5b773f0">
+<div id="outline-container-org279a65b" class="outline-4">
+<h4 id="org279a65b">MA(2) con dos raíces reales, una positiva y la otra negativa</h4>
+<div class="outline-text-4" id="text-org279a65b">
 <p>
 \[
 \boldsymbol{\theta}(z)=1-0.64z^2
@@ -1255,52 +832,6 @@ X_t=(1-0.64\mathsf{B}^2)U_t
 \]
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">1.25</td>
-<td class="org-right">0.0</td>
-<td class="org-right">1.25</td>
-<td class="org-right">0.0</td>
-<td class="org-right">Inf</td>
-<td class="org-right">1</td>
-</tr>
-
-<tr>
-<td class="org-right">-1.25</td>
-<td class="org-right">0.0</td>
-<td class="org-right">1.25</td>
-<td class="org-right">0.5</td>
-<td class="org-right">2.0</td>
-<td class="org-right">1</td>
-</tr>
-</tbody>
-</table>
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1,]
@@ -1311,28 +842,35 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2pn.png'</span
 </div>
 
 
-<div id="org192254b" class="figure">
+
+<div id="orgdb56838" class="figure">
 <p><img src="./img/lecc04/ACF-MA2pn.png" alt="ACF-MA2pn.png" width="900px" />
 </p>
 </div>
 
+
+<pre class="example">
+8db0ac58-dcd7-4cbe-a647-3f98634a5432
+</pre>
+
+
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2pn.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
 
-<div id="org1318f6f" class="figure">
+<div id="org57bd2c1" class="figure">
 <p><img src="./img/lecc04/Sim-MA2pn.png" alt="Sim-MA2pn.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org980e9c3" class="outline-4">
-<h4 id="org980e9c3">MA(2) con un par de raíces complejas</h4>
-<div class="outline-text-4" id="text-org980e9c3">
+<div id="outline-container-orgfc8c522" class="outline-4">
+<h4 id="orgfc8c522">MA(2) con un par de raíces complejas</h4>
+<div class="outline-text-4" id="text-orgfc8c522">
 <p>
 \[
 \boldsymbol{\theta}(z)=1+0.64z^2
@@ -1342,52 +880,6 @@ X_t=(1+0.64\mathsf{B}^2)U_t
 \]
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">0.0</td>
-<td class="org-right">-1.25</td>
-<td class="org-right">1.25</td>
-<td class="org-right">0.25</td>
-<td class="org-right">4.0</td>
-<td class="org-right">1.0</td>
-</tr>
-
-<tr>
-<td class="org-right">0.0</td>
-<td class="org-right">1.25</td>
-<td class="org-right">1.25</td>
-<td class="org-right">0.25</td>
-<td class="org-right">4.0</td>
-<td class="org-right">1.0</td>
-</tr>
-</tbody>
-</table>
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1,]
@@ -1398,28 +890,35 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2np.png'</span
 </div>
 
 
-<div id="org1c254d9" class="figure">
+
+<div id="orga16b956" class="figure">
 <p><img src="./img/lecc04/ACF-MA2np.png" alt="ACF-MA2np.png" width="900px" />
 </p>
 </div>
 
+<pre class="example">
+0f57006b-81cf-4f11-bab8-f3076e16b946
+</pre>
+
+
+
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2np.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
 
-<div id="orgb0832b3" class="figure">
+<div id="org5cefa41" class="figure">
 <p><img src="./img/lecc04/Sim-MA2np.png" alt="Sim-MA2np.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org3328e3d" class="outline-4">
-<h4 id="org3328e3d">MA(2) con dos raíces reales y negativas</h4>
-<div class="outline-text-4" id="text-org3328e3d">
+<div id="outline-container-org7513084" class="outline-4">
+<h4 id="org7513084">MA(2) con dos raíces reales y negativas</h4>
+<div class="outline-text-4" id="text-org7513084">
 <p>
 \[
 \boldsymbol{\theta}(z)=1+1.6z+0.64z^2
@@ -1429,43 +928,6 @@ X_t=(1+1.6\mathsf{B}+0.64\mathsf{B}^2)U_t
 \]
 </p>
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">-1.25</td>
-<td class="org-right">0.0</td>
-<td class="org-right">1.25</td>
-<td class="org-right">0.5</td>
-<td class="org-right">2.0</td>
-<td class="org-right">2.0</td>
-</tr>
-</tbody>
-</table>
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1,]
@@ -1476,28 +938,35 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2rojo.png'</sp
 </div>
 
 
-<div id="orgaf3e2db" class="figure">
+
+<div id="org47d541c" class="figure">
 <p><img src="./img/lecc04/ACF-MA2rojo.png" alt="ACF-MA2rojo.png" width="900px" />
 </p>
 </div>
 
+
+<pre class="example">
+bf9452f8-32d5-4369-8162-2a0368504f7a
+</pre>
+
+
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2rojo.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
 
-<div id="orgb5b8b7b" class="figure">
+<div id="orgd1abb7f" class="figure">
 <p><img src="./img/lecc04/Sim-MA2rojo.png" alt="Sim-MA2rojo.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org7d550e1" class="outline-4">
-<h4 id="org7d550e1">MA(2) con dos raíces reales y positivas</h4>
-<div class="outline-text-4" id="text-org7d550e1">
+<div id="outline-container-orgec669d6" class="outline-4">
+<h4 id="orgec669d6">MA(2) con dos raíces reales y positivas</h4>
+<div class="outline-text-4" id="text-orgec669d6">
 <p>
 \[
 \boldsymbol{\theta}(z)=1-1.6z+0.64z^2
@@ -1506,44 +975,6 @@ X_t=(1-1.6\mathsf{B}+0.64\mathsf{B}^2)U_t
 \;\; {\color{blue}{(\text{r. reales: +, +})}}
 \]
 </p>
-
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-
-<col  class="org-right" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="org-right">P. real</th>
-<th scope="col" class="org-right">P. imag.</th>
-<th scope="col" class="org-right">Módulo</th>
-<th scope="col" class="org-right">Frecuencia</th>
-<th scope="col" class="org-right">Periodo</th>
-<th scope="col" class="org-right">Multip.</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="org-right">1.25</td>
-<td class="org-right">0.0</td>
-<td class="org-right">1.25</td>
-<td class="org-right">0.0</td>
-<td class="org-right">Inf</td>
-<td class="org-right">2</td>
-</tr>
-</tbody>
-</table>
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1,]
@@ -1554,20 +985,26 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2violeta.png'<
 </div>
 
 
-<div id="orgf2bd115" class="figure">
+
+<div id="orgc3d2926" class="figure">
 <p><img src="./img/lecc04/ACF-MA2violeta.png" alt="ACF-MA2violeta.png" width="900px" />
 </p>
 </div>
 
+<pre class="example">
+760acdf5-eb6a-4e67-86ea-4e7c21ee64d3
+</pre>
+
+
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2violeta.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 </code></pre>
 </div>
 
 
 
-<div id="org4eb9b5e" class="figure">
+<div id="org5ee808e" class="figure">
 <p><img src="./img/lecc04/Sim-MA2violeta.png" alt="Sim-MA2violeta.png" width="900px" />
 </p>
 </div>
@@ -1575,9 +1012,9 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2violeta.png'<
 </div>
 </div>
 </div>
-<div id="outline-container-orgbd16069" class="outline-2">
-<h2 id="orgbd16069">(Resumen) características de procesos MA(\(q\))</h2>
-<div class="outline-text-2" id="text-orgbd16069">
+<div id="outline-container-org1a47f00" class="outline-2">
+<h2 id="org1a47f00">(Resumen) características de procesos MA(\(q\))</h2>
+<div class="outline-text-2" id="text-org1a47f00">
 <p>
 <span class="underline">Siempre estacionario.</span>
 </p>
@@ -1611,94 +1048,10 @@ exponenciales y/o sinusoidales amortiguadas.
 <b>Densidad espectral</b> Suma de dos cosenos más una constante.
 </p>
 </div>
-<div id="outline-container-orga7a9a39" class="outline-3">
-<h3 id="orga7a9a39">Gráfico raíces MA(2)</h3>
-<div class="outline-text-3" id="text-orga7a9a39">
-<div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">MA2_param_plot</span>():
-
-    <span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax</span> = plt.subplots(figsize=(10, 6))
-    ax.set_aspect(<span style="font-style: italic;">'equal'</span>)
-
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis
-</span>    <span style="font-weight: bold; font-style: italic;">xmin</span>, <span style="font-weight: bold; font-style: italic;">ymin</span> = -3, -2
-    <span style="font-weight: bold; font-style: italic;">xmax</span>, <span style="font-weight: bold; font-style: italic;">ymax</span> = -xmin, -ymin
-    plt.axis([xmin, xmax, ymin, ymax])
-
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis labels
-</span>    ax.<span style="font-weight: bold;">set</span>(xticks=[], yticks=[])
-    ax.set_xlabel(r<span style="font-style: italic;">'$\theta_2$'</span>, fontsize=16)
-    ax.xaxis.set_label_position(<span style="font-style: italic;">'top'</span>)
-    ax.set_ylabel(r<span style="font-style: italic;">'$\theta_1$'</span>, rotation=0, fontsize=16)
-    ax.yaxis.set_label_position(<span style="font-style: italic;">'right'</span>)
-
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Draw (t1, t2) points
-</span>    <span style="font-weight: bold; font-style: italic;">p1</span> = np.linspace(-2, 2, 100)
-    ax.plot(p1, -<span style="font-weight: bold;">abs</span>(p1) + 1, c=<span style="font-style: italic;">'black'</span>)
-    ax.plot(p1, np.full_like(p1, -1), c=<span style="font-style: italic;">'black'</span>)
-    ax.plot(p1, -(p1**2 / 4), c=<span style="font-style: italic;">'black'</span>)
-
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fill the region below the parabola and above the base of the triangle
-</span>    ax.fill_between(p1, -(p1**2 / 4), -1, where=-(p1**2 / 4) &gt;= -1, color=<span style="font-style: italic;">'lightgray'</span>, alpha=0.5)
-
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Turn normal axes off
-</span>    <span style="font-weight: bold;">for</span> spine <span style="font-weight: bold;">in</span> [<span style="font-style: italic;">'left'</span>, <span style="font-style: italic;">'bottom'</span>, <span style="font-style: italic;">'top'</span>, <span style="font-style: italic;">'right'</span>]:
-        ax.spines[spine].set_visible(<span style="font-weight: bold; text-decoration: underline;">False</span>)
-        
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add arrows to represent axes
-</span>    <span style="font-weight: bold; font-style: italic;">axes_arrows</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'&lt;|-|&gt;'</span>, <span style="font-style: italic;">'lw'</span>: 0.5, <span style="font-style: italic;">'color'</span>: <span style="font-style: italic;">'gray'</span>}  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Hacerlas grises y m&#225;s finas
-</span>    ax.annotate(<span style="font-style: italic;">''</span>, xy=(xmin, 0), xytext=(xmax, 0), arrowprops=axes_arrows)
-    ax.annotate(<span style="font-style: italic;">''</span>, xy=(0, ymin), xytext=(0, ymax), arrowprops=axes_arrows)
-
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Annotate the plot with equations
-</span>    <span style="font-weight: bold; font-style: italic;">plot_arrowsl</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'-|&gt;'</span>, <span style="font-style: italic;">'connectionstyle'</span>: <span style="font-style: italic;">"arc3, rad=-0.2"</span>}
-    <span style="font-weight: bold; font-style: italic;">plot_arrowsr</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'-|&gt;'</span>, <span style="font-style: italic;">'connectionstyle'</span>: <span style="font-style: italic;">"arc3, rad=0.2"</span>}
-    ax.annotate(r<span style="font-style: italic;">'$\theta_1 + \theta_2 &lt; 1$'</span>, xy=(0.4, 0.25), xytext=(1.1, 0.4),
-                arrowprops=plot_arrowsr, fontsize=<span style="font-style: italic;">'12'</span>)
-    ax.annotate(r<span style="font-style: italic;">'$\theta_1 + \theta_2 = 1$'</span>, xy=(0.38, 0.6), xytext=(0.6, 0.8),
-                arrowprops=plot_arrowsr, fontsize=<span style="font-style: italic;">'12'</span>)
-    ax.annotate(r<span style="font-style: italic;">'$\theta_2 &lt; 1 + \theta_1$'</span>, xy=(-0.4, 0.25), xytext=(-1.7, 0.4),
-                arrowprops=plot_arrowsl, fontsize=<span style="font-style: italic;">'12'</span>)
-    ax.annotate(r<span style="font-style: italic;">'$\theta_2 = 1 + \theta_1$'</span>, xy=(-0.38, 0.6), xytext=(-1.2, 0.8),
-                arrowprops=plot_arrowsl, fontsize=<span style="font-style: italic;">'12'</span>)
-    ax.annotate(r<span style="font-style: italic;">'$\theta_2 = -1$'</span>, xy=(1.5, -1), xytext=(1.8, -1.3),
-                arrowprops=plot_arrowsl, fontsize=<span style="font-style: italic;">'12'</span>)
-    ax.annotate(r<span style="font-style: italic;">'${\theta_1}^2 + 4\theta_2 = 0$'</span>, xy=(1.0, -0.28),
-                xytext=(1.8, -0.5), arrowprops=plot_arrowsr, fontsize=<span style="font-style: italic;">'12'</span>)
-    ax.annotate(r<span style="font-style: italic;">'${\theta_1}^2 + 4\theta_2 &lt; 0$'</span>, xy=(-.9, -0.6),
-                xytext=(-2.8, -0.5), arrowprops=plot_arrowsl, fontsize=<span style="font-style: italic;">'12'</span>)
-
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label complex region
-</span>    ax.text(0.09, -0.8, <span style="font-style: italic;">'Ra&#237;ces complejas'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=14, color=<span style="font-style: italic;">'gray'</span>)
-    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label cases
-</span>    ax.text(.3, 0.25, <span style="font-style: italic;">'1'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=16, color=<span style="font-style: italic;">'blue'</span>)
-    ax.text(-.3, 0.25, <span style="font-style: italic;">'2'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=16, color=<span style="font-style: italic;">'blue'</span>)
-    ax.text(-.3, -0.35, <span style="font-style: italic;">'3'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=16, color=<span style="font-style: italic;">'blue'</span>)
-    ax.text(.3, -0.35, <span style="font-style: italic;">'4'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=16, color=<span style="font-style: italic;">'blue'</span>)
-
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small marker to y-axis
-</span>    ax.axhline(y=1.005, xmin=0.495, xmax=0.505, c=<span style="font-style: italic;">'black'</span>)
-    ax.text(-0.12, -1.12, <span style="font-style: italic;">'-1'</span>, fontsize=10)
-    ax.text(-0.12, 0.98, <span style="font-style: italic;">'1'</span>, fontsize=10)
-
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small markers to x-axis
-</span>    ax.axvline(x=-2, ymin=0.495, ymax=0.505, c=<span style="font-style: italic;">'black'</span>)
-    ax.axvline(x=2, ymin=0.495, ymax=0.505, c=<span style="font-style: italic;">'black'</span>)
-    ax.text(-2.12, -0.12, <span style="font-style: italic;">'-2'</span>, fontsize=10)
-    ax.text(1.88, -0.12, <span style="font-style: italic;">'2'</span>, fontsize=10)
-    
-    <span style="font-weight: bold;">return</span> fig
-
-MA2_param_plot().savefig(<span style="font-style: italic;">'./img/lecc04/MA2roots.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
-</code></pre>
-</div>
-</div>
-</div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-08-20 Wed 20:47</p>
+<p class="date">Created: 2025-08-22 Fri 12:08</p>
 </div>
 </body>
 </html>
