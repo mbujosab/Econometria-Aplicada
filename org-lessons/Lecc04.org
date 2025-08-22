@@ -131,291 +131,23 @@ import os
 os.makedirs(imagenes_leccion, exist_ok=True) # crea el directorio si no existe
 #+END_SRC
 
+
 *** Gráficos para las ACF, PACF y densidades espectrales teóricas
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . skip)))
    :UNNUMBERED: notoc
    :END:
 
+Cargamos las funciones auxiliares (véase la carpeta =src/=)
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results silent
-# Módulos necesarios
-import statsmodels.api as sm
-from statsmodels.tsa.arima_process import ArmaProcess
-from scipy import signal
-from scipy.signal import freqz
-from numpy.polynomial import Polynomial
-import math
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+%run -i ./src/analisis_armas.py
 #+END_SRC
-
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-La siguiente función que calcula la PACF a partir de la ACF resolviendo las [[file:./Lecc05.html#org392fab2][ecuaciones de Yule-Walker]] recursivamente con el algoritmo [[https://en.wikipedia.org/wiki/Levinson_recursion][Levinson-Durbin]]; véase /Pourahmadi, M. (2001, Capítulo 7)/ o /Brockwell & Davis (1991, Capitulo 5)/). 
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results silent
-def theoretical_pacf_from_acf(acf_vals):
-    """
-    Calcula la PACF teórica (para lags >= 0) de forma paramétrica usando el algoritmo de Durbin-Levinson.
-    Se asume que acf_vals es un array tal que acf_vals[0] corresponde a lag 0.
-    
-    Retorna un array donde el coeficiente en la posición k corresponde a la PACF en el lag k.
-    """
-    nlags = len(acf_vals)-1
-    # Matriz para almacenar los coeficientes (phi)
-    phi = np.zeros((nlags+1, nlags+1))
-    # v guarda la varianza de error en cada paso
-    v = np.zeros(nlags+1)
-    pacf = np.zeros(nlags+1)
-    v[0] = acf_vals[0]
-    pacf[0] = 1.0  # Por convención, PACF(0)=1.
-    
-    for k in range(1, nlags+1):
-        if k == 1:
-            phi[1,1] = acf_vals[1] / acf_vals[0]
-            pacf[1] = phi[1,1]
-            v[1] = v[0]*(1 - phi[1,1]**2)
-        else:
-            sum_val = 0.0
-            # Sumar phi[k-1,j]*acf_vals[k-j] para j=1,...,k-1.
-            for j in range(1, k):
-                sum_val += phi[k-1, j] * acf_vals[k - j]
-            phi[k, k] = (acf_vals[k] - sum_val) / v[k-1]
-            pacf[k] = phi[k, k]
-            for j in range(1, k):
-                phi[k, j] = phi[k-1, j] - phi[k, k] * phi[k-1, k - j]
-            v[k] = v[k-1] * (1 - phi[k, k]**2)
-    return pacf  # Incluye PACF en lag 0 con valor 1.
-#+END_SRC
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-La siguiente función pinta las ACF, PACF y densidad espectral teóricas.
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results silent
-def plot_arma_parametric_diagnostics(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20):
-    """
-    Genera y retorna una figura con tres subgráficas para un modelo ARMA:
-      - ACF teórica (omitiendo retardo 0)
-      - PACF teórica paramétrica (calculada vía el algoritmo de Durbin-Levinson, omitiendo retardo 0)
-      - Densidad espectral teórica
-    
-    Parámetros:
-      ar_params : array-like
-          Coeficientes del polinomio AR (incluye el 1 inicial).
-      ma_params : array-like
-          Coeficientes del polinomio MA (incluye el 1 inicial).
-      sigma2 : float
-          Varianza del ruido Uₜ.
-      lags : int, opcional
-          Número de retardos considerados (por defecto 20).
-    
-    Retorna:
-      fig : objeto matplotlib.figure.Figure
-    """
-    phi   = Polynomial(ar_params, symbol='B')
-    theta = Polynomial(ma_params, symbol='B')
-    # Crear el proceso ARMA
-    arma_process = ArmaProcess(ar=phi.coef, ma=theta.coef)
-    
-    # 1. Calcular la ACF teórica
-    acf_theo = arma_process.acf(lags=lags)
-    lags_theo = np.arange(len(acf_theo))
-    # Omitir el retardo 0 para gráficos de ACF y PACF:
-    acf_plot = acf_theo[1:]
-    lags_plot = lags_theo[1:]
-    
-    # 2. Calcular la PACF teórica de forma paramétrica a partir de la ACF
-    pacf_theo = theoretical_pacf_from_acf(acf_theo)
-    pacf_plot = pacf_theo[1:]
-    lags_pacf = np.arange(len(pacf_theo))[1:]
-    
-    # 3. Calcular la densidad espectral teórica usando freqz
-    w, h = freqz(theta.coef, phi.coef, worN=1024)
-    freq = w / (2 * np.pi)  # Conversión de radianes/muestra a ciclos/muestra
-    spectrum = (sigma2 / (2 * np.pi)) * np.abs(h)**2
-    
-    # 4. Graficar los tres subgráficos
-    fig, axs = plt.subplots(1, 3, figsize=(18, 3))
-    
-    # ACF teórica
-    axs[0].stem(lags_plot, acf_plot, basefmt=" ")
-    axs[0].axhline(0, color='black', lw=0.5, linestyle='--')
-    axs[0].set_xlabel('Retardo')
-    axs[0].set_ylabel('ACF')
-    
-    # PACF teórica paramétrica
-    axs[1].stem(lags_pacf, pacf_plot, basefmt=" ")
-    axs[1].axhline(0, color='black', lw=0.5, linestyle='--')
-    axs[1].set_xlabel('Retardo')
-    axs[1].set_ylabel('PACF')
-    
-    # Densidad espectral teórica
-    axs[2].plot(freq, spectrum)
-    axs[2].axhline(0, color='black', lw=0.5, linestyle='--')
-    axs[2].set_xlabel('Frecuencia')
-    axs[2].set_ylabel('Densidad Espectral')
-    
-    plt.tight_layout()
-    plt.close(fig)
-    return fig
-#+END_SRC
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-Breve explicación de la anterior función =plot_arma_parametric_diagnostics=:
-
-1. La función recibe los parámetros del modelo ARMA y el número de retardos.
-2. Se calcula la ACF teórica y a partir de ella la PACF con =theoretical_pacf_from_acf=; en la gráfica se omite el retardo cero.
-3. La densidad espectral teórica \( S(\omega) \) se obtiene mediante la función freqz y la fórmula $$S(\omega)=\frac{\sigma^2}{2\pi}\Biggl|\frac{\sum_{j=0}^{q}\theta_j e^{-i2\pi \omega\,j}}{\sum_{k=0}^{p}\phi_k e^{-i2\pi \omega\,k}}\Biggr|^2.$$
-   Donde:
-   - \(\sigma^2\) es la varianza del término de error (innovación) del modelo.
-   - \((\theta_j \mid j=0:q)\) son los coeficientes del polinomio de medias móviles (MA), de modo que el polinomio MA es: 
-     $\theta(z) = \sum_{j=0}^{q}\theta_j\,z^j$.
-  
-   - \((\phi_k \mid k=0:p)\) son los coeficientes del polinomio autorregresivo (AR), de modo que el polinomio AR es:
-     $\phi(z) = \sum_{k=0}^{p}\phi_k\,z^k$.
-  
-   - Al evaluar estos polinomios en \(z = e^{-i\,2\pi \omega}\) se obtiene la respuesta en frecuencia del modelo:
-     $$H(e^{-i\,2\pi \omega})=\frac{\theta\bigl(e^{-i\,2\pi \omega}\bigr)}{\phi\bigl(e^{-i\,2\pi \omega}\bigr)}.$$
-     
-   - El módulo al cuadrado de \( H(e^{-i\,2\pi \omega}) \) multiplicado por \(\frac{\sigma^2}{2\pi}\) es la densidad espectral.
-
-   Esta fórmula es fundamental porque permite conocer la distribución de la varianza del proceso a lo largo de las diferentes frecuencias, lo cual es clave para analizar las propiedades dinámicas en modelos ARMA.
-
-4. Se crean tres subgráficos, y se añade una línea horizontal en y=0 en cada uno (=axhline=).
-5. Por último, la función retorna el objeto figura.
-
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y densidad espectral estimadas con los datos simulados.
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results silent
-def plot_arma_analysis(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20, n=400, seed=0):
-
-    lags=math.floor(n/2) if n/2 < lags else lags
-    
-    phi   = Polynomial(ar_params, symbol='B')
-    theta = Polynomial(ma_params, symbol='B')
-    arma_process = sm.tsa.ArmaProcess(phi.coef, theta.coef)
-    
-    # Simulación de la serie temporal
-    if seed:
-        np.random.seed(seed)
-    data = arma_process.generate_sample(nsample=n)
-       
-    # Crear la figura
-    fig = plt.figure(figsize=(18, 7))
-    
-    # Subgráfico de la serie temporal
-    ax1 = fig.add_subplot(2, 1, 1)
-    ax1.plot(data, color='blue')
-    ax1.set_xlabel('t')
-    
-    # Crear una fila de 3 subgráficos para ACF, PACF y periodograma
-    ax2 = fig.add_subplot(2, 3, 4)  # Fila 2, Columna 1
-    sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title='ACF Estimada', zero=False, auto_ylims=True)
-    ax2.set_xlabel('Retardo')
-
-    ax3 = fig.add_subplot(2, 3, 5)  # Fila 2, Columna 2
-    sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title='PACF Estimada', zero=False, auto_ylims=True)
-    ax3.set_xlabel('Retardo')
-    
-    ax4 = fig.add_subplot(2, 3, 6)  # Fila 2, Columna 3
-    f, Pxx = signal.welch(data, fs=1, nperseg=256)
-    ax4.plot(f, Pxx, color='purple')
-    ax4.set_title('Periodograma Estimado')
-    ax4.set_xlabel('Frecuencia')
-    #ax4.set_ylabel('Densidad Espectral')
-    ax4.set_xlim(0, 0.5)  # Limitar el eje x a 0.5
-
-    plt.tight_layout()
-    plt.close(fig)    
-    return fig
-#+END_SRC
-
-
-************** COMMENT Análisis de las raíces de un polinomio
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-Función que muestra las raíces de un polinomio en una tabla
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results none
-def polynomial_roots_table(coef_polinomio):
-
-    polinomio = Polynomial(coef_polinomio, symbol='B')
-    roots = polinomio.roots()
-    
-    # Contar la multiplicidad de las raíces
-    unique_roots, counts = np.unique(roots, return_counts=True)
-
-    # Crear listas para cada columna de la tabla
-    real_parts = []
-    imaginary_parts = []
-    moduli = []
-    frequencies = []
-    periods = []
-    multipliers = []
-
-    for root, count in zip(unique_roots, counts):
-        real = root.real
-        imag = root.imag
-        
-        # Calcular módulo
-        modulus = np.abs(root)
-        moduli.append(modulus)
-
-        # Calcular frecuencia y período
-        frequency = np.abs(np.angle(root)) / (2*np.pi)
-        period = 1/frequency if frequency else 'Inf'
-        
-        # Append results
-        real_parts.append(real)
-        imaginary_parts.append(imag)
-        frequencies.append(frequency)
-        periods.append(period)
-        multipliers.append(count)  # Multiplicidad
-
-    # Crear un DataFrame para mostrar la tabla
-    table = pd.DataFrame({
-        'P. real': real_parts,
-        'P. imag.': imaginary_parts,
-        'Módulo': moduli,
-        'Frecuencia': frequencies,
-        'Periodo': periods,
-        'Multip.': multipliers
-    })
-    
-    # Ordenar la tabla por la columna 'Frequency' en orden ascendente
-    table = table.sort_values(by='Frecuencia').round(6)
-    table2 = [list(table)] + [None] + table.values.tolist()
-    
-    return table2
-#+END_SRC
-
 
 #+latex: \newpage
 
-************** COMMENT Codigo aux                                  :noexport:
-   :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . skip)))
-   :UNNUMBERED: t 
-   :END:
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-Con el siguiente código mejoro los gráficos y logro transformar las tablas con formato $\LaTeX{}$ en ficheros png.
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results none :eval no
-# definimos parámetros para mejorar los gráficos
-mpl.rc('text', usetex=True)
-mpl.rc('text.latex', preamble=r'\usepackage{amsmath}')
-
-# transformaré salidas en \LaTeX{} de statsmodels a ficheros png que incluiré en las transparencias
-import dataframe_image as dfi
-from sympy.printing.preview import preview
-def repr_png(tex, ImgFile):
-    preamble = "\\documentclass[preview]{standalone}\n" \
-        "\\usepackage{booktabs,amsmath,amsfonts}\\begin{document}"    
-    preview(tex, filename=ImgFile, viewer='file', preamble=preamble, dvioptions=['-D','250'])
-#+END_SRC
 
 * Funciones de autocovarianzas y de autocorrelación (ACF)
    :PROPERTIES:
@@ -514,7 +246,7 @@ Es decir, es posible reconstruir una de las secuencias a partir de la
 otra (por ejemplo resolviendo las [[file:./Lecc05.html#org392fab2][ecuaciones de Yule-Walker]]
 recursivamente con el algoritmo [[https://en.wikipedia.org/wiki/Levinson_recursion][Levinson-Durbin]]; véase
 /Pourahmadi, M. (2001, Capítulo 7)/ o /Brockwell & Davis (1991,
-Capitulo 5)/)
+Capítulo 5)/)
 
 *************** TODO COMMENT Incluir algoritmo en los apuntes      :@EctrApl:
 
@@ -688,6 +420,13 @@ fig.savefig('./img/lecc04/SimulWhitenoise.png', dpi=300, bbox_inches='tight')
 [[./img/lecc04/SimulWhitenoise.png]]
 
 
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+[[./img/lecc04/colores.png]]
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+En la luz blanca todos los colores (frecuencias) aparecen por igual (por eso se ve blanco).
+
+
 ** Proceso de media móvil MA($q$)
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
@@ -780,29 +519,14 @@ U_{t-1}.$$
 $$\boldsymbol{\theta}(z)=1-0.9z\quad\Rightarrow\quad X_t=
 (1-0.9 \mathsf{B})U_t\qquad {\color{blue}{(\theta>0)}}$$
 
-# +RESULTS: raices-ma1p
-:results:
-# : b2f9a549-59d5-46b2-80e8-b009bc03000d
-|  P. real | P. imag. |   Módulo | Frecuencia | Periodo | Multip. |
-|----------+----------+----------+------------+---------+---------|
-| 1.111111 |      0.0 | 1.111111 |        0.0 |     Inf |       1 |
-:end:
-
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA1p.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA1p.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, -0.9]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA1p.png', dpi=300, bbox_inches='tight')
 #+END_SRC
-
-#+name: raices-ma1p
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer :eval no
-polynomial_roots_table(ma_params)
-#+END_SRC
-# +BEGIN_SRC jupyter-python :exports none  :results value table pp :results value drawer :wrap EXPORT
 
 
 #+attr_org: :width 800
@@ -811,10 +535,25 @@ polynomial_roots_table(ma_params)
 [[./img/lecc04/ACF-MA1p.png]]
 
 
+#+name: raices-ma1p
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA1p.png :exports code :results none
-# Ejemplo de uso
-fig = plot_arma_analysis(ar_params, ma_params)
+#+BEGIN_SRC jupyter-python :exports none :results value table pp 
+polynomial_roots_table(ma_params)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+ATTR_REVEAL: :frag t :frag_idx 1
+#+RESULTS: raices-ma1p
+:RESULTS:
+|   | P. real  | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
+|---+----------+----------+----------+------------+---------+---------|
+| 0 | 1.111111 | 0.0      | 1.111111 | 0.0        | Inf     | 1       |
+:END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA1p.png :exports code :results silent
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA1p.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
@@ -836,29 +575,14 @@ fig.savefig('./img/lecc04/Sim-MA1p.png', dpi=300, bbox_inches='tight')
 $$\boldsymbol{\theta}(z)=1+0.9z\quad\Rightarrow\quad X_t=
 (1+0.9 \mathsf{B})U_t\qquad {\color{blue}{(\theta<0)}}$$
 
-# +RESULTS: raices-ma1n
-:results:
-# : 061619f9-ac9c-4560-a763-bebbd2278ecd
-|   P. real | P. imag. |   Módulo | Frecuencia | Periodo | Multip. |
-|-----------+----------+----------+------------+---------+---------|
-| -1.111111 |      0.0 | 1.111111 |        0.5 |     2.0 |     1.0 |
-:end:
-
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA1n.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA1n.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, 0.9]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA1n.png', dpi=300, bbox_inches='tight')
 #+END_SRC
-
-#+name: raices-ma1n
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer :eval no
-polynomial_roots_table(ma_params)
-#+END_SRC
-# +BEGIN_SRC jupyter-python :exports none  :results value table pp :results value drawer :wrap EXPORT
 
 
 #+attr_org: :width 800
@@ -866,10 +590,23 @@ polynomial_roots_table(ma_params)
 #+attr_latex: :width 425px
 [[./img/lecc04/ACF-MA1n.png]]
 
+#+name: raices-ma1n
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer
+polynomial_roots_table(ma_params)
+#+END_SRC
+
+#+RESULTS: raices-ma1n
+:results:
+|   | P. real   | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
+|---+-----------+----------+----------+------------+---------+---------|
+| 0 | -1.111111 | 0.0      | 1.111111 | 0.5        | 2.0     | 1       |
+:end:
+
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA1n.png :exports code :results none
-fig = plot_arma_analysis(ar_params, ma_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA1n.png :exports code :results silent
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA1n.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
@@ -910,11 +647,23 @@ es decir $X_t=U_t-\theta_1 U_{t-1}-\theta_2 U_{t-2}$.
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 
-#+CAPTION: El interior del triángulo es la región paramétrica donde un MA(2) es invertible.
+#+CAPTION: El interior del triángulo es la región paramétrica donde un MA(2) es invertible. Por debajo de la parábola las raíces son complejas. El signo del parámetro $\theta_1$ determina el signo del primer retardo de la ACF y $\theta_2$ el signo del segundo. Las regiones 1, 2, 3, y 4 determinan cómo decae la PACF.
 #+attr_org: :width 400
 #+attr_html: :width 600px
 #+attr_latex: :width 300px
-[[./img/lecc04/MA2roots.png]]
+[[file:img/lecc04/MA2roots.png]]
+
+# #+BEGIN_SRC python :exports results
+# exec(open('./src/analisis_armas.py').read())
+# RegionParametrica('MA').savefig('./img/lecc04/MA2roots.png', dpi=300, bbox_inches='tight')
+# #+END_SRC
+
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file MA2roots.png :exports code :results silent
+RegionParametrica('MA').savefig('./img/lecc04/MA2roots.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+RESULTS:
 
 *** MA(2) con dos parámetros positivos ($+$, $+$)
    :PROPERTIES:
@@ -931,26 +680,13 @@ X_t=(1-0.6\mathsf{B}-0.3\mathsf{B}^2)U_t
 {\color{blue}{(\theta_1>0 \;\text{y}\; \theta_2>0)}}
 \]
 
-# +RESULTS: raices-ma2thpp
-:results:
-|   P. real | P. imag. |   Módulo | Frecuencia | Periodo | Multip. |
-|-----------+----------+----------+------------+---------+---------|
-|  1.081666 |      0.0 | 1.081666 |        0.0 |     Inf |       1 |
-| -3.081666 |      0.0 | 3.081666 |        0.5 |     2.0 |       1 |
-:end:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2thpp.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2thpp.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, -0.6, -0.3]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA2thpp.png', dpi=300, bbox_inches='tight')
-#+END_SRC
-
-#+name: raices-ma2thpp
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer  :eval no
-polynomial_roots_table(ma_params)
 #+END_SRC
 
 
@@ -960,9 +696,25 @@ polynomial_roots_table(ma_params)
 [[./img/lecc04/ACF-MA2thpp.png]]
 
 
+#+name: raices-ma2thpp
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ma_params)
+#+END_SRC
+
+#+RESULTS: raices-ma2thpp
+:RESULTS:
+|   |   P. real | P. imag. |   Módulo | Frecuencia | Periodo | Multip. |
+|---+-----------+----------+----------+------------+---------+---------|
+| 1 |  1.081666 |      0.0 | 1.081666 |        0.0 |     Inf |       1 |
+| 0 | -3.081666 |      0.0 | 3.081666 |        0.5 |     2.0 |       1 |
+:END:
+
+
+
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA2thpp.png :results none
-fig = plot_arma_analysis(ar_params, ma_params)
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA2thpp.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
@@ -986,27 +738,13 @@ X_t=(1+0.6\mathsf{B}-0.3\mathsf{B}^2)U_t
 \;\; {\color{blue}{(\theta_1<0 \;\text{y}\; \theta_2>0)}}
 \]
 
-#+RESULTS: raices-ma2thnp
-# :results:
-#: 79133a7c-9a4e-439f-aac2-9d8737653e65
-|   P. real | P. imag. |   Módulo | Frecuencia | Periodo | Multip. |
-|-----------+----------+----------+------------+---------+---------|
-|  3.081666 |      0.0 | 3.081666 |        0.0 |     Inf |       1 |
-| -1.081666 |      0.0 | 1.081666 |        0.5 |     2.0 |       1 |
-# :end:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2thnp.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2thnp.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, +0.6, -0.3]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA2thnp.png', dpi=300, bbox_inches='tight')
-#+END_SRC
-
-#+name: raices-ma2thnp
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer :eval no
-polynomial_roots_table(ma_params)
 #+END_SRC
 
 
@@ -1015,13 +753,29 @@ polynomial_roots_table(ma_params)
 #+attr_latex: :width 425px
 [[./img/lecc04/ACF-MA2thnp.png]]
 
+
+#+name: raices-ma2thnp
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ma_params)
+#+END_SRC
+#+RESULTS: raices-ma2thnp
+:RESULTS:
+|   |   P. real | P. imag. |   Módulo | Frecuencia | Periodo | Multip. |
+|---+-----------+----------+----------+------------+---------+---------|
+| 1 |  3.081666 |      0.0 | 3.081666 |        0.0 |     Inf |       1 |
+| 0 | -1.081666 |      0.0 | 1.081666 |        0.5 |     2.0 |       1 |
+:END:
+
+
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA2thnp.png :results none
-fig = plot_arma_analysis(ar_params, ma_params)
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA2thnp.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
 
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
 #+attr_org: :width 800
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
@@ -1042,28 +796,13 @@ X_t=(1+0.9\mathsf{B}+0.9\mathsf{B}^2)U_t
 {\color{blue}{(\theta_1<0 \;\text{y}\; \theta_2<0)}}
 \]
 
-# +RESULTS: raices-ma2thnn
-# :results:
-| P. real |  P. imag. |   Módulo | Frecuencia |  Periodo | Multip. |
-|---------+-----------+----------+------------+----------+---------|
-|    -0.5 | -0.927961 | 1.054093 |   0.328657 | 3.042687 |     1.0 |
-|    -0.5 |  0.927961 | 1.054093 |   0.328657 | 3.042687 |     1.0 |
-# :end:
-
-
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2thnn.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2thnn.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, +0.9, 0.9]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA2thnn.png', dpi=300, bbox_inches='tight')
-#+END_SRC
-
-#+name: raices-ma2thnn
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer :eval no
-polynomial_roots_table(ma_params)
 #+END_SRC
 
 
@@ -1073,9 +812,24 @@ polynomial_roots_table(ma_params)
 [[./img/lecc04/ACF-MA2thnn.png]]
 
 
+#+name: raices-ma2thnn
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ma_params)
+#+END_SRC
+
+#+RESULTS: raices-ma2thnn
+:RESULTS:
+|   | P. real |  P. imag. |   Módulo | Frecuencia |  Periodo | Multip. |
+|---+---------+-----------+----------+------------+----------+---------|
+| 0 |    -0.5 | -0.927961 | 1.054093 |   0.328657 | 3.042687 |       1 |
+| 1 |    -0.5 |  0.927961 | 1.054093 |   0.328657 | 3.042687 |       1 |
+:END:
+
+
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA2thnn.png :results none
-fig = plot_arma_analysis(ar_params, ma_params)
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA2thnn.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
@@ -1099,27 +853,13 @@ X_t=(1-1.1\mathsf{B}+0.9\mathsf{B}^2)U_t
 \;\; {\color{blue}{(\theta_1>0 \;\text{y}\; \theta_2<0)}}
 \]
 
-# +RESULTS: raices-ma2thpn
-# :results:
-# : 98e2a871-28cd-4145-b32e-1dc36d030621
-|  P. real |  P. imag. |   Módulo | Frecuencia |  Periodo | Multip. |
-|----------+-----------+----------+------------+----------+---------|
-| 0.611111 | -0.858868 | 1.054093 |   0.151575 | 6.597397 |     1.0 |
-| 0.611111 |  0.858868 | 1.054093 |   0.151575 | 6.597397 |     1.0 |
-# :end:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2thpn.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2thpn.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, -1.1, 0.9]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA2thpn.png', dpi=300, bbox_inches='tight')
-#+END_SRC
-
-#+name: raices-ma2thpn
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer :eval no
-polynomial_roots_table(ma_params)
 #+END_SRC
 
 
@@ -1128,13 +868,31 @@ polynomial_roots_table(ma_params)
 #+attr_latex: :width 425px
 [[./img/lecc04/ACF-MA2thpn.png]]
 
+
+#+name: raices-ma2thpn
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ma_params)
+#+END_SRC
+
+#+RESULTS: raices-ma2thpn
+:RESULTS:
+|   |  P. real |  P. imag. |   Módulo | Frecuencia |  Periodo | Multip. |
+|---+----------+-----------+----------+------------+----------+---------|
+| 0 | 0.611111 | -0.858868 | 1.054093 |   0.151575 | 6.597397 |       1 |
+| 1 | 0.611111 |  0.858868 | 1.054093 |   0.151575 | 6.597397 |       1 |
+:END:
+
+
+
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA2thpn.png :results none
-fig = plot_arma_analysis(ar_params, ma_params)
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA2thpn.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
 
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
 #+attr_org: :width 800
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
@@ -1155,27 +913,13 @@ X_t=(1-0.64\mathsf{B}^2)U_t
 \;\; {\color{blue}{(\text{raices reales: +, -})}}
 \]
 
-#+RESULTS: raices-ma2pn
-# :results:
-# : 595f4d34-cf70-441f-97ec-e003d38faae9
-| P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
-|---------+----------+--------+------------+---------+---------|
-|    1.25 |      0.0 |   1.25 |        0.0 |     Inf |       1 |
-|   -1.25 |      0.0 |   1.25 |        0.5 |     2.0 |       1 |
-# :end:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2pn.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2pn.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, 0, -0.64]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA2pn.png', dpi=300, bbox_inches='tight')
-#+END_SRC
-
-#+name: raices-ma2pn
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer :eval no
-polynomial_roots_table(ma_params)
 #+END_SRC
 
 
@@ -1184,9 +928,25 @@ polynomial_roots_table(ma_params)
 #+attr_latex: :width 425px
 [[./img/lecc04/ACF-MA2pn.png]]
 
+
+#+name: raices-ma2pn
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ma_params)
+#+END_SRC
+
+#+RESULTS: raices-ma2pn
+:RESULTS:
+|   | P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
+|---+---------+----------+--------+------------+---------+---------|
+| 1 |    1.25 |      0.0 |   1.25 |        0.0 |     Inf |       1 |
+| 0 |   -1.25 |      0.0 |   1.25 |        0.5 |     2.0 |       1 |
+:END:
+
+
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA2pn.png :results none
-fig = plot_arma_analysis(ar_params, ma_params)
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA2pn.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
@@ -1211,27 +971,13 @@ X_t=(1+0.64\mathsf{B}^2)U_t
 \;\; {\color{blue}{(\text{par de raices complejas})}}
 \]
 
-#+RESULTS: raices-ma2np
-# :results:
-# : 69f6a127-4a7b-447b-8bca-fbb351c148d5
-| P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
-|---------+----------+--------+------------+---------+---------|
-|     0.0 |    -1.25 |   1.25 |       0.25 |     4.0 |     1.0 |
-|     0.0 |     1.25 |   1.25 |       0.25 |     4.0 |     1.0 |
-# :end:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2np.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2np.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, 0, 0.64]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA2np.png', dpi=300, bbox_inches='tight')
-#+END_SRC
-
-#+name: raices-ma2np
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer :eval no
-polynomial_roots_table(ma_params)
 #+END_SRC
 
 
@@ -1240,9 +986,25 @@ polynomial_roots_table(ma_params)
 #+attr_latex: :width 425px
 [[./img/lecc04/ACF-MA2np.png]]
 
+#+name: raices-ma2np
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ma_params)
+#+END_SRC
+
+#+RESULTS: raices-ma2np
+:RESULTS:
+|   | P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
+|---+---------+----------+--------+------------+---------+---------|
+| 0 |     0.0 |    -1.25 |   1.25 |       0.25 |     4.0 |       1 |
+| 1 |     0.0 |     1.25 |   1.25 |       0.25 |     4.0 |       1 |
+:END:
+
+
+
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA2np.png :results none
-fig = plot_arma_analysis(ar_params, ma_params)
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA2np.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
@@ -1267,26 +1029,13 @@ X_t=(1+1.6\mathsf{B}+0.64\mathsf{B}^2)U_t
 \;\; {\color{blue}{(\text{r. reales: -, -})}}
 \]
 
-#+RESULTS: raices-ma2rojo
-# :results:
-# : b9102310-fbb4-4e1d-adb6-ed99ee5b0c8b
-| P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
-|---------+----------+--------+------------+---------+---------|
-|   -1.25 |      0.0 |   1.25 |        0.5 |     2.0 |     2.0 |
-# :end:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2rojo.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2rojo.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, 1.6, 0.64]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA2rojo.png', dpi=300, bbox_inches='tight')
-#+END_SRC
-
-#+name: raices-ma2rojo
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer :eval no
-polynomial_roots_table(ma_params)
 #+END_SRC
 
 
@@ -1295,9 +1044,24 @@ polynomial_roots_table(ma_params)
 #+attr_latex: :width 425px
 [[./img/lecc04/ACF-MA2rojo.png]]
 
+
+#+name: raices-ma2rojo
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ma_params)
+#+END_SRC
+
+#+RESULTS: raices-ma2rojo
+:RESULTS:
+|   | P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
+|---+---------+----------+--------+------------+---------+---------|
+| 0 |   -1.25 |      0.0 |   1.25 |        0.5 |     2.0 |       2 |
+:END:
+
+
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA2rojo.png :results none
-fig = plot_arma_analysis(ar_params, ma_params)
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA2rojo.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
@@ -1323,26 +1087,12 @@ X_t=(1-1.6\mathsf{B}+0.64\mathsf{B}^2)U_t
 \;\; {\color{blue}{(\text{r. reales: +, +})}}
 \]
 
-#+RESULTS: raices-ma2violeta
-# :results:
-# : cdb8932a-61c1-4deb-ac7e-109687ce7951
-| P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
-|---------+----------+--------+------------+---------+---------|
-|    1.25 |      0.0 |   1.25 |        0.0 |     Inf |       2 |
-# :end:
-
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2violeta.png :exports code :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-MA2violeta.png :exports code :results silent
 ar_params = [1,]
 ma_params = [1, -1.6, 0.64]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
 fig.savefig('./img/lecc04/ACF-MA2violeta.png', dpi=300, bbox_inches='tight')
-#+END_SRC
-
-#+name: raices-ma2violeta
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp :results value drawer
-polynomial_roots_table(ma_params)
 #+END_SRC
 
 
@@ -1351,9 +1101,22 @@ polynomial_roots_table(ma_params)
 #+attr_latex: :width 425px
 [[./img/lecc04/ACF-MA2violeta.png]]
 
+#+name: raices-ma2violeta
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp :results value drawer
+polynomial_roots_table(ma_params)
+#+END_SRC
+#+RESULTS: raices-ma2violeta
+:results:
+|   | P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
+|---+---------+----------+--------+------------+---------+---------|
+| 0 |    1.25 |      0.0 |   1.25 |        0.0 |     Inf |       2 |
+:end:
+
+
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-MA2violeta.png :results none
-fig = plot_arma_analysis(ar_params, ma_params)
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc04/Sim-MA2violeta.png', dpi=300, bbox_inches='tight')
 #+END_SRC
 
@@ -1405,90 +1168,6 @@ $(\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1)$
 #+latex: \noindent
 *Densidad espectral* Suma de dos cosenos más una constante.
 # proporcional al inverso de la densidad espectral de $\;\boldsymbol{\theta}*\boldsymbol{X}=\boldsymbol{U}$
-
-
-
-
-** Gráfico raíces MA(2)
-
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file MA2roots.png :exports code :results none
-def MA2_param_plot():
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.set_aspect('equal')
-
-    # Set axis
-    xmin, ymin = -3, -2
-    xmax, ymax = -xmin, -ymin
-    plt.axis([xmin, xmax, ymin, ymax])
-
-    # Set axis labels
-    ax.set(xticks=[], yticks=[])
-    ax.set_xlabel(r'$\theta_2$', fontsize=16)
-    ax.xaxis.set_label_position('top')
-    ax.set_ylabel(r'$\theta_1$', rotation=0, fontsize=16)
-    ax.yaxis.set_label_position('right')
-
-    # Draw (t1, t2) points
-    p1 = np.linspace(-2, 2, 100)
-    ax.plot(p1, -abs(p1) + 1, c='black')
-    ax.plot(p1, np.full_like(p1, -1), c='black')
-    ax.plot(p1, -(p1**2 / 4), c='black')
-
-    # Fill the region below the parabola and above the base of the triangle
-    ax.fill_between(p1, -(p1**2 / 4), -1, where=-(p1**2 / 4) >= -1, color='lightgray', alpha=0.5)
-
-    # Turn normal axes off
-    for spine in ['left', 'bottom', 'top', 'right']:
-        ax.spines[spine].set_visible(False)
-        
-    # Add arrows to represent axes
-    axes_arrows = {'arrowstyle': '<|-|>', 'lw': 0.5, 'color': 'gray'}  # Hacerlas grises y más finas
-    ax.annotate('', xy=(xmin, 0), xytext=(xmax, 0), arrowprops=axes_arrows)
-    ax.annotate('', xy=(0, ymin), xytext=(0, ymax), arrowprops=axes_arrows)
-
-    # Annotate the plot with equations
-    plot_arrowsl = {'arrowstyle': '-|>', 'connectionstyle': "arc3, rad=-0.2"}
-    plot_arrowsr = {'arrowstyle': '-|>', 'connectionstyle': "arc3, rad=0.2"}
-    ax.annotate(r'$\theta_1 + \theta_2 < 1$', xy=(0.4, 0.25), xytext=(1.1, 0.4),
-                arrowprops=plot_arrowsr, fontsize='12')
-    ax.annotate(r'$\theta_1 + \theta_2 = 1$', xy=(0.38, 0.6), xytext=(0.6, 0.8),
-                arrowprops=plot_arrowsr, fontsize='12')
-    ax.annotate(r'$\theta_2 < 1 + \theta_1$', xy=(-0.4, 0.25), xytext=(-1.7, 0.4),
-                arrowprops=plot_arrowsl, fontsize='12')
-    ax.annotate(r'$\theta_2 = 1 + \theta_1$', xy=(-0.38, 0.6), xytext=(-1.2, 0.8),
-                arrowprops=plot_arrowsl, fontsize='12')
-    ax.annotate(r'$\theta_2 = -1$', xy=(1.5, -1), xytext=(1.8, -1.3),
-                arrowprops=plot_arrowsl, fontsize='12')
-    ax.annotate(r'${\theta_1}^2 + 4\theta_2 = 0$', xy=(1.0, -0.28),
-                xytext=(1.8, -0.5), arrowprops=plot_arrowsr, fontsize='12')
-    ax.annotate(r'${\theta_1}^2 + 4\theta_2 < 0$', xy=(-.9, -0.6),
-                xytext=(-2.8, -0.5), arrowprops=plot_arrowsl, fontsize='12')
-
-    # Label complex region
-    ax.text(0.09, -0.8, 'Raíces complejas', ha='center', fontsize=14, color='gray')
-    
-    # Label cases
-    ax.text(.3, 0.25, '1', ha='center', fontsize=16, color='blue')
-    ax.text(-.3, 0.25, '2', ha='center', fontsize=16, color='blue')
-    ax.text(-.3, -0.35, '3', ha='center', fontsize=16, color='blue')
-    ax.text(.3, -0.35, '4', ha='center', fontsize=16, color='blue')
-
-    # Add small marker to y-axis
-    ax.axhline(y=1.005, xmin=0.495, xmax=0.505, c='black')
-    ax.text(-0.12, -1.12, '-1', fontsize=10)
-    ax.text(-0.12, 0.98, '1', fontsize=10)
-
-    # Add small markers to x-axis
-    ax.axvline(x=-2, ymin=0.495, ymax=0.505, c='black')
-    ax.axvline(x=2, ymin=0.495, ymax=0.505, c='black')
-    ax.text(-2.12, -0.12, '-2', fontsize=10)
-    ax.text(1.88, -0.12, '2', fontsize=10)
-    
-    return fig
-
-MA2_param_plot().savefig('./img/lecc04/MA2roots.png', dpi=300, bbox_inches='tight')
-#+END_SRC
 
 
 * COMMENT Por colocar                                              :noexport:
@@ -1620,6 +1299,9 @@ Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogr
 
 
 * COMMENT ipynb y slides                                           :noexport:
+:PROPERTIES:
+:ID:       a0af0049-d6c4-4572-bb3d-e2a35b541595
+:END:
 
 #+BEGIN_SRC emacs-lisp :results silent
 (require 'ox-ipynb)
@@ -1627,182 +1309,52 @@ Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogr
 #+END_SRC
 
 #+BEGIN_SRC sh :results silent
-#jupyter nbconvert --execute --inplace Lecc04.ipynb
+jupyter nbconvert --execute --inplace Lecc04.ipynb
 #+END_SRC
 
 #+BEGIN_SRC sh :results silent
-#jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc04.ipynb
+jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc04.ipynb
 #+END_SRC
 
-#+attr_ipynb: (slideshow . ((slide_type . subslide)))
 
-#+CAPTION: Región parámetros para MA(2) invertible
-#+attr_org: :width 800
-#+attr_html: :width 900px
-#+attr_latex: :width 225px
+#+BEGIN_SRC jupyter-python :exports none :results silent
+from PIL import Image, ImageDraw, ImageFont
 
+# Colores del arcoíris y sus nombres
+colores = [
+    ("#e81416", "Rojo"),
+    ("#ffa500", "Naranja"),
+    ("#faeb36", "Amarillo"),
+    ("#21FF67", "Verde"),
+    ("#21F8FF", "Azul"),
+    ("#2172FF", "Indigo"),
+    ("#7621FF", "Violeta"),
+]
 
+# Dimensiones de la imagen
+ancho = 700       # Ancho total de la imagen
+alto = 30        # Altura de la imagen
+franja_ancho = ancho // len(colores)  # Ancho de cada franja
 
-[[./img/lecc04/MA2roots.png]]
+# Crear una nueva imagen
+imagen = Image.new("RGB", (ancho, alto))
 
+# Crear un objeto de dibujo
+draw = ImageDraw.Draw(imagen)
 
+# Dibujar las franjas de colores
+for i, (color, nombre) in enumerate(colores):
+    draw.rectangle([i * franja_ancho, 0, (i + 1) * franja_ancho, alto], fill=color)
+    # Dibujar el nombre del color
+    font = ImageFont.load_default()
+    text_width, text_height = draw.textbbox((0, 0), nombre, font=font)[2:4]
+    text_x = i * franja_ancho + (franja_ancho - text_width) / 2
+    text_y = (alto - text_height) / 2
+    draw.text((text_x, text_y), nombre, fill="black", font=font)
 
-** Gráfico raíces AR(2)
-
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file AR2roots.png :exports code :results none
-def AR2_param_plot():
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.set_aspect('equal')
-
-    # Set axis
-    xmin, ymin = -3, -2
-    xmax, ymax = -xmin, -ymin
-    plt.axis([xmin, xmax, ymin, ymax])
-
-    # Set axis labels
-    ax.set(xticks=[], yticks=[])
-    ax.set_xlabel(r'$\phi_2$', fontsize=16)
-    ax.xaxis.set_label_position('top')
-    ax.set_ylabel(r'$\phi_1$', rotation=0, fontsize=16)
-    ax.yaxis.set_label_position('right')
-
-    # Draw (t1, t2) points
-    p1 = np.linspace(-2, 2, 100)
-    ax.plot(p1, -abs(p1) + 1, c='black')
-    ax.plot(p1, np.full_like(p1, -1), c='black')
-    ax.plot(p1, -(p1**2 / 4), c='black')
-
-    # Fill the region below the parabola and above the base of the triangle
-    ax.fill_between(p1, -(p1**2 / 4), -1, where=-(p1**2 / 4) >= -1, color='lightgray', alpha=0.5)
-
-    # Turn normal axes off
-    for spine in ['left', 'bottom', 'top', 'right']:
-        ax.spines[spine].set_visible(False)
-        
-    # Add arrows to represent axes
-    axes_arrows = {'arrowstyle': '<|-|>', 'lw': 0.5, 'color': 'gray'}  # Hacerlas grises y más finas
-    ax.annotate('', xy=(xmin, 0), xytext=(xmax, 0), arrowprops=axes_arrows)
-    ax.annotate('', xy=(0, ymin), xytext=(0, ymax), arrowprops=axes_arrows)
-
-    # Annotate the plot with equations
-    plot_arrowsl = {'arrowstyle': '-|>', 'connectionstyle': "arc3, rad=-0.2"}
-    plot_arrowsr = {'arrowstyle': '-|>', 'connectionstyle': "arc3, rad=0.2"}
-    ax.annotate(r'$\phi_1 + \phi_2 < 1$', xy=(0.4, 0.25), xytext=(1.1, 0.4),
-                arrowprops=plot_arrowsr, fontsize='12')
-    ax.annotate(r'$\phi_1 + \phi_2 = 1$', xy=(0.38, 0.6), xytext=(0.6, 0.8),
-                arrowprops=plot_arrowsr, fontsize='12')
-    ax.annotate(r'$\phi_2 < 1 + \phi_1$', xy=(-0.4, 0.25), xytext=(-1.7, 0.4),
-                arrowprops=plot_arrowsl, fontsize='12')
-    ax.annotate(r'$\phi_2 = 1 + \phi_1$', xy=(-0.38, 0.6), xytext=(-1.2, 0.8),
-                arrowprops=plot_arrowsl, fontsize='12')
-    ax.annotate(r'$\phi_2 = -1$', xy=(1.5, -1), xytext=(1.8, -1.3),
-                arrowprops=plot_arrowsl, fontsize='12')
-    ax.annotate(r'${\phi_1}^2 + 4\phi_2 = 0$', xy=(1.0, -0.28),
-                xytext=(1.8, -0.5), arrowprops=plot_arrowsr, fontsize='12')
-    ax.annotate(r'${\phi_1}^2 + 4\phi_2 < 0$', xy=(-.9, -0.6),
-                xytext=(-2.8, -0.5), arrowprops=plot_arrowsl, fontsize='12')
-
-    # Label complex region
-    ax.text(0.09, -0.8, 'Raíces complejas', ha='center', fontsize=14, color='gray')
-    
-    # Label cases
-    ax.text(.3, 0.25, '1', ha='center', fontsize=16, color='blue')
-    ax.text(-.3, 0.25, '2', ha='center', fontsize=16, color='blue')
-    ax.text(-.3, -0.35, '3', ha='center', fontsize=16, color='blue')
-    ax.text(.3, -0.35, '4', ha='center', fontsize=16, color='blue')
-
-    # Add small marker to y-axis
-    ax.axhline(y=1.005, xmin=0.495, xmax=0.505, c='black')
-    ax.text(-0.12, -1.12, '-1', fontsize=10)
-    ax.text(-0.12, 0.98, '1', fontsize=10)
-
-    # Add small markers to x-axis
-    ax.axvline(x=-2, ymin=0.495, ymax=0.505, c='black')
-    ax.axvline(x=2, ymin=0.495, ymax=0.505, c='black')
-    ax.text(-2.12, -0.12, '-2', fontsize=10)
-    ax.text(1.88, -0.12, '2', fontsize=10)
-    
-    return fig
-
-AR2_param_plot().savefig('./img/lecc04/AR2roots.png', dpi=300, bbox_inches='tight')
+# Guardar la imagen
+imagen.save("./img/lecc04/colores.png", dpi=(300, 300))
 #+END_SRC
 
-[[./img/lecc04/AR2roots.png]]
-
-** Gráfico caso raíces AR(2)
-
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file AR2roots.png :exports code :results none
-def Caso_parametros_plot(parametro1, parametro2, modelo='MA'):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.set_aspect('equal')
-
-    # Set axis
-    xmin, ymin = -2.2, -1.2
-    xmax, ymax = -xmin, -ymin
-    plt.axis([xmin, xmax, ymin, ymax])
-
-    # Define the Greek letter based on modelo with subscripts
-    letra_parametro_1 = r'$\phi_1$' if modelo == 'AR' else r'$\theta_1$'
-    letra_parametro_2 = r'$\phi_2$' if modelo == 'AR' else r'$\theta_2$'
-    
-    # Set axis labels
-    ax.set(xticks=[], yticks=[])
-    ax.set_xlabel(letra_parametro_2, fontsize=16)
-    ax.xaxis.set_label_position('top')
-    ax.set_ylabel(letra_parametro_1, rotation=0, fontsize=16)
-    ax.yaxis.set_label_position('right')
-
-    # Draw (t1, t2) points
-    p1 = np.linspace(-2, 2, 100)
-    ax.plot(p1, -abs(p1) + 1, c='black')
-    ax.plot(p1, np.full_like(p1, -1), c='black')
-    ax.plot(p1, -(p1**2 / 4), c='black')
-
-    # Fill the region below the parabola and above the base of the triangle
-    ax.fill_between(p1, -(p1**2 / 4), -1, where=-(p1**2 / 4) >= -1, color='lightgray', alpha=0.5)
-
-    # Turn normal axes off
-    for spine in ['left', 'bottom', 'top', 'right']:
-        ax.spines[spine].set_visible(False)
-        
-    # Add arrows to represent axes
-    axes_arrows = {'arrowstyle': '<|-|>', 'lw': 0.5, 'color': 'gray'}  # Hacerlas grises y más finas
-    ax.annotate('', xy=(xmin, 0), xytext=(xmax, 0), arrowprops=axes_arrows)
-    ax.annotate('', xy=(0, ymin), xytext=(0, ymax), arrowprops=axes_arrows)
-
-    # Label complex region
-    ax.text(0.09, -0.8, 'Raíces complejas', ha='center', fontsize=14, color='gray')
-    
-    # Add small marker to y-axis
-    ax.axhline(y=1.005, xmin=0.495, xmax=0.505, c='black')
-    ax.text(-0.12, -1.12, '-1', fontsize=10)
-    ax.text(-0.12, 0.98, '1', fontsize=10)
-
-    # Add small markers to x-axis
-    ax.axvline(x=-2, ymin=0.495, ymax=0.505, c='black')
-    ax.axvline(x=2, ymin=0.495, ymax=0.505, c='black')
-    ax.text(-2.12, -0.12, '-2', fontsize=10)
-    ax.text(1.88, -0.12, '2', fontsize=10)
-
-    marker = ax.scatter(parametro1, parametro2, s=100, color='blue', marker='X')
-    ax.legend([marker], [f'({letra_parametro_1}={parametro1}, {letra_parametro_2}={parametro2})'], loc='upper right', fontsize=12)
-    plt.close(fig)
-    
-    return fig
-#+END_SRC
-
-#+BEGIN_SRC jupyter-python
-Caso_parametros_plot(0.6,0.3,'MA') 
-#+END_SRC
-
-#+RESULTS:
-[[file:./.ob-jupyter/1e4e53972fc96dcd3e11c154a6bfcf1e9ddd8584.png]]
 
 
-#+BEGIN_SRC jupyter-python
-Caso_parametros_plot(0.3,0.5,'AR') 
-#+END_SRC
-
-#+RESULTS:
-[[file:./.ob-jupyter/ddafdb43a2b0e12a5a79317fce561428e06acf1b.png]]

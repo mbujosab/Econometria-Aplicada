@@ -37,7 +37,7 @@ TRANSPARENCIAS = $(DOCS)/Transparencias
 
 SRC_FILES = $(LECCIONES_SRC)/Lecc*.org
 
-.PHONY: all clean cleanAll directorios series_formales calendario notebooksYslides
+.PHONY: all clean cleanAll directorios programas_de_python calendario notebooksYslides
 
 all: calendario notebooksYslides practicas publicacion
 
@@ -66,7 +66,7 @@ notebooksYslides: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildc
 
 $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	make directorios
-	make series_formales
+	make programas_de_python
 	cp -a $(LECCIONES_SRC)/*.bib $(LECCIONES_tmp)
 	cp -a $< $(LECCIONES_tmp)
 	echo "EJECUCION DEL NOTEBOOK DE ORG: $(LECCIONES_tmp)/$(@F:.ipynb=.org)..."
@@ -124,26 +124,30 @@ $(LECCIONES_tmp)/Practicas/%.done: org-practicas/%.org
 	echo "➡️ listado de ficheros en el subdirectorio guiones"
 	ls -lR $(LECCIONES_tmp)/Practicas/guiones  # Debug para Actions
 
-series_formales: $(LECCIONES_tmp)/src/implementacion_series_formales.org
 
-$(LECCIONES_tmp)/src/implementacion_series_formales.org: $(LECCIONES_SRC)/src/implementacion_series_formales.org
-	echo "INICIO IMPLEMENTACION_SERIES_FORMALES.ipynb..."
+ORG_FILES := $(wildcard $(LECCIONES_SRC)/src/*.org)
+TMP_FILES := $(patsubst $(LECCIONES_SRC)/src/%.org, $(LECCIONES_tmp)/src/%.org, $(ORG_FILES))
+
+programas_de_python: $(TMP_FILES)
+
+$(LECCIONES_tmp)/src/%.org: $(LECCIONES_SRC)/src/%.org
+	echo "INICIO $*.ipynb..."
 	make directorios
 	cp $< $(LECCIONES_tmp)/src/
-	emacs -q --batch $(LECCIONES_tmp)/src/implementacion_series_formales.org -l org -f org-babel-tangle
-	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.py $(CUADERNOS)/src/
-	ln -sf -r $(CUADERNOS)/src/implementacion_series_formales.py $(CUADERNOS)/
+	emacs -q --batch $(LECCIONES_tmp)/src/$*.org -l org -f org-babel-tangle
+	cp -a $(LECCIONES_tmp)/src/$*.py $(CUADERNOS)/src/
+	ln -sf -r $(CUADERNOS)/src/$*.py $(CUADERNOS)/
 	emacs -q --batch \
 	  --load ~/Software/scimax/init.el \
 	  --eval "(require 'ox-ipynb)" \
---eval "(ox-ipynb-export-org-file-to-ipynb-file \"Lecciones-tmp/src/implementacion_series_formales.org\")"
-	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb
-	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb
-	jupyter nbconvert --execute --to html $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb
-	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.ipynb $(CUADERNOS)
-	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.slides.html $(TRANSPARENCIAS)
-	cp -a $(LECCIONES_tmp)/src/implementacion_series_formales.html $(DOCS)/Lecciones-html/src/
-	echo "TERMINADO IMPLEMENTACION_SERIES_FORMALES.ipynb..."
+	  --eval "(ox-ipynb-export-org-file-to-ipynb-file \"$(LECCIONES_tmp)/src/$*.org\")"
+	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/$*.ipynb
+	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/src/$*.ipynb
+	jupyter nbconvert --execute --to html $(LECCIONES_tmp)/src/$*.ipynb
+	cp -a $(LECCIONES_tmp)/src/$*.ipynb $(CUADERNOS)
+	cp -a $(LECCIONES_tmp)/src/$*.slides.html $(TRANSPARENCIAS)
+	cp -a $(LECCIONES_tmp)/src/$*.html $(DOCS)/Lecciones-html/src/
+	echo "TERMINADO $*.ipynb..."
 
 directorios:
 	mkdir -v -p .github/workflows
@@ -652,6 +656,7 @@ dependencies:
   - seaborn
   - sympy
   - statsmodels
+  - scipy
   - pip:
       - dataframe_image
 #+END_SRC
