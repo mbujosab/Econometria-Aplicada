@@ -326,7 +326,7 @@ modelos lineales concretos.
 Sea $\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U},\;$
 donde $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y
 $\;\boldsymbol{\psi}\in\ell^2\;$ es una serie formal:
-$$X_t=\sum_{j\geq0}\psi_j U_{t-j}.$$ Por la [[file:./Lecc03.html#org6668e5d][lección anterior]] sabemos
+$$X_t=\sum_{j\geq0}\psi_j U_{t-j}.$$ Por la [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf#subsection.4.2][lección anterior]] sabemos
 que $\;E(X_t)=0\;$ y que
 - $\boldsymbol{\gamma} \;=\; \sigma^2 \boldsymbol{\psi}(z)*\boldsymbol{\psi}(z^{-1})$
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
@@ -426,8 +426,55 @@ fig.savefig('./img/lecc04/SimulWhitenoise.png', dpi=300, bbox_inches='tight')
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
 En la luz blanca todos los colores (frecuencias) aparecen por igual (por eso se ve blanco).
 
+#+BEGIN_SRC jupyter-python :exports none :results silent
+from PIL import Image, ImageDraw
 
-** Proceso de media móvil MA($q$)
+# Colores del arcoíris (hexadecimales)
+colores = [
+    "#e81416",  # Rojo
+    "#ffa500",  # Naranja
+    "#faeb36",  # Amarillo
+    "#21FF67",  # Verde
+    "#21F8FF",  # Azul
+    "#2172FF",  # Índigo
+    "#7621FF",  # Violeta
+]
+
+# Función para interpolar entre dos colores
+def interpolar_color(color1, color2, t):
+    c1 = tuple(int(color1[i:i+2], 16) for i in (1, 3, 5))
+    c2 = tuple(int(color2[i:i+2], 16) for i in (1, 3, 5))
+    return "#{:02x}{:02x}{:02x}".format(
+        int(c1[0] + (c2[0] - c1[0]) * t),
+        int(c1[1] + (c2[1] - c1[1]) * t),
+        int(c1[2] + (c2[2] - c1[2]) * t),
+    )
+
+# Dimensiones de la imagen
+ancho = 700  # Ancho total de la imagen
+alto = 30    # Altura de la imagen
+
+# Crear una nueva imagen
+imagen = Image.new("RGB", (ancho, alto))
+
+# Crear un objeto de dibujo
+draw = ImageDraw.Draw(imagen)
+
+# Dibujar el degradado
+num_colores = len(colores) - 1
+for x in range(ancho):
+    # Determinar en qué segmento de colores estamos
+    segmento = x / (ancho / num_colores)
+    i = int(segmento)  # Índice del color inicial
+    t = segmento - i   # Proporción entre el color inicial y el siguiente
+    color = interpolar_color(colores[i], colores[i + 1], t)
+    draw.line([(x, 0), (x, alto)], fill=color)
+
+# Guardar la imagen
+imagen.save("./img/lecc04/colores.png", dpi=(300, 300))
+#+END_SRC
+
+** COMMENT Proceso de media móvil MA($q$)                          :noexport:
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
@@ -1315,46 +1362,4 @@ jupyter nbconvert --execute --inplace Lecc04.ipynb
 #+BEGIN_SRC sh :results silent
 jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc04.ipynb
 #+END_SRC
-
-
-#+BEGIN_SRC jupyter-python :exports none :results silent
-from PIL import Image, ImageDraw, ImageFont
-
-# Colores del arcoíris y sus nombres
-colores = [
-    ("#e81416", "Rojo"),
-    ("#ffa500", "Naranja"),
-    ("#faeb36", "Amarillo"),
-    ("#21FF67", "Verde"),
-    ("#21F8FF", "Azul"),
-    ("#2172FF", "Indigo"),
-    ("#7621FF", "Violeta"),
-]
-
-# Dimensiones de la imagen
-ancho = 700       # Ancho total de la imagen
-alto = 30        # Altura de la imagen
-franja_ancho = ancho // len(colores)  # Ancho de cada franja
-
-# Crear una nueva imagen
-imagen = Image.new("RGB", (ancho, alto))
-
-# Crear un objeto de dibujo
-draw = ImageDraw.Draw(imagen)
-
-# Dibujar las franjas de colores
-for i, (color, nombre) in enumerate(colores):
-    draw.rectangle([i * franja_ancho, 0, (i + 1) * franja_ancho, alto], fill=color)
-    # Dibujar el nombre del color
-    font = ImageFont.load_default()
-    text_width, text_height = draw.textbbox((0, 0), nombre, font=font)[2:4]
-    text_x = i * franja_ancho + (franja_ancho - text_width) / 2
-    text_y = (alto - text_height) / 2
-    draw.text((text_x, text_y), nombre, fill="black", font=font)
-
-# Guardar la imagen
-imagen.save("./img/lecc04/colores.png", dpi=(300, 300))
-#+END_SRC
-
-
 

@@ -1,0 +1,1223 @@
+#    -*- mode: org -*-
+
+#+TITLE: Lección 5. ACF, PACF y densidad espectral de modelos AR
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+
+# +OPTIONS: toc:nil
+
+# +EXCLUDE_TAGS: pngoutput noexport
+
+# https://www.tigerdata.com/blog/how-to-work-with-time-series-in-python
+# https://pyspectrum.readthedocs.io/en/latest/ref_param.html
+
+# https://github.com/QuantEcon/quantecon-notebooks-python/blob/master/arma.ipynb
+# https://github.com/QuantEcon/lecture-python-intro
+# https://quantecon.org/quantecon-py/
+# https://quantecon.org/
+
+
+#+startup: shrink
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/readtheorg_inline.theme
+# ###########
+
+#+LATEX_HEADER_EXTRA: \usepackage{fullpage}
+
+#+LATEX_HEADER_EXTRA: \usepackage[spanish]{babel}
+#+LATEX_HEADER_EXTRA: \usepackage{lmodern}
+#+LATEX_HEADER_EXTRA: \usepackage{tabularx}
+#+LATEX_HEADER_EXTRA: \usepackage{booktabs}
+#+LATEX_HEADER_EXTRA: \usepackage[dvipsnames]{xcolor}
+
+#+LaTeX_HEADER: \newcommand{\lag}{\mathsf{B}}
+#+LaTeX_HEADER: \newcommand{\Sec}[1]{\boldsymbol{#1}}
+#+LaTeX_HEADER: \newcommand{\Pol}[1]{\boldsymbol{#1}}
+
+
+#+latex_header: \usepackage{natbib}
+
+#+LATEX_HEADER: \usepackage{amsthm,amsmath}
+#+LATEX_HEADER: \usepackage[appendix=append]{apxproof}
+# +LATEX_HEADER: \usepackage[appendix=inline]{apxproof}
+# +LATEX_HEADER: \usepackage[appendix=strip]{apxproof}
+#+LATEX_HEADER: \renewcommand{\appendixsectionformat}[2]{Demos de la Sección {#1} (#2)}
+#+LATEX_HEADER: \newtheoremrep{theorem}{Teorema} % [section]
+#+LATEX_HEADER: \newtheoremrep{lemma}[theorem]{Lema}
+#+LATEX_HEADER: \newtheoremrep{prop}[theorem]{Proposición}
+#+LATEX_HEADER: \usepackage{marginnote}
+# +LATEX_HEADER: \renewcommand{\mainbodyrepeatedtheorem}{\textup{($\star$) \marginnote{($\star$): Demo en el apéndice}}}
+#+LATEX_HEADER: \renewcommand{\mainbodyrepeatedtheorem}{\textup{\marginnote{\tiny Demo en apéndice}}}
+#+latex_header: \newtheorem{definition}[theorem]{Definición}
+#+latex_header: \newtheorem*{definition*}{Definición}
+# +LATEX_HEADER: \newtheorem{prop}[theorem]{Proposición}
+#+latex_header: \newtheorem{corollary}[theorem]{Corolario}
+#+latex_header: \newtheorem*{corollary*}{Corolario}
+
+#+LATEX_HEADER: \usepackage[indent]{parskip}
+
+
+#+LATEX: \maketitle
+
+#+PROPERTY: header-args:emacs-lisp :eval export
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+BEGIN_SRC emacs-lisp :exports none :results silent
+(use-package ox-ipynb
+  :load-path (lambda () (expand-file-name "ox-ipynb" scimax-dir)))
+(use-package htmlize)
+#+END_SRC
+
+
+#+begin_abstract
+Veremos tres funciones que describen las características correspondientes a los momentos de segundo Veremos la estructura de la función de autocorrelación (ACF), la función de autocorrelación parcial (PACF) y la densidad espectral en procesos lineales genéricos y hoy lo particularizaremos a procesos de ruido blanco y procesos AR($p$). También las Ecuaciones de Yule-Walker para un AR($p$) estacionario.
+#+end_abstract
+
+- ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc05.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc05.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc05.ipynb][mybinder]])
+
+
+# #+begin_export html
+# <style>
+# .reveal  td {font-size: 60%;}
+# </style>
+# #+end_export
+
+***** COMMENT para Jupyter-Notebook                               :noexport:
+\(
+\newcommand{\lag}{\mathsf{B}}
+\newcommand{\Sec}[1]{\boldsymbol{#1}}
+\newcommand{\Pol}[1]{\boldsymbol{#1}}
+\)
+
+
+***  Carga de algunos módulos de python y creación de directorios auxiliares
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: notoc
+   :END:
+
+   
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results none
+# Para trabajar con los datos y dibujarlos necesitamos cargar algunos módulos de python
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib as mpl
+# definimos parámetros para mejorar los gráficos
+mpl.rc('text', usetex=False)
+import matplotlib.pyplot as plt   # data visualization
+#+END_SRC
+
+**** Directorio auxiliar para albergar las figuras de la lección:
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: t 
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+para publicar la lección como pdf o página web, necesito los gráficos como ficheros ~.png~ alojados algún directorio específico:
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+imagenes_leccion = "./img/lecc05" # directorio para las imágenes de la lección
+import os
+os.makedirs(imagenes_leccion, exist_ok=True) # crea el directorio si no existe
+#+END_SRC
+
+
+*** Gráficos para las ACF, PACF y densidades espectrales teóricas
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: notoc
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Cargamos las funciones auxiliares (véase la carpeta =src/=)
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+%run -i ./src/analisis_armas.py
+#+END_SRC
+
+#+latex: \newpage
+
+
+
+* ACF, PACF y densidad espectral de más modelos lineales (AR)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+** Procesos lineales causales
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+
+Sea $\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U},\;$ donde $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y $\;\boldsymbol{\psi}\in\ell^2\;$ es una serie formal:
+\[
+ X_t=\sum_{j\geq0}\psi_j U_{t-j}.
+\]
+Sabemos que $\;E(X_t)=0;\;$ y por la [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf#subsection.4.2][lección 3]] también sabemos que
+- $\boldsymbol{\gamma} \;=\; \sigma^2 \boldsymbol{\psi}(z)*\boldsymbol{\psi}(z^{-1})$
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+  Es decir, 
+  \[
+   \gamma_k = \sigma^2\sum_{j=0}^\infty \psi_{j+|k|}\cdot\psi_j.
+  \]
+  Además, $\;\gamma_k\to0\;$ cuando $\;k\to\infty$
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+A partir de $\boldsymbol{\gamma}$ obtenemos las otras tres funciones:
+
+*ACF*: $\;\boldsymbol{\rho} \;=\; \frac{1}{\gamma_0}\boldsymbol{\gamma}$
+
+*Dens. espectral*:  \(\;f(\omega)=\frac{1}{2\pi}\sum_{k\geq0}\gamma_k\cos(k\omega)\)@@latex:;\quad\omega\in[-\pi,\pi]@@
+
+*PACF*: $\;\boldsymbol{\pi}\in\ell^2,\quad$ i.e., $\;\pi_k\to0\;$ cuando $\;k\to\infty$ 
+
+#+BEGIN_EXPORT latex
+\noindent
+(Cuando $\boldsymbol{\pi}\in\ell^2$ se dice que el proceso es \emph{no-determinista}.)
+#+END_EXPORT
+
+
+** Proceso autorregresivo AR($p$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Sea 
+\[
+ \boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U},
+\]
+con 
+$\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y donde $\boldsymbol{\phi}$ es un polinomio de grado $p>0$ con $\phi_0=1$. 
+Entonces
+\[
+ (\boldsymbol{\phi}*\boldsymbol{X})_t
+ \;=\;
+ \boldsymbol{\phi}(\mathsf{B})X_t
+ \;=\;
+ (1+\phi_1\mathsf{B}+\phi_2\mathsf{B}^2+\cdots+\phi_p\mathsf{B}^p)X_t
+ \;=\;
+ U_t
+\]
+Y por tanto
+\[X_t= U_t-\sum_{j=1}^p\phi_j X_{t-j}.\]
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Si todas las raíces del polinomio $\boldsymbol{\phi}$ (de grado $p$) están fuera del círculo unidad, es decir, si /el polinomio AR es ``invertible''/ $\;(\boldsymbol{\phi}^{-\triangleright}=\boldsymbol{\phi}^{-1}\in\ell^1)\;$ entonces $\boldsymbol{X}$ tiene una representación como *proceso lineal causal MA($\infty$)*: 
+\[
+ \boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U}
+ \quad\Rightarrow\quad
+ \boldsymbol{X}=\frac{1}{\boldsymbol{\phi}}*\boldsymbol{U}
+ \quad\Rightarrow\quad X_t = U_t + \sum_{j=1}^\infty\psi_j U_{t-j};
+\]
+donde $\;\boldsymbol{\phi}^{-1}=\boldsymbol{\psi}=({\color{blue}1},\ \psi_1,\ \psi_2,\ \psi_3,\ldots)\;$ tiene grado $\infty$.
+#+latex: \bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+latex: \noindent
+Por tanto $E(X_t)=0$ para todo $t\in\mathbb{Z}$ y
+
+$\boldsymbol{\gamma} \;=\; \sigma^2 \frac{1}{\boldsymbol{\phi}(z)}*\frac{1}{\boldsymbol{\phi}(z^{-1})} \;=\; \sigma^2 \sum\limits_{j,k=0}^\infty \psi_{j+k}\psi_j z^{j}\quad$ (grado $\infty$)$\quad$ ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#section.5][Ec. de Yule-Walker]])
+
+$\boldsymbol{\rho} \;=\; \frac{1}{\gamma_0}\boldsymbol{\gamma}$
+
+$f(\omega) =
+  \frac{\sigma^2}{2\pi}\frac{1}{\boldsymbol{\phi}(e^{-i\omega})\cdot\boldsymbol{\phi}(e^{i\omega})}
+  \;=\; \frac{1}{2\pi}\sum\limits_{h=0}^\infty \gamma_h
+  \cos(h\omega);\quad$ donde $\omega\in[-\pi,\pi]$.
+
+(suma infinita de cosenos)
+#+latex: \medskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Pero la PACF, $\;\boldsymbol{\pi},\;$ es una secuencia con grado $p$ y cogrado $-p$ ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#subsubsection.1.2.1][demo en los apuntes]]).
+#+latex: \medskip
+
+
+*** Demostración de que la PACF tiene cogrado $-p$ y grado $p$
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+- Sea $\boldsymbol{X}$ un proceso causal AR($p$): $\quad X_t\;=\;\sum\limits_{j=1}^p\phi_j X_{t-j}+U_t$ @@latex:donde $\boldsymbol{U}\sim WN(0,\sigma^2)$.@@
+- La proyección de $X_{k+1}$ sobre el espacio $\bar{sp}(X_{2}:X_k)$ generado por $X_2,\ldots X_k$ (con $k>p$) es:
+  \[
+    \widehat{X_{k+1}}=P_{\bar{sp}(X_{2}:X_k)}(X_{k+1})=\sum_{j=1}^p\phi_j X_{k+1-j}
+  \]
+- De su representación MA($\infty$): $\;Y\in\bar{sp}(X_{2}:X_k)
+  \;\Rightarrow\; Y\in\bar{sp}(U_j\mid{j\leq k})$, pues
+  $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
+  \quad\Rightarrow\quad
+  \bar{sp}(X_{2}:X_k)\subset\bar{sp}(U_j\mid{j\leq k}) \; \perp \; U_{k+1}$$
+- Si $Y\in\bar{sp}(X_{2}:X_k)$ entonces $Cov\Big((X_{k+1}-\widehat{X_{k+1}}), Y\Big)=Cov(U_{k+1}, Y)=0$
+- Denotemos con $\widetilde{X_{1}}$ a la proyección $P_{\bar{sp}(X_{2}:X_k)}(X_{1})$ de $X_1$ sobre   $\bar{sp}(X_{2}:X_k)$
+- Ahora es fácil ver que $\pi_k=0$ para $k>p$, pues
+  \begin{eqnarray*}
+   \pi_k 
+   = & Corr\Big((X_{k+1}-\widehat{X_{k+1}}),(X_{1}-\widetilde{X_{1}})\Big)\\
+   = & Corr\Big(U_{k+1},(X_{1}-\widetilde{X_{1}})\Big) \; = \; 0
+  \end{eqnarray*}
+  ya que $U_{k+1}\perp(X_{1}-\widetilde{X_{1}}) \in \bar{sp}(U_j\mid{j\leq k})$.
+
+
+** Proceso autorregresivo AR($1$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Sea $\;(1-\phi z)*\boldsymbol{X}=\boldsymbol{U},\quad$ con $\;|\phi|<1\;$ y con $\;\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$, es decir $$X_t=\phi X_{t-1} + U_t.$$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_EXPORT latex
+\noindent
+Como $$\;(1-a z)*(1+a z+a^2 z^2+a^3 z^3+\cdots)=1,\;$$ 
+ahora hay que calcular infinitos términos en 
+$$\boldsymbol{\gamma} \;=\; \sigma^2 (1-\phi z)^{-1}*(1-\phi z^{-1})^{-1}.$$
+% #+latex:\medskip
+
+% # +attr_ipynb: (slideshow . ((slide_type . subslide)))
+Hay varias formas de hacer los cálculos. Una es vía los productos convolución;
+puesto que 
+$$(1-a^2 z)^{-1}=(1+a^2 z+a^4 z^2+a^6 z^3+\cdots)=\sum_{h\in\mathbb{Z}} a^{2|h|} z^h$$ 
+(para verlo basta sustituir $a^2$ por $b$), tenemos que $(1-a z)^{-1}*(1-a z^{-1})^{-1}$ es:
+$$
+\begin{array}{rcccccccl}
+(\ldots,& 0,& 0,& 0,& {\color{blue}{1}},& a,& a^2,& a^3,& \ldots)\\
+*(\ldots,& a^3,& a^2,& a,& {\color{blue}{1}},& 0,& 0,& 0,& \ldots)\\\hline
+=(\ldots,& \frac{a^3}{1+a^2},& \frac{a^2}{1+a^2},& \frac{a}{1+a^2},&{\color{blue}{\frac{1}{1+a^2}}},& \frac{a}{1+a^2},& \frac{a^2}{1+a^2},& \frac{a^3}{1+a^2},& \ldots)
+\end{array}$$
+(donde además hemos sustituido $z$ por $1$, pues cada término es una suma).
+% #+latex: \smallskip
+\smallskip
+
+Es decir $(1-a z)^{-1}*(1-a z^{-1})^{-1}=\sum\limits_{k\in\mathbb{Z}}\frac{a^{|k|}}{1-a^2}z^k$; y por tanto
+$$\boldsymbol{\gamma} \;=\; \sigma^2 (1-\phi z)^{-1}*(1-\phi
+  z^{-1})^{-1} \;=\; \frac{\sigma^2}{1-\phi^2} \sum_{k=-\infty}^\infty
+  \phi^{|k|} z^k$$
+% #+latex: \bigskip
+
+% # +attr_ipynb: (slideshow . ((slide_type . subslide)))
+Pero también podemos usar las Ecuaciones de Yule-Walker. En
+este caso (donde el único parámetro es $\phi_1=\phi$), en cuanto a la
+ACF tenemos que: $$\rho_k=\phi\rho_{k-1}\qquad k>0$$ y como $\rho_0=1$
+$$\rho_k=\phi^k\qquad k\geq0$$ Y en cuanto a la varianza, dado que
+$\rho_1=\phi$
+$$\gamma_0=\frac{\sigma^2}{1-\rho_1\phi}=\frac{\sigma^2}{1-\phi^2}.$$
+Por tanto, la función de autocovarianzas es $$\boldsymbol{\gamma}
+\;=\; \gamma_0\cdot\boldsymbol{\rho} \;=\; \frac{\sigma^2}{1-\phi^2}
+\sum_{k=-\infty}^\infty \phi^{|k|} z^k$$
+% #+latex: \bigskip
+\bigskip
+
+% ** Proceso autorregresivo AR($1$)
+%    :PROPERTIES:
+%    :metadata: (slideshow . ((slide_type . subslide)))
+%    :UNNUMBERED: t 
+%    :END:
+Así pues,
+si $\;(1-\phi z)*\boldsymbol{X}=\boldsymbol{U},\quad$ con
+$\;|\phi|<1\;$ y con $\;\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$, es
+decir, si $$X_t=\phi X_{t-1} + U_t$$
+#+END_EXPORT
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+como $\;\boldsymbol{X}=(1-\phi z)^{-1}*\boldsymbol{U},\quad$ tenemos que
+
+$\boldsymbol{\gamma} \;=\; \sigma^2 (1-\phi z)^{-1}*(1-\phi
+  z^{-1})^{-1} \;=\; \frac{\sigma^2}{1-\phi^2}
+  \sum\limits_{k=-\infty}^\infty \phi^{|k|} z^k\quad$ (grado $\infty$).
+
+$\boldsymbol{\rho} \;=\; \frac{1}{\gamma_0}\boldsymbol{\gamma} \;=\;
+  \frac{1+\phi^2}{\sigma^2}\boldsymbol{\gamma} \;=\;
+  \sum\limits_{j=-\infty}^\infty \phi^{|j|} z^j \quad\Rightarrow\quad
+  \rho_k=\phi^k$ para $k\geq0$.
+
+$f(\omega) \;=\; \frac{1}{2\pi}\sum\limits_{h=0}^\infty \gamma_h
+  \cos(h\omega)=\frac{\sigma^2}{2\pi}\frac{1}{1+\phi^2-2\phi\cos(\omega)}\;$ (compárese con MA($1$)).
+#  = \frac{\sigma^2}{2\pi}\frac{1}{\boldsymbol{\phi}(e^{-i\omega})\cdot\boldsymbol{\phi}(e^{i\omega})}
+
+
+$\boldsymbol{\pi} \;=\; (\ldots,\; 0,\; 0,\; \phi,\; {\color{blue}1},\; \phi,\; 0,\; 0,\;\ldots)\qquad$ (grado $1$).
+# :\quad$ $\pi_0=1,\quad$ $\pi_1=\rho_1=\phi,\quad$ $0=\pi_2=\pi_3=\cdots$
+
+*** AR(1) con raíz positiva
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+# PARÁMETRO NEGATIVO (rojo)
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1-0.9z\quad\Rightarrow\quad X_t=0.9X_{t-1}+U_t\qquad {\color{blue}{(\phi>0)}}$$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-AR1p.png :exports code :results silent
+ar_params = [1, -0.9]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-AR1p.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-AR1p.png]]
+
+
+#+name: raices-ar1p
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports none :results value table pp 
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+ATTR_REVEAL: :frag t :frag_idx 1
+#+RESULTS: raices-ar1p
+:RESULTS:
+|   | P. real  | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
+|---+----------+----------+----------+------------+---------+---------|
+| 0 | 1.111111 | 0.0      | 1.111111 | 0.0        | Inf     | 1       |
+:END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-AR1p.png :exports code :results silent
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
+fig.savefig('./img/lecc05/Sim-AR1p.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-AR1p.png]]
+
+*** AR(1) con raíz negativa
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+# PARÁMETRO POSITIVO (violeta)
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1+0.9z\quad\Rightarrow\quad X_t=-0.9X_{t-1}+U_t\qquad {\color{blue}{(\phi<0)}}$$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-AR1n.png :exports code :results silent
+ar_params = [1, 0.9]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-AR1n.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-AR1n.png]]
+
+
+#+name: raices-ar1n
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports none :results value table pp 
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+ATTR_REVEAL: :frag t :frag_idx 1
+#+RESULTS: raices-ar1n
+:RESULTS:
+|   | P. real   | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
+|---+-----------+----------+----------+------------+---------+---------|
+| 0 | -1.111111 | 0.0      | 1.111111 | 0.5        | 2.0     | 1       |
+:END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-AR1n.png :exports code :results silent
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
+fig.savefig('./img/lecc05/Sim-AR1n.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-AR1n.png]]
+
+
+** Proceso autorregresivo AR($2$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Sea $\quad(1-\phi_1 z-\phi_2 z^2)*\boldsymbol{X}=\boldsymbol{U},\quad$
+con $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y con
+$$\phi_1+\phi_2<1;\qquad \phi_2-\phi_1<1;\qquad |\phi_2|<1;\quad
+\text{(i.e., estacionario)}$$ es decir $$X_t=\phi_1 X_{t-1} + \phi_2
+X_{t-2} + U_t.$$ Entonces
+#+latex: \medskip
+
+$\boldsymbol{\gamma}=\sigma^2\left(
+  \frac{1}{\boldsymbol{\phi}(z)}*\frac{1}{\boldsymbol{\phi}(z^-1)}\right)\qquad$
+  # (Verifica Ec. Yule-Walker:  $\;\gamma_k=\phi_1\gamma_{k-1}+\phi_2\gamma_{k-2};\;$ decae paulatinamente)
+#  [[eqref:eqYuleW3][(3)]
+#+BEGIN_EXPORT latex
+\smallskip
+
+$\quad$ (\emph{de Ec. Yule-Walker: $\gamma_0 =
+   \frac{\sigma^2}{1-\phi_1\rho_1-\phi_2\rho_2}$ y resolvemos
+   $\gamma_k=\phi_1\gamma_{k-1}+\phi_2\gamma_{k-2}$ recursivamente})
+%   $\boldsymbol{\phi}(\mathsf{B})\gamma_k=0$ recursivamente})
+%   #  = \frac{1-\phi_2}{1+\phi_2}\frac{\sigma^2}{(1-\phi_2)^2-\phi_1^2}
+% #+latex: \medskip
+#+END_EXPORT
+
+$\boldsymbol{\rho} \;=\;
+\frac{1}{\gamma_0}\boldsymbol{\gamma}\qquad$
+(Verifica Ec. Yule-Walker:
+$\;\rho_k=\phi_1\rho_{k-1}+\phi_2\rho_{k-2};\;\qquad$ decae@@latex: paulatinamente@@)
+#+latex: \smallskip
+
+#+latex:  $\quad$ \emph{(con $\rho_0=1$ iniciamos el cálculo de $\boldsymbol{\phi}(\mathsf{B})\rho_k=0$ recursivamente)} \medskip
+
+$f(\omega) \;=\;  \frac{\sigma^2}{2\pi}\frac{1}{1+\phi_1^2+\phi_2^2-2\phi_1(1+\phi_2)\cos(\omega)-2\phi_2\cos(2\omega)}$
+# \frac{\sigma^2}{2\pi}\boldsymbol{\phi}(e^{-i\omega})*\boldsymbol{\phi}(e^{i\omega}) \;=\;
+# ;\quad -\pi\leq\omega\leq\pi
+#+latex: \medskip
+
+$\boldsymbol{\pi} \;=\; (\ldots,\; 0,\; \phi_2,\; \frac{\phi_1}{1-\phi_2},\; {\color{blue}1},\; \frac{\phi_1}{1-\phi_2},\; \phi_2,\; 0,\;\ldots)$ 
+# :\quad$ $\pi_0=1,\quad$ $\pi_1=\rho_1=\phi,\quad$ $0=\pi_2=\pi_3=\cdots$
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+CAPTION: El interior del triángulo es la región paramétrica donde un AR(2) es estacionario. Por debajo de la parábola las raíces son complejas. El signo del parámetro $\phi_1$ determina el signo del primer retardo de la PACF y $\phi_2$ el signo del segundo. Las regiones 1, 2, 3, y 4 determinan cómo decae la ACF.
+#+attr_org: :width 400
+#+attr_html: :width 600px
+#+attr_latex: :width 300px
+[[file:img/lecc05/AR2roots.png]]
+
+# #+BEGIN_SRC python :exports results
+# exec(open('./src/analisis_armas.py').read())
+# RegionParametrica('MA').savefig('./img/lecc04/MA2roots.png', dpi=300, bbox_inches='tight')
+# #+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file MA2roots.png :exports code :results silent
+RegionParametrica('AR').savefig('./img/lecc05/AR2roots.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+*** AR(2) con dos parámetros positivos ($+$, $+$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1-0.6z -0.3z^2\quad\Rightarrow\quad
+(1-0.6\mathsf{B}-0.3\mathsf{B}^2)X_t= U_t \;\;
+{\color{blue}{(\phi_1>0 \;\text{y}\; \phi_2>0)}}$$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-AR2pp.png :exports code :results silent
+ar_params = [1, -0.6, -0.3]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-AR2pp.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-AR2pp.png]]
+
+
+#+name: raices-ar2thpp
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+RESULTS: raices-ar2thpp
+:RESULTS:
+|   | P. real   | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
+|---+-----------+----------+----------+------------+---------+---------|
+| 1 | 1.081666  | 0.0      | 1.081666 | 0.0        | Inf     | 1       |
+| 0 | -3.081666 | 0.0      | 3.081666 | 0.5        | 2.0     | 1       |
+:END:
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-AR2pp.png :results none
+fig = plot_arma_analysis(ar_params, ma_params, seed=2025)
+fig.savefig('./img/lecc05/Sim-AR2pp.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-AR2pp.png]]
+
+*** AR(2) con parámetros de distinto signo ($-$, $+$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1+0.6z-0.3z^2\quad\Rightarrow\quad
+(1+0.6\mathsf{B}-0.3\mathsf{B}^2)X_t= U_t \;\;
+{\color{blue}{(\phi_1<0 \;\text{y}\; \phi_2>0)}}$$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-AR2np.png :exports code :results silent
+ar_params = [1, +0.6, -0.3]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-AR2np.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-AR2np.png]]
+
+
+#+name: raices-ar2np
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+RESULTS: raices-ar2np
+:RESULTS:
+|   | P. real   | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
+|---+-----------+----------+----------+------------+---------+---------|
+| 1 | 3.081666  | 0.0      | 3.081666 | 0.0        | Inf     | 1       |
+| 0 | -1.081666 | 0.0      | 1.081666 | 0.5        | 2.0     | 1       |
+:END:
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-AR2np.png :results none
+fig = plot_arma_analysis(ar_params, ma_params, seed=2025)
+fig.savefig('./img/lecc05/Sim-AR2np.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-AR2np.png]]
+
+*** AR(2) con dos parámetros negativos ($-$, $-$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1+0.9z+0.9z^2\quad\Rightarrow\quad
+(1+0.9\mathsf{B}+0.9\mathsf{B}^2)X_t= U_t \;\;
+{\color{blue}{(\phi_1<0 \;\text{y}\; \phi_2<0)}}$$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-AR2nn.png :exports code :results silent
+ar_params = [1, +0.9, +0.9]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-AR2nn.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-AR2nn.png]]
+
+
+#+name: raices-ar2nn
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+RESULTS: raices-ar2nn
+:RESULTS:
+|   | P. real | P. imag.  | Módulo   | Frecuencia | Periodo  | Multip. |
+|---+---------+-----------+----------+------------+----------+---------|
+| 0 | -0.5    | -0.927961 | 1.054093 | 0.328657   | 3.042687 | 1       |
+| 1 | -0.5    | 0.927961  | 1.054093 | 0.328657   | 3.042687 | 1       |
+:END:
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-AR2nn.png :results none
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
+fig.savefig('./img/lecc05/Sim-AR2nn.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-AR2nn.png]]
+
+*** AR(2) con parámetros de distinto signo ($+$, $-$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1-1.1z +0.9z^2\quad\Rightarrow\quad
+(1-1.1\mathsf{B}+0.9\mathsf{B}^2)X_t= U_t \;\;
+{\color{blue}{(\phi_1>0 \;\text{y}\; \phi_2<0)}}$$
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-AR2pn.png :exports code :results silent
+ar_params = [1, -1.1, +0.9]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-AR2pn.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-AR2pn.png]]
+
+
+#+name: raices-ar2pn
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+RESULTS: raices-ar2pn
+:RESULTS:
+|   | P. real  | P. imag.  | Módulo   | Frecuencia | Periodo  | Multip. |
+|---+----------+-----------+----------+------------+----------+---------|
+| 0 | 0.611111 | -0.858868 | 1.054093 | 0.151575   | 6.597397 | 1       |
+| 1 | 0.611111 | 0.858868  | 1.054093 | 0.151575   | 6.597397 | 1       |
+:END:
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-AR2pn.png :results none
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
+fig.savefig('./img/lecc05/Sim-AR2pn.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-AR2pn.png]]
+
+*** AR(2) con dos raíces reales, una positiva y la otra negativa
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+# AR2 rojo y violeta
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1+0.1z-0.8z^2\quad\Rightarrow\quad
+(1+.1\mathsf{B}-.8\mathsf{B}^2)X_t = U_t \;\;
+{\color{blue}{(\text{raices reales: +, -})}}$$
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-AR2RojoVioleta.png :exports code :results silent
+ar_params = [1, 0.1, -0.8]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-AR2RojoVioleta.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-AR2RojoVioleta.png]]
+
+
+#+name: raices-ar2RojoVioleta
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+RESULTS: raices-ar2RojoVioleta
+:RESULTS:
+|   | P. real  | P. imag. | Módulo  | Frecuencia | Periodo | Multip. |
+|---+----------+----------+---------+------------+---------+---------|
+| 1 | 1.18228  | 0.0      | 1.18228 | 0.0        | Inf     | 1       |
+| 0 | -1.05728 | 0.0      | 1.05728 | 0.5        | 2.0     | 1       |
+:END:
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-AR2RojoVioleta.png :results none
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
+fig.savefig('./img/lecc05/Sim-AR2RojoVioleta.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-AR2RojoVioleta.png]]
+
+*** AR(2) con un par de raíces complejas
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+# AR2 verde
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1-0.1z+0.8z^2\quad\Rightarrow\quad
+ (1-.1\mathsf{B}+.8\mathsf{B}^2)X_t = U_t \;
+ {\color{blue}{(\text{par de r. complejas})}}$$
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-ARverde .png :exports code :results silent
+ar_params = [1, -0.1, +0.8]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-ARverde.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-ARverde.png]]
+
+
+#+name: raices-arverde
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+RESULTS: raices-arverde
+:RESULTS:
+|   | P. real | P. imag.  | Módulo   | Frecuencia | Periodo  | Multip. |
+|---+---------+-----------+----------+------------+----------+---------|
+| 0 | 0.0625  | -1.116286 | 1.118034 | 0.241098   | 4.147685 | 1       |
+| 1 | 0.0625  | 1.116286  | 1.118034 | 0.241098   | 4.147685 | 1       |
+:END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-ARverde.png :results none
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
+fig.savefig('./img/lecc05/Sim-ARverde.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-ARverde.png]]
+
+*** AR(2) con dos raíces reales y negativas
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+# AR2 violeta
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1+1.6z+.64z^2\quad\Rightarrow\quad 
+(1+1.6\mathsf{B}+.64\mathsf{B}^2)X_t = U_t \;
+{\color{blue}{(\text{raices reales: -, -})}}$$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-AR2violeta.png :exports code :results silent
+ar_params = [1, 1.6, +0.64]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-AR2violeta.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-AR2violeta.png]]
+
+
+#+name: raices-ar2violeta
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+RESULTS: raices-ar2violeta
+:RESULTS:
+|   | P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
+|---+---------+----------+--------+------------+---------+---------|
+| 0 | -1.25   | 0.0      | 1.25   | 0.5        | 2.0     | 2       |
+:END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-AR2violeta.png :results none
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
+fig.savefig('./img/lecc05/Sim-AR2violeta.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-AR2violeta.png]]
+
+*** AR(2) con dos raíces reales y positivas
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+# AR2 rojo
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+$$\boldsymbol{\phi}(z)=1-1.6z+.64z^2 \;\;\Rightarrow\;\;
+(1-1.6\mathsf{B}+.64\mathsf{B}^2)X_t = U_t \;
+{\color{blue}{(\text{raices reales: +, +})}}$$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-AR2rojo.png :exports code :results silent
+ar_params = [1, -1.6, +0.64]
+ma_params = [1,]
+fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+fig.savefig('./img/lecc05/ACF-AR2rojo.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/ACF-AR2rojo.png]]
+
+
+#+name: raices-ar2rojo
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports results :results value table pp
+polynomial_roots_table(ar_params)
+#+END_SRC
+
+#+RESULTS: raices-ar2rojo
+:RESULTS:
+|   | P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
+|---+---------+----------+--------+------------+---------+---------|
+| 0 | 1.25    | 0.0      | 1.25   | 0.0        | Inf     | 2       |
+:END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-AR2rojo.png :results none
+fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
+fig.savefig('./img/lecc05/Sim-AR2rojo.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc05/Sim-AR2rojo.png]]
+
+
+* (Resumen) características de procesos AR($p$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+#+latex: \noindent
+_Siempre invertible._ (i.e., posee representación AR).
+
+#+latex: \noindent
+Para ser estacionario raíces de $\boldsymbol{\phi}$ fuera del círculo unidad $(\boldsymbol{\phi}^{-\triangleright}=\boldsymbol{\phi}^{-1}\in\ell^1)$
+#+latex: \bigskip
+
+*Tipos de representación del proceso*
+
+#+latex: \noindent
+- Como suma ponderada finita :: (número finito de parámetros) 
+  $$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U}
+  \quad\Rightarrow\quad \boldsymbol{\phi}(\mathsf{B})X_t=U_t$$
+- Como suma ponderada infinita :: (_solo si es estacionario_)
+  $$\boldsymbol{X}=\frac{1}{\boldsymbol{\phi}}*\boldsymbol{U}
+  \quad\Rightarrow\quad
+  X_t=\frac{1}{\boldsymbol{\phi}}(\mathsf{B})U_t$$
+#+latex: \bigskip
+
+#+latex: {\bf Comportamiento de las funciones asociadas a los segundo momentos}
+#+latex: \medskip
+
+#+latex: \noindent
+*ACF ($\boldsymbol{\rho}$):* Grado ($\infty$) y cogrado ($-\infty$); @@latex:combinación de @@ exponenciales y/o sinusoidales amortiguadas.
+#+latex: \smallskip
+
+#+latex: \noindent
+*PACF ($\boldsymbol{\pi}$):* Grado ($p$) y cogrado ($-p$)
+#+latex: \smallskip
+
+#+latex: \noindent
+*Densidad espectral* proporcional al inverso de la densidad espectral de $\boldsymbol{X}=\boldsymbol{\phi}*\boldsymbol{U}$
+
+
+* (Resumen) características de procesos MA($q$)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+latex: \noindent
+_Siempre estacionario._
+
+#+latex: \noindent
+Para ser invertible raíces $\boldsymbol{\theta}$ fuera del círculo unidad 
+$(\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1)$
+#+latex: \bigskip
+
+*Tipos de representación del proceso*
+
+#+latex: \noindent
+- Como suma ponderada finita :: (número finito de parámetros)
+  $$\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}
+  \quad\Rightarrow\quad X_t=\boldsymbol{\theta}(\mathsf{B})U_t$$
+- Como suma ponderada infinita :: (_solo existe si es invertible_):
+  $$\frac{1}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
+  \quad\Rightarrow\quad
+  \frac{1}{\boldsymbol{\theta}}(\mathsf{B})X_t=U_t$$
+#+latex: \bigskip
+
+#+latex: {\bf Comportamiento de las funciones asociadas a los segundos momentos}
+#+latex: \medskip
+
+#+latex: \noindent
+*ACF ($\boldsymbol{\rho}$):* Grado ($q$) y cogrado ($-q$)
+#+latex: \smallskip
+
+#+latex: \noindent
+*PACF ($\boldsymbol{\pi}$):* Grado ($\infty$) y cogrado ($-\infty$); @@latex:combinación de @@ exponenciales y/o sinusoidales amortiguadas.
+#+latex: \smallskip
+
+#+latex: \noindent
+*Densidad espectral* Suma de dos cosenos más una constante.
+# proporcional al inverso de la densidad espectral de $\;\boldsymbol{\theta}*\boldsymbol{X}=\boldsymbol{U}$
+
+
+* Nota final
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+Se puede demostrar que
+- si un proceso tiene una ACF $\boldsymbol{\rho}$ con cogrado $-q$ y grado $q$, es un proceso MA($q$)
+- si un proceso tiene una PACF $\boldsymbol{\pi}$ con cogrado $-p$ y grado $p$, es un proceso AR($p$)
+
+Véase /Pourahmadi M. (2001)./
+#+latex: \medskip
+
+Consecuentemente, que la ACF o la PACF se corten ``bruscamente'' nos indica que el modelo es AR o MA (además de su grado).
+
+Desgraciadamente para los modelos ARMA (qué veremos más adelante) tanto la ACF como la PACF tienen infinitos términos no nulos, por lo que su identificación no es tan sencilla.
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{3.4cm}p{5.4cm}p{5.4cm}
+|                    | *ACF finita*                                             | *ACF persistente*                |
+|--------------------+----------------------------------------------------------+----------------------------------|
+| *PACF finita*      | _Ruido blanco_: retardos conjuntamente NO significativos | _AR_: orden indicado por la PACF |
+| *PACF persistente* | _MA_: orden indicado por la ACF                          | _ARMA_                           |
+
+
+* Las Ecuaciones de Yule-Walker para un AR($p$) estacionario
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+# +attr_ipynb: (slideshow . ((slide_type . skip)))
+Sea un AR($p$) estacionario:
+$\;\;\boldsymbol{\phi}(\mathsf{B})X_t=U_t\;\;$ donde $\;\;\boldsymbol{\phi}(z)=1-\phi_1z^1-\cdots-\phi_pz^p.\;$
+Multiplicando por $X_{t-k}$ y tomando esperanzas:
+\[
+ E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot X_{t-k}\Big] =
+ E[U_t\cdot X_{t-k}]
+\]
+
+Estas ecuaciones se denominan /Ecuaciones de Yule-Walker/ y permiten calcular las autocovarianzas y autocorrelaciones de manera iterativa.
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+latex: \noindent
+/Por una parte/ (lado izquierdo):
+
+Si $\boldsymbol{X}$ es un proceso (débilmente) estacionario con
+$E(\boldsymbol{X})=\boldsymbol{0}\;$ y $\;\boldsymbol{\phi}$ es una serie
+formal absolutamente sumable; entonces para $t,k\in\mathbb{Z}$
+\begin{equation}
+  E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot X_{t-k}\Big]
+  \quad = \quad
+  \boldsymbol{\phi}(\mathsf{B})E\big(X_t\cdot X_{t-k}\big)
+  \quad = \quad
+  \boldsymbol{\phi}(\mathsf{B})\gamma_k
+  \label{eqnLadoIzquierdoYW}
+\end{equation}
+que no depende de $t$, por ser $\boldsymbol{X}$ es un proceso
+(débilmente) estacionario.
+#+latex: \medskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+latex: \noindent
+/Por otra parte/ (lado derecho):
+
+Si $\boldsymbol{X}$ tiene representación
+$\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U}$ donde
+$\;\boldsymbol{U}\sim WN(0,\sigma^2)$ y $\boldsymbol{\psi}\in\ell^2$ es una
+serie formal con $\psi_0=1$; es decir, si es un proceso lineal causal
+# Sea un AR($p$) estacionario:
+# $\;\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U};\;$ entonces $\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U}$ 
+# con $\boldsymbol{\psi}=\frac{1}{\boldsymbol{\phi}}$ y $\psi_0=1$.
+# # donde $\boldsymbol{U}\sim WN(0,\sigma^2)$.
+#+latex: \noindent
+$$\quad X_t=U_t + \sum\nolimits_{j=1}^\infty \psi_j U_{t-j},$$
+entonces para $t,k\in\mathbb{Z}$
+\begin{equation}
+  E[U_t\cdot X_{t-k}] = E\Big[U_t\Big(U_{t-k} + \sum\nolimits_{j=1}^\infty \psi_j U_{t-k-j}\Big) \Big]=
+  \begin{cases}
+  \sigma^2 & \text{cuando } k=0\\
+  0 & \text{cuando } k\ne0
+  \end{cases}
+  \label{eqnLadoDerechoYW}
+\end{equation}
+#+latex: \bigskip
+
+Veamos cómo usar las ecuaciones $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$ para calcular autocovarianzas y autocorrelaciones de manera iterativa:
+#+latex: \bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Sea un AR($p$) estacionario:
+$\;\;\boldsymbol{\phi}(\mathsf{B})X_t=U_t\;\;$ donde
+$\;\;\boldsymbol{\phi}(z)=1-\phi_1z^1-\cdots-\phi_pz^p.\;$
+Multiplicando por $X_{t-k}$ y tomando esperanzas:
+$$E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot X_{t-k}\Big] =
+E[U_t\cdot X_{t-k}]$$
+
+*para $k=0$:* $\quad$ (por $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$)
+$$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_0=\sigma^2\)}
+\quad\Rightarrow\quad
+\gamma_0-\phi_1\gamma_1-\cdots-\phi_p\gamma_p=\sigma^2
+\quad\Rightarrow\quad \sigma^2=\gamma_0-\sum\nolimits_{j=1}^p\phi_j\gamma_j.$$
+Dividiendo por $\gamma_0$ (y recordando que $\rho_0=1$):
+$$\boldsymbol{\phi}(\mathsf{B})\rho_0=\frac{\sigma^2}{\gamma_0}
+\quad\Rightarrow\quad
+\fbox{\(\gamma_0=\frac{\sigma^2}{\boldsymbol{\phi}(\mathsf{B})\rho_0}\)}
+\quad\Rightarrow\quad
+\gamma_0=\frac{\sigma^2}{1-\sum\nolimits_{j=1}^p\phi_j\rho_j}.$$ 
+  
+*para $k>0$:* $\quad$ (por $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$)
+$$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_k=0\)}
+\quad\Rightarrow\quad
+\gamma_k-\phi_1\gamma_{k-1}-\cdots-\phi_p\gamma_{k-p}=0
+\quad\Rightarrow\quad \gamma_k=\sum\nolimits_{j=1}^p\phi_j\gamma_{k-j}.$$ 
+Dividiendo por $\gamma_0$:
+$$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\rho_k=0\)}
+\quad\Rightarrow\quad
+\rho_k-\phi_1\rho_{k-1}-\cdots-\phi_p\rho_{k-p}=0
+\quad\Rightarrow\quad \rho_k=\sum\nolimits_{j=1}^p\phi_j\rho_{k-j}.$$
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+En resumen, la estructura autorregresiva del proceso impone que las
+autocovarianzas (y las autocorrelaciones) verifiquen las ecuaciones de
+Yule-Walker.
+
+** COMMENT Función de autocovarianzas para un ARMA($p,q$)          :noexport:
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+# donde $$\boldsymbol{\phi}(z)=1-\phi_1z^1\cdots-\phi_pz^p \quad\text{y}\quad \boldsymbol{\theta}(z)=1-\theta_1z^1\cdots-\theta_qz^q.$$
+
+Sea un ARMA($p,q$) estacionario:
+$\boldsymbol{\phi}(\mathsf{B}){X_t}=\boldsymbol{\theta}(\mathsf{B}){U_t}\;$
+donde $\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ no tienen raíces
+comunes. Multiplicando por $X_{t-k}$, tomando esperanzas y
+sustituyendo $X_{t-k}$ por su representación MA($\infty$), donde
+$\boldsymbol{\psi}=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}$:
+$$\underbrace{E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot
+X_{t-k}\Big]}_{\boldsymbol{\phi}(\mathsf{B})\gamma_k\;(\text{por
+\ref{eqnLadoIzquierdoYW}})} =
+E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot X_{t-k}\Big]
+\;=\;
+\underbrace{E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot
+\Big(\boldsymbol{\psi}(\mathsf{B})U_{t-k}\Big)\Big]}_{\boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)}$$
+Donde hemos usando $\eqref{eqnLadoIzquierdoYW}$ y renombrando
+$\;\boldsymbol{\theta}(\mathsf{B})U_t=\boldsymbol{W}\;$ y
+$\;\boldsymbol{\psi}(\mathsf{B})U_t=\boldsymbol{Y}.\;$ Así:
+\begin{align*}
+  \boldsymbol{\phi}(\mathsf{B})\gamma_k & = \boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)\\
+  & =  \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{por } \eqref{eqCovarianzaCruzadaProcesosLineales}
+\end{align*}
+Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogrado $-\infty$
+\begin{equation}
+  \boldsymbol{\phi}(\mathsf{B})\gamma_k = 
+  \begin{cases}
+     0 & k > q\quad \text{(como en un AR)}\\
+    \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & k\leq q
+   \quad \text{(que depende de $\boldsymbol{\theta}$ y $\boldsymbol{\phi}$)}
+  \end{cases}
+\end{equation}
+
+
+
+* COMMENT ipynb y slides                                           :noexport:
+:PROPERTIES:
+:ID:       a0af0049-d6c4-4572-bb3d-e2a35b541595
+:END:
+
+#+BEGIN_SRC emacs-lisp :results silent :eval yes
+(require 'ox-ipynb)
+(ox-ipynb-export-org-file-to-ipynb-file "Lecc05.org")
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+jupyter nbconvert --execute --inplace Lecc05.ipynb
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc05.ipynb
+#+END_SRC
+
