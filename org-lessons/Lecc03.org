@@ -73,7 +73,9 @@
 
 
 #+begin_abstract
-Analizaremos las dificultades que plantea la *correlación serial* y veremos cómo la estacionariedad en sentido débil los simplifica. Nos centraremos en los *procesos lineales*, estudiando su valor esperado, su función de autocovarianza, las covarianzas cruzadas entre ellos.
+Analizaremos las dificultades que plantea la *correlación serial* y veremos cómo la estacionariedad en sentido débil los simplifica. 
+Los modelos de procesos estacionarios son útiles para representar la dependencia de los valores de una serie temporal de su pasado.
+Nos centraremos en los *procesos lineales*, estudiando su valor esperado, su función de autocovarianza, las covarianzas cruzadas entre ellos.  
 #+end_abstract
 
 - ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc03.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc03.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc03.ipynb][mybinder]])
@@ -166,6 +168,27 @@ Esto tiene importantes implicaciones en las técnicas de análisis y
 los modelos a utilizar.
 #+latex: \bigskip
 
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+
+1. Las series temporales se clasifican en *estacionarias* y *no estacionarias.*
+2. Las series temporales estacionarias no muestran tendencias a largo plazo o volatilidad cambiante.
+3. Las no estacionarias presentan tendencia, estacionalidad o volatilidad cambiante.
+4. La clasificación de series *depende del periodo de observación.*
+5. *Esta clasificación de las series temporales no es rigurosa (se ha tomado prestada de los procesos estocásticos).*
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+1. Las series temporales se suelen clasificar en dos categorías principales: ``estacionarias'' y ``no estacionarias''. Las series estacionarias son aquellas que mantienen un nivel constante a lo largo del tiempo, sin mostrar tendencias ascendentes o descendentes. En contraste, las series no estacionarias presentan cambios significativos a lo largo del tiempo, incluyendo tendencias, estacionalidad o volatilidad cambiante. Es fundamental identificar la naturaleza de la serie temporal para aplicar métodos de análisis adecuados, ya que cada tipo requiere enfoques y técnicas diferentes.
+
+2. Una serie temporal estacionaria se caracteriza por la estabilidad de sus valores en el tiempo, lo que significa que las fluctuaciones alrededor de un valor medio no alteran el comportamiento general del fenómeno observado. Ejemplos de fenómenos ``estacionarios'' pueden incluir la cantidad de lluvia que cae en una región particular cada año o la temperatura promedio. A menudo, estos procesos son más fáciles de modelar y predecir, dado que sus propiedades estadísticas no cambian con el tiempo.
+
+3. A diferencia de las series temporales estacionarias, las no estacionarias exhiben características más complejas que pueden incluir tendencias a largo plazo, ciclos estacionales, patrones evolutivos y volatilidad cambiante. Esto significa que las variables pueden crecer o decrecer de manera continua, como es evidente en las series de renta nacional o en las ventas de una empresa. El estudio de estas dinámicas es esencial para entender contextos económicos, sociales y climáticos, permitiendo a los analistas hacer pronósticos más informados.
+
+4. El comportamiento de las series temporales puede variar dependiendo del intervalo de tiempo considerado para su análisis. Una serie puede parecer estacionaria en un periodo corto, pero al extender el periodo de observación, se pueden revelar tendencias no evidentes en un principio.
+
+5. Es decir, los términos ``estacionario'' y ``no estacionario'' aplicados a las series temporales son coloquiales (no hay un rigor matemático detrás del término). Aplicados a una serie temporal, comunican que, por su apariencia, podría suponerse que son una realización de un proceso estocástico ``estacionario'' o ``no estacionario'' (aplicados a procesos estocásticos, estos términos sí tienen una definición precisa y rigurosa).
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
 Veamos algunos ejemplos de series temporales...
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -386,12 +409,19 @@ Todas estas características resaltan la complejidad de los procesos subyacentes
 Veamos por qué esto genera dificultades en su tratamiento estadístico...
 #+LATEX: \bigskip
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Un proceso estocástico \(\boldsymbol{X}\) es un conjunto de variables aleatorias \(X_t\) donde el índice \(t\) toma valores en un cierto conjunto \(C\). En nuestro caso, este conjunto es el conjunto de los números enteros \(\mathbb{Z}\).
+
+El proceso \(\boldsymbol{X}\) queda caracterizado si definimos la distribución de probabilidad conjunta de cualquier subconjunto finito de variables aleatorias \((X_p, \ldots, X_k, \ldots, X_q)\). Estas distribuciones se denominan distribuciones finito-dimensionales del proceso. Diremos que conocemos la estructura probabilística de un proceso estocástico cuando conocemos la distribución de cualquier subconjunto de variables; en particular, también las distribuciones marginales de cada variable.
+
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 Consideremos el proceso estocástico
 \[
  \boldsymbol{X}=(X_t \mid t=0,\pm1,\pm2,\ldots).
 \]
-Caracterizar su distribución conjunta (*sus infinitos momentos*) resulta ser demasiado ambicioso. Limitemos a los dos primeros momentos (esperanzas y covarianzas):
+Caracterizar su distribución conjunta (*sus infinitos momentos*) resulta ser demasiado ambicioso. Limitemos a la esperanza para cada $t$ y covarianza de cada par $(t,k)$:
+
+# Caracterizar su distribución conjunta (*sus infinitos momentos*) resulta ser demasiado ambicioso. Limitemos a los dos primeros momentos (esperanzas y covarianzas):
 
 \[
  E(X_t)=\mu_{\color{Blue}{t}}
@@ -454,7 +484,7 @@ esperanza. Denotaremos este espacio con $H$.
    :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-El espacio, dotado de producto escalar y norma $$\langle X \mid Y
+Un espacio vectorial, dotado de producto escalar y norma; por ejemplo $$\langle X \mid Y
 \rangle=E(XY),\qquad \lVert X \rVert= \sqrt{E(X^2)},\qquad X,Y \in
 H,$$ es un espacio de Hilbert.
 
@@ -468,20 +498,18 @@ escalar, covarianza y esperanza del producto serán intercambiables
 no nula).
 #+latex: \medskip
 
-Una colección de variables aleatorias pertenecientes a $H$
+Una colección de variables aleatorias pertenecientes a $H$ 
 $$\boldsymbol{X}=(X_t\mid t\in\mathbb{Z}) \;\text{ con }\; X_t\in H$$
 se denomina /proceso estocástico de segundo orden/.
 
-Si $\boldsymbol{Y}=(Y_t\mid t\in\mathbb{Z})$ es tal que
-$E(Y_t)=\mu\ne0$, entonces $\boldsymbol{Y}$ no es de segundo orden.
+Si $\boldsymbol{Y}=(Y_t\mid t\in\mathbb{Z})$ es tal que $E(Y_t)=\mu\ne0$, entonces $\boldsymbol{Y}$ no es de segundo orden.
 
-Pero basta restar $\mu$ de cada $Y_t$ para tener un proceso
-$(\boldsymbol{Y}-\mu\boldsymbol{1})$ de segundo orden.
+Pero basta restar $\mu$ de cada $Y_t$ para tener un proceso $(\boldsymbol{Y}-\mu\boldsymbol{1})$ de segundo orden.
 
-/Por ello siempre asumiremos/ (sin pérdida de generalidad) /que las
-variables aleatorias de los procesos estocásticos de esta lección/ (y
-la siguiente) /tienen esperanza cero/.
+/Por ello siempre asumiremos/ (sin pérdida de generalidad) /que las variables aleatorias de los procesos estocásticos de esta lección/ (y la siguiente) /tienen esperanza cero/.
 
+Una propiedad fundamental de los procesos estocásticos estacionarios es que forman un conjunto cerrado bajo combinaciones lineales; es decir, cualquier proceso estocástico obtenido mediante una combinación lineal de procesos estocásticos estacionarios es estacionario. En particular, un proceso estocástico definido por los incrementos de otro proceso estocástico estacionario es estacionario: 
+$$X_t=Z_t-Z_{t-1}.$$
 
 ** Primeros momentos de procesos estocásticos de segundo orden
    :PROPERTIES:
@@ -676,13 +704,22 @@ autocovarianzas es $$\boldsymbol{\gamma}(z)\;=\;\sigma^2
 z^0\;=\;(\ldots,0,0,\sigma^2,0,0,\ldots)$$
 
 - Es el proceso estacionario (no trivial) más sencillo.
-- Este proceso es el pilar sobre el que definiremos el resto de
-  ejemplos.
+- *Este proceso es el pilar* sobre el que se construyen los demás procesos (débilmente) estacionarios.
+#+latex:\bigskip
 
-# #+attr_ipynb: (slideshow . ((slide_type . fragment)))
-# Si el proceso $\boldsymbol{U}$ de ruido blanco está formado por
-# variables independientes e idénticamente distribuidas se denota con
-# $\;\boldsymbol{U}\sim IID(0,\sigma^2)$.
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Algunas aclaraciones:
+1. No es necesario que las variables sean independientes ni que tengan la misma distribución; pero sí se requiere que sean incorrelacionadas.
+2. Si las variables son independientes (no solo incorrelacionadas), se llaman /ruido blanco estricto/.
+3. Si el proceso $\boldsymbol{U}$ de ruido blanco está formado por variables independientes e idénticamente distribuidas se denota con $\;\boldsymbol{U}\sim IID(0,\sigma^2)$; en tal caso el proceso es /estrictamente estacionario/.
+4. Asumiendo que las variables siguen una distribución normal (/ruido blanco normal/):
+   - La incorrelación implica independencia.
+   - La normalidad asegura distribuciones marginales iguales.
+   - Esto resulta en un proceso de /ruido blanco estricto/ con variables normales.
+5. La normalidad es una condición fuerte:
+   - Existen procesos de ruido blanco estricto con variables de distribuciones no normales.
+   - Ejemplo: Un proceso con variables uniformes independientes es ruido blanco estricto, pero no es ruido blanco normal
+6. Un proceso de ruido blanco no requiere ser estacionario en sentido estricto, pero un proceso de ruido blanco normal lo es.
 
 ** Procesos lineales
    :PROPERTIES:

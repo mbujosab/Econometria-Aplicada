@@ -78,10 +78,11 @@
 
 
 #+begin_abstract
-Veremos tres funciones que describen las características correspondientes a los momentos de segundo Veremos la estructura de la función de autocorrelación (ACF), la función de autocorrelación parcial (PACF) y la densidad espectral en procesos lineales genéricos y hoy lo particularizaremos a procesos de ruido blanco y procesos AR($p$). También las Ecuaciones de Yule-Walker para un AR($p$) estacionario.
+Hoy veremos la ACF, la PACF y la densidad espectral para el caso de los procesos autorregresivos (AR). Estos procesos se caracterizan por tener infinitos coeficientes de autocorrelación no nulos. Presentan una memoria relativamente larga, ya que el valor actual está correlado con todos los valores previos, aunque con coeficientes que disminuyen suficientemente rápido. Esta propiedad permite representar un proceso AR estacionario como una función lineal de todas las innovaciones generadoras, con pesos que tienden a cero a medida que aumenta el retardo. Veremos que los coeficientes de autocorrelación deben verificar las Ecuaciones de Yule-Walker.
 #+end_abstract
 
 - ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc05.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc05.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc05.ipynb][mybinder]])
+  + programas análisis modelos arma: ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/analisis_armas.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/src/analisis_armas.html][html]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/analisis_armas.ipynb][mybinder]]) 
 
 
 # #+begin_export html
@@ -247,6 +248,13 @@ $f(\omega) =
 Pero la PACF, $\;\boldsymbol{\pi},\;$ es una secuencia con grado $p$ y cogrado $-p$ ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#subsubsection.1.2.1][demo en los apuntes]]).
 #+latex: \medskip
 
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+- Los procesos AR tienen infinitos coeficientes de autocorrelación no nulos.
+- Presentan una *memoria relativamente larga*.
+- El valor en $t$ está correlado con todos los valores previos.
+- Los coeficientes de correlación disminuyen suficientemente rápido.
+- Se pueden representar como una función lineal de todas las innovaciones generadoras --- MA($\infty$).
+- Los coeficientes de autocorrelación deben verificar las Ecuaciones de Yule-Walker.
 
 *** Demostración de que la PACF tiene cogrado $-p$ y grado $p$
    :PROPERTIES:
@@ -386,14 +394,6 @@ fig.savefig('./img/lecc05/ACF-AR1p.png', dpi=300, bbox_inches='tight')
 polynomial_roots_table(ar_params)
 #+END_SRC
 
-#+attr_ipynb: (slideshow . ((slide_type . fragment)))
-#+ATTR_REVEAL: :frag t :frag_idx 1
-#+RESULTS: raices-ar1p
-:RESULTS:
-|   | P. real  | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
-|---+----------+----------+----------+------------+---------+---------|
-| 0 | 1.111111 | 0.0      | 1.111111 | 0.0        | Inf     | 1       |
-:END:
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -441,14 +441,6 @@ fig.savefig('./img/lecc05/ACF-AR1n.png', dpi=300, bbox_inches='tight')
 polynomial_roots_table(ar_params)
 #+END_SRC
 
-#+attr_ipynb: (slideshow . ((slide_type . fragment)))
-#+ATTR_REVEAL: :frag t :frag_idx 1
-#+RESULTS: raices-ar1n
-:RESULTS:
-|   | P. real   | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
-|---+-----------+----------+----------+------------+---------+---------|
-| 0 | -1.111111 | 0.0      | 1.111111 | 0.5        | 2.0     | 1       |
-:END:
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -557,14 +549,6 @@ fig.savefig('./img/lecc05/ACF-AR2pp.png', dpi=300, bbox_inches='tight')
 polynomial_roots_table(ar_params)
 #+END_SRC
 
-#+RESULTS: raices-ar2thpp
-:RESULTS:
-|   | P. real   | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
-|---+-----------+----------+----------+------------+---------+---------|
-| 1 | 1.081666  | 0.0      | 1.081666 | 0.0        | Inf     | 1       |
-| 0 | -3.081666 | 0.0      | 3.081666 | 0.5        | 2.0     | 1       |
-:END:
-
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -610,14 +594,6 @@ fig.savefig('./img/lecc05/ACF-AR2np.png', dpi=300, bbox_inches='tight')
 #+BEGIN_SRC jupyter-python :exports results :results value table pp
 polynomial_roots_table(ar_params)
 #+END_SRC
-
-#+RESULTS: raices-ar2np
-:RESULTS:
-|   | P. real   | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
-|---+-----------+----------+----------+------------+---------+---------|
-| 1 | 3.081666  | 0.0      | 3.081666 | 0.0        | Inf     | 1       |
-| 0 | -1.081666 | 0.0      | 1.081666 | 0.5        | 2.0     | 1       |
-:END:
 
 
 
@@ -665,13 +641,6 @@ fig.savefig('./img/lecc05/ACF-AR2nn.png', dpi=300, bbox_inches='tight')
 polynomial_roots_table(ar_params)
 #+END_SRC
 
-#+RESULTS: raices-ar2nn
-:RESULTS:
-|   | P. real | P. imag.  | Módulo   | Frecuencia | Periodo  | Multip. |
-|---+---------+-----------+----------+------------+----------+---------|
-| 0 | -0.5    | -0.927961 | 1.054093 | 0.328657   | 3.042687 | 1       |
-| 1 | -0.5    | 0.927961  | 1.054093 | 0.328657   | 3.042687 | 1       |
-:END:
 
 
 
@@ -719,14 +688,6 @@ fig.savefig('./img/lecc05/ACF-AR2pn.png', dpi=300, bbox_inches='tight')
 #+BEGIN_SRC jupyter-python :exports results :results value table pp
 polynomial_roots_table(ar_params)
 #+END_SRC
-
-#+RESULTS: raices-ar2pn
-:RESULTS:
-|   | P. real  | P. imag.  | Módulo   | Frecuencia | Periodo  | Multip. |
-|---+----------+-----------+----------+------------+----------+---------|
-| 0 | 0.611111 | -0.858868 | 1.054093 | 0.151575   | 6.597397 | 1       |
-| 1 | 0.611111 | 0.858868  | 1.054093 | 0.151575   | 6.597397 | 1       |
-:END:
 
 
 
@@ -777,14 +738,6 @@ fig.savefig('./img/lecc05/ACF-AR2RojoVioleta.png', dpi=300, bbox_inches='tight')
 polynomial_roots_table(ar_params)
 #+END_SRC
 
-#+RESULTS: raices-ar2RojoVioleta
-:RESULTS:
-|   | P. real  | P. imag. | Módulo  | Frecuencia | Periodo | Multip. |
-|---+----------+----------+---------+------------+---------+---------|
-| 1 | 1.18228  | 0.0      | 1.18228 | 0.0        | Inf     | 1       |
-| 0 | -1.05728 | 0.0      | 1.05728 | 0.5        | 2.0     | 1       |
-:END:
-
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -833,13 +786,6 @@ fig.savefig('./img/lecc05/ACF-ARverde.png', dpi=300, bbox_inches='tight')
 polynomial_roots_table(ar_params)
 #+END_SRC
 
-#+RESULTS: raices-arverde
-:RESULTS:
-|   | P. real | P. imag.  | Módulo   | Frecuencia | Periodo  | Multip. |
-|---+---------+-----------+----------+------------+----------+---------|
-| 0 | 0.0625  | -1.116286 | 1.118034 | 0.241098   | 4.147685 | 1       |
-| 1 | 0.0625  | 1.116286  | 1.118034 | 0.241098   | 4.147685 | 1       |
-:END:
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -887,12 +833,6 @@ fig.savefig('./img/lecc05/ACF-AR2violeta.png', dpi=300, bbox_inches='tight')
 polynomial_roots_table(ar_params)
 #+END_SRC
 
-#+RESULTS: raices-ar2violeta
-:RESULTS:
-|   | P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
-|---+---------+----------+--------+------------+---------+---------|
-| 0 | -1.25   | 0.0      | 1.25   | 0.5        | 2.0     | 2       |
-:END:
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -940,12 +880,6 @@ fig.savefig('./img/lecc05/ACF-AR2rojo.png', dpi=300, bbox_inches='tight')
 polynomial_roots_table(ar_params)
 #+END_SRC
 
-#+RESULTS: raices-ar2rojo
-:RESULTS:
-|   | P. real | P. imag. | Módulo | Frecuencia | Periodo | Multip. |
-|---+---------+----------+--------+------------+---------+---------|
-| 0 | 1.25    | 0.0      | 1.25   | 0.0        | Inf     | 2       |
-:END:
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -1164,44 +1098,6 @@ En resumen, la estructura autorregresiva del proceso impone que las
 autocovarianzas (y las autocorrelaciones) verifiquen las ecuaciones de
 Yule-Walker.
 
-** COMMENT Función de autocovarianzas para un ARMA($p,q$)          :noexport:
-   :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . slide)))
-   :END:
-
-# donde $$\boldsymbol{\phi}(z)=1-\phi_1z^1\cdots-\phi_pz^p \quad\text{y}\quad \boldsymbol{\theta}(z)=1-\theta_1z^1\cdots-\theta_qz^q.$$
-
-Sea un ARMA($p,q$) estacionario:
-$\boldsymbol{\phi}(\mathsf{B}){X_t}=\boldsymbol{\theta}(\mathsf{B}){U_t}\;$
-donde $\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ no tienen raíces
-comunes. Multiplicando por $X_{t-k}$, tomando esperanzas y
-sustituyendo $X_{t-k}$ por su representación MA($\infty$), donde
-$\boldsymbol{\psi}=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}$:
-$$\underbrace{E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot
-X_{t-k}\Big]}_{\boldsymbol{\phi}(\mathsf{B})\gamma_k\;(\text{por
-\ref{eqnLadoIzquierdoYW}})} =
-E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot X_{t-k}\Big]
-\;=\;
-\underbrace{E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot
-\Big(\boldsymbol{\psi}(\mathsf{B})U_{t-k}\Big)\Big]}_{\boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)}$$
-Donde hemos usando $\eqref{eqnLadoIzquierdoYW}$ y renombrando
-$\;\boldsymbol{\theta}(\mathsf{B})U_t=\boldsymbol{W}\;$ y
-$\;\boldsymbol{\psi}(\mathsf{B})U_t=\boldsymbol{Y}.\;$ Así:
-\begin{align*}
-  \boldsymbol{\phi}(\mathsf{B})\gamma_k & = \boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)\\
-  & =  \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{por } \eqref{eqCovarianzaCruzadaProcesosLineales}
-\end{align*}
-Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogrado $-\infty$
-\begin{equation}
-  \boldsymbol{\phi}(\mathsf{B})\gamma_k = 
-  \begin{cases}
-     0 & k > q\quad \text{(como en un AR)}\\
-    \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & k\leq q
-   \quad \text{(que depende de $\boldsymbol{\theta}$ y $\boldsymbol{\phi}$)}
-  \end{cases}
-\end{equation}
-
-
 
 * COMMENT ipynb y slides                                           :noexport:
 :PROPERTIES:
@@ -1214,10 +1110,10 @@ Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogr
 #+END_SRC
 
 #+BEGIN_SRC sh :results silent :eval yes
-jupyter nbconvert --execute --inplace Lecc05.ipynb
+#jupyter nbconvert --execute --inplace Lecc05.ipynb
 #+END_SRC
 
 #+BEGIN_SRC sh :results silent :eval yes
-jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc05.ipynb
+#jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc05.ipynb
 #+END_SRC
 
