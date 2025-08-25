@@ -421,3 +421,71 @@ def RegionParametrica(modelo='generico'):
     plt.close(fig)    
     
     return fig
+
+def RangoMediana(datos, k=6, ax=None):
+    # Inicializar listas para almacenar las medianas y rangos
+    medians = []
+    ranges = []
+    
+    n = len(datos)
+    sub_sample_size = n // k
+    for i in range(k):
+        start = i * sub_sample_size
+        end = start + sub_sample_size
+        
+        if i == k - 1:  # Para el último, incluir los datos sobrantes
+            end = n
+        
+        sub_sample = datos[start:end]
+        
+        # Calcular mediana y rango
+        median = np.median(sub_sample)
+        range_value = np.max(sub_sample) - np.min(sub_sample)
+        
+        medians.append(median)
+        ranges.append(range_value)
+
+    # Crear el gráfico rango-mediana en el eje especificado
+    if ax is not None:
+        ax.scatter(medians, ranges) 
+        ax.set_title('Gráfico Rango-Mediana')
+        ax.set_xlabel('Mediana de Submuestra')
+        ax.set_ylabel('Rango de Submuestra (Max - Min)')
+        ax.grid()
+        
+# def RangoMediana(datos, k=6):
+#     # Inicializar listas para almacenar las medianas y rangos
+#     medians = []
+#     ranges = []
+#     
+#     # Calcular el tamaño de las submuestras
+#     n = len(datos)
+#     sub_sample_size = n // k
+#     for i in range(k):
+#         start = i * sub_sample_size
+#         end = start + sub_sample_size
+#         
+#         if i == k - 1:  # Para el último, incluir los datos sobrantes
+#             end = n
+#         
+#         sub_sample = datos[start:end]
+#         
+#         # Calcular mediana y rango
+#         median = np.median(sub_sample)
+#         range_value = np.max(sub_sample) - np.min(sub_sample)
+#         
+#         medians.append(median)
+#         ranges.append(range_value)
+# 
+#     # Crear el gráfico rango-mediana
+#     fig, ax = plt.subplots(figsize=(5, 4))
+#     ax.scatter(medians, ranges) # , color='r')
+#     ax.set_title('Gráfico Rango-Mediana')
+#     ax.set_xlabel('Mediana de Submuestra')
+#     ax.set_ylabel('Rango de Submuestra (Max - Min)')
+#     ax.grid()
+#     plt.tight_layout()
+#     plt.close(fig)    
+#     
+#     return fig
+#
