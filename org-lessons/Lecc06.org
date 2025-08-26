@@ -82,7 +82,8 @@
 
 
 #+begin_abstract
-Examinaremos la ACF, la PACF y la densidad espectral de procesos ARMA, que son una generalización de los procesos AR y MA. Después indicaremos algunas herramientas estadísticas que usaremos para tratar de identificar un modelo que se ajuste adecuadamente a los datos de una serie temporal: gráficos, contrastes de raíz unitaria, ACF y PACF muestrales, estadísticos descriptivos y contrastes de normalidad.
+Examinaremos la ACF, la PACF y la densidad espectral de procesos ARMA (que son una generalización de los procesos AR y MA). 
+Después repasaremos algunas herramientas estadísticas útiles para tratar de identificar un modelo que se ajuste adecuadamente a los datos de una serie temporal: gráficos, contrastes de raíz unitaria, ACF y PACF muestrales, estadísticos descriptivos y contrastes de normalidad.
 #+end_abstract
 
 - ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc06.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc06.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc06.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc06.ipynb][mybinder]])
@@ -172,10 +173,10 @@ Sea $\;\boldsymbol{X}\;$ el proceso estocástico estacionario solución
 de la ecuación en diferencias:
 $$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}$$
 donde $\;\boldsymbol{U}\sim WN(0,\sigma^2);\;$ el polinomio
-/autorregresivo/ $\;\boldsymbol{\phi}\;$ tiene _grado $p$_ con
+/autorregresivo/ $\;\boldsymbol{\phi}\;$ tiene _grado_ $p$ con
 ${{\phi_{0}=1}}$ (y raíces fuera del círculo unidad), y
-el polinomio /de media móvil/ $\;\boldsymbol{\theta}\;$ es _de grado
-$q$_ con ${{\theta_{0}=1}};\;$ y donde
+el polinomio /de media móvil/ $\;\boldsymbol{\theta}\;$ es de _grado_
+$q$ con ${{\theta_{0}=1}};\;$ y donde
 $\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ no tienen raíces comunes.
 #+latex:\medskip
 
@@ -298,10 +299,10 @@ $$X_t=\phi X_{t-1}-\theta U_{t-1} + U_t.$$
 - $\boldsymbol{\gamma} \;=\; \sigma^2 \frac{(1-\theta z)*(1-\theta z^{-1})}{(1-\phi z)*(1-\phi z^{-1})}\; \text{ por tanto... }$
    
 - $\gamma_0 =
-  \sigma^2\left(1+\frac{(\theta+\phi)^2}{1+\phi^2}\right);\quad
+  \sigma^2\left(1+\frac{(\theta+\phi)^2}{1+\phi^2}\right);\;\;
   \gamma_1 =
-  \sigma^2\left(\phi+\theta+\frac{(\theta+\phi)^2\phi}{1+\phi^2}\right);\;
-  \text{ y }\;\gamma_k =\phi\gamma_{k-1}\;\;\text{si } k>1$
+  \sigma^2\left(\phi+\theta+\frac{(\theta+\phi)^2\phi}{1+\phi^2}\right);\;\;
+  \gamma_k =\phi\gamma_{k-1}\;\;\text{si } k>1$
 
 - $\boldsymbol{\rho} \;=\; \frac{1}{\gamma_0}\boldsymbol{\gamma}$
 
@@ -491,14 +492,14 @@ fig.savefig('./img/lecc06/Sim-arma11RNV.png', dpi=300, bbox_inches='tight')
 - ``estacionaria en media''?
   + (y si lo es, ¿cuál es su media?)
   + (y si no lo es, ¿cómo cambia o evoluciona su media?)
-- ``*/estacionaria en varianza/*''? (/homocedástica/)
+- ``estacionaria en varianza''? (/homocedástica/)
   + (y si lo es, ¿cuál es su varianza?)
   + (y si es /heterocedástica/, ¿cómo cambia o evoluciona su varianza?)
 
-¿Están sus valores correlados con su historia pasada (autocorrelados)?
+¿Están sus valores correlados con su historia pasada (autocorrelados)? (ACF)
 
-¿Qué correlación tienen los datos con los datos $k$ periodos atrás una
-vez descontado el efecto de los datos intermedios?
+¿Qué correlación tienen los datos con los datos de $k$ periodos atrás una
+vez descontado el efecto de los datos intermedios? (PACF)
 #+LATEX: \bigskip
 
 Veamos algunas herramientas estadísticas para poder desvelar estas
@@ -548,7 +549,7 @@ representa:
 
 - *en eje $y$:* dispersión de la serie (normalmente el rango de dichas submuestras).
 
-Si los puntos se sitúan alrededor de una recta de pendiente positiva, tomar logaritmos.
+Si los puntos se sitúan alrededor de una recta de pendiente positiva: tomar logaritmos.
 #+latex: \bigskip
 
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
@@ -688,6 +689,7 @@ el proceso tenga una representación como AR($\infty$) causal), lo cual
 conduce a problemas de identificación y estimación.
 
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc06/ :file diferenciasPasajeros.png  :exports code :results silent
 # Leer los datos
 df = pd.read_csv('../datos/airline-passengers.csv')
@@ -765,6 +767,7 @@ $$\nabla\nabla_{12}(\boldsymbol{y})=(1-\mathsf{B})*(1-\mathsf{B^{12}})*\boldsymb
 arroja una serie que sí parece ser /``estacionaria''/.
 
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python  :results file :output-dir ./img/lecc06/ :file diferenciasTemperaturasRetiro :exports code :results silent
 df3 = pd.read_csv('../datos/Retiro.txt')
 # Generar una columna de fechas desde enero de 1985
@@ -930,7 +933,8 @@ $$\frac{\widehat{\mu}}{\widehat{dt(\widehat{\mu})}}\underset{H_0}{\sim}t_{n-1};\
 \widehat{dt(\widehat{\mu})}=\frac{\widehat{\sigma}}{\sqrt{n}}.$$
 
 # value table pp
-#+BEGIN_SRC jupyter-python  :exports results :results  raw
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python  :exports code :results  raw
 df3['TemperaturaMedia'].describe()
 #+END_SRC
 
@@ -947,7 +951,7 @@ df3['TemperaturaMedia'].describe()
 
 *** Contraste de normalidad Jarque-Bera
    :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . fragment)))
+   :metadata: (slideshow . ((slide_type . subslide)))
    :END:
 
 [[https://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test][Jarque-Bera test (Wikipedia)]]
@@ -957,7 +961,8 @@ df3['TemperaturaMedia'].describe()
 
 - Si hay valores atípicos :: el mejor tratamiento es /intervenirlos/.
 
-#+BEGIN_SRC jupyter-python :exports results :results raw
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports code :results raw
 from scipy import stats
 rng = np.random.default_rng()
 x = rng.normal(0, 1, 100000)

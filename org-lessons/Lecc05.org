@@ -78,7 +78,11 @@
 
 
 #+begin_abstract
-Hoy veremos la ACF, la PACF y la densidad espectral para el caso de los procesos autorregresivos (AR). Estos procesos se caracterizan por tener infinitos coeficientes de autocorrelación no nulos. Presentan una memoria relativamente larga, ya que el valor actual está correlado con todos los valores previos, aunque con coeficientes que disminuyen suficientemente rápido. Esta propiedad permite representar un proceso AR estacionario como una función lineal de todas las innovaciones generadoras, con pesos que tienden a cero a medida que aumenta el retardo. Veremos que los coeficientes de autocorrelación deben verificar las Ecuaciones de Yule-Walker.
+Hoy veremos la ACF, la PACF y la densidad espectral para el caso de los procesos autorregresivos (AR).
+Estos procesos se caracterizan por tener infinitos coeficientes de autocorrelación no nulos. 
+Presentan una memoria relativamente larga, pues el valor actual está correlado con todos los valores previos; aunque con coeficientes que disminuyen suficientemente rápido como para que la secuencia sea absolutamente sumable. 
+Esta propiedad permite representar un proceso AR estacionario como un MA($\infty$), con pesos que tienden a cero a medida que aumenta el retardo. 
+Veremos que los coeficientes de autocorrelación verifican las Ecuaciones de Yule-Walker.
 #+end_abstract
 
 - ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc05.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc05.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc05.ipynb][mybinder]])
@@ -115,6 +119,7 @@ import matplotlib as mpl
 # definimos parámetros para mejorar los gráficos
 mpl.rc('text', usetex=False)
 import matplotlib.pyplot as plt   # data visualization
+import dataframe_image as dfi   # export tables as .png
 #+END_SRC
 
 **** Directorio auxiliar para albergar las figuras de la lección:
@@ -232,7 +237,7 @@ donde $\;\boldsymbol{\phi}^{-1}=\boldsymbol{\psi}=({\color{blue}1},\ \psi_1,\ \p
 #+latex: \noindent
 Por tanto $E(X_t)=0$ para todo $t\in\mathbb{Z}$ y
 
-$\boldsymbol{\gamma} \;=\; \sigma^2 \frac{1}{\boldsymbol{\phi}(z)}*\frac{1}{\boldsymbol{\phi}(z^{-1})} \;=\; \sigma^2 \sum\limits_{j,k=0}^\infty \psi_{j+k}\psi_j z^{j}\quad$ (grado $\infty$)$\quad$ ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#section.5][Ec. de Yule-Walker]])
+$\boldsymbol{\gamma} \;=\; \sigma^2 \frac{1}{\boldsymbol{\phi}(z)}*\frac{1}{\boldsymbol{\phi}(z^{-1})} \;=\; \sigma^2 \sum\limits_{j,k=0}^\infty (\psi_{j+k}\psi_j) z^{j}\quad$ (grado $\infty$)$\quad$ ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#section.5][Ec. de Yule-Walker]])
 
 $\boldsymbol{\rho} \;=\; \frac{1}{\gamma_0}\boldsymbol{\gamma}$
 
@@ -249,12 +254,12 @@ Pero la PACF, $\;\boldsymbol{\pi},\;$ es una secuencia con grado $p$ y cogrado $
 #+latex: \medskip
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
-- Los procesos AR tienen infinitos coeficientes de autocorrelación no nulos.
+- Los procesos AR tienen infinitos coeficientes /no nulos/ de autocorrelación.
 - Presentan una *memoria relativamente larga*.
-- El valor en $t$ está correlado con todos los valores previos.
+  - el valor en $t$ está correlado con todos los valores previos.
 - Los coeficientes de correlación disminuyen suficientemente rápido.
-- Se pueden representar como una función lineal de todas las innovaciones generadoras --- MA($\infty$).
-- Los coeficientes de autocorrelación deben verificar las Ecuaciones de Yule-Walker.
+  - por ello todo AR estacionario tiene representación como proceso lineal causal ---MA($\infty$).
+- Los coeficientes de autocorrelación verifican las Ecuaciones de [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#section.5][Yule-Walker]].
 
 *** Demostración de que la PACF tiene cogrado $-p$ y grado $p$
    :PROPERTIES:
@@ -343,8 +348,9 @@ $\;|\phi|<1\;$ y con $\;\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$, es
 decir, si $$X_t=\phi X_{t-1} + U_t$$
 #+END_EXPORT
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
-como $\;\boldsymbol{X}=(1-\phi z)^{-1}*\boldsymbol{U},\quad$ tenemos que
+como $\;|\phi|<1\;$ tenemos que $\;\boldsymbol{X}=(1-\phi z)^{-1}*\boldsymbol{U}.\quad$ Por tanto:
 
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
 $\boldsymbol{\gamma} \;=\; \sigma^2 (1-\phi z)^{-1}*(1-\phi
   z^{-1})^{-1} \;=\; \frac{\sigma^2}{1-\phi^2}
   \sum\limits_{k=-\infty}^\infty \phi^{|k|} z^k\quad$ (grado $\infty$).
@@ -390,10 +396,16 @@ fig.savefig('./img/lecc05/ACF-AR1p.png', dpi=300, bbox_inches='tight')
 
 #+name: raices-ar1p
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp 
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR1p.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR1p.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR1p.png]]
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -435,12 +447,19 @@ fig.savefig('./img/lecc05/ACF-AR1n.png', dpi=300, bbox_inches='tight')
 [[./img/lecc05/ACF-AR1n.png]]
 
 
+
 #+name: raices-ar1n
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports none :results value table pp 
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR1n.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR1n.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR1n.png]]
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -469,8 +488,7 @@ $$\phi_1+\phi_2<1;\qquad \phi_2-\phi_1<1;\qquad |\phi_2|<1;\quad
 X_{t-2} + U_t.$$ Entonces
 #+latex: \medskip
 
-$\boldsymbol{\gamma}=\sigma^2\left(
-  \frac{1}{\boldsymbol{\phi}(z)}*\frac{1}{\boldsymbol{\phi}(z^-1)}\right)\qquad$
+$\boldsymbol{\gamma}=\sigma^2\left(\frac{1}{\boldsymbol{\phi}(z)}*\frac{1}{\boldsymbol{\phi}(z^-1)}\right)\qquad(\text{grado }\infty)$
   # (Verifica Ec. Yule-Walker:  $\;\gamma_k=\phi_1\gamma_{k-1}+\phi_2\gamma_{k-2};\;$ decae paulatinamente)
 #  [[eqref:eqYuleW3][(3)]
 #+BEGIN_EXPORT latex
@@ -484,10 +502,8 @@ $\quad$ (\emph{de Ec. Yule-Walker: $\gamma_0 =
 % #+latex: \medskip
 #+END_EXPORT
 
-$\boldsymbol{\rho} \;=\;
-\frac{1}{\gamma_0}\boldsymbol{\gamma}\qquad$
-(Verifica Ec. Yule-Walker:
-$\;\rho_k=\phi_1\rho_{k-1}+\phi_2\rho_{k-2};\;\qquad$ decae@@latex: paulatinamente@@)
+$\boldsymbol{\rho} \;=\; \frac{1}{\gamma_0}\boldsymbol{\gamma}\qquad$ (Verifica [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#section.5][Ec. Yule-Walker]]: $\;\rho_k=\phi_1\rho_{k-1}+\phi_2\rho_{k-2})$ 
+# ;\;\qquad$ decae@@latex: paulatinamente@@)
 #+latex: \smallskip
 
 #+latex:  $\quad$ \emph{(con $\rho_0=1$ iniciamos el cálculo de $\boldsymbol{\phi}(\mathsf{B})\rho_k=0$ recursivamente)} \medskip
@@ -510,7 +526,7 @@ $\boldsymbol{\pi} \;=\; (\ldots,\; 0,\; \phi_2,\; \frac{\phi_1}{1-\phi_2},\; {\c
 
 # #+BEGIN_SRC python :exports results
 # exec(open('./src/analisis_armas.py').read())
-# RegionParametrica('MA').savefig('./img/lecc04/MA2roots.png', dpi=300, bbox_inches='tight')
+# RegionParametrica('MA').savefig('./img/lecc05/MA2roots.png', dpi=300, bbox_inches='tight')
 # #+END_SRC
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -543,12 +559,18 @@ fig.savefig('./img/lecc05/ACF-AR2pp.png', dpi=300, bbox_inches='tight')
 [[./img/lecc05/ACF-AR2pp.png]]
 
 
-#+name: raices-ar2thpp
+#+name: raices-ar2pp
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports results :results value table pp
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR2pp.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR2pp.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR2pp.png]]
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -591,10 +613,16 @@ fig.savefig('./img/lecc05/ACF-AR2np.png', dpi=300, bbox_inches='tight')
 
 #+name: raices-ar2np
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports results :results value table pp
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR2np.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR2np.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR2np.png]]
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -637,10 +665,16 @@ fig.savefig('./img/lecc05/ACF-AR2nn.png', dpi=300, bbox_inches='tight')
 
 #+name: raices-ar2nn
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports results :results value table pp
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR2nn.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR2nn.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR2nn.png]]
 
 
 
@@ -685,9 +719,16 @@ fig.savefig('./img/lecc05/ACF-AR2pn.png', dpi=300, bbox_inches='tight')
 
 #+name: raices-ar2pn
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports results :results value table pp
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR2pn.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR2pn.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR2pn.png]]
 
 
 
@@ -718,7 +759,7 @@ $$\boldsymbol{\phi}(z)=1+0.1z-0.8z^2\quad\Rightarrow\quad
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-AR2RojoVioleta.png :exports code :results silent
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-AR2RojoVioleta.png :exports code :results silent
 ar_params = [1, 0.1, -0.8]
 ma_params = [1,]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
@@ -734,14 +775,21 @@ fig.savefig('./img/lecc05/ACF-AR2RojoVioleta.png', dpi=300, bbox_inches='tight')
 
 #+name: raices-ar2RojoVioleta
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports results :results value table pp
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR2RojoVioleta.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR2RojoVioleta.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR2RojoVioleta.png]]
 
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-AR2RojoVioleta.png :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-AR2RojoVioleta.png :results none
 fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc05/Sim-AR2RojoVioleta.png', dpi=300, bbox_inches='tight')
 #+END_SRC
@@ -766,7 +814,7 @@ $$\boldsymbol{\phi}(z)=1-0.1z+0.8z^2\quad\Rightarrow\quad
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-ARverde .png :exports code :results silent
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-ARverde .png :exports code :results silent
 ar_params = [1, -0.1, +0.8]
 ma_params = [1,]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
@@ -780,16 +828,23 @@ fig.savefig('./img/lecc05/ACF-ARverde.png', dpi=300, bbox_inches='tight')
 [[./img/lecc05/ACF-ARverde.png]]
 
 
-#+name: raices-arverde
+
+#+name: raices-ar2verde
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports results :results value table pp
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR2verde.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR2verde.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR2verde.png]]
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-ARverde.png :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-ARverde.png :results none
 fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc05/Sim-ARverde.png', dpi=300, bbox_inches='tight')
 #+END_SRC
@@ -813,7 +868,7 @@ $$\boldsymbol{\phi}(z)=1+1.6z+.64z^2\quad\Rightarrow\quad
 {\color{blue}{(\text{raices reales: -, -})}}$$
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-AR2violeta.png :exports code :results silent
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-AR2violeta.png :exports code :results silent
 ar_params = [1, 1.6, +0.64]
 ma_params = [1,]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
@@ -827,16 +882,23 @@ fig.savefig('./img/lecc05/ACF-AR2violeta.png', dpi=300, bbox_inches='tight')
 [[./img/lecc05/ACF-AR2violeta.png]]
 
 
+
 #+name: raices-ar2violeta
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports results :results value table pp
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR2violeta.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR2violeta.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR2violeta.png]]
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-AR2violeta.png :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-AR2violeta.png :results none
 fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc05/Sim-AR2violeta.png', dpi=300, bbox_inches='tight')
 #+END_SRC
@@ -860,7 +922,7 @@ $$\boldsymbol{\phi}(z)=1-1.6z+.64z^2 \;\;\Rightarrow\;\;
 {\color{blue}{(\text{raices reales: +, +})}}$$
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file ACF-AR2rojo.png :exports code :results silent
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file ACF-AR2rojo.png :exports code :results silent
 ar_params = [1, -1.6, +0.64]
 ma_params = [1,]
 fig = plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
@@ -874,16 +936,25 @@ fig.savefig('./img/lecc05/ACF-AR2rojo.png', dpi=300, bbox_inches='tight')
 [[./img/lecc05/ACF-AR2rojo.png]]
 
 
+
+
 #+name: raices-ar2rojo
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports results :results value table pp
-polynomial_roots_table(ar_params)
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Roots-AR2rojo.png :results silent :exports results
+dfi.export(polynomial_roots_table(ar_params),
+           "./img/lecc05/Roots-AR2rojo.png", dpi=300, table_conversion="matplotlib")
 #+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc05/Roots-AR2rojo.png]]
 
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc04/ :file Sim-AR2rojo.png :results none
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc05/ :file Sim-AR2rojo.png :results none
 fig = plot_arma_analysis(ar_params, ma_params, seed=2026)
 fig.savefig('./img/lecc05/Sim-AR2rojo.png', dpi=300, bbox_inches='tight')
 #+END_SRC
@@ -1072,7 +1143,7 @@ E[U_t\cdot X_{t-k}]$$
 
 *para $k=0$:* $\quad$ (por $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$)
 $$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_0=\sigma^2\)}
-\quad\Rightarrow\quad
+\;\Rightarrow\;
 \gamma_0-\phi_1\gamma_1-\cdots-\phi_p\gamma_p=\sigma^2
 \quad\Rightarrow\quad \sigma^2=\gamma_0-\sum\nolimits_{j=1}^p\phi_j\gamma_j.$$
 Dividiendo por $\gamma_0$ (y recordando que $\rho_0=1$):
@@ -1084,12 +1155,12 @@ $$\boldsymbol{\phi}(\mathsf{B})\rho_0=\frac{\sigma^2}{\gamma_0}
   
 *para $k>0$:* $\quad$ (por $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$)
 $$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_k=0\)}
-\quad\Rightarrow\quad
+\;\Rightarrow\;
 \gamma_k-\phi_1\gamma_{k-1}-\cdots-\phi_p\gamma_{k-p}=0
 \quad\Rightarrow\quad \gamma_k=\sum\nolimits_{j=1}^p\phi_j\gamma_{k-j}.$$ 
 Dividiendo por $\gamma_0$:
 $$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\rho_k=0\)}
-\quad\Rightarrow\quad
+\;\Rightarrow\;
 \rho_k-\phi_1\rho_{k-1}-\cdots-\phi_p\rho_{k-p}=0
 \quad\Rightarrow\quad \rho_k=\sum\nolimits_{j=1}^p\phi_j\rho_{k-j}.$$
 
