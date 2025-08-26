@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-08-25 Mon 20:54 -->
+<!-- 2025-08-26 Tue 20:48 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 4. ACF, PACF y densidad espectral de modelos MA</title>
@@ -66,39 +66,39 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org3ab6f38">Funciones de autocovarianzas y de autocorrelación (ACF)</a></li>
-<li><a href="#orga627b51">Función de autocorrelación parcial  (PACF)</a></li>
-<li><a href="#orgef78e32">Densidad espectral</a></li>
-<li><a href="#org79386ba">ACF, PACF y densidad espectral de algunos modelos lineales</a>
+<li><a href="#orga6cacde">Funciones de autocovarianzas y de autocorrelación (ACF)</a></li>
+<li><a href="#org1191d70">Función de autocorrelación parcial  (PACF)</a></li>
+<li><a href="#orgd261ed3">Densidad espectral</a></li>
+<li><a href="#orgda30767">ACF, PACF y densidad espectral de algunos modelos lineales</a>
 <ul>
-<li><a href="#org56d19ac">Procesos lineales causales</a></li>
-<li><a href="#org4c2fdb6">Proceso de Ruido Blanco</a></li>
-<li><a href="#org8c605dd">Proceso de media móvil MA(\(q\))</a></li>
-<li><a href="#orgc7c58e0">Proceso de media móvil MA(\(1\))</a>
+<li><a href="#orgc8b63c9">Procesos lineales causales</a></li>
+<li><a href="#orge48868a">Proceso de Ruido Blanco</a></li>
+<li><a href="#org5e3c77e">Proceso de media móvil MA(\(q\))</a></li>
+<li><a href="#org7193ca9">Proceso de media móvil MA(\(1\))</a>
 <ul>
-<li><a href="#org530138d">MA(1) con raíz positiva</a></li>
-<li><a href="#org28959d6">MA(1) con raíz negativa</a></li>
+<li><a href="#org9536047">MA(1) con raíz positiva</a></li>
+<li><a href="#org37648c9">MA(1) con raíz negativa</a></li>
 </ul>
 </li>
-<li><a href="#org04db5ea">Proceso de media móvil MA(\(2\))</a>
+<li><a href="#orgf5d3804">Proceso de media móvil MA(\(2\))</a>
 <ul>
-<li><a href="#org205d89e">MA(2) con dos parámetros positivos (\(+\), \(+\))</a></li>
-<li><a href="#org7a75d08">MA(2) con parámetros de distinto signo (\(-\), \(+\))</a></li>
-<li><a href="#org1677ca0">MA(2) con dos parámetros negativos (\(-\), \(-\))</a></li>
-<li><a href="#org5774338">MA(2) con parámetros de distinto signo (\(+\), \(-\))</a></li>
-<li><a href="#org43a209e">MA(2) con dos raíces reales, una positiva y la otra negativa</a></li>
-<li><a href="#orgb064f59">MA(2) con un par de raíces complejas</a></li>
-<li><a href="#orge761bf7">MA(2) con dos raíces reales y negativas</a></li>
-<li><a href="#org7d3b121">MA(2) con dos raíces reales y positivas</a></li>
+<li><a href="#orge46d6d4">MA(2) con dos parámetros positivos (\(+\), \(+\))</a></li>
+<li><a href="#org8188d94">MA(2) con parámetros de distinto signo (\(-\), \(+\))</a></li>
+<li><a href="#org72dceda">MA(2) con dos parámetros negativos (\(-\), \(-\))</a></li>
+<li><a href="#org31d65d8">MA(2) con parámetros de distinto signo (\(+\), \(-\))</a></li>
+<li><a href="#org0accc7f">MA(2) con dos raíces reales, una positiva y la otra negativa</a></li>
+<li><a href="#orgbdf1120">MA(2) con un par de raíces complejas</a></li>
+<li><a href="#org6122e6f">MA(2) con dos raíces reales y negativas</a></li>
+<li><a href="#orgbef414d">MA(2) con dos raíces reales y positivas</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orga9ff56d">(Resumen) características de procesos MA(\(q\))</a></li>
+<li><a href="#org4b1cbcf">(Resumen) características de procesos MA(\(q\))</a></li>
 </ul>
 </div>
 </div>
-<div class="abstract" id="org7d7fa7b">
+<div class="abstract" id="orge6661d1">
 <p>
 Veremos tres funciones que describen las características correspondientes a los momentos de segundo orden de los procesos lineales: la función de autocorrelación (ACF), la función de autocorrelación parcial (PACF) y la densidad espectral (estas tres funciones son transformaciones de la función de autocovarianzas del proceso). Veremos la estructura de estas funciones en procesos lineales genéricos. Primero para  ruido blanco. Luego nos centraremos en los procesos de media móvil, o procesos MA; que caracterizan series con ``memoria muy corta''. Estos procesos son funciones de un número finito, y generalmente pequeño, de las innovaciones pasadas. A diferencia de los modelos autorregresivos, los procesos MA solo están correlados con un reducido número de valores anteriores, lo que permite que su función de autocorrelación simple tenga únicamente unas pocas autocorrelaciones distintas de cero.
 </p>
@@ -116,9 +116,9 @@ Veremos tres funciones que describen las características correspondientes a los
 <style>
 .reveal  td {font-size: 60%;}
 </style>
-<div id="outline-container-org5176cc0" class="outline-4">
-<h4 id="org5176cc0">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-org5176cc0">
+<div id="outline-container-org0ad89d5" class="outline-4">
+<h4 id="org0ad89d5">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-org0ad89d5">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python
 </span><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra
@@ -126,13 +126,14 @@ Veremos tres funciones que describen las características correspondientes a los
 </span><span style="font-weight: bold;">import</span> matplotlib <span style="font-weight: bold;">as</span> mpl
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">definimos par&#225;metros para mejorar los gr&#225;ficos
 </span>mpl.rc(<span style="font-style: italic;">'text'</span>, usetex=<span style="font-weight: bold; text-decoration: underline;">False</span>)
-<span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt   <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">data visualization</span>
+<span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt   <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">data visualization
+</span><span style="font-weight: bold;">import</span> dataframe_image <span style="font-weight: bold;">as</span> dfi   <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">export tables as .png</span>
 </code></pre>
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="orgf2f9d73"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
-<div class="outline-text-5" id="text-orgf2f9d73">
+<li><a id="orga1def79"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
+<div class="outline-text-5" id="text-orga1def79">
 <p>
 para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
@@ -146,9 +147,9 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 </li>
 </ul>
 </div>
-<div id="outline-container-org149537a" class="outline-4">
-<h4 id="org149537a">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
-<div class="outline-text-4" id="text-org149537a">
+<div id="outline-container-org1ced03e" class="outline-4">
+<h4 id="org1ced03e">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
+<div class="outline-text-4" id="text-org1ced03e">
 <p>
 Cargamos las funciones auxiliares (véase la carpeta <code>src/</code>)
 </p>
@@ -161,9 +162,9 @@ warnings.filterwarnings(<span style="font-style: italic;">"ignore"</span>, categ
 </div>
 </div>
 </div>
-<div id="outline-container-org3ab6f38" class="outline-2">
-<h2 id="org3ab6f38">Funciones de autocovarianzas y de autocorrelación (ACF)</h2>
-<div class="outline-text-2" id="text-org3ab6f38">
+<div id="outline-container-orga6cacde" class="outline-2">
+<h2 id="orga6cacde">Funciones de autocovarianzas y de autocorrelación (ACF)</h2>
+<div class="outline-text-2" id="text-orga6cacde">
 <p>
 Si un proceso estocástico es estacionario, la covarianza entre \(X_t\) y \(X_{t+k}\) no depende de \(t\); tan solo depende de la distancia temporal \(k\) entre ambas variables aleatorias: \(\;Cov(X_t,X_{t-k})=\gamma_k.\;\) 
 </p>
@@ -188,9 +189,9 @@ proceso estocástico.
 </p>
 </div>
 </div>
-<div id="outline-container-orga627b51" class="outline-2">
-<h2 id="orga627b51">Función de autocorrelación parcial  (PACF)</h2>
-<div class="outline-text-2" id="text-orga627b51">
+<div id="outline-container-org1191d70" class="outline-2">
+<h2 id="org1191d70">Función de autocorrelación parcial  (PACF)</h2>
+<div class="outline-text-2" id="text-org1191d70">
 <p>
 La <i>correlación parcial</i> entre dos variables \(X_t\) y \(X_{t-k}\) de un
 proceso estacionario \(\boldsymbol{X}\) mide su correlación una vez
@@ -263,9 +264,9 @@ arrojará luz sobre las propiedades de un proceso estocástico.
 </p>
 </div>
 </div>
-<div id="outline-container-orgef78e32" class="outline-2">
-<h2 id="orgef78e32">Densidad espectral</h2>
-<div class="outline-text-2" id="text-orgef78e32">
+<div id="outline-container-orgd261ed3" class="outline-2">
+<h2 id="orgd261ed3">Densidad espectral</h2>
+<div class="outline-text-2" id="text-orgd261ed3">
 <p>
 Si \(\boldsymbol{X}\) es un proceso estocástico con función de
 autocovarianzas \(\boldsymbol{\gamma}\in\ell^1\), es decir, con función
@@ -322,13 +323,13 @@ modelos lineales concretos.
 </p>
 </div>
 </div>
-<div id="outline-container-org79386ba" class="outline-2">
-<h2 id="org79386ba">ACF, PACF y densidad espectral de algunos modelos lineales</h2>
-<div class="outline-text-2" id="text-org79386ba">
+<div id="outline-container-orgda30767" class="outline-2">
+<h2 id="orgda30767">ACF, PACF y densidad espectral de algunos modelos lineales</h2>
+<div class="outline-text-2" id="text-orgda30767">
 </div>
-<div id="outline-container-org56d19ac" class="outline-3">
-<h3 id="org56d19ac">Procesos lineales causales</h3>
-<div class="outline-text-3" id="text-org56d19ac">
+<div id="outline-container-orgc8b63c9" class="outline-3">
+<h3 id="orgc8b63c9">Procesos lineales causales</h3>
+<div class="outline-text-3" id="text-orgc8b63c9">
 <p>
 Sea \(\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U},\;\)
 donde \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y
@@ -361,9 +362,9 @@ A partir de \(\boldsymbol{\gamma}\) obtenemos las otras tres funciones:
 </p>
 </div>
 </div>
-<div id="outline-container-org4c2fdb6" class="outline-3">
-<h3 id="org4c2fdb6">Proceso de Ruido Blanco</h3>
-<div class="outline-text-3" id="text-org4c2fdb6">
+<div id="outline-container-orge48868a" class="outline-3">
+<h3 id="orge48868a">Proceso de Ruido Blanco</h3>
+<div class="outline-text-3" id="text-orge48868a">
 <p>
 Sea \(\boldsymbol{X}=1*\boldsymbol{U}\),
 donde \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;;\) es decir \(X_t=U_t\) para
@@ -396,7 +397,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACFwhitenoise.png'</
 </div>
 
 
-<div id="org71ede5b" class="figure">
+<div id="orgc641e0b" class="figure">
 <p><img src="./img/lecc04/ACFwhitenoise.png" alt="ACFwhitenoise.png" width="900px" />
 </p>
 </div>
@@ -409,27 +410,27 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/SimulWhitenoise.png'
 
 
 
-<div id="orgad0921d" class="figure">
+<div id="orgcb5402f" class="figure">
 <p><img src="./img/lecc04/SimulWhitenoise.png" alt="SimulWhitenoise.png" width="900px" />
 </p>
 </div>
 
 
 
-<div id="org53c21b1" class="figure">
+<div id="org2d6ec3f" class="figure">
 <p><img src="./img/lecc04/colores.png" alt="colores.png" />
 </p>
 </div>
 
 <p>
 En la luz blanca todos los colores (frecuencias) aparecen por igual (por eso se ve blanco).
-Este proceso es el pilar sobre el que construimos los demás procesos (débilmente) estacionarios.
+El ruido blanco es el pilar sobre el que construimos los demás procesos (débilmente) estacionarios.
 </p>
 </div>
 </div>
-<div id="outline-container-org8c605dd" class="outline-3">
-<h3 id="org8c605dd">Proceso de media móvil MA(\(q\))</h3>
-<div class="outline-text-3" id="text-org8c605dd">
+<div id="outline-container-org5e3c77e" class="outline-3">
+<h3 id="org5e3c77e">Proceso de media móvil MA(\(q\))</h3>
+<div class="outline-text-3" id="text-org5e3c77e">
 <p>
 Sea \(\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}\), con \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y donde \(\boldsymbol{\theta}\) es un polinomio de orden \(q>0\), con \(\theta_0=1\) y con todas sus raíces fuera del círculo unidad \((\boldsymbol{\theta}^{-\triangleright}\in\ell^1)\), es decir \[X_t=\sum_{j=1}^q\theta_j U_{t-j}+U_t.\]
 </p>
@@ -481,9 +482,9 @@ Los procesos MA se caracterizan por su ``memoria muy corta''. Estos procesos dep
 </p>
 </div>
 </div>
-<div id="outline-container-orgc7c58e0" class="outline-3">
-<h3 id="orgc7c58e0">Proceso de media móvil MA(\(1\))</h3>
-<div class="outline-text-3" id="text-orgc7c58e0">
+<div id="outline-container-org7193ca9" class="outline-3">
+<h3 id="org7193ca9">Proceso de media móvil MA(\(1\))</h3>
+<div class="outline-text-3" id="text-org7193ca9">
 <p>
 Sea \(\boldsymbol{X}=(1-\theta z)*\boldsymbol{U}\) con \(|\theta|<1\) y
 con \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\), es decir \[X_t=U_t-\theta
@@ -509,9 +510,9 @@ U_{t-1}.\]
 <li>\(\boldsymbol{\pi} \;=\; \sum\limits_{k\in\mathbb{Z}}{  \frac{-\theta^k(1-\theta^2)}{1-\theta^{2(k+1)}} z^k}\)</li>
 </ul>
 </div>
-<div id="outline-container-org530138d" class="outline-4">
-<h4 id="org530138d">MA(1) con raíz positiva</h4>
-<div class="outline-text-4" id="text-org530138d">
+<div id="outline-container-org9536047" class="outline-4">
+<h4 id="org9536047">MA(1) con raíz positiva</h4>
+<div class="outline-text-4" id="text-org9536047">
 <p>
 \[\boldsymbol{\theta}(z)=1-0.9z\quad\Rightarrow\quad X_t=
 (1-0.9 \mathsf{B})U_t\qquad {\color{blue}{(\theta>0)}}\]
@@ -528,10 +529,18 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA1p.png'</span>
 
 
 
-<div id="org9e73aed" class="figure">
+<div id="org28ffb85" class="figure">
 <p><img src="./img/lecc04/ACF-MA1p.png" alt="ACF-MA1p.png" width="900px" />
 </p>
 </div>
+
+
+
+<div id="org7977257" class="figure">
+<p><img src="img/lecc04/Roots-MA1p.png" alt="Roots-MA1p.png" width="500px" />
+</p>
+</div>
+
 
 
 <div class="org-src-container">
@@ -542,15 +551,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA1p.png'</span>
 
 
 
-<div id="orgf4eac8e" class="figure">
+<div id="org027db15" class="figure">
 <p><img src="./img/lecc04/Sim-MA1p.png" alt="Sim-MA1p.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org28959d6" class="outline-4">
-<h4 id="org28959d6">MA(1) con raíz negativa</h4>
-<div class="outline-text-4" id="text-org28959d6">
+<div id="outline-container-org37648c9" class="outline-4">
+<h4 id="org37648c9">MA(1) con raíz negativa</h4>
+<div class="outline-text-4" id="text-org37648c9">
 <p>
 \[\boldsymbol{\theta}(z)=1+0.9z\quad\Rightarrow\quad X_t=
 (1+0.9 \mathsf{B})U_t\qquad {\color{blue}{(\theta<0)}}\]
@@ -567,10 +576,18 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA1n.png'</span>
 
 
 
-<div id="orga518920" class="figure">
+<div id="org100407c" class="figure">
 <p><img src="./img/lecc04/ACF-MA1n.png" alt="ACF-MA1n.png" width="900px" />
 </p>
 </div>
+
+
+<div id="org27e32fa" class="figure">
+<p><img src="img/lecc04/Roots-MA1n.png" alt="Roots-MA1n.png" width="500px" />
+</p>
+</div>
+
+
 
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span> = plot_arma_analysis(ar_params, ma_params, seed=2026)
@@ -579,16 +596,16 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA1n.png'</span>
 </div>
 
 
-<div id="orgd9712e6" class="figure">
+<div id="org9644f44" class="figure">
 <p><img src="./img/lecc04/Sim-MA1n.png" alt="Sim-MA1n.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org04db5ea" class="outline-3">
-<h3 id="org04db5ea">Proceso de media móvil MA(\(2\))</h3>
-<div class="outline-text-3" id="text-org04db5ea">
+<div id="outline-container-orgf5d3804" class="outline-3">
+<h3 id="orgf5d3804">Proceso de media móvil MA(\(2\))</h3>
+<div class="outline-text-3" id="text-orgf5d3804">
 <p>
 Sea \(\boldsymbol{X}=(1-\theta_1 z-\theta_2 z^2)*\boldsymbol{U}\), con
 \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y con
@@ -622,20 +639,15 @@ decae paulatinamente.</li>
 </ul>
 
 
-<div id="orgda9baa0" class="figure">
+<div id="org4736e1d" class="figure">
 <p><img src="img/lecc04/MA2roots.png" alt="MA2roots.png" width="600px" />
 </p>
 <p><span class="figure-number">Figura 1: </span>El interior del triángulo es la región paramétrica donde un MA(2) es invertible. Por debajo de la parábola las raíces son complejas. El signo del parámetro \(\theta_1\) determina el signo del primer retardo de la ACF y \(\theta_2\) el signo del segundo. Las regiones 1, 2, 3, y 4 determinan cómo decae la PACF.</p>
 </div>
-
-<div class="org-src-container">
-<pre class="src src-jupyter-python"><code>RegionParametrica(<span style="font-style: italic;">'MA'</span>).savefig(<span style="font-style: italic;">'./img/lecc04/MA2roots.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
-</code></pre>
 </div>
-</div>
-<div id="outline-container-org205d89e" class="outline-4">
-<h4 id="org205d89e">MA(2) con dos parámetros positivos (\(+\), \(+\))</h4>
-<div class="outline-text-4" id="text-org205d89e">
+<div id="outline-container-orge46d6d4" class="outline-4">
+<h4 id="orge46d6d4">MA(2) con dos parámetros positivos (\(+\), \(+\))</h4>
+<div class="outline-text-4" id="text-orge46d6d4">
 <p>
 \[
 \boldsymbol{\theta}(z) = 1-0.6z -0.3z^2
@@ -657,17 +669,17 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2thpp.png'</sp
 
 
 
-<div id="org1809719" class="figure">
+<div id="org09fe266" class="figure">
 <p><img src="./img/lecc04/ACF-MA2thpp.png" alt="ACF-MA2thpp.png" width="900px" />
 </p>
 </div>
 
 
-<pre class="example">
-d48fd8e6-47f8-4088-a86b-936137087e5d
-</pre>
 
-
+<div id="org2d3a0eb" class="figure">
+<p><img src="img/lecc04/Roots-MA2thpp.png" alt="Roots-MA2thpp.png" width="500px" />
+</p>
+</div>
 
 
 <div class="org-src-container">
@@ -678,15 +690,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2thpp.png'</sp
 
 
 
-<div id="orgb2b39d9" class="figure">
+<div id="org01f4555" class="figure">
 <p><img src="./img/lecc04/Sim-MA2thpp.png" alt="Sim-MA2thpp.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org7a75d08" class="outline-4">
-<h4 id="org7a75d08">MA(2) con parámetros de distinto signo (\(-\), \(+\))</h4>
-<div class="outline-text-4" id="text-org7a75d08">
+<div id="outline-container-org8188d94" class="outline-4">
+<h4 id="org8188d94">MA(2) con parámetros de distinto signo (\(-\), \(+\))</h4>
+<div class="outline-text-4" id="text-org8188d94">
 <p>
 \[
 \boldsymbol{\theta}(z)=1+0.6z -0.3z^2
@@ -707,16 +719,17 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2thnp.png'</sp
 
 
 
-<div id="org63eb327" class="figure">
+<div id="org1e15aa9" class="figure">
 <p><img src="./img/lecc04/ACF-MA2thnp.png" alt="ACF-MA2thnp.png" width="900px" />
 </p>
 </div>
 
 
-<pre class="example">
-cf298c14-578d-4afc-a46c-1ea5452bf48f
-</pre>
 
+<div id="org7d606b0" class="figure">
+<p><img src="img/lecc04/Roots-MA2thnp.png" alt="Roots-MA2thnp.png" width="500px" />
+</p>
+</div>
 
 
 <div class="org-src-container">
@@ -727,15 +740,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2thnp.png'</sp
 
 
 
-<div id="orgd5525b5" class="figure">
+<div id="orgafcba00" class="figure">
 <p><img src="./img/lecc04/Sim-MA2thnp.png" alt="Sim-MA2thnp.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org1677ca0" class="outline-4">
-<h4 id="org1677ca0">MA(2) con dos parámetros negativos (\(-\), \(-\))</h4>
-<div class="outline-text-4" id="text-org1677ca0">
+<div id="outline-container-org72dceda" class="outline-4">
+<h4 id="org72dceda">MA(2) con dos parámetros negativos (\(-\), \(-\))</h4>
+<div class="outline-text-4" id="text-org72dceda">
 <p>
 \[
 \boldsymbol{\theta}(z) = 1+0.9z +0.9z^2
@@ -757,16 +770,17 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2thnn.png'</sp
 
 
 
-<div id="org5cf4ce5" class="figure">
+<div id="org10a75f3" class="figure">
 <p><img src="./img/lecc04/ACF-MA2thnn.png" alt="ACF-MA2thnn.png" width="900px" />
 </p>
 </div>
 
 
-<pre class="example">
-d2fc7023-4994-42b3-ba8e-17b83ccbfdac
-</pre>
 
+<div id="org81ff7f0" class="figure">
+<p><img src="img/lecc04/Roots-MA2thnn.png" alt="Roots-MA2thnn.png" width="500px" />
+</p>
+</div>
 
 
 <div class="org-src-container">
@@ -777,15 +791,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2thnn.png'</sp
 
 
 
-<div id="org288773c" class="figure">
+<div id="org94b06cf" class="figure">
 <p><img src="./img/lecc04/Sim-MA2thnn.png" alt="Sim-MA2thnn.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org5774338" class="outline-4">
-<h4 id="org5774338">MA(2) con parámetros de distinto signo (\(+\), \(-\))</h4>
-<div class="outline-text-4" id="text-org5774338">
+<div id="outline-container-org31d65d8" class="outline-4">
+<h4 id="org31d65d8">MA(2) con parámetros de distinto signo (\(+\), \(-\))</h4>
+<div class="outline-text-4" id="text-org31d65d8">
 <p>
 \[
 \boldsymbol{\theta}(z)=1-1.1z +0.9z^2
@@ -806,16 +820,17 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2thpn.png'</sp
 
 
 
-<div id="orgb1f58a2" class="figure">
+<div id="orga403172" class="figure">
 <p><img src="./img/lecc04/ACF-MA2thpn.png" alt="ACF-MA2thpn.png" width="900px" />
 </p>
 </div>
 
 
-<pre class="example">
-8168149b-8038-4d51-84fe-4d8105e81f62
-</pre>
 
+<div id="org58e2fd8" class="figure">
+<p><img src="img/lecc04/Roots-MA2thpn.png" alt="Roots-MA2thpn.png" width="500px" />
+</p>
+</div>
 
 
 <div class="org-src-container">
@@ -826,15 +841,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2thpn.png'</sp
 
 
 
-<div id="org3d76aea" class="figure">
+<div id="org064aa15" class="figure">
 <p><img src="./img/lecc04/Sim-MA2thpn.png" alt="Sim-MA2thpn.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org43a209e" class="outline-4">
-<h4 id="org43a209e">MA(2) con dos raíces reales, una positiva y la otra negativa</h4>
-<div class="outline-text-4" id="text-org43a209e">
+<div id="outline-container-org0accc7f" class="outline-4">
+<h4 id="org0accc7f">MA(2) con dos raíces reales, una positiva y la otra negativa</h4>
+<div class="outline-text-4" id="text-org0accc7f">
 <p>
 \[
 \boldsymbol{\theta}(z)=1-0.64z^2
@@ -855,15 +870,18 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2pn.png'</span
 
 
 
-<div id="orgaa0ee60" class="figure">
+<div id="org22103f5" class="figure">
 <p><img src="./img/lecc04/ACF-MA2pn.png" alt="ACF-MA2pn.png" width="900px" />
 </p>
 </div>
 
 
-<pre class="example">
-a60dcdfe-4963-4e8f-8ea4-e6595ca55b2a
-</pre>
+
+
+<div id="orgfa82a58" class="figure">
+<p><img src="img/lecc04/Roots-MA2pn.png" alt="Roots-MA2pn.png" width="500px" />
+</p>
+</div>
 
 
 
@@ -875,15 +893,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2pn.png'</span
 
 
 
-<div id="org7d67544" class="figure">
+<div id="org84f2fbc" class="figure">
 <p><img src="./img/lecc04/Sim-MA2pn.png" alt="Sim-MA2pn.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgb064f59" class="outline-4">
-<h4 id="orgb064f59">MA(2) con un par de raíces complejas</h4>
-<div class="outline-text-4" id="text-orgb064f59">
+<div id="outline-container-orgbdf1120" class="outline-4">
+<h4 id="orgbdf1120">MA(2) con un par de raíces complejas</h4>
+<div class="outline-text-4" id="text-orgbdf1120">
 <p>
 \[
 \boldsymbol{\theta}(z)=1+0.64z^2
@@ -904,14 +922,17 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2np.png'</span
 
 
 
-<div id="org964d27c" class="figure">
+<div id="org25bf8dc" class="figure">
 <p><img src="./img/lecc04/ACF-MA2np.png" alt="ACF-MA2np.png" width="900px" />
 </p>
 </div>
 
-<pre class="example">
-6f6df2c4-a16f-48dc-8aa4-8fa9e5f207a5
-</pre>
+
+
+<div id="orge6ab5a2" class="figure">
+<p><img src="img/lecc04/Roots-MA2np.png" alt="Roots-MA2np.png" width="500px" />
+</p>
+</div>
 
 
 
@@ -923,15 +944,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2np.png'</span
 
 
 
-<div id="org964d1f9" class="figure">
+<div id="org036c1b2" class="figure">
 <p><img src="./img/lecc04/Sim-MA2np.png" alt="Sim-MA2np.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orge761bf7" class="outline-4">
-<h4 id="orge761bf7">MA(2) con dos raíces reales y negativas</h4>
-<div class="outline-text-4" id="text-orge761bf7">
+<div id="outline-container-org6122e6f" class="outline-4">
+<h4 id="org6122e6f">MA(2) con dos raíces reales y negativas</h4>
+<div class="outline-text-4" id="text-org6122e6f">
 <p>
 \[
 \boldsymbol{\theta}(z)=1+1.6z+0.64z^2
@@ -952,15 +973,17 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2rojo.png'</sp
 
 
 
-<div id="org53ef623" class="figure">
+<div id="orgf2f2e96" class="figure">
 <p><img src="./img/lecc04/ACF-MA2rojo.png" alt="ACF-MA2rojo.png" width="900px" />
 </p>
 </div>
 
 
-<pre class="example">
-8f369b69-062a-497e-b58c-d1feffbe74ca
-</pre>
+
+<div id="org1a3b115" class="figure">
+<p><img src="img/lecc04/Roots-MA2rojo.png" alt="Roots-MA2rojo.png" width="500px" />
+</p>
+</div>
 
 
 
@@ -972,15 +995,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2rojo.png'</sp
 
 
 
-<div id="org6848601" class="figure">
+<div id="orgb6a8eaa" class="figure">
 <p><img src="./img/lecc04/Sim-MA2rojo.png" alt="Sim-MA2rojo.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org7d3b121" class="outline-4">
-<h4 id="org7d3b121">MA(2) con dos raíces reales y positivas</h4>
-<div class="outline-text-4" id="text-org7d3b121">
+<div id="outline-container-orgbef414d" class="outline-4">
+<h4 id="orgbef414d">MA(2) con dos raíces reales y positivas</h4>
+<div class="outline-text-4" id="text-orgbef414d">
 <p>
 \[
 \boldsymbol{\theta}(z)=1-1.6z+0.64z^2
@@ -1000,14 +1023,18 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/ACF-MA2violeta.png'<
 
 
 
-<div id="org2a8c750" class="figure">
+<div id="orgdb0b241" class="figure">
 <p><img src="./img/lecc04/ACF-MA2violeta.png" alt="ACF-MA2violeta.png" width="900px" />
 </p>
 </div>
 
-<pre class="example">
-1c5379e1-89c5-4c70-a9a2-dbb5b91cf8e5
-</pre>
+
+
+
+<div id="org40a03d3" class="figure">
+<p><img src="img/lecc04/Roots-MA2violeta.png" alt="Roots-MA2violeta.png" width="500px" />
+</p>
+</div>
 
 
 
@@ -1019,7 +1046,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2violeta.png'<
 
 
 
-<div id="org27f8af9" class="figure">
+<div id="orga98cf22" class="figure">
 <p><img src="./img/lecc04/Sim-MA2violeta.png" alt="Sim-MA2violeta.png" width="900px" />
 </p>
 </div>
@@ -1027,9 +1054,9 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc04/Sim-MA2violeta.png'<
 </div>
 </div>
 </div>
-<div id="outline-container-orga9ff56d" class="outline-2">
-<h2 id="orga9ff56d">(Resumen) características de procesos MA(\(q\))</h2>
-<div class="outline-text-2" id="text-orga9ff56d">
+<div id="outline-container-org4b1cbcf" class="outline-2">
+<h2 id="org4b1cbcf">(Resumen) características de procesos MA(\(q\))</h2>
+<div class="outline-text-2" id="text-org4b1cbcf">
 <p>
 <span class="underline">Siempre estacionario.</span>
 </p>
@@ -1066,7 +1093,7 @@ exponenciales y/o sinusoidales amortiguadas.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-08-25 Mon 20:54</p>
+<p class="date">Created: 2025-08-26 Tue 20:48</p>
 </div>
 </body>
 </html>
