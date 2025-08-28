@@ -4,6 +4,8 @@
 # +PROPERTY: header-args :exports both :results silent 
 # +OPTIONS: toc:nil num:nil
 
+# https://cienciadedatos.net/documentos/py51-modelos-arima-sarimax-python#Instrucciones_para_citar
+
 # ###########
 #+SETUPFILE: ../../css/readtheorg_inline.theme
 # ###########
@@ -43,6 +45,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 #+RESULTS:
 
 
+
 * ACF, PACF y densidad espectral teóricas
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
@@ -53,11 +56,12 @@ warnings.filterwarnings("ignore", category=UserWarning)
 #+BEGIN_SRC jupyter-python
 ar_params = [1,]
 ma_params = [1,]
-plot_arma_parametric_diagnostics(ar_params, ma_params, 1, lags=20)
+plot_arma_parametric_diagnostics(ar_params, ma_params)
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/37b1fa129bef75418818a60e853d6600bb69b8f1.png]]
+[[file:./.ob-jupyter/359e5e4b9d88f184388337db68201abfee2a790b.png]]
+
 
 * ACF, PACF y densidad espectral estimadas de un modelo simulado
    :PROPERTIES:
@@ -72,7 +76,7 @@ plot_arma_analysis(ar_params, ma_params, seed=2026)
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/aa6379cc40ebe321b4072553eb045e107d272799.png]]
+[[file:./.ob-jupyter/f07342ac528d084ad30fec257706638bbcee261d.png]]
 
 * Análisis de un modelo ARMA
    :PROPERTIES:
@@ -84,11 +88,60 @@ plot_arma_analysis(ar_params, ma_params, seed=2026)
 #+BEGIN_SRC jupyter-python
 ar_params = [1, 0.5]
 ma_params = [1, -0.9, 0.4]
-plot_arma_parametric_diagnostics(ar_params, ma_params, sigma2=1, lags=20)
+plot_arma_parametric_diagnostics(ar_params, ma_params)
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/677b40f3186cab1432077f7d515d9cc9a2275c6e.png]]
+[[file:./.ob-jupyter/a393dd77462cd5b95687e928799d953a9b7d40e6.png]]
+
+
+
+** Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma
+
+#+BEGIN_SRC jupyter-python
+plot_arma_analysis(ar_params, ma_params)
+#+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/f8c02f1170fbd718e6f5afbcec2008f3151e4e58.png]]
+
+
+*** Caso paseo aleatorio
+
+#+BEGIN_SRC jupyter-python
+plot_paseo_aleatorio_analysis(trend="t", pendiente=0.25, n=400, semilla=2025)
+#+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/e27179d1ebe7f69edbd7b53fadda5d7f6b64e8ed.png]]
+
+
+#+BEGIN_SRC jupyter-python
+plot_paseo_aleatorio_analysis(n=400, semilla=2026)
+#+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/3931ee2707bc4d6398075b2c3d3f1ed968179a03.png]]
+
+
+*** Caso ARMA estacional
+
+
+#+BEGIN_SRC jupyter-python
+plot_arma_seasonal_parametric_diagnostics(ar_params=[1, -0.9], s=12, seasonal_ar_params=[1, -0.9], logs=True)
+#+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/e7d76821848b16a233e9dc9a2ccb6668409baba7.png]]
+
+#+BEGIN_SRC jupyter-python
+plot_arma_seasonal_parametric_diagnostics(seasonal_ma_params=[1, -0.9])
+#+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/da40da21b718410568d6cabef676c5332e2456fd.png]]
+
+
 
 
 ** Raíces de uno de los polinomos
@@ -102,10 +155,10 @@ polynomial_roots_table(ma_params)
 
 #+RESULTS:
 :RESULTS:
-|   | P. real | P. imag.  | Módulo   | Frecuencia | Periodo  | Multip. |
+|   | P. real |  P. imag. |   Módulo | Frecuencia |  Periodo | Multip. |
 |---+---------+-----------+----------+------------+----------+---------|
-| 0 | 1.125   | -1.111024 | 1.581139 | 0.124005   | 8.064174 | 1       |
-| 1 | 1.125   | 1.111024  | 1.581139 | 0.124005   | 8.064174 | 1       |
+| 0 |   1.125 | -1.111024 | 1.581139 |   0.124005 | 8.064174 |       1 |
+| 1 |   1.125 |  1.111024 | 1.581139 |   0.124005 | 8.064174 |       1 |
 :END:
 
 
@@ -114,7 +167,8 @@ plot_arma_analysis(ar_params, ma_params)
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/45e614982840fa61a58836b4e9f1f15355c5900c.png]]
+[[file:./.ob-jupyter/3ad887dc36c532c414f1c93490155fe6707fbad8.png]]
+
 
 * Ejemplo de uso
    :PROPERTIES:
@@ -134,10 +188,10 @@ polynomial_roots_table(ma_params)
 
 #+RESULTS:
 :RESULTS:
-|   | P. real  | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
+|   |  P. real | P. imag. |   Módulo | Frecuencia | Periodo | Multip. |
 |---+----------+----------+----------+------------+---------+---------|
-| 0 | 1.111111 | 0.0      | 1.111111 | 0.0        | Inf     | 1       |
-| 1 | 1.666667 | 0.0      | 1.666667 | 0.0        | Inf     | 1       |
+| 0 | 1.111111 |      0.0 | 1.111111 |        0.0 |     Inf |       1 |
+| 1 | 1.666667 |      0.0 | 1.666667 |        0.0 |     Inf |       1 |
 :END:
 
 
@@ -151,19 +205,20 @@ Localizacion_parametros_plot(-ma_params[1],-ma_params[2],'AR')
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 #+BEGIN_SRC jupyter-python 
-plot_arma_parametric_diagnostics([1], ma_params, sigma2=1, lags=20)
+plot_arma_parametric_diagnostics([1], ma_params)
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/3b2c2f8f1056b3a1161ac6ec3fcbcb697951a5dd.png]]
+[[file:./.ob-jupyter/e3c6b5552bdd98a7716d92649b6d046f07c0f030.png]]
 
-#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+
+
 #+BEGIN_SRC jupyter-python
-plot_arma_analysis([1], ma_params)
+plot_sarima_analysis(seasonal_ar_params=[1,],d=0, ar_params=[1,],D=1,s=12,n=300)
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/68ceaf40fe4c91fc5128d54bfe94aa3b2e0e9f71.png]]
+[[file:./.ob-jupyter/c2a426d9540f5dfc76865506facaedc725f996c1.png]]
 
 
 
@@ -176,7 +231,11 @@ plot_arma_analysis([1], ma_params)
 <<imports>>
 <<calculo-PACF-a-partir-de-la-ACF>>
 <<representacion-ACF-PACF-y-espectro>>
+<<representacion-ACF-PACF-y-espectro-ARMA-estacional>>
+<<SARIMA2ARMA>>
 <<analisis-ARMA-simulado>>
+<<analisis-SARIMA-simulado>>
+<<analisis-RW-simulado>>
 <<analisis-raices-polinomio>>
 <<Localizacion parametros polinomio grado 2>>
 <<Región paramétrica polinomio grado 2>>
@@ -189,17 +248,23 @@ plot_arma_analysis([1], ma_params)
 #+name: imports
 #+begin_src python :eval no
 import numpy as np
+from numpy.polynomial import Polynomial
+
 import pandas as pd
+
 import matplotlib as mpl
 # definimos parámetros para mejorar los gráficos
 mpl.rc('text', usetex=False)
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker ## *** nuevo para ARMAs estacionales
 
 import statsmodels.api as sm
 from statsmodels.tsa.arima_process import ArmaProcess
+from statsmodels.tsa.arima.model import ARIMA ## *** nuevo en paseos aleatorios
+
 from scipy import signal
 from scipy.signal import freqz
-from numpy.polynomial import Polynomial
+
 import math
 
 #+end_src
@@ -261,10 +326,11 @@ def theoretical_pacf_from_acf(acf_vals):
    :END:
 
 
-La siguiente función pinta las ACF, PACF y densidad espectral teóricas.
+La siguiente función pinta las ACF, PACF y densidad espectral teóricas de un modelo ARMA.
+
 #+name: representacion-ACF-PACF-y-espectro
-#+BEGIN_SRC python :eval no
-def plot_arma_parametric_diagnostics(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20):
+#+BEGIN_SRC python :noweb yes :eval no
+def plot_arma_parametric_diagnostics(ar_params=[1,], ma_params=[1,], sigma2=1, lags=False):
     """
     Genera y retorna una figura con tres subgráficas para un modelo ARMA:
       - ACF teórica (omitiendo retardo 0)
@@ -289,7 +355,13 @@ def plot_arma_parametric_diagnostics(ar_params=[1,], ma_params=[1,], sigma2=1, l
     theta = Polynomial(ma_params, symbol='B')
     # Crear el proceso ARMA
     arma_process = ArmaProcess(ar=phi.coef, ma=theta.coef)
-    
+
+    s=4
+    if lags:
+        lags=lags
+    else:
+        lags=(s*5)+1
+
     # 1. Calcular la ACF teórica
     acf_theo = arma_process.acf(lags=lags)
     lags_theo = np.arange(len(acf_theo))
@@ -308,25 +380,9 @@ def plot_arma_parametric_diagnostics(ar_params=[1,], ma_params=[1,], sigma2=1, l
     spectrum = (sigma2 / (2 * np.pi)) * np.abs(h)**2
     
     # 4. Graficar los tres subgráficos
-    fig, axs = plt.subplots(1, 3, figsize=(18, 3))
-    
-    # ACF teórica
-    axs[0].stem(lags_plot, acf_plot, basefmt=" ")
-    axs[0].axhline(0, color='black', lw=0.5, linestyle='--')
-    axs[0].set_xlabel('Retardo')
-    axs[0].set_ylabel('ACF')
-    
-    # PACF teórica paramétrica
-    axs[1].stem(lags_pacf, pacf_plot, basefmt=" ")
-    axs[1].axhline(0, color='black', lw=0.5, linestyle='--')
-    axs[1].set_xlabel('Retardo')
-    axs[1].set_ylabel('PACF')
-    
-    # Densidad espectral teórica
-    axs[2].plot(freq, spectrum)
-    axs[2].axhline(0, color='black', lw=0.5, linestyle='--')
-    axs[2].set_xlabel('Frecuencia')
-    axs[2].set_ylabel('Densidad Espectral')
+    s=5
+    logs=False
+    <<Creación de las 3 figuras>>
     
     plt.tight_layout()
     plt.close(fig)
@@ -358,6 +414,151 @@ Breve explicación de la anterior función =plot_arma_parametric_diagnostics=:
 5. Por último, la función retorna el objeto figura.
 
 
+#+name: representacion-ACF-PACF-y-espectro-ARMA-estacional
+#+BEGIN_SRC python :noweb yes
+def plot_arma_seasonal_parametric_diagnostics(ar_params=[1,], ma_params=[1,], s=5, seasonal_ar_params=[1,], seasonal_ma_params=[1,], sigma2=1, lags=False, logs=False):
+    """
+    Genera y retorna una figura con tres subgráficas para un modelo ARMA estacional:
+      - ACF teórica (omitiendo retardo 0)
+      - PACF teórica paramétrica (calculada vía el algoritmo de Durbin-Levinson, omitiendo retardo 0)
+      - Densidad espectral teórica
+    
+    Parámetros:
+      ar_params (list):
+          Coeficientes del polinomio AR en B (debe incluir el 1 inicial).
+      ma_params (list):
+          Coeficientes del polinomio MA en B  (debe incluir el 1 inicial).
+      seasonal_ar_params (list):
+          Coeficientes del polinomio AR estacional en B^s (debe incluir el 1 inicial).
+      seasonal_ma_params (list):
+          Coeficientes del polinomio MA estacional en B^s (debe incluir el 1 inicial).
+      sigma2 (float):
+          Varianza del ruido Uₜ.
+      lags (int, opcional): 
+          Número de retardos considerados (por defecto 20).
+      seasonal_lags (int, opcional): 
+          Número de retardos estacionales (por defecto 0).
+    
+    Retorna:
+      fig : objeto matplotlib.figure.Figure
+    """
+
+    def Seasonal_polynomial(coeffs, k):
+        """
+        Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
+        """        
+        ## Crea la lista completa de coeficientes para el polinomio
+        lista_coefs = [coeffs[i//k] if i % k == 0 else 0 for i in range(k * len(coeffs) - (k - 1))]
+        # Crea y devuelve el polinomio a partir de los coeficientes
+        return Polynomial(lista_coefs, symbol='B')
+
+    if lags:
+        lags=lags
+    else:
+        lags=(s*5)+1
+
+    # Definir los polinomios AR y MA (incluyendo componentes estacionales)
+    phi_r   = Polynomial(ar_params, symbol='B')
+    theta_r = Polynomial(ma_params, symbol='B')
+    phi_s   = Seasonal_polynomial(seasonal_ar_params, s)
+    theta_s = Seasonal_polynomial(seasonal_ma_params, s)
+
+    phi = phi_r*phi_s
+    theta = theta_r*theta_s
+    
+    # Crear el proceso ARMA estacional
+    arma_process = ArmaProcess(ar=phi.coef, ma=theta.coef)
+    
+    # 1. Calcular la ACF teórica
+    acf_theo = arma_process.acf(lags=lags)
+    lags_theo = np.arange(len(acf_theo))
+    # Omitir el retardo 0 para gráficos de ACF y PACF:
+    acf_plot = acf_theo[1:]
+    lags_plot = lags_theo[1:]
+    
+    # 2. Calcular la PACF teórica de forma paramétrica a partir de la ACF
+    pacf_theo = theoretical_pacf_from_acf(acf_theo)
+    pacf_plot = pacf_theo[1:]
+    lags_pacf = np.arange(len(pacf_theo))[1:]
+    
+    # 3. Calcular la densidad espectral teórica usando freqz
+    w, h = freqz(theta.coef, phi.coef, worN=1024)
+    freq = w / (2 * np.pi)  # Conversión de radianes/muestra a ciclos/muestra
+    spectrum = (sigma2 / (2 * np.pi)) * np.abs(h)**2
+    
+    # 4. Graficar los tres subgráficos
+    <<Creación de las 3 figuras>>
+    
+    plt.tight_layout()
+    plt.close(fig)
+    return fig
+
+#+END_SRC
+
+
+#+name: Creación de las 3 figuras
+#+BEGIN_SRC python
+fig, axs = plt.subplots(1, 3, figsize=(18, 3))
+
+# ACF teórica
+axs[0].stem(lags_plot, acf_plot, basefmt=" ")
+axs[0].axhline(0, color='black', lw=0.5, linestyle='--')
+axs[0].set_xlabel('Retardo')
+axs[0].set_ylabel('ACF')
+axs[0].xaxis.set_major_locator(ticker.MultipleLocator(s))  # Tics en múltiplos de 's'
+axs[0].grid(axis='x')  # Añadir cuadrícula vertical
+
+# PACF teórica paramétrica
+axs[1].stem(lags_pacf, pacf_plot, basefmt=" ")
+axs[1].axhline(0, color='black', lw=0.5, linestyle='--')
+axs[1].set_xlabel('Retardo')
+axs[1].set_ylabel('PACF')
+axs[1].xaxis.set_major_locator(ticker.MultipleLocator(s))  # Tics en múltiplos de 's'
+axs[1].grid(axis='x')  # Añadir cuadrícula vertical
+
+# Densidad espectral teórica
+axs[2].plot(freq, spectrum)
+axs[2].axhline(0, color='black', lw=0.5, linestyle='--')
+axs[2].set_xlabel('Frecuencia')
+
+if logs:
+    axs[2].set_yscale('log')
+    axs[2].set_ylabel('Log. Densidad Espectral')
+else:
+    axs[2].set_ylabel('Densidad Espectral')
+#+END_SRC
+
+
+#+name: SARIMA2ARMA
+#+BEGIN_SRC python
+def SARIMA2ARMA(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0):
+    """
+    Devuelve los coeficientes de los polinomios AR y MA en B con todas las raíces del modelo.
+    """        
+    def Seasonal_polynomial(coeffs, k):
+        """
+        Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
+        """        
+        ## Crea la lista completa de coeficientes para el polinomio
+        lista_coefs = [coeffs[i//k] if i % k == 0 else 0 for i in range(k * len(coeffs) - (k - 1))]
+        # Crea y devuelve el polinomio a partir de los coeficientes
+        return Polynomial(lista_coefs, symbol='B')
+
+    # Definir los polinomios AR y MA (incluyendo componentes estacionales y raíces unitarias)
+    phi_r   = Polynomial(ar_params, symbol='B')
+    theta_r = Polynomial(ma_params, symbol='B')
+    I_r     = Polynomial([1, -1], symbol='B')**d
+    phi_s   = Seasonal_polynomial(seasonal_ar_params, s)
+    theta_s = Seasonal_polynomial(seasonal_ma_params, s)
+    I_s     = Seasonal_polynomial([1, -1], s)**D
+
+    phi = phi_r*phi_s*I_r*I_s
+    theta = theta_r*theta_s
+    return phi.coef, theta.coef
+
+#+END_SRC
+
+
 ** Simulación y análisis de un modelo ARMA (=plot_arma_analysis=)
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
@@ -366,8 +567,8 @@ Breve explicación de la anterior función =plot_arma_parametric_diagnostics=:
 Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y densidad espectral estimadas con los datos simulados.
 
 #+name: analisis-ARMA-simulado
-#+BEGIN_SRC python :eval no
-def plot_arma_analysis(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20, n=400, seed=0):
+#+BEGIN_SRC python :noweb yes :eval no
+def plot_arma_analysis(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20, n=400, seed=None):
     """
     Simula una serie temporal utilizando un modelo ARMA y visualiza la serie generada junto con sus funciones de autocorrelación (ACF), autocorrelación parcial (PACF) y el periodograma estimado.
     
@@ -402,36 +603,129 @@ def plot_arma_analysis(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20, n=400,
     if seed:
         np.random.seed(seed)
     data = arma_process.generate_sample(nsample=n)
-       
-    # Crear la figura
-    fig = plt.figure(figsize=(18, 7))
-    
-    # Subgráfico de la serie temporal
-    ax1 = fig.add_subplot(2, 1, 1)
-    ax1.plot(data, color='blue')
-    ax1.set_xlabel('t')
-    
-    # Crear una fila de 3 subgráficos para ACF, PACF y periodograma
-    ax2 = fig.add_subplot(2, 3, 4)  # Fila 2, Columna 1
-    sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title='ACF Estimada', zero=False, auto_ylims=True)
-    ax2.set_xlabel('Retardo')
 
-    ax3 = fig.add_subplot(2, 3, 5)  # Fila 2, Columna 2
-    sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title='PACF Estimada', zero=False, auto_ylims=True)
-    ax3.set_xlabel('Retardo')
+    s=5
+    <<Creación de las 4 figuras>>
     
-    ax4 = fig.add_subplot(2, 3, 6)  # Fila 2, Columna 3
-    f, Pxx = signal.welch(data, fs=1, nperseg=256)
-    ax4.plot(f, Pxx, color='purple')
-    ax4.set_title('Periodograma Estimado')
-    ax4.set_xlabel('Frecuencia')
-    #ax4.set_ylabel('Densidad Espectral')
-    ax4.set_xlim(0, 0.5)  # Limitar el eje x a 0.5
-
     plt.tight_layout()
     plt.close(fig)    
     return fig
 
+#+END_SRC
+
+#+name: analisis-SARIMA-simulado
+#+BEGIN_SRC python :noweb yes :eval no
+def plot_sarima_analysis(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0, sigma2=1, lags=False, n=400, seed=None):
+    """
+    Simula una serie temporal utilizando un modelo ARMA y visualiza la serie generada junto con sus funciones de autocorrelación (ACF), autocorrelación parcial (PACF) y el periodograma estimado.
+    
+    Parameters
+    ----------
+    ar_params : list, optional
+        Coeficientes AR del modelo (por defecto [1]).
+    ma_params : list, optional
+        Coeficientes MA del modelo (por defecto [1]).
+    sigma2 : float, optional
+        Varianza del ruido blanco (por defecto 1).
+    lags : int, optional
+        Número de lags a incluir en ACF y PACF (por defecto 20).
+    n : int, optional
+        Número de observaciones a simular (por defecto 400).
+    seed : int, optional
+        Semilla para la generación aleatoria (por defecto 0).
+    
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+        La figura generada que incluye la serie temporal y los gráficos ACF, PACF y el periodograma.
+    """
+
+    lags=math.floor(n/2) if n/2 < lags else lags
+
+    phi, theta = SARIMA2ARMA(ar_params=ar_params, ma_params=ma_params, d=d, s=s, seasonal_ar_params=seasonal_ar_params, seasonal_ma_params=seasonal_ma_params, D=D)
+    
+    arma_process = sm.tsa.ArmaProcess(phi, theta)
+    
+    # Simulación de la serie temporal
+    if seed:
+        np.random.seed(seed)
+    data = arma_process.generate_sample(nsample=n)
+       
+    if lags:
+        lags=lags
+    else:
+        lags=(s*5)+1
+    <<Creación de las 4 figuras>>
+    
+    plt.tight_layout()
+    plt.close(fig)    
+    return fig
+
+#+END_SRC
+
+*** Caso paseo aleatorio
+
+#+name: analisis-RW-simulado
+#+BEGIN_SRC python :noweb yes
+def plot_paseo_aleatorio_analysis(sigma2=1, lags=20, n=400, semilla=None, trend="n", pendiente=0):
+    # Simulación de la serie temporal
+    transitorio = 50
+    if semilla:
+        np.random.seed(semilla)
+
+    if trend=="n":
+        # ARIMA(0,1,0) sin deriva
+        model_rw = ARIMA(np.zeros(n), order=(0,1,0))
+        # params = [sigma²] --> varianza del ruido
+        data = model_rw.simulate(params=[sigma2], random_state=semilla, nsimulations=transitorio+n)[transitorio:]
+    elif trend=="t":
+        # Paseo aleatorio con deriva (ARIMA(0,1,0) con tendencia lineal)
+        model_rw_drift = ARIMA(np.zeros(n), order=(0,1,0), trend="t")
+        # params = [pendiente, sigma²]
+        data = model_rw_drift.simulate(params=[pendiente, sigma2], random_state=semilla, nsimulations=transitorio+n)[transitorio:]
+
+    s=5
+    <<Creación de las 4 figuras>>
+    
+    plt.tight_layout()
+    plt.close(fig)
+    return fig
+#+END_SRC
+
+#+RESULTS: analisis-RW-simulado
+
+**** Código común para la generación de las 4 figuras
+
+#+name: Creación de las 4 figuras
+#+BEGIN_SRC python
+# Crear la figura
+fig = plt.figure(figsize=(18, 7))
+
+# Subgráfico de la serie temporal
+ax1 = fig.add_subplot(2, 1, 1)
+ax1.plot(data, color='blue')
+ax1.set_title('Serie Temporal Simulada')
+ax1.set_xlabel('t')
+
+# Crear una fila de 3 subgráficos para ACF, PACF y periodograma
+ax2 = fig.add_subplot(2, 3, 4)  # Fila 2, Columna 1
+sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title='ACF Estimada', zero=False, auto_ylims=True)
+ax2.set_xlabel('Retardo')
+ax2.xaxis.set_major_locator(ticker.MultipleLocator(s))  # Tics en múltiplos de 's'
+ax2.grid(axis='x')  # Añadir cuadrícula vertical
+
+ax3 = fig.add_subplot(2, 3, 5)  # Fila 2, Columna 2
+sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title='PACF Estimada', zero=False, auto_ylims=True)
+ax3.set_xlabel('Retardo')
+ax3.xaxis.set_major_locator(ticker.MultipleLocator(s))  # Tics en múltiplos de 's'
+ax3.grid(axis='x')  # Añadir cuadrícula vertical
+
+ax4 = fig.add_subplot(2, 3, 6)  # Fila 2, Columna 3
+f, Pxx = signal.welch(data, fs=1, nperseg=256)
+ax4.plot(f, Pxx, color='purple')
+ax4.set_title('Periodograma Estimado')
+ax4.set_xlabel('Frecuencia')
+ax4.set_xlim(0, 0.5)  # Limitar el eje x a 0.5
 #+END_SRC
 
 
@@ -690,14 +984,14 @@ ax.text(0.09, -0.8, 'Raíces complejas', ha='center', fontsize=14, color='gray')
 #+END_SRC
 
 
-** Gráfico rango mediana2 (=RangoMediana=)
+** Gráfico rango mediana (=RangoMediana=)
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
 
 #+name: Gráfico Rango-Mediana
-#+BEGIN_SRC python :eval no :exports none
+#+BEGIN_SRC python :eval no 
 def RangoMediana(datos, k=6, ax=None):
     # Inicializar listas para almacenar las medianas y rangos
     medians = []
@@ -729,6 +1023,8 @@ def RangoMediana(datos, k=6, ax=None):
         ax.set_ylabel('Rango de Submuestra (Max - Min)')
         ax.grid()
         
+#+END_SRC
+
 # def RangoMediana(datos, k=6):
 #     # Inicializar listas para almacenar las medianas y rangos
 #     medians = []
@@ -765,8 +1061,6 @@ def RangoMediana(datos, k=6, ax=None):
 #     
 #     return fig
 # 
-#+END_SRC
-
 
 
 
