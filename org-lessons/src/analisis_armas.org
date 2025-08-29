@@ -97,17 +97,24 @@ plot_arma_parametric_diagnostics(ar_params, ma_params)
 
 
 ** Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
 
 #+BEGIN_SRC jupyter-python
 plot_arma_analysis(ar_params, ma_params)
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/f8c02f1170fbd718e6f5afbcec2008f3151e4e58.png]]
+[[file:./.ob-jupyter/d79611cc84c6a86a4db5b6673458187218e635cc.png]]
 
 
 *** Caso paseo aleatorio
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
 
+Paseo aleatorio con deriva
 #+BEGIN_SRC jupyter-python
 plot_paseo_aleatorio_analysis(trend="t", pendiente=0.25, n=400, semilla=2025)
 #+END_SRC
@@ -116,6 +123,8 @@ plot_paseo_aleatorio_analysis(trend="t", pendiente=0.25, n=400, semilla=2025)
 [[file:./.ob-jupyter/e27179d1ebe7f69edbd7b53fadda5d7f6b64e8ed.png]]
 
 
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Paseo aleatorio sin deriva
 #+BEGIN_SRC jupyter-python
 plot_paseo_aleatorio_analysis(n=400, semilla=2026)
 #+END_SRC
@@ -125,6 +134,9 @@ plot_paseo_aleatorio_analysis(n=400, semilla=2026)
 
 
 *** Caso ARMA estacional
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
 
 
 #+BEGIN_SRC jupyter-python
@@ -132,14 +144,14 @@ plot_arma_seasonal_parametric_diagnostics(ar_params=[1, -0.9], s=12, seasonal_ar
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/e7d76821848b16a233e9dc9a2ccb6668409baba7.png]]
+[[file:./.ob-jupyter/2581bda04440c7ca76dfffd7bbc9bb6f29c13aab.png]]
 
 #+BEGIN_SRC jupyter-python
 plot_arma_seasonal_parametric_diagnostics(seasonal_ma_params=[1, -0.9])
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/da40da21b718410568d6cabef676c5332e2456fd.png]]
+[[file:./.ob-jupyter/2fe53a5553bb116755a93d44065a25fb12445dfe.png]]
 
 
 
@@ -150,15 +162,16 @@ plot_arma_seasonal_parametric_diagnostics(seasonal_ma_params=[1, -0.9])
    :END:
 
 #+BEGIN_SRC jupyter-python 
-polynomial_roots_table(ma_params)
+ar_params = [1, -0.9, 0.4]
+polynomial_roots_table(ar_params)
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-|   | P. real |  P. imag. |   Módulo | Frecuencia |  Periodo | Multip. |
+|   | P. real | P. imag.  | Módulo   | Frecuencia | Periodo  | Multip. |
 |---+---------+-----------+----------+------------+----------+---------|
-| 0 |   1.125 | -1.111024 | 1.581139 |   0.124005 | 8.064174 |       1 |
-| 1 |   1.125 |  1.111024 | 1.581139 |   0.124005 | 8.064174 |       1 |
+| 0 | 1.125   | -1.111024 | 1.581139 | 0.124005   | 8.064174 | 1       |
+| 1 | 1.125   | 1.111024  | 1.581139 | 0.124005   | 8.064174 | 1       |
 :END:
 
 
@@ -167,7 +180,7 @@ plot_arma_analysis(ar_params, ma_params)
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/3ad887dc36c532c414f1c93490155fe6707fbad8.png]]
+[[file:./.ob-jupyter/f07342ac528d084ad30fec257706638bbcee261d.png]]
 
 
 * Ejemplo de uso
@@ -188,10 +201,10 @@ polynomial_roots_table(ma_params)
 
 #+RESULTS:
 :RESULTS:
-|   |  P. real | P. imag. |   Módulo | Frecuencia | Periodo | Multip. |
+|   | P. real  | P. imag. | Módulo   | Frecuencia | Periodo | Multip. |
 |---+----------+----------+----------+------------+---------+---------|
-| 0 | 1.111111 |      0.0 | 1.111111 |        0.0 |     Inf |       1 |
-| 1 | 1.666667 |      0.0 | 1.666667 |        0.0 |     Inf |       1 |
+| 0 | 1.111111 | 0.0      | 1.111111 | 0.0        | Inf     | 1       |
+| 1 | 1.666667 | 0.0      | 1.666667 | 0.0        | Inf     | 1       |
 :END:
 
 
@@ -218,7 +231,7 @@ plot_sarima_analysis(seasonal_ar_params=[1,],d=0, ar_params=[1,],D=1,s=12,n=300)
 #+END_SRC
 
 #+RESULTS:
-[[file:./.ob-jupyter/c2a426d9540f5dfc76865506facaedc725f996c1.png]]
+[[file:./.ob-jupyter/8811f9e76b57de0bd4efd6355d64af40957078aa.png]]
 
 
 
@@ -237,6 +250,7 @@ plot_sarima_analysis(seasonal_ar_params=[1,],d=0, ar_params=[1,],D=1,s=12,n=300)
 <<analisis-SARIMA-simulado>>
 <<analisis-RW-simulado>>
 <<analisis-raices-polinomio>>
+<<Conversión de un polinomio estacional en uno regular>>
 <<Localizacion parametros polinomio grado 2>>
 <<Región paramétrica polinomio grado 2>>
 <<Gráfico Rango-Mediana>>
@@ -443,25 +457,16 @@ def plot_arma_seasonal_parametric_diagnostics(ar_params=[1,], ma_params=[1,], s=
       fig : objeto matplotlib.figure.Figure
     """
 
-    def Seasonal_polynomial(coeffs, k):
-        """
-        Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
-        """        
-        ## Crea la lista completa de coeficientes para el polinomio
-        lista_coefs = [coeffs[i//k] if i % k == 0 else 0 for i in range(k * len(coeffs) - (k - 1))]
-        # Crea y devuelve el polinomio a partir de los coeficientes
-        return Polynomial(lista_coefs, symbol='B')
-
     if lags:
         lags=lags
     else:
-        lags=(s*5)+1
+        lags=(s*5)+2
 
     # Definir los polinomios AR y MA (incluyendo componentes estacionales)
     phi_r   = Polynomial(ar_params, symbol='B')
     theta_r = Polynomial(ma_params, symbol='B')
-    phi_s   = Seasonal_polynomial(seasonal_ar_params, s)
-    theta_s = Seasonal_polynomial(seasonal_ma_params, s)
+    phi_s   = Seasonal_to_regular_polynomial(seasonal_ar_params, s)
+    theta_s = Seasonal_to_regular_polynomial(seasonal_ma_params, s)
 
     phi = phi_r*phi_s
     theta = theta_r*theta_s
@@ -494,6 +499,8 @@ def plot_arma_seasonal_parametric_diagnostics(ar_params=[1,], ma_params=[1,], s=
     return fig
 
 #+END_SRC
+
+#+RESULTS: representacion-ACF-PACF-y-espectro-ARMA-estacional
 
 
 #+name: Creación de las 3 figuras
@@ -528,6 +535,8 @@ else:
     axs[2].set_ylabel('Densidad Espectral')
 #+END_SRC
 
+#+RESULTS: Creación de las 3 figuras
+
 
 #+name: SARIMA2ARMA
 #+BEGIN_SRC python
@@ -535,28 +544,22 @@ def SARIMA2ARMA(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,
     """
     Devuelve los coeficientes de los polinomios AR y MA en B con todas las raíces del modelo.
     """        
-    def Seasonal_polynomial(coeffs, k):
-        """
-        Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
-        """        
-        ## Crea la lista completa de coeficientes para el polinomio
-        lista_coefs = [coeffs[i//k] if i % k == 0 else 0 for i in range(k * len(coeffs) - (k - 1))]
-        # Crea y devuelve el polinomio a partir de los coeficientes
-        return Polynomial(lista_coefs, symbol='B')
 
     # Definir los polinomios AR y MA (incluyendo componentes estacionales y raíces unitarias)
     phi_r   = Polynomial(ar_params, symbol='B')
     theta_r = Polynomial(ma_params, symbol='B')
     I_r     = Polynomial([1, -1], symbol='B')**d
-    phi_s   = Seasonal_polynomial(seasonal_ar_params, s)
-    theta_s = Seasonal_polynomial(seasonal_ma_params, s)
-    I_s     = Seasonal_polynomial([1, -1], s)**D
+    phi_s   = Seasonal_to_regular_polynomial(seasonal_ar_params, s)
+    theta_s = Seasonal_to_regular_polynomial(seasonal_ma_params, s)
+    I_s     = Seasonal_to_regular_polynomial([1, -1], s)**D
 
     phi = phi_r*phi_s*I_r*I_s
     theta = theta_r*theta_s
     return phi.coef, theta.coef
 
 #+END_SRC
+
+#+RESULTS: SARIMA2ARMA
 
 
 ** Simulación y análisis de un modelo ARMA (=plot_arma_analysis=)
@@ -639,9 +642,6 @@ def plot_sarima_analysis(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_p
     fig : matplotlib.figure.Figure
         La figura generada que incluye la serie temporal y los gráficos ACF, PACF y el periodograma.
     """
-
-    lags=math.floor(n/2) if n/2 < lags else lags
-
     phi, theta = SARIMA2ARMA(ar_params=ar_params, ma_params=ma_params, d=d, s=s, seasonal_ar_params=seasonal_ar_params, seasonal_ma_params=seasonal_ma_params, D=D)
     
     arma_process = sm.tsa.ArmaProcess(phi, theta)
@@ -655,6 +655,9 @@ def plot_sarima_analysis(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_p
         lags=lags
     else:
         lags=(s*5)+1
+
+    lags=math.floor(n/2) if n/2 < lags else lags
+    
     <<Creación de las 4 figuras>>
     
     plt.tight_layout()
@@ -727,6 +730,8 @@ ax4.set_title('Periodograma Estimado')
 ax4.set_xlabel('Frecuencia')
 ax4.set_xlim(0, 0.5)  # Limitar el eje x a 0.5
 #+END_SRC
+
+#+RESULTS: Creación de las 4 figuras
 
 
 ** Análisis de las raíces de un polinomio (=polynomial_roots_table=)
@@ -861,6 +866,24 @@ def Localizacion_parametros_plot(parametro1, parametro2, modelo='MA'):
     return fig
 
 #+END_SRC
+
+
+** Conversión de un polinomio $B^s$ en un polinomio en $B$
+
+#+name: Conversión de un polinomio estacional en uno regular
+#+BEGIN_SRC python
+def Seasonal_to_regular_polynomial(coeffs, s):
+    """
+    Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
+    """        
+    ## Crea la lista completa de coeficientes para el polinomio
+    lista_coefs = [coeffs[i//s] if i % s == 0 else 0 for i in range(s * len(coeffs) - (s - 1))]
+    # Crea y devuelve el polinomio a partir de los coeficientes
+    return Polynomial(lista_coefs, symbol='B')
+
+#+END_SRC
+
+#+RESULTS: Conversión de un polinomio estacional en uno regular
 
 
 ** Gráfico región parámetros polinomio grado 2 (=RegionParametrica=)

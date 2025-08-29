@@ -1,0 +1,696 @@
+#    -*- mode: org -*-
+
+#+TITLE: Modelos ARIMA y SARIMA. Identificación y diagnosis. Lección 7
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+
+# +OPTIONS: toc:nil
+
+# +EXCLUDE_TAGS: pngoutput noexport
+
+# https://machinelearningmastery.com/arima-for-time-series-forecasting-with-python/
+# https://www.machinelearningplus.com/time-series/arima-model-time-series-forecasting-python/
+# https://medium.com/datainc/time-series-analysis-and-forecasting-with-arima-in-python-aa22694b3aaa
+
+# https://www.tigerdata.com/blog/how-to-work-with-time-series-in-python
+# https://pyspectrum.readthedocs.io/en/latest/ref_param.html
+
+# https://github.com/QuantEcon/quantecon-notebooks-python/blob/master/arma.ipynb
+# https://github.com/QuantEcon/lecture-python-intro
+# https://quantecon.org/quantecon-py/
+# https://quantecon.org/
+
+
+#+startup: shrink
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/readtheorg_inline.theme
+# ###########
+
+#+LATEX_HEADER_EXTRA: \usepackage{fullpage}
+
+#+LATEX_HEADER_EXTRA: \usepackage[spanish]{babel}
+#+LATEX_HEADER_EXTRA: \usepackage{lmodern}
+#+LATEX_HEADER_EXTRA: \usepackage{tabularx}
+#+LATEX_HEADER_EXTRA: \usepackage{booktabs}
+#+LATEX_HEADER_EXTRA: \usepackage[dvipsnames]{xcolor}
+
+#+LaTeX_HEADER: \newcommand{\lag}{\mathsf{B}}
+#+LaTeX_HEADER: \newcommand{\Sec}[1]{\boldsymbol{#1}}
+#+LaTeX_HEADER: \newcommand{\Pol}[1]{\boldsymbol{#1}}
+
+
+#+latex_header: \usepackage{natbib}
+
+#+LATEX_HEADER: \usepackage{amsthm,amsmath}
+#+LATEX_HEADER: \usepackage[appendix=append]{apxproof}
+# +LATEX_HEADER: \usepackage[appendix=inline]{apxproof}
+# +LATEX_HEADER: \usepackage[appendix=strip]{apxproof}
+#+LATEX_HEADER: \renewcommand{\appendixsectionformat}[2]{Demos de la Sección {#1} (#2)}
+#+LATEX_HEADER: \newtheoremrep{theorem}{Teorema} % [section]
+#+LATEX_HEADER: \newtheoremrep{lemma}[theorem]{Lema}
+#+LATEX_HEADER: \newtheoremrep{prop}[theorem]{Proposición}
+#+LATEX_HEADER: \usepackage{marginnote}
+# +LATEX_HEADER: \renewcommand{\mainbodyrepeatedtheorem}{\textup{($\star$) \marginnote{($\star$): Demo en el apéndice}}}
+#+LATEX_HEADER: \renewcommand{\mainbodyrepeatedtheorem}{\textup{\marginnote{\tiny Demo en apéndice}}}
+#+latex_header: \newtheorem{definition}[theorem]{Definición}
+#+latex_header: \newtheorem*{definition*}{Definición}
+# +LATEX_HEADER: \newtheorem{prop}[theorem]{Proposición}
+#+latex_header: \newtheorem{corollary}[theorem]{Corolario}
+#+latex_header: \newtheorem*{corollary*}{Corolario}
+
+#+LATEX_HEADER: \usepackage[indent]{parskip}
+
+
+#+LATEX: \maketitle
+
+#+PROPERTY: header-args:emacs-lisp :eval export
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+BEGIN_SRC emacs-lisp :exports none :results silent
+(use-package ox-ipynb
+  :load-path (lambda () (expand-file-name "ox-ipynb" scimax-dir)))
+(use-package htmlize)
+#+END_SRC
+
+
+#+begin_abstract
+Repasaremos los instrumentos de identificación y diagnosis del análisis univariante.
+Extenderemos la notación para incorporar modelos con raíces unitarias y modelos estacionales.
+Finalmente resumiremos las ideas principales del análisis univariante.
+#+end_abstract
+
+- ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc07.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc07.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc07.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc07.ipynb][mybinder]])
+
+
+# #+begin_export html
+# <style>
+# .reveal  td {font-size: 60%;}
+# </style>
+# #+end_export
+
+*************** TODO COMMENT falta incluir el periodograma como herramienta
+
+
+***** COMMENT para Jupyter-Notebook                               :noexport:
+\(
+\newcommand{\lag}{\mathsf{B}}
+\newcommand{\Sec}[1]{\boldsymbol{#1}}
+\newcommand{\Pol}[1]{\boldsymbol{#1}}
+\)
+
+
+***  Carga de algunos módulos de python y creación de directorios auxiliares
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: notoc
+   :END:
+
+   
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results none
+# Para trabajar con los datos y dibujarlos necesitamos cargar algunos módulos de python
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib as mpl
+# definimos parámetros para mejorar los gráficos
+mpl.rc('text', usetex=False)
+import matplotlib.pyplot as plt   # data visualization
+import dataframe_image as dfi   # export tables as .png
+#+END_SRC
+
+**** Directorio auxiliar para albergar las figuras de la lección:
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: t 
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+para publicar la lección como pdf o página web, necesito los gráficos como ficheros ~.png~ alojados algún directorio específico:
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+imagenes_leccion = "./img/lecc07" # directorio para las imágenes de la lección
+import os
+os.makedirs(imagenes_leccion, exist_ok=True) # crea el directorio si no existe
+#+END_SRC
+
+
+*** Gráficos para las ACF, PACF y densidades espectrales teóricas
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: notoc
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Cargamos las funciones auxiliares (véase la carpeta =src/=)
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
+%run -i ./src/analisis_armas.py
+#+END_SRC
+
+# +latex: \newpage
+
+
+* Identificación y diagnosis
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+
+- Combinando herramientas gráficas y estadísticas, se puede inferir un modelo para los datos.
+- Este proceso de especificación empírica de un modelo es conocido como "/identificación/".
+#+latex: \medskip
+
+El proceso de identificación puede estructurarse como una secuencia de
+preguntas:
+
+1) ¿Es la serie estacionaria?
+2) ¿Tiene una media significativa?
+3) ¿Es persistente la ACF? ¿sigue alguna pauta reconocible?
+4) ¿Es persistente la PACF? ¿sigue alguna pauta reconocible?
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+- La identificación se apoya en estadísticos muestrales (media, autocorrelaciones, etc.) cuya representatividad respecto del proceso estocástico subyacente depende de la estacionariedad y la ergodicidad.
+- Tras inducir la estacionariedad, especificamos un modelo tentativo decidiendo cuál de las funciones ACF o PACF es finita y cuál es persistente
+#+latex: \medskip
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{3.4cm}p{5.4cm}p{5.4cm}
+|                    | *ACF finita*                                             | *ACF persistente*                |
+|--------------------+----------------------------------------------------------+----------------------------------|
+| *PACF finita*      | _Ruido blanco_: retardos conjuntamente NO significativos | _AR_: orden indicado por la PACF |
+| *PACF persistente* | _MA_: orden indicado por la ACF                          | _ARMA_                           |
+
+La parametrización de mayor orden en modelos ARMA con series económicas suele ser ARMA($2,1$)
+#+latex: \medskip
+
+** Instrumentos de identificación
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{2.3cm}p{5.5cm}p{7.4cm}
+|                                                         | Instrumento                                                                                                                         | Objetivo y observaciones                                                                                                             |
+|---------------------------------------------------------+-------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------|
+| Transf. @@latex:\mbox{@@logarítmica@@latex:}@@          | Gráficos rango-media y serie temporal.                                                                                              | Conseguir independizar la variabilidad de los datos de su nivel. Las series económicas necesitan esta transformación frecuentemente. |
+| $d$, orden de @@latex:\mbox{@@diferenciación@@latex:}@@ | Gráfico de la serie temporal. ACF (caída lenta y lineal). @@latex:\mbox{@@Contrastes@@latex:}@@ de raíz unitaria (DF o ADF y KPSS). | Conseguir que los datos fluctúen en torno a una media estable. En series económicas, $d$ suele ser 0, 1 ó 2.                         |
+| Constante                                               | Media de la serie transformada. @@latex:\mbox{@@Desviación@@latex:}@@ típica de la media.                                           | Si la media de la serie transformada es significativa, el modelo debe incluir un término constante.                                  |
+| $p$, orden AR.                                          | Si PACF cae abruptamente en el retardo $p$ y la ACF decae lentamente.                                                               | En series económicas $p$ suele ser $\leq2$.                                                                                          |
+| $q$, orden MA.                                          | Si ACF cae abruptamente en el retardo $q$ y PACF  decae lentamente.                                                                 | En series económicas q suele ser $\leq1$.                                                                                            |
+#+latex: \medskip
+
+** Instrumentos de diagnosis
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{2.3cm}p{5.5cm}p{7.2cm}
+|                                                         | Instrumento                                                | Posible diagnóstico                                                                                              |
+|---------------------------------------------------------+------------------------------------------------------------+------------------------------------------------------------------------------------------------------------------|
+| $d$, orden de @@latex:\mbox{@@diferenciación@@latex:}@@ | /Proximidad a 1/ de alguna raíz de los polinomios AR o MA. | Conviene diferenciar si la raíz es AR; o quitar una diferencia si es MA (/salvo si hay tendencia determinista/). |
+| $d$, orden de @@latex:\mbox{@@diferenciación@@latex:}@@ | Gráfico de los residuos.                                   | Si muestra rachas largas de residuos positivos o negativos, puede ser necesaria una diferencia adicional.        |
+| Constante                                               | Media de los residuos.                                     | Si es significativa: añadir una  constante.                                                                      |
+| Constante                                               | Constante estimada.                                        | Si NO es significativa: el modelo mejorará quitando el término constante.                                        |
+| $p$ y $q$,                                              | Contrastes de significación de los parámetros estimados.   | Pueden sugerir eliminar parámetros irrelevantes.                                                                 |
+| $p$ y $q$,                                              | ACF/PACF residuos. Test Q de Ljung-Box.                    | Indican posibles pautas de autocorrelación no modelizadas.                                                       |
+| $p$ y $q$,                                              | Correlaciones elevadas entre los parámetros estimados.     | Puede ser síntoma de sobreparametrización.                                                                       |
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Una vez superadas las pruebas de diagnostico, aún se puede aplicar un análisis exploratorio; consistente en añadir parámetros AR y/o MA para comprobar si resultan significativos y mejoran el modelo.
+ 
+
+* Raíces unitarias
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+** Notación: operadores retardo y diferencia y modelos ARIMA
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+El operador diferencia $\nabla$ se define a partir del operador retardo como $\nabla=(1 - \mathsf{B})$:
+\[
+ \nabla Y_t = (1 - \mathsf{B})Y_t = Y_t - Y_{t-1}.
+\]
+El operador diferencia estacional es ${\nabla}_{_S} = (1 - \mathsf{B}^S)$:
+\[
+ \nabla_{_S}Y_t = (1 - \mathsf{B}^S)Y_t = Y_t - Y_{t-S}.
+\]
+
+*** Notación: ARIMA
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+Extendemos la notación a procesos con raíces autorregresivas unitarias con ``ARIMA($p,d,q$)''; 
+donde $d$ indica el número de diferencias que la serie necesita para ser $I(0)$,
+\[
+ \boldsymbol{\phi}_p*\nabla^d*\boldsymbol{Y} = \boldsymbol{\theta}_q* \boldsymbol{U};
+\]
+es decir
+\[
+ \boldsymbol{\phi}_p(\mathsf{B})\nabla^d Y_t = \boldsymbol{\theta}_q(\mathsf{B}) U_t; \quad t\in\mathbb{Z}.
+\]
+
+
+** Raíces unitarias en los polinomios AR y MA
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+   
+Cuando un polinomio tiene alguna raíz igual a uno se dice que tiene ``raíces unitarias''.
+
+Si el polinomio AR estimado tiene alguna raíz ``próxima a uno'' es síntoma de infradiferenciación.
+
+Si el polinomio MA estimado tiene alguna raíz ``próxima a uno'' es síntoma de sobrediferenciación.
+# a) sobrediferenciación... salvo cuando...
+# b) antes de diferenciar hubiera una tendencia determinista (que podemos comprobar, por ejemplo, con un test ADF).
+
+Ejemplos:
+# que ilustran los tres casos:
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{7cm}p{7cm}
+| Modelo expresado con raíces unitarias en $\boldsymbol{\phi}$ o $\boldsymbol{\theta}$ | Modelo equivalente sin raíces unitarias en $\boldsymbol{\phi}$ o $\boldsymbol{\theta}$ |
+|--------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------|
+| $(1-1.5\mathsf{B}+.5\mathsf{B}^2) Y_t = U_t$                                         | ${\color{blue}{(1-0.5\mathsf{B})\nabla Y_t=U_t}}$                                      |
+| $(1-.5\mathsf{B}+0.7\mathsf{B}^2)\nabla^2Y_t=(1-\mathsf{B})U_t$                      | ${\color{blue}{(1-.5\mathsf{B}+0.7\mathsf{B}^2)\nabla Y_t =  U_t}}$                    |
+| $\nabla Y_t = \beta+          (1-\mathsf{B}) U_t$                                    | ${\color{blue}{Y_t = \beta t + U_t}}\quad$ (¡no estacionario!)                         |
+
+** Paseos aleatorios
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+
+Un paseo aleatorio representa una variable cuyos incrementos son ruido blanco:
+\[Y_t = \mu + Y_{t-1} + U_t.\]
+
+Cuando $\mu\ne0$ se denomina /paseo aleatorio con deriva/: $\;\nabla Y_t = \mu +  U_t$.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file ACF-RWcd.png :exports code :results silent
+fig = plot_paseo_aleatorio_analysis(trend="t", pendiente=0.25, n=400, semilla=2025)
+fig.savefig('./img/lecc07/ACF-RWcd.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/ACF-RWcd.png]]
+ 
+El proceso tiene mayor inercia cuanto mayor es $|\mu|$. El signo de $\mu$ determina el signo de la pendiente global.
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Cuando $\mu=0$ se denomina sencillamente /paseo aleatorio/: $\;\nabla Y_t =  U_t$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file ACF-RW.png :exports code :results silent
+fig = plot_paseo_aleatorio_analysis(n=400, semilla=2026)
+fig.savefig('./img/lecc07/ACF-RW.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/ACF-RW.png]]
+
+
+* Modelos ARIMA estacionales (SARIMA)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+   
+El período estacional $S$ es el número mínimo de observaciones necesarias para recorrer un ciclo estacional completo. 
+Por ejemplo, $S=12$ para datos mensuales, $S=4$ para datos trimestrales, $S=24$ para datos horarios, etc.
+
+Describiremos comportamientos estacionales con modelos ARIMA$(p,d,q)\times(P,D,Q)_S$ 
+\[
+ \boldsymbol{\phi}_p(\mathsf{B})\boldsymbol{\Phi}_P(\mathsf{B}^S)\nabla^d\nabla_{_S}^D Y_t
+ =
+ \boldsymbol{\theta}_q(\mathsf{B})\boldsymbol{\Theta}_q(\mathsf{B}^S) U_t; 
+ \quad t\in\mathbb{Z}
+\]
+donde
+\begin{align*}
+ \boldsymbol{\Phi}_P(\mathsf{B}^S)  = & 1-\Phi_1\mathsf{B}^{1\cdot S}-\Phi_2\mathsf{B}^{2\cdot S}-\cdots-\Phi_P\mathsf{B}^{P\cdot S}\\
+ \boldsymbol{\Theta}_Q(\mathsf{B}^S)  = & 1-\Theta_1\mathsf{B}^{1\cdot S}-\Theta_2\mathsf{B}^{2\cdot S}-\cdots-\Theta_Q\mathsf{B}^{Q\cdot S}\\
+ {\nabla}_{_S}^D = & (1 - \mathsf{B}^S)^D
+\end{align*}
+Es decir, el modelo consta de polinomios autorregresivos y de media móvil tanto regulares (en minúsculas) como estacionales (en mayúsculas).
+#+latex: \medskip
+ 
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Veamos un ejemplo de un modelo MA($1$) estacional y otro de un modelo AR($1$) estacional...
+
+** MA(1) estacional con raíz positiva
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+MA($1$) estacional:
+$\quad\boldsymbol{\Theta}=1-0.9z^{12}\quad\Rightarrow\quad X_t= (1-0.9 \mathsf{B}^{12})U_t$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file ACF-SMA1p.png :exports code :results none 
+SMA1 = [1, -0.9]
+fig = plot_arma_seasonal_parametric_diagnostics(seasonal_ma_params=SMA1, s=12)
+fig.savefig('./img/lecc07/ACF-SMA1p.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/ACF-SMA1p.png]]
+
+#+name: raices-SMA1p
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file Roots-SMA1p.png :results silent :exports results
+dfi.export(polynomial_roots_table(Seasonal_to_regular_polynomial(SMA1, 12).coef),
+           "./img/lecc07/Roots-SMA1p.png", dpi=300, table_conversion="matplotlib")
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc07/Roots-SMA1p.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file Sim-SMA1p.png :exports code :results silent
+fig = plot_sarima_analysis(seasonal_ma_params=SMA1, s=12, seed=2025)
+fig.savefig('./img/lecc07/Sim-SMA1p.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/Sim-SMA1p.png]]
+
+
+** AR(1) estacional con raíz positiva
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+AR($1$) estacional:
+$\quad\boldsymbol{\Phi}=1-0.9z^{12}\quad\Rightarrow\quad (1-0.9 \mathsf{B}^{12})X_t= U_t$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file ACF-SAR1p.png :exports code :results none 
+SAR1 = [1, -0.9]
+fig = plot_arma_seasonal_parametric_diagnostics(seasonal_ar_params=SAR1, s=12)
+fig.savefig('./img/lecc07/ACF-SAR1p.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/ACF-SAR1p.png]]
+
+#+name: raices-SAR1p
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file Roots-SAR1p.png :results silent :exports results
+dfi.export(polynomial_roots_table(Seasonal_to_regular_polynomial(SAR1, 12).coef),
+           "./img/lecc07/Roots-SAR1p.png", dpi=300, table_conversion="matplotlib")
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_html: :width 500px
+#+attr_org: :width 800
+#+attr_latex: :width 250px
+[[file:img/lecc07/Roots-SAR1p.png]]
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+Evidentemente las raíces son iguales a las del caso anterior (aunque ahora corresponden al polinomio autorregresivo).
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file Sim-SAR1p.png :exports code :results silent
+fig = plot_sarima_analysis(seasonal_ar_params=SAR1, s=12, seed=2025)
+fig.savefig('./img/lecc07/Sim-SAR1p.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/Sim-SAR1p.png]]
+
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Con estos dos ejemplos hemos podido apreciar que:
+- las pautas de autocorrelación son análogas a las de los MA(1) y  AR(2), pero ahora los retardos significativos corresponden a los retardos estacionales, es decir, a múltiplos del período estacional $S$.
+- En estos ejemplos, en los que $S=12$, los retardos estacionales son: 12, 24, 36, 48, 60,...
+- las correlaciones correspondientes a los “retardos regulares” (es decir, todos menos menos los estacionales) son no significativas en general.
+#+latex:\bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Veamos ahora un par de ejemplos de modelos estacionales multiplicativos (i.e., con parte regular y parte estacional).
+
+** ARIMA (0,0,1)x(0,0,1) 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . slide)))
+ARIMA$(0,0,1)\times(0,0,1)_{12}$: $\quad X_t= (1-0.9 \mathsf{B})(1-0.9 \mathsf{B}^{12})U_t$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file ACF-MA1SMA1.png :exports code :results none 
+MA1  = [1, -0.8]
+SMA1 = [1, -0.9]
+fig = plot_arma_seasonal_parametric_diagnostics(ma_params=MA1, seasonal_ma_params=SMA1, s=12)
+fig.savefig('./img/lecc07/ACF-MA1SMA1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/ACF-MA1SMA1.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file Sim-MA1SMA1.png :exports code :results silent
+fig = plot_sarima_analysis(ma_params=MA1, seasonal_ma_params=SMA1, s=12, seed=2025)
+fig.savefig('./img/lecc07/Sim-MA1SMA1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/Sim-MA1SMA1.png]]
+
+** ARIMA (1,0,0)x(0,0,1) 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+ARIMA$(1,0,0)\times(0,0,1)_{12}$: $\quad (1-0.9 \mathsf{B})X_t= (1-0.9 \mathsf{B}^{12})U_t$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file ACF-AR1SMA1.png :exports code :results none 
+AR1  = [1, -0.8]
+SMA1 = [1, -0.9]
+fig = plot_arma_seasonal_parametric_diagnostics(ar_params=AR1, seasonal_ma_params=SMA1, s=12)
+fig.savefig('./img/lecc07/ACF-AR1SMA1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/ACF-AR1SMA1.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file Sim-AR1SMA1.png :exports code :results silent
+fig = plot_sarima_analysis(ar_params=AR1, seasonal_ma_params=SMA1, s=12, seed=2025)
+fig.savefig('./img/lecc07/Sim-AR1SMA1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/Sim-AR1SMA1.png]]
+
+
+** ARIMA (1,0,0)x(1,0,0) 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+ARIMA$(1,0,0)\times(1,0,0)_{12}$: $\quad (1-0.9 \mathsf{B})(1-0.9 \mathsf{B}^{12})X_t= U_t$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file ACF-AR1SAR1.png :exports code :results none 
+AR1  = [1, -0.8]
+SAR1 = [1, -0.9]
+fig = plot_arma_seasonal_parametric_diagnostics(ar_params=AR1, seasonal_ar_params=SAR1, s=12, logs=True)
+fig.savefig('./img/lecc07/ACF-AR1SAR1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/ACF-AR1SAR1.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file Sim-AR1SAR1.png :exports code :results silent
+fig = plot_sarima_analysis(ar_params=AR1, seasonal_ar_params=SAR1, s=12, seed=2025)
+fig.savefig('./img/lecc07/Sim-AR1SAR1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/Sim-AR1SAR1.png]]
+
+
+** ARIMA (0,0,1)x(1,0,0) 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+ARIMA$(0,0,1)\times(1,0,0)_{12}$: $\quad (1-0.9 \mathsf{B}^{12})X_t= (1-0.9 \mathsf{B})U_t$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file ACF-MA1SAR1.png :exports code :results none 
+MA1  = [1, -0.8]
+SAR1 = [1, -0.9]
+fig = plot_arma_seasonal_parametric_diagnostics(ma_params=MA1, seasonal_ar_params=SAR1, s=12)
+fig.savefig('./img/lecc07/ACF-MA1SAR1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/ACF-MA1SAR1.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc07/ :file Sim-MA1SAR1.png :exports code :results silent
+fig = plot_sarima_analysis(ma_params=MA1, seasonal_ar_params=SAR1, s=12, seed=2025)
+fig.savefig('./img/lecc07/Sim-MA1SAR1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc07/Sim-MA1SAR1.png]]
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+En estos cuatro ejemplos hemos podido apreciar que
+- en el entorno de los retardos estacionales surgen una serie de coeficientes significativos (“satélites”) que proceden de la interacción entre las estructuras regular y estacional
+- Estos satélites son útiles para identificar en qué retardos estacionales hay autocorrelaciones no nulas, pero no requieren una parametrización especial.
+
+
+* Resumen del análisis univariante de series temporales 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . notes)))
+   :END:
+
+** Ideas principales respecto a la modelización univariante
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+- Es una modelización sin variables exógenas 
+- Modelizan la interdependencia temporal con polinomios de órdenes reducidos.
+- Está especialmente indicada para hacer predicción.
+- Parte de dos supuestos sobre el proceso estocástico subyacente:
+  a) es débilmente estacionario
+  b) tiene representación como proceso lineal:
+     $\; Y_t=\mu+\sum_{j=0}^\infty a_j U_{t-j};\quad$ con
+     $\quad\mu\in\mathbb{R},\;$ $\quad\boldsymbol{a}\in\ell^2\quad$ y
+     $\quad\boldsymbol{U}\sim WN(0,\sigma^2)$
+   
+     # (se suele asumir normalidad en $U_t$)
+- Utiliza múltiples instrumentos: (a) gráficos (b) función de autocorrelación (c) función de autocorrelación parcial, (d) estadístico Q de Ljung-Box, etc...
+- Si la serie original no "parece" débilmente estacionaria, se induce esta propiedad mediante las transformaciones adecuadas
+
+# Los procesos lineales tienen pautas de autocorrelación teórica características y reconocibles
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{3.4cm}p{5.4cm}p{5.4cm}
+|                    | *ACF finita*                                             | *ACF persistente*                |
+|--------------------+----------------------------------------------------------+----------------------------------|
+| *PACF finita*      | _Ruido blanco_: retardos conjuntamente NO significativos | _AR_: orden indicado por la PACF |
+| *PACF persistente* | _MA_: orden indicado por la ACF                          | _ARMA_                           |
+
+** Metodología
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+   
+Tres fases:
+- Identificación :: Se elige una especificación provisional para el proceso estocástico subyacente en función de las características medibles de los datos (``dejar que los datos hablen'')
+- Estimación :: suele requerir métodos iterativos (/Gretl se encarga de esto/)
+- Diagnosis :: de la calidad estadística del modelo ajustado. Algunos controles estándar son:
+  - Significatividad de los parámetros estimados
+  - Estacionariedad y homocedasticidad de los residuos
+  - ¿Existe un patrón de autocorrelación residual que podría ser modelado? 
+    ¿O hemos logrado que los residuos sean */"ruido blanco"/*?
+
+Si la diagnosis no es satisfactoria, se vuelve a la primera fase.
+
+Si la diagnosis es satisfactoria... ¡hemos logrado un modelo aceptable!... que podremos usar para realizar pronósticos.
+
+
+* COMMENT ipynb y slides                                           :noexport:
+
+#+BEGIN_SRC emacs-lisp :results silent :eval yes
+(require 'ox-ipynb)
+(ox-ipynb-export-org-file-to-ipynb-file "Lecc07.org")
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+jupyter nbconvert --execute --inplace Lecc07.ipynb
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc07.ipynb
+#+END_SRC
+
