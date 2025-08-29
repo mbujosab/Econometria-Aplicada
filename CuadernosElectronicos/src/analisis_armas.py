@@ -167,25 +167,16 @@ def plot_arma_seasonal_parametric_diagnostics(ar_params=[1,], ma_params=[1,], s=
       fig : objeto matplotlib.figure.Figure
     """
 
-    def Seasonal_polynomial(coeffs, k):
-        """
-        Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
-        """        
-        ## Crea la lista completa de coeficientes para el polinomio
-        lista_coefs = [coeffs[i//k] if i % k == 0 else 0 for i in range(k * len(coeffs) - (k - 1))]
-        # Crea y devuelve el polinomio a partir de los coeficientes
-        return Polynomial(lista_coefs, symbol='B')
-
     if lags:
         lags=lags
     else:
-        lags=(s*5)+1
+        lags=(s*5)+2
 
     # Definir los polinomios AR y MA (incluyendo componentes estacionales)
     phi_r   = Polynomial(ar_params, symbol='B')
     theta_r = Polynomial(ma_params, symbol='B')
-    phi_s   = Seasonal_polynomial(seasonal_ar_params, s)
-    theta_s = Seasonal_polynomial(seasonal_ma_params, s)
+    phi_s   = Seasonal_to_regular_polynomial(seasonal_ar_params, s)
+    theta_s = Seasonal_to_regular_polynomial(seasonal_ma_params, s)
 
     phi = phi_r*phi_s
     theta = theta_r*theta_s
@@ -248,22 +239,14 @@ def SARIMA2ARMA(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,
     """
     Devuelve los coeficientes de los polinomios AR y MA en B con todas las raíces del modelo.
     """        
-    def Seasonal_polynomial(coeffs, k):
-        """
-        Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
-        """        
-        ## Crea la lista completa de coeficientes para el polinomio
-        lista_coefs = [coeffs[i//k] if i % k == 0 else 0 for i in range(k * len(coeffs) - (k - 1))]
-        # Crea y devuelve el polinomio a partir de los coeficientes
-        return Polynomial(lista_coefs, symbol='B')
 
     # Definir los polinomios AR y MA (incluyendo componentes estacionales y raíces unitarias)
     phi_r   = Polynomial(ar_params, symbol='B')
     theta_r = Polynomial(ma_params, symbol='B')
     I_r     = Polynomial([1, -1], symbol='B')**d
-    phi_s   = Seasonal_polynomial(seasonal_ar_params, s)
-    theta_s = Seasonal_polynomial(seasonal_ma_params, s)
-    I_s     = Seasonal_polynomial([1, -1], s)**D
+    phi_s   = Seasonal_to_regular_polynomial(seasonal_ar_params, s)
+    theta_s = Seasonal_to_regular_polynomial(seasonal_ma_params, s)
+    I_s     = Seasonal_to_regular_polynomial([1, -1], s)**D
 
     phi = phi_r*phi_s*I_r*I_s
     theta = theta_r*theta_s
@@ -363,9 +346,6 @@ def plot_sarima_analysis(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_p
     fig : matplotlib.figure.Figure
         La figura generada que incluye la serie temporal y los gráficos ACF, PACF y el periodograma.
     """
-
-    lags=math.floor(n/2) if n/2 < lags else lags
-
     phi, theta = SARIMA2ARMA(ar_params=ar_params, ma_params=ma_params, d=d, s=s, seasonal_ar_params=seasonal_ar_params, seasonal_ma_params=seasonal_ma_params, D=D)
     
     arma_process = sm.tsa.ArmaProcess(phi, theta)
@@ -379,6 +359,9 @@ def plot_sarima_analysis(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_p
         lags=lags
     else:
         lags=(s*5)+1
+
+    lags=math.floor(n/2) if n/2 < lags else lags
+    
     # Crear la figura
     fig = plt.figure(figsize=(18, 7))
     
@@ -525,6 +508,15 @@ def polynomial_roots_table(coef_polinomio):
     # Ordenar la tabla por la columna 'Frequency' en orden ascendente
     tabla = table.sort_values(by='Frecuencia').round(6)   
     return tabla
+
+def Seasonal_to_regular_polynomial(coeffs, s):
+    """
+    Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
+    """        
+    ## Crea la lista completa de coeficientes para el polinomio
+    lista_coefs = [coeffs[i//s] if i % s == 0 else 0 for i in range(s * len(coeffs) - (s - 1))]
+    # Crea y devuelve el polinomio a partir de los coeficientes
+    return Polynomial(lista_coefs, symbol='B')
 
 def Localizacion_parametros_plot(parametro1, parametro2, modelo='MA'):
     """
