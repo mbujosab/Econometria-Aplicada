@@ -22,6 +22,14 @@
 #+LATEX_HEADER_EXTRA: \usepackage{tabularx}
 #+LATEX_HEADER_EXTRA: \usepackage{booktabs}
 
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no :eval no
+(unless (file-directory-p "docs")
+  (make-directory "docs"))
+(unless (file-directory-p "docs/.binder")
+  (make-directory "docs/.binder"))
+#+END_SRC
+
+
 #+LATEX: \maketitle
 
 * Fichero =makefile=
@@ -216,6 +224,11 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y git emacs pandoc aspell aspell-en aspell-es zip gretl
         pip install jupyter nbconvert
+
+    - name: Crear carpeta para Instalar base de datos del Banco de España en Gretl
+      run: |
+        mkdir -p ~/.gretl/db
+        cp -r db/* ~/.gretl/db/
 
     - name: Install Python modules
       run: |
