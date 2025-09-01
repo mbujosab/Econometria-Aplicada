@@ -1,0 +1,29 @@
+# Necesario para que gretl guarde los ficheros en el directorio de la práctica.
+# Si no funciona, comente la primera línea y descomente la segunda (asegurándose de que el directoro de trabajo de gretl es el correcto):
+
+string directory = getenv("DIRECTORIO")
+#string directory = $(pwd) ~ "/P-L01-B-produccionCemento
+set workdir "@directory"
+
+open ../datos/be2311.csv
+setobs 12 1955:01 --time-series
+
+Cemento <- gnuplot Producciondecemento --time-series --with-lines --output="Cemento.png"
+
+rmplot Producciondecemento --output="RangoMedia-Cemento.png"
+
+logs Producciondecemento
+
+LogsCemento <- gnuplot l_Producciondecemento --time-series --with-lines
+
+rmplot l_Producciondecemento --output="RangoMedia-LogCemento.png"
+
+LogCemento <- gnuplot l_Producciondecemento --time-series --with-lines --output="LogCemento.png"
+
+diff l_Producciondecemento
+
+D_LogCemento <- gnuplot d_l_Producciondecemento --time-series --with-lines --output="D_LogCemento.png"
+
+sdiff d_l_Producciondecemento
+
+D12_D_LogsCemento <- gnuplot sd_d_l_Producciondecemento --time-series --with-lines  --output="D12_D_LogCemento.png"

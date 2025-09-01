@@ -1,0 +1,84 @@
+# Necesario para que gretl guarde los ficheros en el directorio de la práctica.
+# Si no funciona, comente la primera línea y descomente la segunda (asegurándose de que el directoro de trabajo de gretl es el correcto):
+
+string directory = getenv("DIRECTORIO")
+#string directory = $(pwd) ~ "/LetrasTesoroAmericano3y6meses" 
+set workdir "@directory"
+
+open ../datos/LetrasTesoroAmericano3y6meses.gdt
+gnuplot TB3 TB6  --time-series --with-lines --output="TB3yTB6.png"
+
+gnuplot TB3 --time-series --with-lines --output="TB3.png"
+corrgm TB3 --plot="TB3ACF-PACF.png"
+
+diff TB3
+RegresionAUX_TB3 <- ols d_TB3 0 TB3(-1) d_TB3(-1) d_TB3(-2) d_TB3(-3)
+
+outfile --quiet RegresionAUX_TB3.txt
+    ols d_TB3 0 TB3(-1) d_TB3(-1) d_TB3(-2) d_TB3(-3) 
+end outfile
+
+adf 3 TB3 --c
+
+outfile --quiet adf_TB3.txt
+    adf 3 TB3 --c
+end outfile
+
+kpss 3 TB3
+
+outfile --quiet kpss_TB3.txt
+    kpss 3 TB3
+end outfile
+
+gnuplot TB6 --time-series --with-lines --output="TB6.png"
+corrgm TB6 --plot="TB6ACF-PACF.png"
+
+diff TB6
+RegresionAUX_TB6 <- ols d_TB6 0 TB6(-1) d_TB6(-1) d_TB6(-2) d_TB6(-3)
+
+outfile --quiet RegresionAUX_TB6.txt
+    ols d_TB6 0 TB6(-1) d_TB6(-1) d_TB6(-2) d_TB6(-3) 
+end outfile
+
+adf 3 TB6 --c
+
+outfile --quiet adf_TB6.txt
+    adf 3 TB6 --c
+end outfile
+
+kpss 3 TB6
+
+outfile --quiet kpss_TB6.txt
+    kpss 3 TB6
+end outfile
+
+coint 3 TB3 TB6
+
+outfile --quiet test_cointegracion.txt
+    coint 3 TB3 TB6
+end outfile
+
+MCO3sobre6 <- ols TB3 0 TB6
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 1 --quiet
+
+outfile --quiet modeloMCO.txt
+  ols TB3 0 TB6
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 1 --quiet
+end outfile
+
+diff TB3 TB6
+MCO3sobre6_en_Diff <- ols d_TB3 0 d_TB6
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 2 --quiet
+
+outfile --quiet modeloMCO_en_diff.txt
+  ols d_TB3 0 d_TB6
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 2 --quiet
+end outfile
