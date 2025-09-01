@@ -1,3 +1,5 @@
+#    -*- mode: org -*-
+
 #+Title: Lección 1 --- Número de viajeros internacionales
 #+author: Marcos Bujosa
 #+LANGUAGE: es
@@ -78,7 +80,7 @@
 
 * Número de viajeros internacionales
 
-   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Practicas/guiones/lecc01-airlinePass.inp][lecc01-airlinePass.inp]] |
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Practicas/guiones/P-L01-A-airlinePass.inp][P-L01-A-airlinePass.inp]] |
 
 En esta primera práctica con [[https://gretl.sourceforge.net/es.html][Gretl]] reproduciremos el ejemplo visto en clase, en el que hemos aplicado distintas transformaciones a los datos hasta obtener una serie temporal que podemos asumir que podría ser una realización de un proceso estocástico estacionario.  Los datos son mensuales y contienen el número de viajeros internacionales (en miles) en las líneas aéreas norteamericanas en los años 1949--1960 que aparece en manual de Box & Jenkins.
 
@@ -97,7 +99,7 @@ Comencemos cargando los datos:
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 /o bien teclee en linea de comandos/:
 #+NAME: Lectura del fichero de datos
-#+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no
+#+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no
 open bjg
 #+end_src
 
@@ -112,7 +114,7 @@ open bjg
   #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
   /o bien teclee en linea de comandos/:
     #+NAME: Mostramos los valores de los datos en columna
-    #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+    #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no 
 print -o g
     #+end_src
 
@@ -145,7 +147,7 @@ Para consultar la documentación sobre cualquier comando, puede emplear el menú
   #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
   /o bien teclee en linea de comandos/:
     #+NAME: Guardamos scatterplot como icono
-    #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+    #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no 
 AirlinePassengers <- gnuplot g --time-series --with-lines
     #+end_src
 
@@ -166,7 +168,7 @@ Seleccione con el ratón la variable =g= y luego pulse en el menú desplegable *
     #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
     /o bien teclee en linea de comandos/: 
       #+NAME: Aplicamos la transformación logarítmica
-      #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+      #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no 
 logs g
       #+end_src
 
@@ -179,7 +181,7 @@ Genere el gráfico de series temporales de esta nueva serie y guárdelo como un 
 
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
   #+NAME: Guardamos scatterplot como icono
-  #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+  #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no :results none
 LogsAirlinePassengers <- gnuplot l_g --time-series --with-lines
   #+end_src
 #+latex: }
@@ -191,7 +193,7 @@ Seleccione con el ratón la variable =l_g= y luego pulse en el menú desplegable
 
     #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
     /o bien teclee en linea de comandos/: 
-      #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+      #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no 
 diff l_g
       #+end_src
     #+latex: }
@@ -201,7 +203,7 @@ Entre las variables aparecerá una nueva con el prefijo =d_=, es decir, en este 
 Genere el gráfico de series temporales de esta nueva serie y guárdelo como un nuevo icono (Use un nombre suficientemente descriptivo, por ejemplo =D_LogsAirlinePassengers=)
 
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+#+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no :results none
 D_LogsAirlinePassengers <- gnuplot d_l_g --time-series --with-lines
 #+end_src
 #+latex: }
@@ -216,7 +218,7 @@ diferencia.
 
   #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
   /en linea de comandos/: 
-    #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+    #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no 
 diff g
 logs d_g
 print -o d_l_g l_d_g
@@ -229,7 +231,7 @@ Seleccione con el ratón la variable =d_l_g= y luego pulse en el menú desplegab
 
     #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
     /o bien teclee en linea de comandos/: 
-      #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no 
+      #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no 
 sdiff d_l_g
       #+end_src
     #+latex: }
@@ -239,7 +241,7 @@ Entre las variables aparecerá una nueva con el prefijo =sd_=, es decir, en este
 Genere el gráfico de series temporales de esta nueva serie y guárdelo como un nuevo icono (Use un nombre suficientemente descriptivo, por ejemplo =D12_D_LogsAirlinePassengers=)
 
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-  #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+  #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no :results none
 D12_D_LogsAirlinePassengers <- gnuplot sd_d_l_g --time-series --with-lines
   #+end_src
 #+latex: }
@@ -252,7 +254,7 @@ Observe que en la serie obtenida ya no se observa ni tendencia ni un componente 
 
    #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
    /en linea de comandos/: 
-     #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+     #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no :results none
 sdiff l_g
 D12_LogsAirlinePassengers <- gnuplot sd_l_g --time-series --with-lines
      #+end_src
@@ -264,7 +266,7 @@ D12_LogsAirlinePassengers <- gnuplot sd_l_g --time-series --with-lines
 
    #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
    /en linea de comandos/: 
-     #+begin_src gretl :tangle ./guiones/lecc01-airlinePass.inp :eval no :results none
+     #+begin_src gretl :tangle ./guiones/P-L01-A-airlinePass.inp :eval no :results none
 diff sd_l_g
 print -o sd_d_l_g  d_sd_l_g
      #+end_src
@@ -275,7 +277,7 @@ Es decir, el orden en que se tomen la diferencia ordinaria y la diferencia estac
 # +LATEX: \clearpage
 #+latex: {\vspace{10pt}
 #+latex: \noindent
-*Código completo de la práctica* ~lecc01-airlinePass.inp~
+*Código completo de la práctica* ~P-L01-A-airlinePass.inp~
 #+latex: \vspace{10pt}
-\lstinputlisting{guiones/lecc01-airlinePass.inp}
+\lstinputlisting{guiones/P-L01-A-airlinePass.inp}
 #+LATEX: \clearpage }

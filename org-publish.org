@@ -39,6 +39,8 @@ Genera el directorio =docs= con los ficheros para GitPages con subdirectorios pa
 #+BEGIN_SRC makefile :noweb no-export :results silent :tangle makefile
 LECCIONES_SRC = ./org-lessons
 LECCIONES_tmp = ./Lecciones-tmp
+PRACTICAS_SRC = ./org-practicas
+PRACTICAS_tmp = ./Practicas-tmp
 DOCS = ./docs
 CUADERNOS = $(DOCS)/CuadernosElectronicos
 TRANSPARENCIAS = $(DOCS)/Transparencias
@@ -103,23 +105,23 @@ $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 PRACTICAS_SRC = $(wildcard org-practicas/*.org)
 
 # Ficheros .done como señal de que fueron tanglados
-PRACTICAS_DONE = $(patsubst org-practicas/%.org, $(LECCIONES_tmp)/Practicas/%.done, $(PRACTICAS_SRC))
+PRACTICAS_DONE = $(patsubst org-practicas/%.org, $(PRACTICAS_tmp)/%.done, $(PRACTICAS_SRC))
 
 # Objetivo principal
 practicas: $(PRACTICAS_DONE)
 	@echo "✅ Todas las prácticas actualizadas."
 
-$(LECCIONES_tmp)/Practicas/%.done: org-practicas/%.org
+$(PRACTICAS_tmp)/%.done: org-practicas/%.org
 	echo "➡️ Copiando y ejecutando $< ..."
-	mkdir -p $(LECCIONES_tmp)/Practicas/guiones
-	cp $< $(LECCIONES_tmp)/Practicas/
-	ln -snf -r $(LECCIONES_tmp)/datos $(LECCIONES_tmp)/Practicas/
-	cp -a org-practicas/hansl.tex $(LECCIONES_tmp)/Practicas/
+	mkdir -p $(PRACTICAS_tmp)/guiones
+	cp $< $(PRACTICAS_tmp)/
+	ln -snf -r $(LECCIONES_tmp)/datos $(PRACTICAS_tmp)/
+	cp -a org-practicas/hansl.tex $(PRACTICAS_tmp)/
 	echo "🧠 Ejecutando org-babel-tangle y eval..."
 	set -e; \
 	if emacs --batch \
 	  --load ~/Software/scimax/init.el \
-	  $(LECCIONES_tmp)/Practicas/$*.org \
+	  $(PRACTICAS_tmp)/$*.org \
 	  --eval "(org-babel-execute-buffer)" \
 	  --eval "(save-buffer)" \
 	  --kill; then \
@@ -131,7 +133,7 @@ $(LECCIONES_tmp)/Practicas/%.done: org-practicas/%.org
 	    exit 1; \
 	fi
 	echo "➡️ listado de ficheros en el subdirectorio guiones"
-	ls -lR $(LECCIONES_tmp)/Practicas/guiones  # Debug para Actions
+	ls -lR $(PRACTICAS_tmp)/guiones  # Debug para Actions
 
 
 ORG_FILES := $(wildcard $(LECCIONES_SRC)/src/*.org)
@@ -557,7 +559,7 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :base-directory ,base-directory
                    :base-extension "org"
                    :publishing-directory ,(concat base-directory "docs")
-                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|docs\\|Lecciones-tmp\\|org-publish.org\\|README.org"
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|docs\\|Lecciones-tmp\\|Practicas-tmp\\|org-publish.org\\|README.org"
                    :recursive t
                    :publishing-function org-html-publish-to-html
                    :auto-preamble t
@@ -571,7 +573,7 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :base-directory  "./Lecciones-tmp/"
                    :base-extension "org"
                    :publishing-directory ,(concat base-directory "docs/Lecciones-html")
-                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|Practicas-tmp\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
                    :recursive t
                    :publishing-function org-html-publish-to-html
                    :auto-preamble t
@@ -591,15 +593,48 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :publishing-function my-org-latex-publish-to-pdf
                    :auto-preamble t)
 
+                  ("practicas-html"
+                   :base-directory  "./Practicas-tmp/"
+                   :base-extension "org"
+                   :publishing-directory ,(concat base-directory "docs/Practicas-html")
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|Practicas-tmp\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
+                   :recursive t
+                   :publishing-function org-html-publish-to-html
+                   :auto-preamble t
+                   :auto-sitemap t
+                   :with-author nil
+                   :with-creator nil
+                   :with-toc t
+                   :section-numbers nil)
+
+                  ("practicas-pdf"
+                   :base-directory "./Practicas-tmp/"
+                   :base-extension "org"
+                   :publishing-directory ,(concat base-directory "docs/Practicas-pdf")
+                   :exclude "src\\|org-lessons\\|org-practicas"
+                   :recursive t
+                   :auto-sitemap nil
+                   :publishing-function my-org-latex-publish-to-pdf
+                   :auto-preamble t)
+
+		  
                   ("static-index"
                    :base-directory ,base-directory
                    :base-extension "css\\|js\\|png\\|jpg\\|gif\\|dat\\|mov\\|txt\\|svg\\|aiff\\|inp"
                    :publishing-directory ,(concat base-directory "docs")
-                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|docs\\|chatCopilot.*\\|org-publish.*\\|README.org"
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|Practicas-tmp\\|docs\\|chatCopilot.*\\|org-publish.*\\|README.org"
                    :recursive t
                    :publishing-function org-publish-attachment)
 
-                  ("web-repositorio" :components ("index" "html" "pdf" "static-index")))))
+                  ("practicas-static-index"
+                   :base-directory "./Practicas-tmp/"
+                   :base-extension "css\\|js\\|png\\|jpg\\|gif\\|dat\\|mov\\|txt\\|svg\\|aiff\\|inp"
+                   :publishing-directory ,(concat base-directory "docs/Practicas-html")
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|docs\\|datos\\|chatCopilot.*\\|org-publish.*\\|README.org"
+                   :recursive t
+                   :publishing-function org-publish-attachment)
+
+                  ("web-repositorio" :components ("index" "html" "pdf" "practicas-html" "practicas-pdf" "static-index" "practicas-static-index")))))
 
   (message "🟢 Iniciando publicación del índice (web-repositorio)...")
   (org-publish "web-repositorio" t)
