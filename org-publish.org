@@ -22,7 +22,7 @@
 #+LATEX_HEADER_EXTRA: \usepackage{tabularx}
 #+LATEX_HEADER_EXTRA: \usepackage{booktabs}
 
-#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no :eval no
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no :eval yes
 (unless (file-directory-p "docs")
   (make-directory "docs"))
 (unless (file-directory-p "docs/.binder")
@@ -57,7 +57,9 @@ $(DOCS)/Calendario-Econometria-Aplicada.pdf:
 	emacs --batch Calendario/README.org -l org -f org-babel-tangle
 	cd Calendario && make Calendario-Econometria-Aplicada.pdf
 
-publicacion: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES))) README.org index.org
+publicacion: publicacion-lecciones publicacion-practicas
+
+publicacion-lecciones: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES))) README.org index.org
 	echo "FICHEROS EN CuadernosElectronicos y Transparencias?..."
 	cp -a $(LECCIONES_tmp)/Lecc*.slides.html $(TRANSPARENCIAS)
 	ls $(CUADERNOS)
@@ -67,10 +69,22 @@ publicacion: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $
 	  --load ~/Software/scimax/init.el \
 	  -l publica.el
 	cp -a README.org  $(DOCS)
-	cp -a $(LECCIONES_tmp)/sitemap.org  $(DOCS)/Lecciones-html
 	echo "FICHEROS EN Docs?..."
 	find $(DOCS)
 	touch $@
+
+publicacion-practicas: $(patsubst $(PRACTICAS_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES))) README.org index.org
+	echo "EJECUCIÓN DE publica-practicas.el..."
+	emacs --batch \
+	  --load ~/Software/scimax/init.el \
+	  -l publica-practicas.el
+	cp -a README.org  $(DOCS)
+	cp -a $(PRACTICAS_tmp)/sitemap.org  $(DOCS)/Practicas-html
+	echo "FICHEROS EN Docs?..."
+	find $(DOCS)/Practicas-html
+	find $(DOCS)/Practicas-pdf
+	touch $@
+
 
 notebooksYslides: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES)))
 	touch $@
@@ -177,13 +191,15 @@ directorios:
 
 clean:
 	rm -r -f $(LECCIONES_tmp)
+	rm -r -f $(PRACTICAS_tmp)
 
 cleanAll: clean
 	#find $(DOCS)/ -mindepth 1 ! -name 'README.org' ! -name '.binder' -exec rm -rf {} +
 	rm -r -f $(DOCS)
 	rm -f directorios
 	rm -f series_formales
-	rm -f publicacion
+	rm -f publicacion-lecciones
+	rm -f publicacion-practicas
 	rm -f practicas
 	rm -f notebooksYslides
 	rm -f sitemap.org
@@ -530,7 +546,7 @@ El backend "Agg"  no me funcionó, por lo que opté por indicar explícitamente 
 
 
 
-* Script =publica.el= de elisp para publicar los =.org= es formato =pdf= y ~html~
+* Script =publica.el= de elisp para publicar las lecciones con formato =.org= como ficheros con formato =pdf= y ~html~
 
 Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
 
@@ -587,36 +603,11 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :base-directory "./Lecciones-tmp/"
                    :base-extension "org"
                    :publishing-directory ,(concat base-directory "docs/Lecciones-pdf")
-                   :exclude "src\\|org-lessons\\|org-practicas"
+                   :exclude "src\\|org-lessons\\|org-practicas\\|sitemap.org"
                    :recursive t
                    :auto-sitemap nil
                    :publishing-function my-org-latex-publish-to-pdf
                    :auto-preamble t)
-
-                  ("practicas-html"
-                   :base-directory  "./Practicas-tmp/"
-                   :base-extension "org"
-                   :publishing-directory ,(concat base-directory "docs/Practicas-html")
-                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|Practicas-tmp\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
-                   :recursive t
-                   :publishing-function org-html-publish-to-html
-                   :auto-preamble t
-                   :auto-sitemap t
-                   :with-author nil
-                   :with-creator nil
-                   :with-toc t
-                   :section-numbers nil)
-
-                  ("practicas-pdf"
-                   :base-directory "./Practicas-tmp/"
-                   :base-extension "org"
-                   :publishing-directory ,(concat base-directory "docs/Practicas-pdf")
-                   :exclude "src\\|org-lessons\\|org-practicas"
-                   :recursive t
-                   :auto-sitemap nil
-                   :publishing-function my-org-latex-publish-to-pdf
-                   :auto-preamble t)
-
 		  
                   ("static-index"
                    :base-directory ,base-directory
@@ -626,15 +617,7 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :recursive t
                    :publishing-function org-publish-attachment)
 
-                  ("practicas-static-index"
-                   :base-directory "./Practicas-tmp/"
-                   :base-extension "css\\|js\\|png\\|jpg\\|gif\\|dat\\|mov\\|txt\\|svg\\|aiff\\|inp"
-                   :publishing-directory ,(concat base-directory "docs/Practicas-html")
-                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|docs\\|datos\\|chatCopilot.*\\|org-publish.*\\|README.org"
-                   :recursive t
-                   :publishing-function org-publish-attachment)
-
-                  ("web-repositorio" :components ("index" "html" "pdf" "practicas-html" "practicas-pdf" "static-index" "practicas-static-index")))))
+                  ("web-repositorio" :components ("index" "html" "pdf" "static-index")))))
 
   (message "🟢 Iniciando publicación del índice (web-repositorio)...")
   (org-publish "web-repositorio" t)
@@ -651,6 +634,86 @@ Podemos chequear la versión local ejecutando en emacs el siguiente bloque
 
 #+BEGIN_SRC emacs-lisp :results silent
 (browse-url "docs/index.html")
+#+END_SRC
+
+
+* Script =publica-practicas.el= de elisp para publicar las prácticas con formato =.org= como ficheros con formato =pdf= y ~html~
+
+Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
+
+#+BEGIN_SRC  emacs-lisp :tangle publica-practicas.el :results silent
+;;; publica.el --- Publicación HTML y PDF para el repositorio Scimax-ELN
+
+(require 'ox-publish)
+
+(setq org-confirm-babel-evaluate nil
+      org-export-with-broken-links t
+      org-html-validation-link nil
+      org-html-head-include-scripts nil
+      org-html-head-include-default-style nil)
+
+(defun my-org-latex-publish-to-pdf (plist filename pub-dir)
+  "Publica un archivo Org como PDF tras ejecutar bloques de código."
+  (message "Exportando a PDF: %s" filename)
+  (with-current-buffer (find-file-noselect filename)
+    ;(org-babel-execute-buffer)
+    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(let* ((base-directory "./"))
+  (setq org-publish-project-alist
+        (append org-publish-project-alist
+                `(("index"
+                   :base-directory ,base-directory
+                   :base-extension "org"
+                   :publishing-directory ,(concat base-directory "docs")
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|docs\\|Lecciones-tmp\\|Practicas-tmp"
+                   :recursive nil
+                   :publishing-function org-html-publish-to-html
+                   :auto-preamble t
+                   :auto-sitemap nil
+                   :with-author nil
+                   :with-creator nil
+                   :with-toc t
+                   :section-numbers nil)
+
+                  ("practicas-html"
+                   :base-directory  "./Practicas-tmp/"
+                   :base-extension "org"
+                   :publishing-directory ,(concat base-directory "docs/Practicas-html")
+                   :exclude "datos"
+                   :recursive t
+                   :publishing-function org-html-publish-to-html
+                   :auto-preamble t
+                   :auto-sitemap t
+                   :with-author nil
+                   :with-creator nil
+                   :with-toc t
+                   :section-numbers nil)
+
+                  ("practicas-pdf"
+                   :base-directory "./Practicas-tmp/"
+                   :base-extension "org"
+                   :publishing-directory ,(concat base-directory "docs/Practicas-pdf")
+                   :exclude "datos\\|sitemap.org"
+                   :recursive t
+                   :auto-sitemap nil
+                   :publishing-function my-org-latex-publish-to-pdf
+                   :auto-preamble t)
+
+                  ("practicas-static-index"
+                   :base-directory "./Practicas-tmp/"
+                   :base-extension "css\\|js\\|png\\|jpg\\|gif\\|dat\\|mov\\|txt\\|svg\\|aiff\\|inp"
+                   :publishing-directory ,(concat base-directory "docs/Practicas-html")
+                   :exclude "hansl.tex"
+                   :recursive t
+                   :publishing-function org-publish-attachment)
+
+                  ("web-repositorio" :components ("index" "practicas-html" "practicas-pdf" "practicas-static-index")))))
+
+  (message "🟢 Iniciando publicación del índice (web-repositorio)...")
+  (org-publish "web-repositorio" t)
+  (message "✅ Publicación del índice completada."))
+
 #+END_SRC
 
 
