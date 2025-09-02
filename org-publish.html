@@ -1,0 +1,990 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+<!-- 2025-09-02 Tue 14:30 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Publicación de los ficheros org en GitHub pages</title>
+<meta name="generator" content="Org Mode" />
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Publicación de los ficheros org en GitHub pages</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org6b3e6c7">Fichero <code>makefile</code></a>
+<ul>
+<li><a href="#orgd1a7d2b">Aclaraciones</a></li>
+</ul>
+</li>
+<li><a href="#org208624e">Fichero <code>build.yml</code></a>
+<ul>
+<li><a href="#org63ab86d">Aclaraciones</a>
+<ul>
+<li><a href="#org52ad92e">Consulta a Copilot sobre la generación de figuras</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orgc4aae49">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
+<li><a href="#orgf48a0da">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
+<li><a href="#org4bd5abb">slides para GitHubpages</a></li>
+<li><a href="#org829cfc0">Directorio <code>.binder</code> para MyBinder</a>
+<ul>
+<li><a href="#orgae9df6a">Fichero <code>environment.yml</code></a></li>
+<li><a href="#org749d3d3">Fichero <code>apt.txt</code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org6b3e6c7" class="outline-2">
+<h2 id="org6b3e6c7">Fichero <code>makefile</code></h2>
+<div class="outline-text-2" id="text-org6b3e6c7">
+<p>
+Genera el directorio <code>docs</code> con los ficheros para GitPages con subdirectorios para los <code>CuadernosElectronicos</code>, <code>pdfs</code>, <code>Transparencias</code> y los ficheros con las lecciones en <code>html</code>.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-makefile"><code><span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span> = ./org-lessons
+<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span> = ./Lecciones-tmp
+<span style="font-weight: bold; font-style: italic;">PRACTICAS_SRC</span> = ./org-practicas
+<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span> = ./Practicas-tmp
+<span style="font-weight: bold; font-style: italic;">DOCS</span> = ./docs
+<span style="font-weight: bold; font-style: italic;">CUADERNOS</span> = $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/CuadernosElectronicos
+<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span> = $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Transparencias
+
+<span style="font-weight: bold; font-style: italic;">SRC_FILES</span> = $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/Lecc*.org
+
+<span style="font-weight: bold;">.PHONY</span>: all clean cleanAll directorios programas_de_python calendario notebooksYslides
+
+<span style="font-weight: bold;">all</span>: calendario notebooksYslides practicas publicacion
+
+<span style="font-weight: bold;">calendario</span>: directorios $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Calendario-Econometria-Aplicada.pdf
+
+<span style="font-weight: bold;">$(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold;">)/Calendario-Econometria-Aplicada.pdf</span>:
+        emacs --batch Calendario/README.org -l org -f org-babel-tangle
+        cd Calendario &amp;&amp; make Calendario-Econometria-Aplicada.pdf
+
+<span style="font-weight: bold;">publicacion</span>: publicacion-lecciones publicacion-practicas
+
+<span style="font-weight: bold;">publicacion-lecciones</span>: $(<span style="font-weight: bold; font-style: italic;">patsubst</span> $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/%.org,$(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/%.ipynb,$(<span style="font-weight: bold; font-style: italic;">wildcard</span> $(<span style="font-weight: bold; font-style: italic;">SRC_FILES</span>))) README.org index.org
+        echo <span style="font-style: italic;">"FICHEROS EN CuadernosElectronicos y Transparencias?..."</span>
+        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/Lecc*.slides.html $(<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span>)
+        ls $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)
+        ls $(<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span>)
+        echo <span style="font-style: italic;">"EJECUCI&#211;N DE publica.el..."</span>
+        emacs --batch \
+          --load ~/Software/scimax/init.el \
+          -l publica.el
+        cp -a README.org  $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
+        echo <span style="font-style: italic;">"FICHEROS EN Docs?..."</span>
+        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
+        touch <span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">@</span>
+
+<span style="font-weight: bold;">publicacion-practicas</span>: $(<span style="font-weight: bold; font-style: italic;">patsubst</span> $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_SRC</span>)/%.org,$(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/%.ipynb,$(<span style="font-weight: bold; font-style: italic;">wildcard</span> $(<span style="font-weight: bold; font-style: italic;">SRC_FILES</span>))) README.org index.org
+        echo <span style="font-style: italic;">"EJECUCI&#211;N DE publica-practicas.el..."</span>
+        emacs --batch \
+          --load ~/Software/scimax/init.el \
+          -l publica-practicas.el
+        cp -a README.org  $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
+        cp -a $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/sitemap.org  $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-html
+        echo <span style="font-style: italic;">"FICHEROS EN Docs?..."</span>
+        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-html
+        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-pdf
+        touch <span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">@</span>
+
+
+<span style="font-weight: bold;">notebooksYslides</span>: $(<span style="font-weight: bold; font-style: italic;">patsubst</span> $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/%.org,$(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/%.ipynb,$(<span style="font-weight: bold; font-style: italic;">wildcard</span> $(<span style="font-weight: bold; font-style: italic;">SRC_FILES</span>)))
+        touch <span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">@</span>
+
+<span style="font-weight: bold;">$(</span><span style="font-weight: bold; font-style: italic;">CUADERNOS</span><span style="font-weight: bold;">)/%.ipynb $(</span><span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span><span style="font-weight: bold;">)/%.slides.html</span>: $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/%.org
+        make directorios
+        make programas_de_python
+        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/*.bib $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)
+        cp -a $<span style="font-weight: bold; text-decoration: underline;">&lt;</span> $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)
+        echo <span style="font-style: italic;">"EJECUCION DEL NOTEBOOK DE ORG: $(</span><span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span><span style="font-style: italic;">)/$(</span><span style="font-weight: bold; font-style: italic;">@F</span><span style="font-style: italic;">:.ipynb=.org)..."</span>
+        emacs -Q -l ~/Software/scimax/init.el $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/$(<span style="font-weight: bold; font-style: italic;">@F</span>:<span style="font-weight: bold; font-style: italic;">.ipynb</span>=.org) --batch --eval <span style="font-style: italic;">"(org-babel-execute-buffer)"</span> --eval <span style="font-style: italic;">"(save-buffer)"</span> --kill
+        echo <span style="font-style: italic;">"EJECUCION DEL NOTEBOOK DE JUPYTER..."</span>
+        jupyter nbconvert --execute --inplace $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/$(<span style="font-weight: bold; font-style: italic;">@F</span>) 
+        echo <span style="font-style: italic;">"FICHEROS EN ./lecciones?..."</span>
+        find $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)
+        echo <span style="font-style: italic;">"FICHEROS EN ./docs/Lecciones-html/img?..."</span>
+        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/img $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html
+        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/img
+        echo <span style="font-style: italic;">"Contenido de img tras notebook:"</span>
+        find $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/img
+        echo <span style="font-style: italic;">"COPIO LO QUE SE HA GENERADO (.ipynb sin ejecutar y las im&#225;genes) A ./docs..."</span>
+        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/$(<span style="font-weight: bold; font-style: italic;">@F</span>) $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)
+        ln -snf -r $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/img/ $(<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span>)/
+        ln -snf -r $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/img/ $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;"># Ejecutar el notebook con jupyter nbconvert
+</span>        echo <span style="font-style: italic;">"CREACI&#211;N DE LAS SLIDES..."</span>
+        jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix <span style="font-style: italic;">"https://unpkg.com/reveal.js@5.2.1"</span> --execute $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/$(<span style="font-weight: bold; font-style: italic;">@F</span>) 
+        echo <span style="font-style: italic;">"&#10145;&#65039; FICHEROS EN docs/ TRAS GENERAR SLIDES Y NOTEBOOKS DE JUPYTER..."</span>
+        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Lista de archivos fuente .org en org-practicas
+</span><span style="font-weight: bold; font-style: italic;">PRACTICAS_SRC</span> = $(<span style="font-weight: bold; font-style: italic;">wildcard</span> org-practicas/*.org)
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ficheros .done como se&#241;al de que fueron tanglados
+</span><span style="font-weight: bold; font-style: italic;">PRACTICAS_DONE</span> = $(<span style="font-weight: bold; font-style: italic;">patsubst</span> org-practicas/%.org, $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/%.done, $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_SRC</span>))
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Objetivo principal
+</span><span style="font-weight: bold;">practicas</span>: $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_DONE</span>)
+        <span style="font-weight: bold; text-decoration: underline;">@</span>echo <span style="font-style: italic;">"&#9989; Todas las pr&#225;cticas actualizadas."</span>
+
+<span style="font-weight: bold;">$(</span><span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span><span style="font-weight: bold;">)/%.done</span>: org-practicas/%.org
+        echo <span style="font-style: italic;">"&#10145;&#65039; Copiando y ejecutando $</span><span style="font-weight: bold; font-style: italic; text-decoration: underline;">&lt;</span><span style="font-style: italic;"> ..."</span>
+        mkdir -p $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/guiones
+        cp $<span style="font-weight: bold; text-decoration: underline;">&lt;</span> $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/
+        ln -snf -r $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/datos $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/
+        cp -a org-practicas/hansl.tex $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/
+        echo <span style="font-style: italic;">"&#129504; Ejecutando org-babel-tangle y eval..."</span>
+        set -e; \
+        if emacs --batch \
+          --load ~/Software/scimax/init.el \
+          $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.org \
+          --eval <span style="font-style: italic;">"(org-babel-execute-buffer)"</span> \
+          --eval <span style="font-style: italic;">"(save-buffer)"</span> \
+          --kill; then \
+            echo <span style="font-style: italic;">"&#9989; Correcto: $</span><span style="font-weight: bold; font-style: italic; text-decoration: underline;">&lt;</span><span style="font-style: italic;">"</span>; \
+            touch <span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">@</span>; \
+        else \
+            echo <span style="font-style: italic;">"&#10060; Error al procesar $</span><span style="font-weight: bold; font-style: italic; text-decoration: underline;">&lt;</span><span style="font-style: italic;">"</span>; \
+            rm -f <span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">@</span>; \
+            exit 1; \
+        fi
+        echo <span style="font-style: italic;">"&#10145;&#65039; listado de ficheros en el subdirectorio guiones"</span>
+        ls -lR $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/guiones  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Debug para Actions
+</span>
+
+<span style="font-weight: bold; font-style: italic;">ORG_FILES</span> := $(<span style="font-weight: bold; font-style: italic;">wildcard</span> $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/src/*.org)
+<span style="font-weight: bold; font-style: italic;">TMP_FILES</span> := $(<span style="font-weight: bold; font-style: italic;">patsubst</span> $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/src/%.org, $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/%.org, $(<span style="font-weight: bold; font-style: italic;">ORG_FILES</span>))
+
+<span style="font-weight: bold;">programas_de_python</span>: $(<span style="font-weight: bold; font-style: italic;">TMP_FILES</span>)
+
+<span style="font-weight: bold;">$(</span><span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span><span style="font-weight: bold;">)/src/%.org</span>: $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/src/%.org
+        echo <span style="font-style: italic;">"INICIO </span><span style="font-weight: bold; font-style: italic;">$</span><span style="font-weight: bold; font-style: italic; text-decoration: underline;">*</span><span style="font-style: italic;">.ipynb..."</span>
+        make directorios
+        cp $<span style="font-weight: bold; text-decoration: underline;">&lt;</span> $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/
+        emacs -q --batch $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.org -l org -f org-babel-tangle
+        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.py $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/src/
+        ln -sf -r $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/src/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.py $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/
+        emacs -q --batch \
+          --load ~/Software/scimax/init.el \
+          --eval <span style="font-style: italic;">"(require 'ox-ipynb)"</span> \
+          --eval <span style="font-style: italic;">"(ox-ipynb-export-org-file-to-ipynb-file \"$(</span><span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span><span style="font-style: italic;">)/src/</span><span style="font-weight: bold; font-style: italic;">$</span><span style="font-weight: bold; font-style: italic; text-decoration: underline;">*</span><span style="font-style: italic;">.org\")"</span>
+        jupyter nbconvert --execute --inplace $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.ipynb
+        jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix <span style="font-style: italic;">"https://unpkg.com/reveal.js@5.2.1"</span> --execute $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.ipynb
+        jupyter nbconvert --execute --to html $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.ipynb
+        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.ipynb $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)
+        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.slides.html $(<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span>)
+        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/<span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">*</span>.html $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/src/
+        echo <span style="font-style: italic;">"TERMINADO </span><span style="font-weight: bold; font-style: italic;">$</span><span style="font-weight: bold; font-style: italic; text-decoration: underline;">*</span><span style="font-style: italic;">.ipynb..."</span>
+
+<span style="font-weight: bold;">directorios</span>:
+        mkdir -v -p .github/workflows
+        mkdir -v -p $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src
+        mkdir -v -p $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/img
+        mkdir -v -p $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-pdf
+        mkdir -v -p $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/.binder
+        mkdir -v -p $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/img
+        mkdir -v -p $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/src
+        mkdir -v -p $(<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span>)
+        mkdir -v -p $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/src
+        cp -a ./css $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/
+        cp -a ./datos $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/
+        cp -a ./datos $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/
+        touch directorios
+
+<span style="font-weight: bold;">clean</span>:
+        rm -r -f $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)
+        rm -r -f $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)
+
+<span style="font-weight: bold;">cleanAll</span>: clean
+        #<span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)/ -mindepth 1 ! -name 'README.org' ! -name '.binder' -exec rm -rf {} +
+</span>        rm -r -f $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
+        rm -f directorios
+        rm -f series_formales
+        rm -f publicacion-lecciones
+        rm -f publicacion-practicas
+        rm -f practicas
+        rm -f notebooksYslides
+        rm -f sitemap.org
+        rm -r -f logs
+</code></pre>
+</div>
+</div>
+<div id="outline-container-orgd1a7d2b" class="outline-3">
+<h3 id="orgd1a7d2b">Aclaraciones</h3>
+<div class="outline-text-3" id="text-orgd1a7d2b">
+<p>
+El directorio <code>./Lecciones-tmp</code> es temporal (en el fichero <code>makefile</code> se hace referencia a él con <code>$(LECCIONES_tmp)</code>). En dicho directorio se ejecutan los notebooks. Los ficheros creados se copian en distintos subdirectorios del directorio de publicación <code>./docs</code> (en el fichero <code>makefile</code> es referenciado con <code>$(DOCS)</code> ). El subdirectorio <code>./docs</code> es el directorio de donde "cuelgan" las páginas web; dichas páginas se distribuyen desde la rama <code>gh-pages</code> del repositorio.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org208624e" class="outline-2">
+<h2 id="org208624e">Fichero <code>build.yml</code></h2>
+<div class="outline-text-2" id="text-org208624e">
+<p>
+Contiene las instrucciones que ejecutará GitHub Actions en el repositorio cada vez que éste sea actualizado.
+</p>
+
+<p>
+Usa el contenido (los ficheros fuente) de la rama <code>main</code> y copia los ficheros compilados en la raíz de la rama <code>gh-pages</code>. 
+</p>
+<div class="org-src-container">
+<pre class="src src-yml"><code>name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git emacs pandoc aspell aspell-en aspell-es zip gretl
+        pip install jupyter nbconvert
+
+    - name: Crear carpeta e instalar la base de datos del Banco de España en Gretl
+      run: |
+        mkdir -p ~/.gretl/db
+        cp -r db/* ~/.gretl/db/
+
+    - name: Install Python modules
+      run: |
+        pip install sympy numpy pandas matplotlib dataframe-image statsmodels seaborn scipy
+
+    - name: Verify Jupyter Installation
+      run: |
+        jupyter kernelspec list
+
+    - name: Install LaTeX
+      run: |
+        sudo apt-get install -y texlive  texlive-latex-recommended texlive-latex-extra  texlive-fonts-extra texlive-fonts-recommended texlive-xetex texlive-science python3-pygments texlive-lang-spanish texlive-bibtex-extra texlive-binaries texlive-extra-utils texlive-font-utils texlive-luatex texlive-xetex dvipng
+
+    - name: Disable tlmgr (prevent accidental calls)
+      run: sudo mv /usr/bin/tlmgr /usr/bin/tlmgr.disabled || true
+
+    - name: Clone Scimax
+      run: |
+        git clone https://github.com/jkitchin/scimax.git ~/Software/scimax
+
+    - name: Download ox-ipynb.el
+      run: |
+        wget https://raw.githubusercontent.com/jkitchin/ox-ipynb/master/ox-ipynb.el -O ~/Software/scimax/ox-ipynb.el
+
+    - name: Install s.el and dash.el
+      run: |
+        emacs --batch --eval "(require 'package)" \
+                      --eval "(add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\"))" \
+                      --eval "(package-refresh-contents)" \
+                      --eval "(package-install 's)" \
+                      --eval "(package-install 'dash)"
+
+    - name: Create no-tlmgr.el
+      run: |
+        mkdir -p ~/.emacs.d
+        echo "(setq system-packages-use-sudo nil)" &gt; ~/.emacs.d/no-tlmgr.el
+        echo "(setq TeX-install-font-lock nil)" &gt;&gt; ~/.emacs.d/no-tlmgr.el
+        echo "(setq TeX-live-install-texmf nil)" &gt;&gt; ~/.emacs.d/no-tlmgr.el
+
+    - name: Verify ox-ipynb Installation
+      run: |
+        emacs --batch \
+              --eval "(add-to-list 'load-path \"~/Software/scimax/\")" \
+              --eval "(dolist (dir (directory-files \"~/.emacs.d/elpa/\" t \"^[^.]\")) (add-to-list 'load-path dir))" \
+              --eval "(require 'ox-ipynb)"
+
+    - name: Create .binder directory
+      run: mkdir -p docs/.binder
+
+    - name: Ficheros de configuracion
+      run: |
+        emacs --batch org-publish.org -l org -f org-babel-tangle
+
+    - name: Execute Makefile notebooksYslides
+      run: |
+        set -e
+        make notebooksYslides
+
+    - name: Inspección tras notebooksYslides
+      run: |
+        echo "Contenido de ./Lecciones-tmp:"
+        find ./Lecciones-tmp
+        echo "Contenido de ./docs:"
+        find ./docs
+
+    - name: Execute Makefile practicas
+      run: |
+        set -e
+        make practicas
+        echo "Contenido de ./Practicas-tmp:"
+        find ./Practicas-tmp
+
+    - name: Execute Makefile calendario
+      run: |
+        set -e
+        make calendario
+
+    - name: Execute Makefile publicacion
+      run: |
+        set -e
+        make publicacion
+
+    - name: Comprobar contenido de docs antes de deploy
+      run: |
+        echo "Contenido de docs antes de deploy:"
+        ls -la docs
+
+    - name: Deploy docs/ a gh-pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GH_PAGES_TOKEN }}
+        publish_dir: ./docs
+        publish_branch: gh-pages
+#        force_orphan: true
+#        allow_empty_commit: true
+</code></pre>
+</div>
+</div>
+<div id="outline-container-org63ab86d" class="outline-3">
+<h3 id="org63ab86d">Aclaraciones</h3>
+<div class="outline-text-3" id="text-org63ab86d">
+</div>
+<ul class="org-ul">
+<li><a id="org8582181"></a>tlmgr<br />
+<div class="outline-text-5" id="text-org8582181">
+<p>
+Scimax intenta usar <code>tlmgr</code> para instalar paquetes de \(\LaTeX{}\), pero <code>Actions</code> de <code>GitHub</code> no lo permite. Las medidas tomadas para evitar este problema han sido 
+</p>
+<ol class="org-ol">
+<li><p>
+Al ejecutarse <code>.github/workflows/build.yml</code> en GitHub Actions se crea un fichero <code>~/.emacs.d/no-tlmgr.el</code> con el siguiente contenido
+</p>
+<div class="org-src-container">
+<pre class="src src-nil"><code>(setq system-packages-use-sudo nil)
+(setq TeX-install-font-lock nil)
+</code></pre>
+</div>
+<p>
+así, al publicar los ficheros, podemos llamar a scimax del siguiente modo
+</p>
+<div class="org-src-container">
+<pre class="src src-nil"><code>emacs --batch \
+  --load ~/.emacs.d/no-tlmgr.el \
+  --load ~/Software/scimax/init.el \
+  -l publica.el
+</code></pre>
+</div></li>
+<li><p>
+Además en <code>.github/workflows/build.yml</code> he añadido
+</p>
+<div class="org-src-container">
+<pre class="src src-nil"><code>    - name: Disable tlmgr (prevent accidental calls)
+      run: sudo mv /usr/bin/tlmgr /usr/bin/tlmgr.disabled || true
+</code></pre>
+</div></li>
+</ol>
+
+<p>
+Quizá sea suficiente solo con esto segundo. Pero si quito el fichero <code>~/.emacs.d/no-tlmgr.el</code>, también he de omitirlo en las llamadas a emacs usando scimax (como así funciona&hellip; así se queda).
+</p>
+</div>
+</li>
+</ul>
+<div id="outline-container-org52ad92e" class="outline-4">
+<h4 id="org52ad92e">Consulta a Copilot sobre la generación de figuras</h4>
+<div class="outline-text-4" id="text-org52ad92e">
+<p>
+Tuve dificultades para que la ejecución en GitHub Actions de los de los cuadernos electrónicos de Scimax creara las figuras. A continuación copio mi consulta a copilot: 
+</p>
+
+<blockquote>
+<hr />
+<hr />
+<p>
+<b><i>Consulta</i></b>:
+<i>Anteriormente faltaba por instalar el paquete dvipng. Una vez instalado dvipng, el bloque de código</i>:
+</p>
+
+<p>
+<i>ha creado correctamente el fichero "img/prueba_action.png" con la figura. Sin embargo, el bloque</i>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><code>df1.plot(x=<span style="font-style: italic;">'obs'</span>,xlabel=<span style="font-style: italic;">''</span>,figsize=(15,4)).set_title(<span style="font-style: italic;">'PIB zona euro'</span>,fontsize=18)
+</code></pre>
+</div>
+
+<p>
+<i>no ha creado el fichero ./img/lecc01/PIB_UEM.png con su correspondiente figura.</i>
+</p>
+<hr />
+<hr />
+</blockquote>
+
+<p>
+¡Excelente que la instalación de dvipng haya solucionado la generación de imágenes para el primer bloque!  
+Ahora, pasemos a analizar por qué el segundo bloque <b>no genera</b> el archivo `./img/lecc01/PIB_UEM.png`.
+</p>
+
+<hr />
+</div>
+<ul class="org-ul">
+<li><a id="orge4e9e93"></a>Diagnóstico y causas probables<br />
+<ul class="org-ul">
+<li><a id="org8933cad"></a>1. Diferencia clave entre ambos bloques<br />
+<div class="outline-text-6" id="text-org8933cad">
+<ul class="org-ul">
+<li><p>
+<b>Bloque que funciona:</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-org"><code>  #+BEGIN<span style="color: #0000ff; text-decoration: underline;">_SRC</span> jupyter-python :results file :exports results
+  plt.plot([1,2,3],[4,5,6])
+  plt.savefig("img/prueba<span style="color: #0000ff; text-decoration: underline;">_action.png</span>")
+  "img/prueba<span style="color: #0000ff; text-decoration: underline;">_action.png</span>"
+</code></pre>
+</div>
+<p>
+#+END_SRC
+</p>
+
+<ul class="org-ul">
+<li>Aquí, tú generas la figura y la guardas explícitamente con `plt.savefig()`, y luego devuelves el nombre del archivo en la última línea.</li>
+</ul></li>
+
+<li><p>
+<b>Bloque que falla:</b>
+</p>
+
+<div class="org-src-container">
+<pre class="src src-org"><code>  #+BEGIN<span style="color: #0000ff; text-decoration: underline;">_SRC</span> jupyter-python :results file :file ./img/lecc01/PIB<span style="color: #0000ff; text-decoration: underline;">_UEM.png</span>
+  df1.plot(x='obs',xlabel='',figsize=(15,4)).set<span style="color: #0000ff; text-decoration: underline;">_title</span>('PIB zona euro',fontsize=18)
+</code></pre>
+</div>
+<p>
+#+END_SRC
+</p>
+
+<ul class="org-ul">
+<li>Aquí confías en que org-babel/jupyter-python guardará automáticamente la figura en `:file`, pero el método pandas `df.plot()` <b>no guarda ni devuelve</b> el archivo.</li>
+</ul></li>
+</ul>
+</div>
+</li>
+<li><a id="orgc666d63"></a>2. ¿Por qué falla el segundo bloque?<br />
+<div class="outline-text-6" id="text-orgc666d63">
+<ul class="org-ul">
+<li>El argumento `:file ./img/lecc01/PIB_UEM.png` espera que el último comando del bloque <b>guarde la imagen en ese path</b> (o devuelva una figura que org/jupyter pueda guardar ahí).</li>
+<li>El método `df1.plot(&hellip;).set_title(&hellip;)` crea y modifica una figura activa, pero <b>no la guarda</b>.</li>
+<li>Si usas solo `set_title()`, no hay ninguna instrucción para guardar el gráfico.</li>
+<li>Por defecto, ni org-babel ni jupyter-python pueden adivinar que la figura debe ser guardada en ese path si no se lo indicas de forma explícita.</li>
+</ul>
+
+<hr />
+</div>
+</li>
+</ul>
+</li>
+<li><a id="org1acf012"></a>Solución recomendada<br />
+<div class="outline-text-5" id="text-org1acf012">
+<p>
+<b>Debes guardar la figura manualmente al path especificado</b>, y devolver ese path como resultado del bloque.
+</p>
+</div>
+<ul class="org-ul">
+<li><a id="orgda9a19d"></a>Forma correcta:<br />
+<div class="outline-text-6" id="text-orgda9a19d">
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ax</span> = df1.plot(x=<span style="font-style: italic;">'obs'</span>, xlabel=<span style="font-style: italic;">''</span>, figsize=(15,4))
+ax.set_title(<span style="font-style: italic;">'PIB zona euro'</span>, fontsize=18)
+<span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt
+plt.savefig(<span style="font-style: italic;">"./img/lecc01/PIB_UEM.png"</span>)
+<span style="font-style: italic;">"./img/lecc01/PIB_UEM.png"</span>
+</code></pre>
+</div>
+
+<ul class="org-ul">
+<li>Esto asegura que la imagen se guarda donde deseas y que el bloque devuelve el path correcto para que org-babel inserte la imagen en el documento.</li>
+</ul>
+</div>
+</li>
+<li><a id="orge1f6510"></a>Alternativas<br />
+<div class="outline-text-6" id="text-orge1f6510">
+<ul class="org-ul">
+<li>Si usas solo `:results file` sin `:file`, puedes devolver el nombre del archivo en la última línea.</li>
+<li>Siempre asegúrate de llamar a `plt.savefig()` <b>después</b> de crear el gráfico.</li>
+</ul>
+
+<hr />
+</div>
+</li>
+</ul>
+</li>
+<li><a id="orgf9e3945"></a>Resumen<br />
+<div class="outline-text-5" id="text-orgf9e3945">
+<ul class="org-ul">
+<li>El bloque con `plt.savefig(&hellip;)` funciona porque guarda explícitamente la imagen.</li>
+<li>El bloque con pandas `plot` y solo `set_title()` <b>NO guarda la imagen</b>; debes añadir `plt.savefig()` y devolver el path.</li>
+<li>Así, org-babel/jupyter-python incrustará correctamente la imagen en el documento exportado.</li>
+</ul>
+
+<hr />
+
+<blockquote>
+<hr />
+<hr />
+<p>
+<b><i>Consulta</i></b>:
+<i>Sin embargo. Cuando ejecuto localmente el fichero org sí se crean las figuras en mi disco. ¿Hay algún modo de que también se creen con Actions sin modificar los bloques? Es decir, ¿hay algún modo de que funcionen tal y como están ahora mismo?</i>
+</p>
+<hr />
+<hr />
+</blockquote>
+
+<p>
+¡Esta es una pregunta muy frecuente al usar org-babel/jupyter en entornos CI/CD!  
+La diferencia entre tu entorno local y GitHub Actions suele deberse a <b>la configuración del entorno gráfico</b> y de <b>matplotlib</b>.
+</p>
+
+<hr />
+</div>
+</li>
+<li><a id="orgbed20bf"></a>¿Por qué funciona localmente pero no en Actions?<br />
+<div class="outline-text-5" id="text-orgbed20bf">
+<ul class="org-ul">
+<li><b>Localmente</b>, matplotlib tiene acceso a un entorno gráfico (X11, Wayland, etc.) y suele usar un backend como `TkAgg`, `Qt5Agg`,…</li>
+<li><b>En GitHub Actions</b> (o cualquier entorno headless), <b>matplotlib no tiene acceso a un display</b> y por defecto puede intentar usar un backend que requiere uno, lo que impide guardar imágenes.</li>
+</ul>
+</div>
+<ul class="org-ul">
+<li><a id="org2fa9392"></a>Backend headless necesario<br />
+<div class="outline-text-6" id="text-org2fa9392">
+<p>
+Para guardar imágenes sin display, <b>matplotlib debe usar un backend como "Agg"</b>.
+</p>
+
+<hr />
+</div>
+</li>
+</ul>
+</li>
+<li><a id="orgc2f90e6"></a>Solución: Forzar el backend "Agg" para matplotlib<br />
+<div class="outline-text-5" id="text-orgc2f90e6">
+<p>
+Esto se puede hacer <b>sin modificar los bloques</b> añadiendo una configuración previa en tu flujo de trabajo o al comienzo de la ejecución.
+</p>
+</div>
+<ul class="org-ul">
+<li><a id="org95ab882"></a>Opción 1: Variable de entorno en el workflow<br />
+<div class="outline-text-6" id="text-org95ab882">
+<p>
+Añade esto antes de ejecutar Emacs en tu `build.yml`:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yaml"><code>- name: Set MPLBACKEND (matplotlib)
+  run: echo "MPLBACKEND=Agg" &gt;&gt; $GITHUB_ENV
+</code></pre>
+</div>
+
+<p>
+Matplotlib detectará esto y usará el backend adecuado.
+</p>
+</div>
+</li>
+<li><a id="orgfbc294c"></a>Opción 2: Variable de entorno en shell<br />
+<div class="outline-text-6" id="text-orgfbc294c">
+<p>
+O directamente en el comando de ejecución:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><code><span style="font-weight: bold; font-style: italic;">MPLBACKEND</span>=Agg emacs -Q -l ~/Software/scimax/init.el ./lecciones/Lecc01.org --batch ...
+</code></pre>
+</div>
+</div>
+</li>
+<li><a id="org63429c5"></a>Opción 3: Configuración en Emacs/jupyter-python<br />
+<div class="outline-text-6" id="text-org63429c5">
+<p>
+Si puedes modificar la configuración de Emacs que se carga, añade a tu init.el o a la cabecera de los bloques:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><code><span style="font-weight: bold;">import</span> matplotlib
+matplotlib.use(<span style="font-style: italic;">"Agg"</span>)
+</code></pre>
+</div>
+
+<p>
+Pero esto requeriría modificar los bloques, que quieres evitar.
+</p>
+
+<hr />
+</div>
+</li>
+</ul>
+</li>
+<li><a id="orgf4ad85a"></a>Resumen<br />
+<div class="outline-text-5" id="text-orgf4ad85a">
+<ul class="org-ul">
+<li><b>El problema</b>: matplotlib necesita el backend "Agg" para funcionar headless.</li>
+<li><b>La solución sin modificar los bloques</b>: establece la variable de entorno `MPLBACKEND=Agg` en el workflow antes de ejecutar Emacs.</li>
+<li><b>Así</b>, los bloques que generan imágenes funcionarán igual en Actions que localmente, <b>sin necesidad de cambiar el código de los bloques</b>.</li>
+</ul>
+
+<hr />
+<hr />
+<hr />
+<p>
+<b><i>SOLUCIÓN FINALMENTE ADOPTADA</i></b>:
+</p>
+
+<p>
+El backend "Agg"  no me funcionó, por lo que opté por indicar explícitamente en el código de python el fichero donde se debe guardar cada figura.
+</p>
+<hr />
+<hr />
+<hr />
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc4aae49" class="outline-2">
+<h2 id="orgc4aae49">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
+<div class="outline-text-2" id="text-orgc4aae49">
+<p>
+Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><code><span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">publica.el --- Publicaci&#243;n HTML y PDF para el repositorio Scimax-ELN
+</span>
+(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">ox-publish</span>)
+
+(<span style="font-weight: bold;">setq</span> org-confirm-babel-evaluate nil
+      org-export-with-broken-links t
+      org-html-validation-link nil
+      org-html-head-include-scripts nil
+      org-html-head-include-default-style nil)
+
+(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">my-org-latex-publish-to-pdf</span> (plist filename pub-dir)
+  <span style="font-style: italic;">"Publica un archivo Org como PDF tras ejecutar bloques de c&#243;digo."</span>
+  (message <span style="font-style: italic;">"Exportando a PDF: %s"</span> filename)
+  (<span style="font-weight: bold;">with-current-buffer</span> (find-file-noselect filename)
+    <span style="font-weight: bold; font-style: italic;">;</span><span style="font-weight: bold; font-style: italic;">(org-babel-execute-buffer)
+</span>    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(<span style="font-weight: bold;">let*</span> ((base-directory <span style="font-style: italic;">"./"</span>))
+  (<span style="font-weight: bold;">setq</span> org-publish-project-alist
+        (append org-publish-project-alist
+                `((<span style="font-style: italic;">"index"</span>
+                   <span style="font-weight: bold;">:base-directory</span> ,base-directory
+                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"org"</span>
+                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs"</span>)
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Calendario</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-lessons</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-practicas</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">docs</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Lecciones-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Practicas-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-publish.org</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">README.org"</span>
+                   <span style="font-weight: bold;">:recursive</span> t
+                   <span style="font-weight: bold;">:publishing-function</span> org-html-publish-to-html
+                   <span style="font-weight: bold;">:auto-preamble</span> t
+                   <span style="font-weight: bold;">:auto-sitemap</span> nil
+                   <span style="font-weight: bold;">:with-author</span> nil
+                   <span style="font-weight: bold;">:with-creator</span> nil
+                   <span style="font-weight: bold;">:with-toc</span> t
+                   <span style="font-weight: bold;">:section-numbers</span> nil)
+
+                  (<span style="font-style: italic;">"html"</span>
+                   <span style="font-weight: bold;">:base-directory</span>  <span style="font-style: italic;">"./Lecciones-tmp/"</span>
+                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"org"</span>
+                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs/Lecciones-html"</span>)
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Calendario</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-lessons</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-practicas</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Lecciones-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Practicas-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">docs</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">chatCopilot.org</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-publish.org</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">README.org"</span>
+                   <span style="font-weight: bold;">:recursive</span> t
+                   <span style="font-weight: bold;">:publishing-function</span> org-html-publish-to-html
+                   <span style="font-weight: bold;">:auto-preamble</span> t
+                   <span style="font-weight: bold;">:auto-sitemap</span> t
+                   <span style="font-weight: bold;">:with-author</span> nil
+                   <span style="font-weight: bold;">:with-creator</span> nil
+                   <span style="font-weight: bold;">:with-toc</span> t
+                   <span style="font-weight: bold;">:section-numbers</span> nil)
+
+                  (<span style="font-style: italic;">"pdf"</span>
+                   <span style="font-weight: bold;">:base-directory</span> <span style="font-style: italic;">"./Lecciones-tmp/"</span>
+                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"org"</span>
+                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs/Lecciones-pdf"</span>)
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-lessons</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-practicas</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">sitemap.org"</span>
+                   <span style="font-weight: bold;">:recursive</span> t
+                   <span style="font-weight: bold;">:auto-sitemap</span> nil
+                   <span style="font-weight: bold;">:publishing-function</span> my-org-latex-publish-to-pdf
+                   <span style="font-weight: bold;">:auto-preamble</span> t)
+                  
+                  (<span style="font-style: italic;">"static-index"</span>
+                   <span style="font-weight: bold;">:base-directory</span> ,base-directory
+                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"css</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">js</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">png</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">jpg</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">gif</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">dat</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">mov</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">txt</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">svg</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">aiff</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">inp"</span>
+                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs"</span>)
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Calendario</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-lessons</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-practicas</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Lecciones-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Practicas-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">docs</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">chatCopilot.*</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-publish.*</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">README.org"</span>
+                   <span style="font-weight: bold;">:recursive</span> t
+                   <span style="font-weight: bold;">:publishing-function</span> org-publish-attachment)
+
+                  (<span style="font-style: italic;">"web-repositorio"</span> <span style="font-weight: bold;">:components</span> (<span style="font-style: italic;">"index"</span> <span style="font-style: italic;">"html"</span> <span style="font-style: italic;">"pdf"</span> <span style="font-style: italic;">"static-index"</span>)))))
+
+  (message <span style="font-style: italic;">"&#128994; Iniciando publicaci&#243;n del &#237;ndice (web-repositorio)..."</span>)
+  (org-publish <span style="font-style: italic;">"web-repositorio"</span> t)
+  (message <span style="font-style: italic;">"&#9989; Publicaci&#243;n del &#237;ndice completada."</span>))
+
+</code></pre>
+</div>
+
+<p>
+Podemos chequear la versión local ejecutando en emacs el siguiente bloque
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><code>(browse-url <span style="font-style: italic;">"docs/index.html"</span>)
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf48a0da" class="outline-2">
+<h2 id="orgf48a0da">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
+<div class="outline-text-2" id="text-orgf48a0da">
+<p>
+Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
+</p>
+
+<div class="org-src-container">
+<pre class="src src-emacs-lisp"><code><span style="font-weight: bold; font-style: italic;">;;; </span><span style="font-weight: bold; font-style: italic;">publica.el --- Publicaci&#243;n HTML y PDF para el repositorio Scimax-ELN
+</span>
+(<span style="font-weight: bold;">require</span> '<span style="font-weight: bold; text-decoration: underline;">ox-publish</span>)
+
+(<span style="font-weight: bold;">setq</span> org-confirm-babel-evaluate nil
+      org-export-with-broken-links t
+      org-html-validation-link nil
+      org-html-head-include-scripts nil
+      org-html-head-include-default-style nil)
+
+(<span style="font-weight: bold;">defun</span> <span style="font-weight: bold;">my-org-latex-publish-to-pdf</span> (plist filename pub-dir)
+  <span style="font-style: italic;">"Publica un archivo Org como PDF tras ejecutar bloques de c&#243;digo."</span>
+  (message <span style="font-style: italic;">"Exportando a PDF: %s"</span> filename)
+  (<span style="font-weight: bold;">with-current-buffer</span> (find-file-noselect filename)
+    <span style="font-weight: bold; font-style: italic;">;</span><span style="font-weight: bold; font-style: italic;">(org-babel-execute-buffer)
+</span>    (org-latex-publish-to-pdf plist filename pub-dir)))
+
+(<span style="font-weight: bold;">let*</span> ((base-directory <span style="font-style: italic;">"./"</span>))
+  (<span style="font-weight: bold;">setq</span> org-publish-project-alist
+        (append org-publish-project-alist
+                `((<span style="font-style: italic;">"index"</span>
+                   <span style="font-weight: bold;">:base-directory</span> ,base-directory
+                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"org"</span>
+                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs"</span>)
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Calendario</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-lessons</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-practicas</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">docs</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Lecciones-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Practicas-tmp"</span>
+                   <span style="font-weight: bold;">:recursive</span> nil
+                   <span style="font-weight: bold;">:publishing-function</span> org-html-publish-to-html
+                   <span style="font-weight: bold;">:auto-preamble</span> t
+                   <span style="font-weight: bold;">:auto-sitemap</span> nil
+                   <span style="font-weight: bold;">:with-author</span> nil
+                   <span style="font-weight: bold;">:with-creator</span> nil
+                   <span style="font-weight: bold;">:with-toc</span> t
+                   <span style="font-weight: bold;">:section-numbers</span> nil)
+
+                  (<span style="font-style: italic;">"practicas-html"</span>
+                   <span style="font-weight: bold;">:base-directory</span>  <span style="font-style: italic;">"./Practicas-tmp/"</span>
+                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"org"</span>
+                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs/Practicas-html"</span>)
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"datos"</span>
+                   <span style="font-weight: bold;">:recursive</span> t
+                   <span style="font-weight: bold;">:publishing-function</span> org-html-publish-to-html
+                   <span style="font-weight: bold;">:auto-preamble</span> t
+                   <span style="font-weight: bold;">:auto-sitemap</span> t
+                   <span style="font-weight: bold;">:with-author</span> nil
+                   <span style="font-weight: bold;">:with-creator</span> nil
+                   <span style="font-weight: bold;">:with-toc</span> t
+                   <span style="font-weight: bold;">:section-numbers</span> nil)
+
+                  (<span style="font-style: italic;">"practicas-pdf"</span>
+                   <span style="font-weight: bold;">:base-directory</span> <span style="font-style: italic;">"./Practicas-tmp/"</span>
+                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"org"</span>
+                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs/Practicas-pdf"</span>)
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"datos</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">sitemap.org"</span>
+                   <span style="font-weight: bold;">:recursive</span> t
+                   <span style="font-weight: bold;">:auto-sitemap</span> nil
+                   <span style="font-weight: bold;">:publishing-function</span> my-org-latex-publish-to-pdf
+                   <span style="font-weight: bold;">:auto-preamble</span> t)
+
+                  (<span style="font-style: italic;">"practicas-static-index"</span>
+                   <span style="font-weight: bold;">:base-directory</span> <span style="font-style: italic;">"./Practicas-tmp/"</span>
+                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"css</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">js</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">png</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">jpg</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">gif</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">dat</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">mov</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">txt</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">svg</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">aiff</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">inp"</span>
+                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs/Practicas-html"</span>)
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"hansl.tex"</span>
+                   <span style="font-weight: bold;">:recursive</span> t
+                   <span style="font-weight: bold;">:publishing-function</span> org-publish-attachment)
+
+                  (<span style="font-style: italic;">"web-repositorio"</span> <span style="font-weight: bold;">:components</span> (<span style="font-style: italic;">"index"</span> <span style="font-style: italic;">"practicas-html"</span> <span style="font-style: italic;">"practicas-pdf"</span> <span style="font-style: italic;">"practicas-static-index"</span>)))))
+
+  (message <span style="font-style: italic;">"&#128994; Iniciando publicaci&#243;n del &#237;ndice (web-repositorio)..."</span>)
+  (org-publish <span style="font-style: italic;">"web-repositorio"</span> t)
+  (message <span style="font-style: italic;">"&#9989; Publicaci&#243;n del &#237;ndice completada."</span>))
+
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org4bd5abb" class="outline-2">
+<h2 id="org4bd5abb">slides para GitHubpages</h2>
+<div class="outline-text-2" id="text-org4bd5abb">
+<p>
+Esta es la configuración para convertir los Notebooks de Jupyter en slides:
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><code><span style="font-weight: bold; font-style: italic;">c</span> = get_config()
+
+c.SlidesExporter.<span style="font-weight: bold; font-style: italic;">reveal_theme</span> = <span style="font-style: italic;">'solarized'</span>
+c.SlidesExporter.<span style="font-weight: bold; font-style: italic;">reveal_scroll</span> = <span style="font-weight: bold; text-decoration: underline;">True</span>
+c.SlidesExporter.<span style="font-weight: bold; font-style: italic;">language_code</span> = <span style="font-style: italic;">'es'</span>
+
+c.SlidesExporter.<span style="font-weight: bold; font-style: italic;">mathjax_url</span> = <span style="font-style: italic;">"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"</span>
+
+c.SlidesExporter.<span style="font-weight: bold; font-style: italic;">jquery_url</span> = <span style="font-style: italic;">"https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"</span>
+
+c.SlidesExporter.<span style="font-weight: bold; font-style: italic;">require_js_url</span> = <span style="font-style: italic;">"https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"</span>
+</code></pre>
+</div>
+
+
+<p>
+<a href="https://nbconvert.readthedocs.io/en/latest/config_options.html">Configuración para nbconvert</a> (las slides usan ficheros de la web para poder funcionar en GitHubPages)
+</p>
+
+<p>
+<a href="https://dbafromthecold.com/2021/02/21/creating-presentations-with-reveal-and-github-pages/">creating-presentations-with-reveal-and-github-pages</a>
+</p>
+
+<p>
+<a href="https://github.com/RichardAfolabi/Presentation_js">https://github.com/RichardAfolabi/Presentation_js</a>
+</p>
+
+<p>
+<a href="https://emasuriano.com/til/2024-07-01-create-presentations-from-notebook/">https://emasuriano.com/til/2024-07-01-create-presentations-from-notebook/</a>
+</p>
+
+<p>
+<a href="https://github.com/yjwen/org-reveal">https://github.com/yjwen/org-reveal</a>
+<a href="https://github.com/hexmode/ox-reveal">https://github.com/hexmode/ox-reveal</a>
+</p>
+</div>
+</div>
+<div id="outline-container-org829cfc0" class="outline-2">
+<h2 id="org829cfc0">Directorio <code>.binder</code> para MyBinder</h2>
+<div class="outline-text-2" id="text-org829cfc0">
+</div>
+<div id="outline-container-orgae9df6a" class="outline-3">
+<h3 id="orgae9df6a">Fichero <code>environment.yml</code></h3>
+<div class="outline-text-3" id="text-orgae9df6a">
+<p>
+Dado que los notebooks del curso emplean algunos módulos de python, la ejecución online en <a href="https://mybinder.org/">MyBinder</a> de los correspondientes Notebooks de Jupyter requiere de la creación de un fichero que indique las dependencias necesarias para que se instale el software necesario (creo que <code>defaults</code> instala el latex necesario para los gráficos). 
+</p>
+
+<div class="org-src-container">
+<pre class="src src-yml"><code>name: binder-env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - pip
+  - ipykernel
+  - numpy
+  - pandas
+  - matplotlib
+  - seaborn
+  - sympy
+  - statsmodels
+  - scipy
+  - pillow  # Biblioteca necesaria para manipulación de imágenes (grafico arcoiris)
+  - pip:
+      - dataframe_image
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org749d3d3" class="outline-3">
+<h3 id="org749d3d3">Fichero <code>apt.txt</code></h3>
+<div class="outline-text-3" id="text-org749d3d3">
+<p>
+Algunos gráficos de los notebooks usan \LaTeX{}. Este fichero indica a MyBinder qué paquetes debe instalar para cubrir las dependencias.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-text"><code>texlive
+texlive-latex-extra
+texlive-fonts-recommended
+texlive-fonts-extra
+dvipng
+cm-super
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Created: 2025-09-02 Tue 14:30</p>
+</div>
+</body>
+</html>
