@@ -1,4 +1,6 @@
-#+TITLE: Implementación en Python de series con grado o cogrado arbitrarios
+#    -*- mode: org -*-
+
+#+TITLE: Lección 1 --- series con grado o cogrado arbitrarios
 #+AUTHOR: Marcos Bujosa
 #+LANGUAGE: es
 # +PROPERTY: header-args :exports both :results silent 
@@ -39,22 +41,24 @@
    :PROPERTIES:
    :header-args: :tangle no
    :metadata: (slideshow . ((slide_type . skip)))
+   :ID:       20e7c7c6-d6e1-46d5-8822-8e48f8c7e012
    :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-Más abajo aparece una implementación en Python de las series con principio (con cogrado) y las series con final (con grado). Dicha implementación consiste en la definición de dos clases: la clase =SerieConPrincipio= y la clase =SerieConFinal=. 
+Más abajo ([[id:69899898-728e-42e8-b441-0b7cdcf8f75c][sección 2]]) aparece una implementación en Python de las series con principio (con cogrado) y las series con final (con grado). Dicha implementación consiste en la definición de dos clases: la clase =SerieConPrincipio= y la clase =SerieConFinal=. 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 El siguiente bloque de código es para que este cuaderno electrónico (notebook) lea el [[file:./implementacion_series_formales.py][implementacion_series_formales.py]] de python con la definición de ambas clases:
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results silent
-import warnings
-warnings.filterwarnings("ignore", category=UserWarning)
+#import warnings
+#warnings.filterwarnings("ignore", category=UserWarning)
 %run -i implementacion_series_formales.py
 #+END_SRC
 
+
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-Para mayor claridad, los ejemplos de más abajo usan un parámetro simbólico. El bloque de código que puede ver a continuación define un parámetro simbólico $a$.
+Los ejemplos de más abajo usan un parámetro simbólico para mayor claridad. El bloque de código que puede ver a continuación define dicho parámetro simbólico $a$.
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results silent
 from sympy import symbols
@@ -65,20 +69,34 @@ a = symbols('a')
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
-Definimos un polinomio de grado 1 como una =SerieConPrincipio= (con cogrado 0):
+
+Definimos el polinomio $1 - az$ como una =SerieConPrincipio= con cogrado 0:
 #+BEGIN_SRC jupyter-python #:display text/latex
 p=SerieConPrincipio([1,-a],0)
 p
 #+END_SRC
 
+#+RESULTS:
+:RESULTS:
+$$1 - az$$
+:END:
 
 Su inversa $p^{-\triangleright}$ (en el conjunto de series /con principio/) es:
 #+BEGIN_SRC jupyter-python 
-p.inversa()
+número_coeficientes = 6
+p.inversa(número_coeficientes)
 #+END_SRC
 
+#+RESULTS:
+:RESULTS:
+$$1 + az + a^{2}z^{2} + a^{3}z^{3} + a^{4}z^{4} + a^{5}z^{5} + \cdots$$
+:END:
 
-Fíjese que su inversa (/con principio/) tiene cogrado -0. 
+#+latex: \noindent
+(donde hemos indicado cuántos coeficientes queremos mostrar)
+#+latex: \medskip
+
+Fíjese que su inversa (/con principio/) tiene cogrado $0$. 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 *Nota.* Al haber creado este polinomio como un elemento de la clase =SerieConPrincipio=, el procedimiento ~.inversa()~ genera la inversa como una serie con principio (con cogrado). A esta inversa la hemos denotado con $p^{-\triangleright}$ en la lección correspondiente.
@@ -96,6 +114,8 @@ valor = 0.8
 p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
 
+#+RESULTS:
+[[file:./.ob-jupyter/d17624a07b29bff25119a84cb7adb4d1a0c0d9fc.png]]
 
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
@@ -103,6 +123,9 @@ p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 valor = -0.8
 p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/ea82b5a0869188f8842c477b8eb3442c247135ac.png]]
 
 
 
@@ -120,6 +143,9 @@ valor = 1
 p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
 
+#+RESULTS:
+[[file:./.ob-jupyter/947df4a92ed4f1e251149486330e45bfcfcfaf10.png]]
+
 
 
 
@@ -128,6 +154,9 @@ p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 valor = -1
 p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/ef9625ea7fa28f8c46bdf8db90958550f50baf31.png]]
 
 
 
@@ -143,6 +172,9 @@ valor = 1.2
 p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
 
+#+RESULTS:
+[[file:./.ob-jupyter/f658d652fb3325334ef1ef3477a5ab6c9d50ebd7.png]]
+
 
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
@@ -150,6 +182,9 @@ p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 valor = -1.2
 p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/fe9f6cba8b8f1cde002ac7f3a3faba62c856efd6.png]]
 
 
 
@@ -166,6 +201,11 @@ Si calculamos solo cinco términos de la inversa, se anulan todos los coeficient
 p * p.inversa()
 #+END_SRC
 
+#+RESULTS:
+:RESULTS:
+$$1 - a^{5}z^{5}$$
+:END:
+
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -175,6 +215,11 @@ Con solo cincuenta términos se anulan todos excepto el quincuagésimo (y el $1$
 p * p.inversa(50)
 #+END_SRC
 
+#+RESULTS:
+:RESULTS:
+$$1 - a^{50}z^{50}$$
+:END:
+
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -183,6 +228,11 @@ Con quinientos se anulan todos excepto el parámetro en la posición 500 (y el $
 #+BEGIN_SRC jupyter-python
 p * p.inversa(500)
 #+END_SRC
+
+#+RESULTS:
+:RESULTS:
+$$1 - a^{500}z^{500}$$
+:END:
 
 
 
@@ -200,11 +250,22 @@ p2=SerieConFinal([1,-a],1)
 p2
 #+END_SRC
 
+#+RESULTS:
+:RESULTS:
+$$1 - az$$
+:END:
+
 
 Su inversa $p^{\blacktriangleleft-}$ (en el conjunto de series /con final/) es:
 #+BEGIN_SRC jupyter-python
 p2.inversa()
 #+END_SRC
+
+#+RESULTS:
+:RESULTS:
+$$\cdots - \frac{1}{a^{5}}z^{-5} - \frac{1}{a^{4}}z^{-4} -
+\frac{1}{a^{3}}z^{-3} - \frac{1}{a^{2}}z^{-2} - \frac{1}{a}z^{-1}$$
+:END:
 
 
 
@@ -223,17 +284,23 @@ Veamos con unos gráficos el comportamiento de los coeficientes de esta nueva in
    :END:
 
 #+BEGIN_SRC jupyter-python
-valor = 0.8
-p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
+valor = 0.9
+p2.inversa(10).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/070570397d7f1f448bd62af27805d79b04609d5d.png]]
 
 
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 #+BEGIN_SRC jupyter-python
-valor = -0.8
-p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
+valor = -0.9
+p2.inversa(10).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/75c6965aed07f21d3f6572c28d2c805bc2fb171a.png]]
 
 
 
@@ -246,16 +313,22 @@ p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 
 #+BEGIN_SRC jupyter-python
 valor = 1
-p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
+p2.inversa(10).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/55e27875f9fe0fed918d445be9771bd3aa837a0d.png]]
 
 
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 #+BEGIN_SRC jupyter-python
 valor = -1
-p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
+p2.inversa(10).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/5caf6a5500000e65af5336f3c8cc53b820b1b6e6.png]]
 
 
 
@@ -271,6 +344,9 @@ valor = 1.2
 p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
 
+#+RESULTS:
+[[file:./.ob-jupyter/c807919826f404121e0d80d6f39dea0d04253233.png]]
+
 
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
@@ -278,6 +354,9 @@ p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 valor = -1.2
 p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$')
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/1c0207cdef0158ec1522fdc3ca7f66c8f72cbc98.png]]
 
 
 
@@ -298,12 +377,20 @@ s_cp = SerieConPrincipio(lista, -1)
 s_cp
 #+END_SRC
 
+#+RESULTS:
+:RESULTS:
+$$z^{-1} - 0.1 - 0.75z$$
+:END:
+
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python
-s_cp.inversa(30).plot_serie(title='inversa con principio de ' + s_cp._repr_latex_())
+s_cp.inversa(30).plot_serie(title='inversa con principio de ' + s_cp.latex())
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/ed59ab8f6ed692c3c031ad433476db2eb6b8593b.png]]
 
 
 
@@ -313,12 +400,20 @@ s_cf=SerieConFinal(lista, 1)
 s_cf
 #+END_SRC
 
+#+RESULTS:
+:RESULTS:
+$$z^{-1} - 0.1 - 0.75z$$
+:END:
+
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python
-s_cf.inversa(30).plot_serie(title='inversa con final de ' + s_cp._repr_latex_())
+s_cf.inversa(30).plot_serie(title='inversa con final de ' + s_cp.latex())
 #+END_SRC
+
+#+RESULTS:
+[[file:./.ob-jupyter/dc5e3a9c1449c4dc7262af4e3dd0778722bc6763.png]]
 
 
 
@@ -328,7 +423,7 @@ s_cf.inversa(30).plot_serie(title='inversa con final de ' + s_cp._repr_latex_())
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
-#+BEGIN_SRC python :noweb yes :tangle ./implementacion_series_formales.py  :results none
+#+BEGIN_SRC python :noweb yes :tangle ./implementacion_series_formales.py :eval no :exports none
 <<imports>>
 <<metodos-generales-representacion>>
 <<SerieConPrincipio>>
@@ -341,6 +436,7 @@ s_cf.inversa(30).plot_serie(title='inversa con final de ' + s_cp._repr_latex_())
     <<plot_serie-method>>
     <<subs-method>>
 <<SerieConFinal>>
+<<EscalerasConvolucion>>
 #+END_SRC
 
 
@@ -373,7 +469,7 @@ from fractions import Fraction
 import sympy
 from sympy import Add
 import matplotlib.pyplot as plt
-from IPython.display import display, Math, display_png
+from IPython.display import display, Math, display_png, Latex
 import tempfile
 from os.path import join           
 
@@ -400,7 +496,8 @@ def latex(a):
 
 def pinta(data):
     """Muestra en Jupyter la representación latex de data"""
-    display(Math(latex(data)))
+    display(Latex('$$'+latex(data)+'$$'))
+    #display(Math(latex(data)))
     
 #+END_SRC
 
@@ -436,7 +533,7 @@ El constructor elimina ceros iniciales y ajusta el índice inicial (cogrado).
 
 #+name: init-method
 #+begin_src python :results none
-def __init__(self, coeficientes, cogrado=0, final=False):
+def __init__(self, coeficientes, cogrado=0, final=False, RepEscalera=False):
     primeros_no_nulos = next((i for i, c in enumerate(coeficientes) if c != 0), None)
     if primeros_no_nulos is None:
         self.coeficientes = []
@@ -451,6 +548,7 @@ def __init__(self, coeficientes, cogrado=0, final=False):
         float(c) if self.usa_float and isinstance(c, (int, float)) else Fraction(c) if isinstance(c, (int, float)) else c
         for c in self.coeficientes
     ]
+    self.RepEscalera=RepEscalera
 
 #+end_src
 
@@ -497,6 +595,7 @@ def latex(self):
             else:
                 terminos.append(f"{coef_latex}z^{{{indice}}}")  # Aseguramos que el exponente esté entre llaves
     cadena = r' + \cdots' if self.final else ''
+    #return '$'+ " + ".join(terminos).replace("+ -", "- ") + cadena +'$'
     return " + ".join(terminos).replace("+ -", "- ") + cadena 
 
 def _repr_latex_(self):
@@ -506,11 +605,14 @@ def _repr_latex_(self):
     Retorna:
     - str: Representación en formato LaTeX para notebooks de Jupyter.
     """
-    return '$'+self.latex()+'$'
+    return '$$'+self.latex()+'$$'
 
 def _repr_html_(self):
     """ Construye la representación para el entorno jupyter notebook """
-    return html(self.latex())
+    if self.RepEscalera:
+        return html(self.escalera())
+    else:
+        return html(self.latex())
 
 #def _repr_png_(self):
 #    """ Representación png para el entorno jupyter en Emacs """
@@ -522,7 +624,29 @@ def _repr_html_(self):
 #        return open(join(workdir, 'borrame.png'),'rb').read()
 #    except:
 #        return '$'+self.latex()+'$'
-    
+
+def coeficientesEscalera(self):
+    coeficientes = list(self.coeficientes)  # Creamos una copia de la lista de coeficientes
+
+    if self.cogrado > 0:
+        coeficientes = [0]*self.cogrado + coeficientes
+        origen = 0        
+    else: # len(self.coeficientes) + self.cogrado > 0:
+        coeficientes = coeficientes + [0]*(1 - self.cogrado - len(self.coeficientes))
+        origen = -self.cogrado
+        
+    return coeficientes, origen
+
+def escalera(self):
+    coeficientes, origen = self.coeficientesEscalera()
+    celdas = [r'\cdots 0'] + [r'{\color{blue}{\{' + str(c) + '\}}}' if i == origen else f"{str(c)}" for i,c in enumerate(coeficientes)] + [r'\cdots']    
+    size = len(celdas)-1
+    contenido = ' & '.join(celdas)
+    latex_representation = "\\begin{array}{" + "c|"*size + "c}\n\\hline\n"
+    latex_representation += f"{contenido} \\\\\hline"
+    latex_representation += r"\end{array}"
+    return '$' + latex_representation + '$'
+
 #+end_src
 
 *** Suma de series
@@ -651,24 +775,49 @@ def inversa(self, num_terminos=5):
 *** Gráfico de la serie
 
 #+name: plot_serie-method
-#+BEGIN_SRC python :results none
-def plot_serie(serie, title="Serie con principio (con cogrado)"):
+#+BEGIN_SRC python
+def plot_serie(self, indices_previos_al_cogrado=3, title="Serie con principio (con cogrado)"):
     """
     Dibuja la serie como un gráfico de barras.
     """
-    indices = range(serie.cogrado, serie.cogrado + len(serie.coeficientes))
-    valores = serie.coeficientes
-    plt.figure(figsize=(8, 4))
-    #plt.bar(indices, valores, width=0.5, color='skyblue', edgecolor='k')
-    plt.stem(indices, valores)
+    indices_nulos = range(self.cogrado - indices_previos_al_cogrado, self.cogrado)
+    valores_nulos = [0] * indices_previos_al_cogrado  # Coeficientes nulos
+
+    indices = range(self.cogrado, self.cogrado + len(self.coeficientes))
+    valores = self.coeficientes
+
+    # Combina valores nulos y de la serie
+    all_indices = list(indices_nulos) + list(indices)
+    all_valores = valores_nulos + valores
+
+    fig = plt.figure(figsize=(9, 3))
+    plt.stem(all_indices, all_valores)
     plt.axhline(0, color='black', linewidth=0.8)
-    plt.xticks(indices, [str(int(idx)) for idx in indices]) # Asegura que las etiquetas sean enteras
+
+    # Etiquetas para los índices
+    etiquetas = [str(int(idx)) for idx in all_indices]
+    plt.xticks(all_indices, etiquetas)  # Establecer etiquetas en el eje X
+
+    # Personalizar las etiquetas
+    for i, idx in enumerate(all_indices):
+        xtick_label = plt.gca().get_xticklabels()[i]  # Obtener la etiqueta actual
+        if idx == self.cogrado:
+            xtick_label.set_color('red')  # Cambiar color a rojo
+            xtick_label.set_weight('bold')  # Cambiar a negrita
+        elif idx < self.cogrado:
+            xtick_label.set_color('#D3D3D3')  # Cambiar color a gris claro
+
     plt.xlabel("Índice")
     plt.ylabel("Valor")
     plt.title(title)
-    plt.show()
-
+    plt.tight_layout()
+    plt.close(fig)
+    return fig
+    
 #+END_SRC
+
+#+RESULTS: plot_serie-method
+
 
 *** Sustitución simbólica
 
@@ -704,6 +853,8 @@ print("Producto:", s1 * s2)
 print("Inversa de s2 (hasta z^5):", s2.inversa(6))
 #+end_src
 
+#+RESULTS:
+
 
 ** Clase =SerieConFinal=: series con grado arbitrario en python
 :PROPERTIES:
@@ -732,7 +883,7 @@ class SerieConFinal:
     - inversa: Calcula la inversa generando coeficientes hacia índices negativos.
     """
 
-    def __init__(self, coeficientes, grado=0, principio=False):
+    def __init__(self, coeficientes, grado=0, principio=False, RepEscalera=False):
         # Eliminar ceros finales
         ultimos_no_nulos = next((i for i in reversed(range(len(coeficientes))) if coeficientes[i] != 0), None)
         if ultimos_no_nulos is None:  # Serie nula
@@ -748,6 +899,7 @@ class SerieConFinal:
             float(c) if self.usa_float and isinstance(c, (int, float)) else Fraction(c) if isinstance(c, (int, float)) else c
             for c in self.coeficientes
         ]
+        self.RepEscalera=RepEscalera
 
     def __repr__(self):
         return f"({self.grado}, {self.coeficientes})"
@@ -775,13 +927,20 @@ class SerieConFinal:
         cadena = r'\cdots + ' if self.principio else ''
         representacion = cadena + " + ".join(terminos).replace("+ -", "- ")
         return representacion.replace("+ -", "- ")
+        #return '$' + representacion.replace("+ -", "- ") + '$'
+        #return '$'+ " + ".join(terminos).replace("+ -", "- ") + cadena +'$'
+
 
     def _repr_latex_(self):
         return '$'+self.latex()+'$'
 
     def _repr_html_(self):
         """ Construye la representación para el entorno jupyter notebook """
-        return html(self.latex())
+        """ Construye la representación para el entorno jupyter notebook """
+        if self.RepEscalera:
+            return html(self.escalera())
+        else:
+            return html(self.latex())
     
 #    def _repr_png_(self):
 #        """ Representación png para el entorno jupyter en Emacs """
@@ -793,7 +952,31 @@ class SerieConFinal:
 #            return open(join(workdir, 'borrame.png'),'rb').read()
 #        except:
 #            return '$'+self.latex()+'$'
+
+    def coeficientesEscalera(self):
+        coeficientes = list(self.coeficientes)  # Creamos una copia de la lista de coeficientes
+        
+        if self.grado + 1 > len(self.coeficientes):
+            coeficientes = [0]*(self.grado + 1 - len(self.coeficientes)) + coeficientes
+            origen = 0            
+        elif len(self.coeficientes) >  self.grado:
+            coeficientes = coeficientes + [0]*(-self.grado)
+            origen = len(coeficientes) - max(self.grado,0) -1 
+
+        return coeficientes, origen
     
+            
+    def escalera(self):
+        coeficientes, origen = self.coeficientesEscalera()
+        celdas = [r'\cdots'] + [r'{\color{blue}{\{' + str(c) + '\}}}' if i == origen else f"{str(c)}" for i,c in enumerate(coeficientes)] + [r'0\cdots']        
+        size = len(celdas)-1
+        contenido = ' & '.join(celdas)
+        latex_representation = "\\begin{array}{" + "c|"*size + "c}\n\\hline\n"
+        latex_representation += f"{contenido} \\\\\hline"
+        latex_representation += r"\end{array}"
+        return '$' + latex_representation + '$'
+
+
     def __add__(self, otra):
         grado = max(self.grado, otra.grado)
         inicio = min(self.grado - len(self.coeficientes) + 1, otra.grado - len(otra.coeficientes) + 1)
@@ -851,33 +1034,50 @@ class SerieConFinal:
         # El resultado es otra SerieConFinal con coeficientes en orden inverso
         return SerieConFinal(b[::-1], -self.grado, principio=True)
 
-
-    def plot_serie(self, title="Serie con final (con grado)"):
+    
+    def plot_serie(self, indices_posteriores_al_grado=3, title="Serie con final (con grado)"):
         """
-        Dibuja la serie como un gráfico de barras.
+        Dibuja la serie como un gráfico de barras, extendiéndola con ceros.
         """
         # Calcular los índices para el eje X
-        # El índice del último elemento de la lista será self.grado
-        # Los coeficientes anteriores se colocarán en índices decrecientes
         longitud_lista = len(self.coeficientes)
         indices = []
+        
         for i in range(longitud_lista):
-            # El último elemento de la lista (índice longitud_lista - 1)
-            # se mapea a self.grado.
-            # Los coeficientes anteriores (longitud_lista - 2, etc.)
-            # se mapean a self.grado - 1, self.grado - 2, etc.
             indice_mapeado = self.grado - (longitud_lista - 1 - i)
             indices.append(indice_mapeado)
-        valores = self.coeficientes
-        plt.figure(figsize=(8, 4))
-        #plt.bar(indices, valores, width=0.5, color='skyblue', edgecolor='k')
+        
+        # Añadir índices nulos después de self.grado
+        for i in range(1, indices_posteriores_al_grado + 1):
+            indices.append(self.grado + i)
+        
+        # Crear la lista de valores
+        valores = self.coeficientes + [0] * indices_posteriores_al_grado  # Añadir ceros
+        
+        fig = plt.figure(figsize=(9, 3))
         plt.stem(indices, valores)
         plt.axhline(0, color='black', linewidth=0.8)
-        plt.xticks(indices, [str(int(idx)) for idx in indices]) # Asegura que las etiquetas sean enteras
+        plt.xticks(indices, [str(int(idx)) for idx in indices])  # Etiquetas enteras
         plt.xlabel("Índice")
         plt.ylabel("Valor")
         plt.title(title)
-        plt.show()
+        # Crear etiquetas
+        etiquetas = [str(int(idx)) for idx in indices]
+        plt.xticks(indices, etiquetas)  # Establecer etiquetas posiciones iniciales
+        # Personalizar la etiqueta del índice self.grado
+        for i, etiqueta in enumerate(etiquetas):
+            if indices[i] == self.grado:
+                etiq_actual, = plt.gca().get_xticklabels()[i],   # Obtener la etiqueta actual
+                etiq_actual.set_color('red')  # Cambiar a azul
+                etiq_actual.set_weight('bold')  # Cambiar a negrita
+            elif indices[i] > self.grado:
+                etiq_actual, = plt.gca().get_xticklabels()[i],   # Obtener la etiqueta actual
+                etiq_actual.set_color('#D3D3D3')  # Cambiar a gris claro
+                etiq_actual.set_fontstyle('italic')  # Cambiar a cursiva
+                
+        plt.tight_layout()
+        plt.close(fig)
+        return fig
         
     def subs(self, reglasDeSustitucion=[]):
         """ Sustitución de variables simbólicas """
@@ -894,4 +1094,53 @@ class SerieConFinal:
     
 #+END_SRC
 
+
+** Funciones auxiliares
+
+#+name: EscalerasConvolucion
+#+BEGIN_SRC python
+def EscalerasConvolucion(secuencia1,secuencia2):
+    serie1, origen1 = secuencia1.coeficientesEscalera()
+    serie2, origen2 = secuencia2.coeficientesEscalera()
+    
+    negativos1 = serie1[:origen1]
+    negativos2 = serie2[:origen2]
+    negativos = max(len(negativos1), len(negativos2))
+    lista1neg = [0]*(negativos-len(negativos1)) + negativos1 # añadimos ceros si no hay suficientes coeficientes a la izquierda del origen
+    lista2neg = [0]*(negativos-len(negativos2)) + negativos2 # añadimos ceros si no hay suficientes coeficientes a la izquierda del origen
+    cabeceraNeg = [r'z^{-' + str(i+1) +r'}' for i in reversed(range(len(lista1neg))) ]
+    
+    lista1origen = [r'{\color{blue}{\{' + str(serie1[origen1]) + '\}}}'] # destacamos el coeficiente situado en el origen
+    lista2origen = [r'{\color{blue}{\{' + str(serie2[origen2]) + '\}}}'] # destacamos el coeficiente situado en el origen
+    cabeceraOrigen = [r'{\color{blue}{z^0}}']
+    
+    positivos1 = serie1[origen1+1:]
+    positivos2 = serie2[origen2+1:]
+    positivos = max(len(positivos1), len(positivos2))
+    lista1pos = positivos1 + [0]*(positivos-len(positivos1)) #[0 if i>len(lista1)-1 else lista1[i] for i in range(positivos)]
+    lista2pos = positivos2 + [0]*(positivos-len(positivos2)) #=[0 if i>len(lista2)-1 else lista2[i] for i in range(positivos)]
+    cabeceraPos = [r'z^{' + str(i+1) +r'}' for i,_ in (enumerate(lista1pos)) ]
+    
+    coeficientes1 = lista1neg + lista1origen + lista1pos
+    coeficientes2 = lista2neg + lista2origen + lista2pos
+    cabecera = cabeceraNeg + cabeceraOrigen + cabeceraPos
+    
+    # Consigue el tamaño para la alineación de las columnas
+    size = len(coeficientes1)-1
+    
+    # Comenzamos a escribir la matriz en LaTeX
+    #latex_matrix = "\\begin{array}{|" + "c|"*size + "}\n" #\n\\hline\n"
+    latex_matrix = "\\begin{array}{" + "c|"*size + "c}\n" #\n\\hline\n"
+    latex_matrix += " & ".join(str(x) for x in cabecera) + " \\\\\\hline\\hline\n"
+    latex_matrix += " & ".join(str(x) for x in coeficientes1) + " \\\\\\hline\\hline\n"
+    latex_matrix += " & ".join(str(x) for x in coeficientes2) + " \\\\\\hline\n"
+    latex_matrix += "\\end{array}"
+
+    # Mostramos la matriz en el notebook de Jupyter
+    #display(Math(r'\['+latex_matrix+r'\]'))
+    return Latex(r'\['+latex_matrix+r'\]')
+
+#+END_SRC
+
+#+RESULTS: EscalerasConvolucion
 

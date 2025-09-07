@@ -1,0 +1,863 @@
+#    -*- mode: org -*-
+
+#+TITLE: Lección 2 --- polinomios y series formales
+#+AUTHOR: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+# +PROPERTY: header-args :tangle ./guiones/lecc01-airlinePass.inp
+
+# +OPTIONS: :eval yes
+# +PROPERTY: header-args :eval yes
+
+#+INFOJS_OPT: view:overview
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+#+latex_class_options: [10pt]
+
+#+LATEX_HEADER: \usepackage[spanish]{babel}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+
+# +LATEX: \maketitle
+
+# #+NAME: if-no--guiones-makefir
+# #+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+# (unless (file-directory-p "P-L02-A-polinomios_y_series_formales")
+#   (make-directory "P-L02-A-polinomios_y_series_formales"))
+# #+END_SRC
+
+# #+NAME: tangle-all-code-blocks
+# #+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+# (org-babel-tangle)
+# #+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :exports none :results silent
+(use-package ox-ipynb
+  :load-path (lambda () (expand-file-name "ox-ipynb" scimax-dir)))
+(use-package htmlize)
+(org-babel-tangle)
+#+END_SRC
+
+
+#+LATEX: \maketitle
+
+
+* Polinomios como series formales finitas
+   :PROPERTIES:
+   :header-args: :tangle no
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+El siguiente bloque de código es para que este cuaderno electrónico (notebook) cargue mi implementación de algunos objetos (no es una buena implementación, pero es suficiente para ilustrar algunas ideas). Puede consultar el código de mi [[file:./implementacion_series_formales.py][implementacion_series_formales.py]] en python con la definición las clases =SerieConPrincipio= y =SerieConFinal=:
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+%run -i src/implementacion_series_formales.py
+#+END_SRC
+# import warnings
+# warnings.filterwarnings("ignore", category=UserWarning)
+
+**** Creación del directorio auxiliar para albergar las figuras de la lección 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: t 
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Para publicar la lección como pdf o página web, necesito los gráficos como ficheros ~.png~ alojados algún directorio específico:
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+imagenes_leccion = "./img/P-L02-A-polinomios_y_series_formales" # directorio para las imágenes de la lección
+import os
+os.makedirs(imagenes_leccion, exist_ok=True) # crea el directorio si no existe
+#+END_SRC
+
+
+************** COMMENT Codigo aux
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :UNNUMBERED: t 
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Con el siguiente código mejoro los gráficos y logro transformar las tablas con formato $\LaTeX{}$ en ficheros png.
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results none
+import matplotlib as mpl
+# definimos parámetros para mejorar los gráficos
+mpl.rc('text', usetex=True)
+mpl.rc('text.latex', preamble=r'\usepackage{amsmath}')
+#import matplotlib.pyplot as plt   # data visualization
+
+# transformaré salidas en \LaTeX{} de statsmodels a ficheros png que incluiré en las transparencias
+import dataframe_image as dfi
+from sympy.printing.preview import preview
+def repr_png(tex, ImgFile):
+    preamble = "\\documentclass[preview]{standalone}\n" \
+        "\\usepackage{booktabs,amsmath,amsfonts}\\begin{document}"    
+    preview(tex, filename=ImgFile, viewer='file', preamble=preamble, dvioptions=['-D','250'])
+#+END_SRC
+
+
+** Polinomios como series formales
+
+Recuerde que un polinomio tiene cogrado no negativo; por tanto la siguiente serie con principio y cogrado $0$ es un polinomio:
+#+BEGIN_SRC jupyter-python #:display text/latex
+a=SerieConPrincipio([10,2,4,7,3,0,0],0)
+pinta(a)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[10 + 2z + 4z^{2} + 7z^{3} + 3z^{4}\]
+:END:
+
+
+Para ilustrar el producto por convolución también usaremos esta representación en forma de escalera tumbada y donde se destaca el coeficiente situado en la posición $0$.
+#+BEGIN_SRC jupyter-python
+a.RepEscalera=True
+a
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+$$\begin{array}{c|c|c|c|c|c|c|c|c} \hline \cdots 0 &
+{\color{blue}{\{10\}}} & 2 & 4 & 7 & 3 & 0 & 0 & \cdots
+\\\hline\end{array}$$
+:END:
+
+
+También usaremos representaciones gráfica de este tipo:
+# +name: polinomioA
+#+BEGIN_SRC jupyter-python 
+a.plot_serie(indices_previos_al_cogrado=2, title='$'+latex(a)+'$').savefig(imagenes_leccion + '/polinomioA.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+RESULTS:
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/polinomioA.png]]
+
+
+La condición para que una secuencia sea un polinomio es que sea una serie formal (que su /cogrado/ no sea negativo) y que además tenga final (que tenga /grado/ finito); consecuentemente, un polinomio solo tiene un número finito de coeficientes no nulos. 
+
+Por tanto, también es un polinomio la siguiente serie con principio, finita y con cogrado $4$:
+#+BEGIN_SRC jupyter-python #:display text/latex 
+b = SerieConPrincipio([1,2,0,0],4)
+pinta(b)
+b.plot_serie(indices_previos_al_cogrado=4, title='$'+latex(b)+'$').savefig(imagenes_leccion + '/polinomioB.png', dpi=300, bbox_inches='tight')
+b.RepEscalera=True
+b
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[z^{4} + 2z^{5}\]
+$$\begin{array}{c|c|c|c|c|c|c|c|c|c} \hline \cdots 0 &
+{\color{blue}{\{0\}}} & 0 & 0 & 0 & 1 & 2 & 0 & 0 & \cdots
+\\\hline\end{array}$$
+:END:
+
+
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/polinomioB.png]]
+
+** No toda secuencia finita es un polinomio
+
+Sin embargo, esta serie con principio y cogrado $-1$ NO es un polinomio:
+#+BEGIN_SRC jupyter-python #:display text/latex
+c=SerieConPrincipio([1,2,0,0],-1)
+pinta(c)
+c.plot_serie(indices_previos_al_cogrado=4, title='$'+latex(c)+'$').savefig(imagenes_leccion + '/serie_con_principioC.png', dpi=300, bbox_inches='tight')
+c.RepEscalera=True
+c
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[z^{-1} + 2\]
+$$\begin{array}{c|c|c|c|c|c} \hline \cdots 0 & 1 & {\color{blue}{\{2\}}}
+& 0 & 0 & \cdots \\\hline\end{array}$$
+:END:
+
+
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/serie_con_principioC.png]]
+
+Fíjese que como el cogrado es negativo, esta secuencia NO es un polinomio.
+
+
+* El producto entre polinomios es un producto convolución
+
+- Ejercicio A :: Ejecute los siguientes pasos:
+  - Multiplique el polinomio $x + 2x^{2}$ con el polinomio $1 - x$.
+    + Fíjese que al hacerlo, multiplica cada uno de los elementos del primer polinomio por cada uno de los elementos del segundo.
+    + Fíjese que luego agrega (suma) los términos que corresponden a la misma potencia de $x$.
+  - Se pueden hacer los mismos cálculos usando la siguiente representación, donde el coeficiente de cada potencia $k$ se calcula sumando los productos de los pares de números cuyos índices suman $k$.
+
+    #+BEGIN_SRC jupyter-python :exports results
+  EscalerasConvolucion(SerieConPrincipio([1, 2], cogrado=1),
+                       SerieConPrincipio([1,-1], cogrado=0))
+    #+END_SRC
+
+    #+RESULTS:
+    :RESULTS:
+    \[\begin{array}{c|c|c}
+{\color{blue}{z^0}} & z^{1} & z^{2} \\\hline\hline
+{\color{blue}{\{0\}}} & 1 & 2 \\\hline\hline
+{\color{blue}{\{1\}}} & -1 & 0 \\\hline
+\end{array}\]
+    :END:
+
+El producto entre polinomios es un producto convolución.
+\[
+ (\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}
+\]
+Nótese que el /cogrado/ de la secuencia resultante necesariamente es /suma/ de los /cogrados/; y que el /grado/ del resultado necesariamente es /suma/ de los /grados/.
+
+#+BEGIN_SRC jupyter-python :exports results
+pinta(SerieConPrincipio([1, 2], cogrado=1)*SerieConPrincipio([1,-1], cogrado=0))
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[z + z^{2} - 2z^{3}\]
+:END:
+
+- Ejercicio B ::  Ejecute los siguientes pasos:
+  - Multiplique el polinomio $x + 2x^{2} - x^{3}$ con el polinomio $x - x^{2} + x^{3}$.
+    + Fíjese que al hacerlo, multiplica cada uno de los elementos del primer polinomio por cada uno de los elementos del segundo.
+    + Fíjese que luego agrega (suma) los términos que corresponden a la misma potencia de $x$.
+  - Se pueden hacer los mismos cálculos usando la siguiente representación, donde el coeficiente de cada potencia $k$ se calcula sumando los productos de los pares de números cuyos índices suman $k$.
+
+    #+BEGIN_SRC jupyter-python :exports results
+  EscalerasConvolucion(SerieConPrincipio([1, 2,-1], cogrado=1),
+                       SerieConPrincipio([1,-1, 1], cogrado=1))
+    #+END_SRC
+
+    #+RESULTS:
+    :RESULTS:
+    \[\begin{array}{c|c|c|c}
+{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} \\\hline\hline
+{\color{blue}{\{0\}}} & 1 & 2 & -1 \\\hline\hline
+{\color{blue}{\{0\}}} & 1 & -1 & 1 \\\hline
+\end{array}\]
+    :END:
+
+El producto entre polinomios es un producto convolución.
+\[
+ (\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}
+\]
+Nótese que el /cogrado/ de la secuencia resultante necesariamente es /suma/ de los /cogrados/; y que el /grado/ del resultado necesariamente es /suma/ de los /grados/.
+
+#+BEGIN_SRC jupyter-python :exports results
+pinta(SerieConPrincipio([1, 2,-1], cogrado=1)*SerieConPrincipio([1,-1, 1], cogrado=1))
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[z^{2} + z^{3} - 2z^{4} + 3z^{5} - z^{6}\]
+:END:
+
+
+
+* Polinomio como =SerieConPrincipio= y su secuencia inversa con principio
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Para mayor claridad, los siguientes ejemplos usan un parámetro simbólico. El bloque de código que puede ver a continuación define un parámetro simbólico $a$.
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+from sympy import symbols
+a = symbols('a')
+#+END_SRC
+
+Definamos el polinomio $1 - az$ como una =SerieConPrincipio= con cogrado 0:
+#+BEGIN_SRC jupyter-python #:display text/latex
+p=SerieConPrincipio([1, -a],0)
+pinta(p)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[1 -  az\]
+:END:
+
+
+
+Su inversa $p^{-\triangleright}$ (en el conjunto de series /con principio/) es:
+#+BEGIN_SRC jupyter-python 
+número_coeficientes = 12
+pinta(p.inversa(número_coeficientes))
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[1 + az + a^{2}z^{2} + a^{3}z^{3} + a^{4}z^{4} + a^{5}z^{5} + a^{6}z^{6} + a^{7}z^{7} + a^{8}z^{8} + a^{9}z^{9} + a^{10}z^{10} + a^{11}z^{11} + \cdots\]
+:END:
+(donde hemos indicado el número de coeficientes que queremos mostrar, pero la secuencia tiene infinitos coeficientes no nulos si $a\ne0$; y por tanto NO es un polinomio si $a\ne0$).
+#+latex: \bigskip
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+*Nota.* Al haber creado este polinomio como un elemento de la clase =SerieConPrincipio=, el procedimiento ~.inversa()~ genera la inversa como una serie con principio (con cogrado). A esta inversa la hemos denotado con $p^{-\triangleright}$ en la lección correspondiente.
+#+latex: \bigskip
+
+
+** Cogrado de la inversa con principio
+
+Fíjese que su inversa (/con principio/) tiene cogrado $0$ (el cogrado de la inversa es menos el cogrado de la serie. Veámoslo con un ejemplo: 
+
+#+BEGIN_SRC jupyter-python #:display text/latex
+q=SerieConPrincipio([1,-a],3)
+pinta(q)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[z^{3} -  az^{4}\]
+:END:
+
+Su inversa con principio es
+#+BEGIN_SRC jupyter-python
+pinta(q.inversa())
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[z^{-3} + az^{-2} + a^{2}z^{-1} + a^{3} + a^{4}z + \cdots\]
+:END:
+
+Que posee infinitos términos no nulos si $a\ne0$ (por tanto no puede ser un polinomio cuando $a\ne0$). Pero además tiene cogrado negativo (no es un polinomio ni siquiera cuando $a=0$).
+
+
+* La inversa con principio puede ser sumable o no
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Consideremos el polinomio $1-ax$. 
+Mediante gráficos podemos ver el comportamiento de los coeficientes para distintos valores del parámetro $a$. 
+Para estos dibujos calcularemos 15 coeficientes y sustituiremos el parámetro $a$ por un ~valor~ concreto en cada caso.
+
+**** Para valores de $a$ menores a 1 en valor absoluto (*raíz fuera del círculo unidad*)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+BEGIN_SRC jupyter-python :results silent
+valor = 0.8
+p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCP08.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCP08.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+BEGIN_SRC jupyter-python :results silent
+valor = -0.8
+p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCP-08.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCP-08.png]]
+
+
+
+/Para polinomios con raíces fuera del círculo unidad los coeficientes de la inversa/ (con principio $p^{-\triangleright}$) /se aproximan a 0 cuando los índices crecen./ 
+
+Éste es el caso en el que  $p^{-\triangleright}=p^{-1}$ (inversa absolutamente sumable).
+
+**** Para valores de $a$ iguales a 1 en valor absoluto (*raíz sobre el círculo unidad*)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+BEGIN_SRC jupyter-python :results silent
+valor = 1
+p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCP1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCP1.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+BEGIN_SRC jupyter-python :results silent
+valor = -1
+p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCP-1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCP-1.png]]
+
+
+
+/Para polinomios con raíces en el círculo unidad los coeficientes de la inversa mantienen patrones estables/,
+y no son secuencias sumables (la suma de los coeficientes no converge).
+
+**** Para valores de $a$ mayores a 1 en valor absoluto (*raíz en el interior del círculo unidad*)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+BEGIN_SRC jupyter-python :results silent
+valor = 1.2
+p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCP12.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCP12.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+BEGIN_SRC jupyter-python  :results silent
+valor = -1.2
+p.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCP-12.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCP-12.png]]
+
+
+/Para polinomios con raíces dentro del círculo unidad los coeficientes de la inversa/ (con principio $p^{-\triangleright}$) /crecen exponencialmente cuando los índices crecen./
+
+
+*** Multipliquemos $1-ax$ por su inversa con principio
+
+Nótese que no estamos multiplicando dos polinomios.
+\begin{align*}
+  (1-ax)*(1-ax)^{-\triangleright} = & (1-ax)*(1 + ax + a^{2}x^{2} + a^{3}x^{3} + a^{4}x^{4} + \cdots) \\ 
+  = & (1 + ax + a^{2}x^{2} + a^{3}x^{3} + a^{4}x^{4} + \cdots) - ax(1 + ax + a^{2}x^{2} + a^{3}x^{3} + a^{4}x^{4} + \cdots) \\
+  = & (1 + ax + a^{2}x^{2} + a^{3}x^{3} + a^{4}x^{4} + \cdots) + (-ax - a^{2}x^{2} - a^{3}x^{3} - a^{4}x^{4} - \cdots) \\
+  = & 1.
+\end{align*}
+
+Por ejemplo si el polinomio es $1-2z$:
+
+#+BEGIN_SRC jupyter-python :exports results
+#EscalerasConvolucion(SerieConPrincipio([1,-Fraction(1,2)], cogrado=0),
+#                     SerieConPrincipio([1,-Fraction(1,2)], cogrado=0).inversa(8) )
+EscalerasConvolucion(SerieConPrincipio([1,-2], cogrado=0),
+                     SerieConPrincipio([1,-2], cogrado=0).inversa(8) )
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[\begin{array}{c|c|c|c|c|c|c|c}
+{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} & z^{4} & z^{5} & z^{6} & z^{7} \\\hline\hline
+{\color{blue}{\{1\}}} & -2 & 0 & 0 & 0 & 0 & 0 & 0 \\\hline\hline
+{\color{blue}{\{1\}}} & 2 & 4 & 8 & 16 & 32 & 64 & 128 \\\hline
+\end{array}\]
+:END:
+
+Recuerde que el producto convolución entre secuencias es:
+\[
+ (\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}
+\]
+
+
+* La inversa de un polinomio con grado y cogrado distintos es una secuencia infinita
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Recuerde que, en general, *la inversa de un polinomio es una serie con infinitos términos*. Como esta (incompleta) implementación en Python solo calcula una cantidad finita de términos, el producto del polinomio por la serie calculada no es exactamente $1$, aunque nos podemos aproximar a la inversa tanto como queramos (dentro de las capacidades del ordenador y en casos sencillos). 
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Si calculamos solo cinco términos de la inversa, se anulan todos los coeficientes excepto el quinto (y el $1$ de la posición $0$):
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python
+pinta(p * p.inversa())
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[1 -  a^{5}z^{5}\]
+:END:
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Con solo cincuenta términos se anulan todos excepto el quincuagésimo (y el $1$ de la posición $0$):
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python
+pinta(p * p.inversa(50))
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[1 -  a^{50}z^{50}\]
+:END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Con quinientos términos se anulan todos excepto el parámetro en la posición 500 (y el $1$ de la posición $0$):
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python
+pinta(p * p.inversa(500))
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[1 -  a^{500}z^{500}\]
+:END:
+
+Dependiendo del valor de $a$, este producto puede estar arbitrariamente cerca, o arbitrariamente lejos de $1$ (dada la existencia del /n/-ésimo término $a^{n}$ donde $n$ es el número de coeficientes calculados)
+#+latex: \medskip
+
+... aunque también podemos mantenernos a un palote (de norma $1$) para todo $n$.
+#+BEGIN_SRC jupyter-python :results silent
+s = p.subs((a, 1))
+(s * s.inversa(25)).plot_serie(title='Esto no es  $1$').savefig(imagenes_leccion + '/noEs1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/noEs1.png]]
+
+#+latex: \bigskip
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+En resumen, si $a\ne0$, el producto ~p*(p.inversa(500))~ no calcula exactamente la serie $1$ (la que tienen un $1$ en la posición $0$ y es nula en todas las demás posiciones). Nótese que la componente correspondiente a la posición 500 es distinta de cero (su magnitud es $a^{500}$). Por tanto, ~p.inversa(500)~ no es realmente la inversa de ~p~. Fíjese que la serie ~p.inversa(500)~ solo tiene 500 términos no nulos; sin embargo, *la serie (con cogrado) que verdaderamente es inversa del polinomio ~p~ requiere de infinitos términos no nulos* (algo que esta implementación en Python no maneja).
+
+** Otro ejemplo.
+
+#+BEGIN_SRC jupyter-python
+d = SerieConPrincipio([1,  0, - 0.9, 0, - 0.2,  0.2],0)
+pinta(d)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[1.0 - 0.9z^{2} - 0.2z^{4} + 0.2z^{5}\]
+:END:
+
+#+BEGIN_SRC jupyter-python  :results silent
+d.inversa(35).subs((a,valor)).plot_serie(title=r'$(1.0 - 0.9z^{2} - 0.2z^{3} + 0.2z^{4})^{-\triangleright}$').savefig(imagenes_leccion + '/InversaPolinomio.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InversaPolinomio.png]]
+
+#+BEGIN_SRC jupyter-python :results silent
+(d * d.inversa(25)).plot_serie(title='Esto no es  $1$').savefig(imagenes_leccion + '/tampocoEs1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/tampocoEs1.png]]
+
+#+latex: \bigskip
+
+/Puede experimentar en el notebook todo lo que quiera, pero tenga en cuenta que si la inversa es una secuencia explosiva e intenta calcular muchos términos, excederá las capacidades de cálculo del ordenador./
+#+latex: \bigskip
+
+
+*LO MÁS IMPORTANTE*: quédese con que, en general, */la inversa de un polinomio es una secuencia con _infinitos_ términos no nulos/*.
+#+latex: \medskip
+
+Digo en general, pues si el grado y cogrado del polinomio son el mismo índice, la inversa sí es finita: $$(x^{2})*(x^{-2})=1.$$
+
+
+* Polinomio como =SerieConFinal= y su secuencia inversa con final
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+Ahora vamos a definir exactamente el mismo polinomio $1-ax$; pero en esta ocasión lo haremos como una =SerieConFinal= (con ~grado~ igual a 1).
+#+BEGIN_SRC jupyter-python
+p2=SerieConFinal([1,-a],1)
+pinta(p2)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[1 -  az\]
+:END:
+
+
+Su inversa $p^{\blacktriangleleft-}$ (en el conjunto de series /con final/) es:
+#+BEGIN_SRC jupyter-python
+pinta(p2.inversa())
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[\cdots -  \frac{1}{a^{5}}z^{-5} -  \frac{1}{a^{4}}z^{-4} -  \frac{1}{a^{3}}z^{-3} -  \frac{1}{a^{2}}z^{-2} -  \frac{1}{a}z^{-1}\]
+:END:
+
+
+Fíjese que como el grado del polinomio ~p2~ es 1, el grado de $p^{\blacktriangleleft-}$ es $-1.$
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+*Nota.* Al haber creado este polinomio como un elemento de la clase =SerieConFinal=, el procedimiento ~.inversa()~ genera la inversa como una serie con final (con grado). A esta inversa la hemos denotado con $p^{\blacktriangleleft-}$ en la lección correspondiente.
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Veamos con unos gráficos el comportamiento de los coeficientes de esta nueva inversa $p^{\blacktriangleleft-}$ para distintos valores del parámetro $a$.
+
+**** Para valores de $a$ menores a 1 en valor absoluto (*raíz fuera del círculo unidad*)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+BEGIN_SRC jupyter-python :results silent
+valor = 0.9
+p2.inversa(10).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCF09.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCF09.png]]
+
+
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+BEGIN_SRC jupyter-python :results silent
+valor = -0.9
+p2.inversa(10).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCF-09.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCF-09.png]]
+
+
+/Para polinomios con raíces fuera del círculo unidad los coeficientes de la inversa/ (con final $p^{\blacktriangleleft-}$) /crecen exponencialmente cuando los índices decrecen/ (justo lo contrario que con las inversas con principio).
+
+**** Para valores de $a$ iguales a 1 en valor absoluto (*raíz sobre el círculo unidad*)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+BEGIN_SRC jupyter-python :results none
+valor = 1
+p2.inversa(10).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCF1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCF1.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+BEGIN_SRC jupyter-python :results none
+valor = -1
+p2.inversa(10).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCF-1.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCF-1.png]]
+
+
+
+
+/Para polinomios con raíces en el círculo unidad los coeficientes de la inversa mantienen patrones estables/ (de manera similar a lo que ocurre con las inversas con principio).
+
+**** Para valores de $a$ mayores a 1 en valor absoluto (*raíz en el interior del círculo unidad*)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+#+BEGIN_SRC jupyter-python :results silent
+valor = 1.2
+p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCF12.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCF12.png]]
+
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+BEGIN_SRC jupyter-python :results silent
+valor = -1.2
+p2.inversa(15).subs((a,valor)).plot_serie(title='$a='+str(valor)+'$').savefig(imagenes_leccion + '/InvCF-12.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InvCF-12.png]]
+
+
+/Para valores de $a$ mayores a 1 en valor absoluto los coeficientes de la inversa/ (con final $p^{\blacktriangleleft-}$) /se aproximan a 0 cuando los índices decrecen/  (justo lo contrario que con las inversas con principio).
+
+Este es el caso en el que  $p^{\blacktriangleleft-}=p^{-1}$ (inversa absolutamente sumable).
+
+*** Multipliquemos $1-ax$ por su inversa con final
+
+Nótese que no estamos multiplicando dos polinomios.
+\begin{align*}
+  (1-ax)*(1-ax)^{\blacktriangleleft-} = & (1-ax)*\Big(\cdots - \frac{1}{a^{4}}x^{-4} - \frac{1}{a^{3}}x^{-3} - \frac{1}{a^{2}}x^{-2} - \frac{1}{a}x^{-1}\Big) \\ 
+  = & \Big(\cdots - \frac{1}{a^{4}x^{4}} - \frac{1}{a^{3}x^{3}} - \frac{1}{a^{2}x^{2}} - \frac{1}{ax}\Big) 
+    - ax\Big(\cdots - \frac{1}{a^{4}x^{4}} - \frac{1}{a^{3}x^{3}} - \frac{1}{a^{2}x^{2}} - \frac{1}{ax}\Big)  \\
+  = & \Big(\cdots - \frac{1}{a^{4}x^{4}} - \frac{1}{a^{3}x^{3}} - \frac{1}{a^{2}x^{2}} - \frac{1}{ax}\Big) 
+    + \Big(\cdots + \frac{1}{a^{3}x^{3}} + \frac{1}{a^{2}x^{2}} + \frac{1}{ax} + 1\Big)  \\
+  = & 1.
+\end{align*}
+
+Por ejemplo si el polinomio es $1-\frac{1}{2}z$:
+
+#+BEGIN_SRC jupyter-python :exports results
+EscalerasConvolucion(SerieConFinal([1,-Fraction(1,2)], grado=1),
+                     SerieConFinal([1,-Fraction(1,2)], grado=1).inversa(8) )
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[\begin{array}{c|c|c|c|c|c|c|c|c|c}
+z^{-8} & z^{-7} & z^{-6} & z^{-5} & z^{-4} & z^{-3} & z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} \\\hline\hline
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & {\color{blue}{\{1\}}} & -1/2 \\\hline\hline
+-256 & -128 & -64 & -32 & -16 & -8 & -4 & -2 & {\color{blue}{\{0\}}} & 0 \\\hline
+\end{array}\]
+:END:
+
+Recuerde que el producto convolución entre secuencias es:
+\[
+ (\boldsymbol{a}*\boldsymbol{b})_t=\sum_{r+s=t} a_rb_s; \qquad r,s,t\in\mathbb{Z}
+\]
+
+
+Cabe señalar que un polinomio es cero para índices menores que su co-grado y cero para índices mayores que su grado, por lo tanto, en el cálculo del producto de convolución, para cada $t$ solo interviene la suma de una cantidad finita de productos de coeficientes no nulos.
+#+latex: \medskip
+
+Del mismo modo, dado que las secuencias con principio son cero para los índices menores que su co-grado, en el cálculo de su producto de convolución, para cada $t$ solo interviene la suma de una cantidad finita de productos de coeficientes no nulos. Consecuentemente, está definido el producto entre cualquier par de secuencias con principio.
+#+latex: \medskip
+
+Lo mismo ocurre con las secuencias con final, que son cero para índices mayores que su grado.
+#+latex: \medskip
+
+Sin embargo, el problema surge cuando intentamos multiplicar dos secuencias infinitas en ambos sentidos, es decir, que tienen un número infinito de coeficientes no nulos tanto en los índices negativos como en los positivos. Para que el producto de convolución esté definido entre ellas, es necesario que cada una de las sumas $\sum_{r+s=t} a_rb_s$ sea convergente, y esto está garantizado si las secuencias son absolutamente sumables.
+#+latex: \bigskip
+
+En la disciplina de Series Temporales aparecen este tipo de productos, por ello se requieren condiciones que garanticen que las secuencias sean absolutamente sumables y así trabajar con expresiones bien definidas. 
+#+latex: \medskip
+
+Además, se asume que los modelos deben explicar el presente en función del pasado (lo que ocurre hoy afecta a lo que ocurrirá mañana pero lo que ocurre hoy no cambia lo que pasó ayer). Consecuentemente se usa el operador de retardo combinado con secuencias con principio. En particular se emplean expresiones en las que intervienen inversas de polinomios que son secuencias con principio. Estas inversas solo pueden ser convergentes si las raíces del polinomio se encuentran fuera del círculo unidad (si tienen un módulo mayor que uno).
+#+latex: \medskip
+
+Así pues, en Series Temporales, cuando se habla de "la" inversa de un polinomio, siempre se refiere a la inversa convergente (la absolutamente sumable) y que tiene cogrado (que tiene principio).
+
+
+* Inversas de series con principio y de series con final
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+Lo que hemos visto es un caso particular de las series con principio o las series con final (fíjese que los polinomios pertenecen a ambos tipos de secuencias a la vez).
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python
+lista = [1, -.1, -.75]
+s_cp = SerieConPrincipio(lista, -1)
+pinta(s_cp)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[z^{-1} - 0.1 - 0.75z\]
+:END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+s_cp.inversa(30).plot_serie(title='inversa con principio de  $' + s_cp.latex()+ '$').savefig(imagenes_leccion + '/InversaSerieConPrincipio.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InversaSerieConPrincipio.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python
+s_cf=SerieConFinal(lista, 1)
+pinta(s_cf)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+\[z^{-1} - 0.1 - 0.75z\]
+:END:
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results silent
+s_cf.inversa(30).plot_serie(title='inversa con final de  $' + s_cf.latex()+ '$').savefig(imagenes_leccion + '/InversaSerieConFinal.png', dpi=300, bbox_inches='tight')
+#+END_SRC
+
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+attr_latex: :width 325px
+[[file:./img/P-L02-A-polinomios_y_series_formales/InversaSerieConFinal.png]]
+
+Ambas son secuencias inversas de la expresión $z^{-1} - 0.1 - 0.75z$. Fíjese que una inversa es convergente y la otra es explosiva.
+
+
+* COMMENT ipynb y slides                                           :noexport:
+
+#+BEGIN_SRC emacs-lisp :results silent :eval yes
+(require 'ox-ipynb)
+(ox-ipynb-export-org-file-to-ipynb-file "P-L02-A-polinomios_y_series_formales.org")
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+# jupyter nbconvert --execute --inplace P-L02-A-polinomios_y_series_formales.ipynb
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+# jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute P-L02-A-polinomios_y_series_formales.ipynb
+#+END_SRC

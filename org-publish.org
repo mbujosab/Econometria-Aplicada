@@ -45,11 +45,13 @@ DOCS = ./docs
 CUADERNOS = $(DOCS)/CuadernosElectronicos
 TRANSPARENCIAS = $(DOCS)/Transparencias
 
-SRC_FILES = $(LECCIONES_SRC)/Lecc*.org
+SRC_FILES = $(LECCIONES_SRC)/*.org
+# SRC_FILES = $(LECCIONES_SRC)/Lecc*.org
+# SRC_PRACTICAS_PYTHON_FILES = $(LECCIONES_SRC)/P-L.org
 
-.PHONY: all clean cleanAll directorios programas_de_python calendario notebooksYslides
+#.PHONY: cleanAll directorios programas_de_python calendario notebooksYslides limpia_kernels_jupyter practicas publicacion limpia_kernels_jupyter
 
-all: calendario notebooksYslides practicas publicacion
+all: calendario notebooksYslides practicas publicacion limpia_kernels_jupyter
 
 calendario: directorios $(DOCS)/Calendario-Econometria-Aplicada.pdf
 
@@ -58,40 +60,70 @@ $(DOCS)/Calendario-Econometria-Aplicada.pdf:
 	cd Calendario && make Calendario-Econometria-Aplicada.pdf
 
 publicacion: publicacion-lecciones publicacion-practicas
+	cp -a README.org  $(DOCS)
+	mkdir -p $(DOCS)/Practicas-html/img
+	find . -wholename $(LECCIONES_tmp)/P-L*.pdf -exec cp {} $(DOCS)/Practicas-pdf/ \;
+	find . -wholename $(LECCIONES_tmp)/P-L*.html -exec cp {} $(DOCS)/Practicas-html/ \;
+	cp -a $(DOCS)/Lecciones-html/img/P-L* $(DOCS)/Practicas-html/img/
+	cp -a $(DOCS)/Lecciones-html/P-L*.html $(DOCS)/Practicas-html/
+#	find $(DOCS)/Lecciones-html/img/ -maxdepth 1 -type d -name "P-L*" -exec cp -a {}  $(DOCS)/Practicas-html/img/ \;
+#	find $(DOCS)
+
+
+# Defino las rutas de origen y destino para mayor claridad
+SRC_IMG = $(DOCS)/Lecciones-html/img/ 
+DST_IMG = $(DOCS)/Practicas-html/img/
+
+# Para crear los enlaces simbólicos de las prácticas en Python
+img_symlink_files:
+	files=$(shell find $(SRC_IMG) -name *.png); \
+	for file in $$files; do \
+		if [ -e "$$file" ]; then \
+			base_name=$$(basename "$$file" .png); \
+			echo "Procesando archivo: $$file"; \
+			ln -snf ../$$file "$(DST_IMG)$$base_name.png"; \
+			echo "Enlace creado: $(DST_IMG)$$base_name.png -> ../$$file"; \
+		else \
+			echo "Archivo: $$file no existe"; \
+		fi; \
+	done
+
 
 publicacion-lecciones: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES))) README.org index.org
 	echo "FICHEROS EN CuadernosElectronicos y Transparencias?..."
 	cp -a $(LECCIONES_tmp)/Lecc*.slides.html $(TRANSPARENCIAS)
+	find . -wholename $(LECCIONES_tmp)/P-L*.slides.html -exec cp {} $(TRANSPARENCIAS)/ \;
+	#cp -a $(LECCIONES_tmp)/P-L*.slides.html $(TRANSPARENCIAS)
 	ls $(CUADERNOS)
 	ls $(TRANSPARENCIAS)
 	echo "EJECUCIÓN DE publica.el..."
 	emacs --batch \
 	  --load ~/Software/scimax/init.el \
 	  -l publica.el
-	cp -a README.org  $(DOCS)
-	echo "FICHEROS EN Docs?..."
-	find $(DOCS)
 	touch $@
+#	echo "FICHEROS EN Docs?..."
+#	find $(DOCS)/Lecciones-html
+#	find $(DOCS)/Lecciones-pdf
 
 publicacion-practicas: $(patsubst $(PRACTICAS_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES))) README.org index.org
 	echo "EJECUCIÓN DE publica-practicas.el..."
 	emacs --batch \
 	  --load ~/Software/scimax/init.el \
 	  -l publica-practicas.el
-	cp -a README.org  $(DOCS)
-	cp -a $(PRACTICAS_tmp)/sitemap.org  $(DOCS)/Practicas-html
 	echo "FICHEROS EN Docs?..."
-	find $(DOCS)/Practicas-html
-	find $(DOCS)/Practicas-pdf
 	touch $@
+#	find $(DOCS)/Practicas-html
+#	find $(DOCS)/Practicas-pdf
 
 
 notebooksYslides: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES)))
 	touch $@
+#	pkill -f "python3 -m ipykernel_launcher"
 
 $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	make directorios
 	make programas_de_python
+	make symlink_files
 	cp -a $(LECCIONES_SRC)/*.bib $(LECCIONES_tmp)
 	cp -a $< $(LECCIONES_tmp)
 	echo "EJECUCION DEL NOTEBOOK DE ORG: $(LECCIONES_tmp)/$(@F:.ipynb=.org)..."
@@ -99,12 +131,12 @@ $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	echo "EJECUCION DEL NOTEBOOK DE JUPYTER..."
 	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/$(@F) 
 	echo "FICHEROS EN ./lecciones?..."
-	find $(LECCIONES_tmp)
+#	find $(LECCIONES_tmp)
 	echo "FICHEROS EN ./docs/Lecciones-html/img?..."
 	cp -a $(LECCIONES_tmp)/img $(DOCS)/Lecciones-html
-	find $(DOCS)/Lecciones-html/img
+#	find $(DOCS)/Lecciones-html/img
 	echo "Contenido de img tras notebook:"
-	find $(LECCIONES_tmp)/img
+#	find $(LECCIONES_tmp)/img
 	echo "COPIO LO QUE SE HA GENERADO (.ipynb sin ejecutar y las imágenes) A ./docs..."
 	cp -a $(LECCIONES_tmp)/$(@F) $(CUADERNOS)
 	ln -snf -r $(DOCS)/Lecciones-html/img/ $(TRANSPARENCIAS)/
@@ -113,7 +145,29 @@ $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	echo "CREACIÓN DE LAS SLIDES..."
 	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/$(@F) 
 	echo "➡️ FICHEROS EN docs/ TRAS GENERAR SLIDES Y NOTEBOOKS DE JUPYTER..."
-	find $(DOCS)
+#	find $(DOCS)
+
+
+
+# Define las rutas de origen y destino para mayor claridad
+SRC_DIR_PRACTICAS =./org-practicas/     # ./org-practicas/
+DST_DIR_PRACTICAS =./org-lessons/
+
+# Para crear los enlaces simbólicos de las prácticas en Python
+symlink_files:
+	files=$(shell find $(SRC_DIR_PRACTICAS) -name *.txt); \
+	for file in $$files; do \
+		if [ -e "$$file" ]; then \
+			base_name=$$(basename "$$file" .txt); \
+			echo "Procesando archivo: $$file"; \
+			ln -snf ../$$file "$(DST_DIR_PRACTICAS)$$base_name.org"; \
+			echo "Enlace creado: $(DST_DIR_PRACTICAS)$$base_name.org -> ../$$file"; \
+		else \
+			echo "Archivo: $$file no existe"; \
+		fi; \
+	done
+
+
 
 # Lista de archivos fuente .org en org-practicas
 PRACTICAS_SRC = $(wildcard org-practicas/*.org)
@@ -121,7 +175,7 @@ PRACTICAS_SRC = $(wildcard org-practicas/*.org)
 # Ficheros .done como señal de que fueron tanglados
 PRACTICAS_DONE = $(patsubst org-practicas/%.org, $(PRACTICAS_tmp)/%.done, $(PRACTICAS_SRC))
 
-# Objetivo principal
+# Objetivo principal de las prácticas en Gretl
 practicas: $(PRACTICAS_DONE)
 	@echo "✅ Todas las prácticas actualizadas."
 
@@ -129,6 +183,8 @@ $(PRACTICAS_tmp)/%.done: org-practicas/%.org
 	echo "➡️ Copiando y ejecutando $< ..."
 	mkdir -p $(PRACTICAS_tmp)/guiones
 	cp $< $(PRACTICAS_tmp)/
+	mkdir -p $(PRACTICAS_tmp)/src
+	cp $(LECCIONES_tmp)/src/*.py $(PRACTICAS_tmp)/src
 	ln -snf -r $(LECCIONES_tmp)/datos $(PRACTICAS_tmp)/
 	cp -a org-practicas/hansl.tex $(PRACTICAS_tmp)/
 	echo "🧠 Ejecutando org-babel-tangle y eval..."
@@ -204,6 +260,11 @@ cleanAll: clean
 	rm -f notebooksYslides
 	rm -f sitemap.org
 	rm -r -f logs
+
+limpia_kernels_jupyter:
+	pkill -f "python3 -m ipykernel_launcher"
+	# pkill -f "python3 -m ipykernel_launcher -f /home/marcos/.local/share/jupyter/runtime/kernel-.*\.json"
+
 #+END_SRC
 
 ** Aclaraciones
@@ -545,6 +606,23 @@ El backend "Agg"  no me funcionó, por lo que opté por indicar explícitamente 
 -----
 
 
+*** Consulta sobre los núcleos de Jupyter
+
+Cuando ejecuto Actions en GitHub y Actions ejecuta un notebook de jupyter ¿En qué directorio lo hace? Me gustaria matar los procesos  python3 -m ipykernel_launcher tras ejecutar los notebooks
+
+**** Respuesta
+
+Cuando GitHub Actions ejecuta un notebook de Jupyter, lo hace en un entorno temporal que se crea para cada ejecución de la acción. Usualmente, el directorio de trabajo es el que se especifica en el archivo de configuración (`.yml`) de la acción, comúnmente en el directorio del repositorio.
+
+Si deseas matar los procesos de Jupyter después de que se ejecute un notebook en GitHub Actions, puedes agregar un paso en tu flujo de trabajo (workflow) que use un comando como `pkill` para terminar los procesos de Jupyter, tal como:
+
+```yaml
+- name: Kill Jupyter processes
+  run: pkill -f "python3 -m ipykernel_launcher"
+```
+
+Sin embargo, ten en cuenta que los entornos de GitHub Actions se eliminan después de que una ejecución finaliza, por lo que normalmente no es necesario matar procesos manualmente al final del trabajo.
+
 
 * Script =publica.el= de elisp para publicar las lecciones con formato =.org= como ficheros con formato =pdf= y ~html~
 
@@ -565,8 +643,18 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
   "Publica un archivo Org como PDF tras ejecutar bloques de código."
   (message "Exportando a PDF: %s" filename)
   (with-current-buffer (find-file-noselect filename)
-    ;(org-babel-execute-buffer)
+    (org-babel-execute-buffer)
+    (sleep-for 20)
+    (save-buffer)
     (org-latex-publish-to-pdf plist filename pub-dir)))
+
+;; (defun my-org-html-publish-to-html (plist filename pub-dir)
+;;   "Publica un archivo Org como PDF tras ejecutar bloques de código."
+;;   (message "Exportando a html: %s" filename)
+;;   (with-current-buffer (find-file-noselect filename)
+;;     (org-babel-execute-buffer)
+;;     (sleep-for 20)
+;;     (org-html-publish-to-html plist filename pub-dir)))
 
 (let* ((base-directory "./"))
   (setq org-publish-project-alist
@@ -585,13 +673,23 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :with-toc t
                    :section-numbers nil)
 
+                  ("pdf"
+                   :base-directory "./Lecciones-tmp/"
+                   :base-extension "org"
+                   :publishing-directory ,(concat base-directory "docs/Lecciones-pdf")
+                   :exclude "src\\|README.org\\|sitemap.org"
+                   :recursive t
+                   :auto-sitemap nil
+                   :publishing-function my-org-latex-publish-to-pdf
+                   :auto-preamble t)
+		  
                   ("html"
                    :base-directory  "./Lecciones-tmp/"
                    :base-extension "org"
                    :publishing-directory ,(concat base-directory "docs/Lecciones-html")
-                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|Practicas-tmp\\|docs\\|chatCopilot.org\\|org-publish.org\\|README.org"
+                   :exclude "src\\|README.org"
                    :recursive t
-                   :publishing-function org-html-publish-to-html
+                   :publishing-function org-html-publish-to-html ; my-org-html-publish-to-html ; 
                    :auto-preamble t
                    :auto-sitemap t
                    :with-author nil
@@ -599,25 +697,15 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :with-toc t
                    :section-numbers nil)
 
-                  ("pdf"
-                   :base-directory "./Lecciones-tmp/"
-                   :base-extension "org"
-                   :publishing-directory ,(concat base-directory "docs/Lecciones-pdf")
-                   :exclude "src\\|org-lessons\\|org-practicas\\|sitemap.org"
-                   :recursive t
-                   :auto-sitemap nil
-                   :publishing-function my-org-latex-publish-to-pdf
-                   :auto-preamble t)
-		  
                   ("static-index"
                    :base-directory ,base-directory
                    :base-extension "css\\|js\\|png\\|jpg\\|gif\\|dat\\|mov\\|txt\\|svg\\|aiff\\|inp"
                    :publishing-directory ,(concat base-directory "docs")
-                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|Practicas-tmp\\|docs\\|chatCopilot.*\\|org-publish.*\\|README.org"
+                   :exclude "src\\|Calendario\\|org-lessons\\|org-practicas\\|Lecciones-tmp\\|Practicas-tmp\\|docs\\|org-publish.*\\|README.org"
                    :recursive t
                    :publishing-function org-publish-attachment)
 
-                  ("web-repositorio" :components ("index" "html" "pdf" "static-index")))))
+                  ("web-repositorio" :components ("index" "pdf" "html" "static-index")))))
 
   (message "🟢 Iniciando publicación del índice (web-repositorio)...")
   (org-publish "web-repositorio" t)
