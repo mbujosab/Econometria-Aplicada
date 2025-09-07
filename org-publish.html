@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-09-02 Tue 14:30 -->
+<!-- 2025-09-07 Sun 21:07 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Publicación de los ficheros org en GitHub pages</title>
@@ -48,35 +48,36 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org6b3e6c7">Fichero <code>makefile</code></a>
+<li><a href="#orga0229fb">Fichero <code>makefile</code></a>
 <ul>
-<li><a href="#orgd1a7d2b">Aclaraciones</a></li>
+<li><a href="#org2534daa">Aclaraciones</a></li>
 </ul>
 </li>
-<li><a href="#org208624e">Fichero <code>build.yml</code></a>
+<li><a href="#org54728e1">Fichero <code>build.yml</code></a>
 <ul>
-<li><a href="#org63ab86d">Aclaraciones</a>
+<li><a href="#org8de5cdb">Aclaraciones</a>
 <ul>
-<li><a href="#org52ad92e">Consulta a Copilot sobre la generación de figuras</a></li>
+<li><a href="#orgae9da0f">Consulta a Copilot sobre la generación de figuras</a></li>
+<li><a href="#orgb2993dd">Consulta sobre los núcleos de Jupyter</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgc4aae49">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
-<li><a href="#orgf48a0da">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
-<li><a href="#org4bd5abb">slides para GitHubpages</a></li>
-<li><a href="#org829cfc0">Directorio <code>.binder</code> para MyBinder</a>
+<li><a href="#org4e55a2e">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
+<li><a href="#orgb5aec55">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
+<li><a href="#orgc4832cb">slides para GitHubpages</a></li>
+<li><a href="#orgf9ef830">Directorio <code>.binder</code> para MyBinder</a>
 <ul>
-<li><a href="#orgae9df6a">Fichero <code>environment.yml</code></a></li>
-<li><a href="#org749d3d3">Fichero <code>apt.txt</code></a></li>
+<li><a href="#org6340413">Fichero <code>environment.yml</code></a></li>
+<li><a href="#org9c17c7d">Fichero <code>apt.txt</code></a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org6b3e6c7" class="outline-2">
-<h2 id="org6b3e6c7">Fichero <code>makefile</code></h2>
-<div class="outline-text-2" id="text-org6b3e6c7">
+<div id="outline-container-orga0229fb" class="outline-2">
+<h2 id="orga0229fb">Fichero <code>makefile</code></h2>
+<div class="outline-text-2" id="text-orga0229fb">
 <p>
 Genera el directorio <code>docs</code> con los ficheros para GitPages con subdirectorios para los <code>CuadernosElectronicos</code>, <code>pdfs</code>, <code>Transparencias</code> y los ficheros con las lecciones en <code>html</code>.
 </p>
@@ -90,11 +91,13 @@ Genera el directorio <code>docs</code> con los ficheros para GitPages con subdir
 <span style="font-weight: bold; font-style: italic;">CUADERNOS</span> = $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/CuadernosElectronicos
 <span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span> = $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Transparencias
 
-<span style="font-weight: bold; font-style: italic;">SRC_FILES</span> = $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/Lecc*.org
-
-<span style="font-weight: bold;">.PHONY</span>: all clean cleanAll directorios programas_de_python calendario notebooksYslides
-
-<span style="font-weight: bold;">all</span>: calendario notebooksYslides practicas publicacion
+<span style="font-weight: bold; font-style: italic;">SRC_FILES</span> = $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/*.org
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">SRC_FILES = $(</span><span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span><span style="font-weight: bold; font-style: italic;">)/Lecc*.org
+</span><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">SRC_PRACTICAS_PYTHON_FILES = $(</span><span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span><span style="font-weight: bold; font-style: italic;">)/P-L.org
+</span>
+<span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">.PHONY: cleanAll directorios programas_de_python calendario notebooksYslides limpia_kernels_jupyter practicas publicacion limpia_kernels_jupyter
+</span>
+<span style="font-weight: bold;">all</span>: calendario notebooksYslides practicas publicacion limpia_kernels_jupyter
 
 <span style="font-weight: bold;">calendario</span>: directorios $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Calendario-Econometria-Aplicada.pdf
 
@@ -103,54 +106,84 @@ Genera el directorio <code>docs</code> con los ficheros para GitPages con subdir
         cd Calendario &amp;&amp; make Calendario-Econometria-Aplicada.pdf
 
 <span style="font-weight: bold;">publicacion</span>: publicacion-lecciones publicacion-practicas
+        cp -a README.org  $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
+        mkdir -p $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-html/img
+        find . -wholename $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/P-L*.pdf -exec cp {} $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-pdf/ \;
+        find . -wholename $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/P-L*.html -exec cp {} $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-html/ \;
+        cp -a $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/img/P-L* $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-html/img/
+        cp -a $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/P-L*.html $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-html/
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)/Lecciones-html/img/ -maxdepth 1 -type d -name "P-L*" -exec cp -a {}  $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)/Practicas-html/img/ \;
+</span><span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)
+</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Defino las rutas de origen y destino para mayor claridad
+</span><span style="font-weight: bold; font-style: italic;">SRC_IMG</span> = $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/img/ 
+<span style="font-weight: bold; font-style: italic;">DST_IMG</span> = $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-html/img/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para crear los enlaces simb&#243;licos de las pr&#225;cticas en Python
+</span><span style="font-weight: bold;">img_symlink_files</span>:
+        <span style="font-weight: bold; font-style: italic;">files</span>=$(<span style="font-weight: bold; font-style: italic;">shell</span> find $(<span style="font-weight: bold; font-style: italic;">SRC_IMG</span>) -name *.png); \
+        for file in $$files; do \
+                if [ -e <span style="font-style: italic;">"$$file"</span> ]; then \
+                        <span style="font-weight: bold; font-style: italic;">base_name</span>=$$(basename <span style="font-style: italic;">"$$file"</span> .png); \
+                        echo <span style="font-style: italic;">"Procesando archivo: $$file"</span>; \
+                        ln -snf ../$$file <span style="font-style: italic;">"$(</span><span style="font-weight: bold; font-style: italic;">DST_IMG</span><span style="font-style: italic;">)$$base_name.png"</span>; \
+                        echo <span style="font-style: italic;">"Enlace creado: $(</span><span style="font-weight: bold; font-style: italic;">DST_IMG</span><span style="font-style: italic;">)$$base_name.png -&gt; ../$$file"</span>; \
+                else \
+                        echo <span style="font-style: italic;">"Archivo: $$file no existe"</span>; \
+                fi; \
+        done
+
 
 <span style="font-weight: bold;">publicacion-lecciones</span>: $(<span style="font-weight: bold; font-style: italic;">patsubst</span> $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/%.org,$(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/%.ipynb,$(<span style="font-weight: bold; font-style: italic;">wildcard</span> $(<span style="font-weight: bold; font-style: italic;">SRC_FILES</span>))) README.org index.org
         echo <span style="font-style: italic;">"FICHEROS EN CuadernosElectronicos y Transparencias?..."</span>
         cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/Lecc*.slides.html $(<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span>)
-        ls $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)
+        find . -wholename $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/P-L*.slides.html -exec cp {} $(<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span>)/ \;
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">#cp -a $(</span><span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span><span style="font-weight: bold; font-style: italic;">)/P-L*.slides.html $(</span><span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span><span style="font-weight: bold; font-style: italic;">)
+</span>        ls $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)
         ls $(<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span>)
         echo <span style="font-style: italic;">"EJECUCI&#211;N DE publica.el..."</span>
         emacs --batch \
           --load ~/Software/scimax/init.el \
           -l publica.el
-        cp -a README.org  $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
-        echo <span style="font-style: italic;">"FICHEROS EN Docs?..."</span>
-        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
         touch <span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">@</span>
-
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">echo "FICHEROS EN Docs?..."
+</span><span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)/Lecciones-html
+</span><span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)/Lecciones-pdf
+</span>
 <span style="font-weight: bold;">publicacion-practicas</span>: $(<span style="font-weight: bold; font-style: italic;">patsubst</span> $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_SRC</span>)/%.org,$(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/%.ipynb,$(<span style="font-weight: bold; font-style: italic;">wildcard</span> $(<span style="font-weight: bold; font-style: italic;">SRC_FILES</span>))) README.org index.org
         echo <span style="font-style: italic;">"EJECUCI&#211;N DE publica-practicas.el..."</span>
         emacs --batch \
           --load ~/Software/scimax/init.el \
           -l publica-practicas.el
-        cp -a README.org  $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
-        cp -a $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/sitemap.org  $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-html
         echo <span style="font-style: italic;">"FICHEROS EN Docs?..."</span>
-        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-html
-        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Practicas-pdf
         touch <span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">@</span>
-
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)/Practicas-html
+</span><span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)/Practicas-pdf
+</span>
 
 <span style="font-weight: bold;">notebooksYslides</span>: $(<span style="font-weight: bold; font-style: italic;">patsubst</span> $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/%.org,$(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/%.ipynb,$(<span style="font-weight: bold; font-style: italic;">wildcard</span> $(<span style="font-weight: bold; font-style: italic;">SRC_FILES</span>)))
         touch <span style="font-weight: bold;">$</span><span style="font-weight: bold; text-decoration: underline;">@</span>
-
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">pkill -f "python3 -m ipykernel_launcher"
+</span>
 <span style="font-weight: bold;">$(</span><span style="font-weight: bold; font-style: italic;">CUADERNOS</span><span style="font-weight: bold;">)/%.ipynb $(</span><span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span><span style="font-weight: bold;">)/%.slides.html</span>: $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/%.org
         make directorios
         make programas_de_python
-        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/*.bib $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">make symlink_files
+</span>        cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_SRC</span>)/*.bib $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)
         cp -a $<span style="font-weight: bold; text-decoration: underline;">&lt;</span> $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)
         echo <span style="font-style: italic;">"EJECUCION DEL NOTEBOOK DE ORG: $(</span><span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span><span style="font-style: italic;">)/$(</span><span style="font-weight: bold; font-style: italic;">@F</span><span style="font-style: italic;">:.ipynb=.org)..."</span>
         emacs -Q -l ~/Software/scimax/init.el $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/$(<span style="font-weight: bold; font-style: italic;">@F</span>:<span style="font-weight: bold; font-style: italic;">.ipynb</span>=.org) --batch --eval <span style="font-style: italic;">"(org-babel-execute-buffer)"</span> --eval <span style="font-style: italic;">"(save-buffer)"</span> --kill
         echo <span style="font-style: italic;">"EJECUCION DEL NOTEBOOK DE JUPYTER..."</span>
         jupyter nbconvert --execute --inplace $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/$(<span style="font-weight: bold; font-style: italic;">@F</span>) 
         echo <span style="font-style: italic;">"FICHEROS EN ./lecciones?..."</span>
-        find $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)
-        echo <span style="font-style: italic;">"FICHEROS EN ./docs/Lecciones-html/img?..."</span>
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span><span style="font-weight: bold; font-style: italic;">)
+</span>        echo <span style="font-style: italic;">"FICHEROS EN ./docs/Lecciones-html/img?..."</span>
         cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/img $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html
-        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/img
-        echo <span style="font-style: italic;">"Contenido de img tras notebook:"</span>
-        find $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/img
-        echo <span style="font-style: italic;">"COPIO LO QUE SE HA GENERADO (.ipynb sin ejecutar y las im&#225;genes) A ./docs..."</span>
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)/Lecciones-html/img
+</span>        echo <span style="font-style: italic;">"Contenido de img tras notebook:"</span>
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span><span style="font-weight: bold; font-style: italic;">)/img
+</span>        echo <span style="font-style: italic;">"COPIO LO QUE SE HA GENERADO (.ipynb sin ejecutar y las im&#225;genes) A ./docs..."</span>
         cp -a $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/$(<span style="font-weight: bold; font-style: italic;">@F</span>) $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)
         ln -snf -r $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/img/ $(<span style="font-weight: bold; font-style: italic;">TRANSPARENCIAS</span>)/
         ln -snf -r $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)/Lecciones-html/img/ $(<span style="font-weight: bold; font-style: italic;">CUADERNOS</span>)/
@@ -158,7 +191,29 @@ Genera el directorio <code>docs</code> con los ficheros para GitPages con subdir
 </span>        echo <span style="font-style: italic;">"CREACI&#211;N DE LAS SLIDES..."</span>
         jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix <span style="font-style: italic;">"https://unpkg.com/reveal.js@5.2.1"</span> --execute $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/$(<span style="font-weight: bold; font-style: italic;">@F</span>) 
         echo <span style="font-style: italic;">"&#10145;&#65039; FICHEROS EN docs/ TRAS GENERAR SLIDES Y NOTEBOOKS DE JUPYTER..."</span>
-        find $(<span style="font-weight: bold; font-style: italic;">DOCS</span>)
+<span style="font-weight: bold; font-style: italic;">#       </span><span style="font-weight: bold; font-style: italic;">find $(</span><span style="font-weight: bold; font-style: italic;">DOCS</span><span style="font-weight: bold; font-style: italic;">)
+</span>
+
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Define las rutas de origen y destino para mayor claridad
+</span><span style="font-weight: bold; font-style: italic;">SRC_DIR_PRACTICAS</span> =./org-practicas/     <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">./org-practicas/
+</span><span style="font-weight: bold; font-style: italic;">DST_DIR_PRACTICAS</span> =./org-lessons/
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para crear los enlaces simb&#243;licos de las pr&#225;cticas en Python
+</span><span style="font-weight: bold;">symlink_files</span>:
+        <span style="font-weight: bold; font-style: italic;">files</span>=$(<span style="font-weight: bold; font-style: italic;">shell</span> find $(<span style="font-weight: bold; font-style: italic;">SRC_DIR_PRACTICAS</span>) -name *.txt); \
+        for file in $$files; do \
+                if [ -e <span style="font-style: italic;">"$$file"</span> ]; then \
+                        <span style="font-weight: bold; font-style: italic;">base_name</span>=$$(basename <span style="font-style: italic;">"$$file"</span> .txt); \
+                        echo <span style="font-style: italic;">"Procesando archivo: $$file"</span>; \
+                        ln -snf ../$$file <span style="font-style: italic;">"$(</span><span style="font-weight: bold; font-style: italic;">DST_DIR_PRACTICAS</span><span style="font-style: italic;">)$$base_name.org"</span>; \
+                        echo <span style="font-style: italic;">"Enlace creado: $(</span><span style="font-weight: bold; font-style: italic;">DST_DIR_PRACTICAS</span><span style="font-style: italic;">)$$base_name.org -&gt; ../$$file"</span>; \
+                else \
+                        echo <span style="font-style: italic;">"Archivo: $$file no existe"</span>; \
+                fi; \
+        done
+
+
 
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Lista de archivos fuente .org en org-practicas
 </span><span style="font-weight: bold; font-style: italic;">PRACTICAS_SRC</span> = $(<span style="font-weight: bold; font-style: italic;">wildcard</span> org-practicas/*.org)
@@ -166,7 +221,7 @@ Genera el directorio <code>docs</code> con los ficheros para GitPages con subdir
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ficheros .done como se&#241;al de que fueron tanglados
 </span><span style="font-weight: bold; font-style: italic;">PRACTICAS_DONE</span> = $(<span style="font-weight: bold; font-style: italic;">patsubst</span> org-practicas/%.org, $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/%.done, $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_SRC</span>))
 
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Objetivo principal
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Objetivo principal de las pr&#225;cticas en Gretl
 </span><span style="font-weight: bold;">practicas</span>: $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_DONE</span>)
         <span style="font-weight: bold; text-decoration: underline;">@</span>echo <span style="font-style: italic;">"&#9989; Todas las pr&#225;cticas actualizadas."</span>
 
@@ -174,6 +229,8 @@ Genera el directorio <code>docs</code> con los ficheros para GitPages con subdir
         echo <span style="font-style: italic;">"&#10145;&#65039; Copiando y ejecutando $</span><span style="font-weight: bold; font-style: italic; text-decoration: underline;">&lt;</span><span style="font-style: italic;"> ..."</span>
         mkdir -p $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/guiones
         cp $<span style="font-weight: bold; text-decoration: underline;">&lt;</span> $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/
+        mkdir -p $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/src
+        cp $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/src/*.py $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/src
         ln -snf -r $(<span style="font-weight: bold; font-style: italic;">LECCIONES_tmp</span>)/datos $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/
         cp -a org-practicas/hansl.tex $(<span style="font-weight: bold; font-style: italic;">PRACTICAS_tmp</span>)/
         echo <span style="font-style: italic;">"&#129504; Ejecutando org-babel-tangle y eval..."</span>
@@ -249,21 +306,26 @@ Genera el directorio <code>docs</code> con los ficheros para GitPages con subdir
         rm -f notebooksYslides
         rm -f sitemap.org
         rm -r -f logs
+
+<span style="font-weight: bold;">limpia_kernels_jupyter</span>:
+        pkill -f <span style="font-style: italic;">"python3 -m ipykernel_launcher"</span>
+        #<span style="font-weight: bold; font-style: italic;"> </span><span style="font-weight: bold; font-style: italic;">pkill -f "python3 -m ipykernel_launcher -f /home/marcos/.local/share/jupyter/runtime/kernel-.*\.json"
+</span>
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orgd1a7d2b" class="outline-3">
-<h3 id="orgd1a7d2b">Aclaraciones</h3>
-<div class="outline-text-3" id="text-orgd1a7d2b">
+<div id="outline-container-org2534daa" class="outline-3">
+<h3 id="org2534daa">Aclaraciones</h3>
+<div class="outline-text-3" id="text-org2534daa">
 <p>
 El directorio <code>./Lecciones-tmp</code> es temporal (en el fichero <code>makefile</code> se hace referencia a él con <code>$(LECCIONES_tmp)</code>). En dicho directorio se ejecutan los notebooks. Los ficheros creados se copian en distintos subdirectorios del directorio de publicación <code>./docs</code> (en el fichero <code>makefile</code> es referenciado con <code>$(DOCS)</code> ). El subdirectorio <code>./docs</code> es el directorio de donde "cuelgan" las páginas web; dichas páginas se distribuyen desde la rama <code>gh-pages</code> del repositorio.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org208624e" class="outline-2">
-<h2 id="org208624e">Fichero <code>build.yml</code></h2>
-<div class="outline-text-2" id="text-org208624e">
+<div id="outline-container-org54728e1" class="outline-2">
+<h2 id="org54728e1">Fichero <code>build.yml</code></h2>
+<div class="outline-text-2" id="text-org54728e1">
 <p>
 Contiene las instrucciones que ejecutará GitHub Actions en el repositorio cada vez que éste sea actualizado.
 </p>
@@ -400,13 +462,13 @@ jobs:
 </code></pre>
 </div>
 </div>
-<div id="outline-container-org63ab86d" class="outline-3">
-<h3 id="org63ab86d">Aclaraciones</h3>
-<div class="outline-text-3" id="text-org63ab86d">
+<div id="outline-container-org8de5cdb" class="outline-3">
+<h3 id="org8de5cdb">Aclaraciones</h3>
+<div class="outline-text-3" id="text-org8de5cdb">
 </div>
 <ul class="org-ul">
-<li><a id="org8582181"></a>tlmgr<br />
-<div class="outline-text-5" id="text-org8582181">
+<li><a id="org65b60da"></a>tlmgr<br />
+<div class="outline-text-5" id="text-org65b60da">
 <p>
 Scimax intenta usar <code>tlmgr</code> para instalar paquetes de \(\LaTeX{}\), pero <code>Actions</code> de <code>GitHub</code> no lo permite. Las medidas tomadas para evitar este problema han sido 
 </p>
@@ -445,9 +507,9 @@ Quizá sea suficiente solo con esto segundo. Pero si quito el fichero <code>~/.e
 </div>
 </li>
 </ul>
-<div id="outline-container-org52ad92e" class="outline-4">
-<h4 id="org52ad92e">Consulta a Copilot sobre la generación de figuras</h4>
-<div class="outline-text-4" id="text-org52ad92e">
+<div id="outline-container-orgae9da0f" class="outline-4">
+<h4 id="orgae9da0f">Consulta a Copilot sobre la generación de figuras</h4>
+<div class="outline-text-4" id="text-orgae9da0f">
 <p>
 Tuve dificultades para que la ejecución en GitHub Actions de los de los cuadernos electrónicos de Scimax creara las figuras. A continuación copio mi consulta a copilot: 
 </p>
@@ -484,10 +546,10 @@ Ahora, pasemos a analizar por qué el segundo bloque <b>no genera</b> el archivo
 <hr />
 </div>
 <ul class="org-ul">
-<li><a id="orge4e9e93"></a>Diagnóstico y causas probables<br />
+<li><a id="orga9c9e4b"></a>Diagnóstico y causas probables<br />
 <ul class="org-ul">
-<li><a id="org8933cad"></a>1. Diferencia clave entre ambos bloques<br />
-<div class="outline-text-6" id="text-org8933cad">
+<li><a id="orgfdacf73"></a>1. Diferencia clave entre ambos bloques<br />
+<div class="outline-text-6" id="text-orgfdacf73">
 <ul class="org-ul">
 <li><p>
 <b>Bloque que funciona:</b>
@@ -527,8 +589,8 @@ Ahora, pasemos a analizar por qué el segundo bloque <b>no genera</b> el archivo
 </ul>
 </div>
 </li>
-<li><a id="orgc666d63"></a>2. ¿Por qué falla el segundo bloque?<br />
-<div class="outline-text-6" id="text-orgc666d63">
+<li><a id="org1064ab1"></a>2. ¿Por qué falla el segundo bloque?<br />
+<div class="outline-text-6" id="text-org1064ab1">
 <ul class="org-ul">
 <li>El argumento `:file ./img/lecc01/PIB_UEM.png` espera que el último comando del bloque <b>guarde la imagen en ese path</b> (o devuelva una figura que org/jupyter pueda guardar ahí).</li>
 <li>El método `df1.plot(&hellip;).set_title(&hellip;)` crea y modifica una figura activa, pero <b>no la guarda</b>.</li>
@@ -541,15 +603,15 @@ Ahora, pasemos a analizar por qué el segundo bloque <b>no genera</b> el archivo
 </li>
 </ul>
 </li>
-<li><a id="org1acf012"></a>Solución recomendada<br />
-<div class="outline-text-5" id="text-org1acf012">
+<li><a id="orgb081353"></a>Solución recomendada<br />
+<div class="outline-text-5" id="text-orgb081353">
 <p>
 <b>Debes guardar la figura manualmente al path especificado</b>, y devolver ese path como resultado del bloque.
 </p>
 </div>
 <ul class="org-ul">
-<li><a id="orgda9a19d"></a>Forma correcta:<br />
-<div class="outline-text-6" id="text-orgda9a19d">
+<li><a id="org0314767"></a>Forma correcta:<br />
+<div class="outline-text-6" id="text-org0314767">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ax</span> = df1.plot(x=<span style="font-style: italic;">'obs'</span>, xlabel=<span style="font-style: italic;">''</span>, figsize=(15,4))
 ax.set_title(<span style="font-style: italic;">'PIB zona euro'</span>, fontsize=18)
@@ -564,8 +626,8 @@ plt.savefig(<span style="font-style: italic;">"./img/lecc01/PIB_UEM.png"</span>)
 </ul>
 </div>
 </li>
-<li><a id="orge1f6510"></a>Alternativas<br />
-<div class="outline-text-6" id="text-orge1f6510">
+<li><a id="orgaf1d31c"></a>Alternativas<br />
+<div class="outline-text-6" id="text-orgaf1d31c">
 <ul class="org-ul">
 <li>Si usas solo `:results file` sin `:file`, puedes devolver el nombre del archivo en la última línea.</li>
 <li>Siempre asegúrate de llamar a `plt.savefig()` <b>después</b> de crear el gráfico.</li>
@@ -576,8 +638,8 @@ plt.savefig(<span style="font-style: italic;">"./img/lecc01/PIB_UEM.png"</span>)
 </li>
 </ul>
 </li>
-<li><a id="orgf9e3945"></a>Resumen<br />
-<div class="outline-text-5" id="text-orgf9e3945">
+<li><a id="org2d53eb8"></a>Resumen<br />
+<div class="outline-text-5" id="text-org2d53eb8">
 <ul class="org-ul">
 <li>El bloque con `plt.savefig(&hellip;)` funciona porque guarda explícitamente la imagen.</li>
 <li>El bloque con pandas `plot` y solo `set_title()` <b>NO guarda la imagen</b>; debes añadir `plt.savefig()` y devolver el path.</li>
@@ -605,16 +667,16 @@ La diferencia entre tu entorno local y GitHub Actions suele deberse a <b>la conf
 <hr />
 </div>
 </li>
-<li><a id="orgbed20bf"></a>¿Por qué funciona localmente pero no en Actions?<br />
-<div class="outline-text-5" id="text-orgbed20bf">
+<li><a id="org149cb1a"></a>¿Por qué funciona localmente pero no en Actions?<br />
+<div class="outline-text-5" id="text-org149cb1a">
 <ul class="org-ul">
 <li><b>Localmente</b>, matplotlib tiene acceso a un entorno gráfico (X11, Wayland, etc.) y suele usar un backend como `TkAgg`, `Qt5Agg`,…</li>
 <li><b>En GitHub Actions</b> (o cualquier entorno headless), <b>matplotlib no tiene acceso a un display</b> y por defecto puede intentar usar un backend que requiere uno, lo que impide guardar imágenes.</li>
 </ul>
 </div>
 <ul class="org-ul">
-<li><a id="org2fa9392"></a>Backend headless necesario<br />
-<div class="outline-text-6" id="text-org2fa9392">
+<li><a id="org5217b49"></a>Backend headless necesario<br />
+<div class="outline-text-6" id="text-org5217b49">
 <p>
 Para guardar imágenes sin display, <b>matplotlib debe usar un backend como "Agg"</b>.
 </p>
@@ -624,15 +686,15 @@ Para guardar imágenes sin display, <b>matplotlib debe usar un backend como "Agg
 </li>
 </ul>
 </li>
-<li><a id="orgc2f90e6"></a>Solución: Forzar el backend "Agg" para matplotlib<br />
-<div class="outline-text-5" id="text-orgc2f90e6">
+<li><a id="org5de331b"></a>Solución: Forzar el backend "Agg" para matplotlib<br />
+<div class="outline-text-5" id="text-org5de331b">
 <p>
 Esto se puede hacer <b>sin modificar los bloques</b> añadiendo una configuración previa en tu flujo de trabajo o al comienzo de la ejecución.
 </p>
 </div>
 <ul class="org-ul">
-<li><a id="org95ab882"></a>Opción 1: Variable de entorno en el workflow<br />
-<div class="outline-text-6" id="text-org95ab882">
+<li><a id="orgae9c394"></a>Opción 1: Variable de entorno en el workflow<br />
+<div class="outline-text-6" id="text-orgae9c394">
 <p>
 Añade esto antes de ejecutar Emacs en tu `build.yml`:
 </p>
@@ -648,8 +710,8 @@ Matplotlib detectará esto y usará el backend adecuado.
 </p>
 </div>
 </li>
-<li><a id="orgfbc294c"></a>Opción 2: Variable de entorno en shell<br />
-<div class="outline-text-6" id="text-orgfbc294c">
+<li><a id="org73173a8"></a>Opción 2: Variable de entorno en shell<br />
+<div class="outline-text-6" id="text-org73173a8">
 <p>
 O directamente en el comando de ejecución:
 </p>
@@ -660,8 +722,8 @@ O directamente en el comando de ejecución:
 </div>
 </div>
 </li>
-<li><a id="org63429c5"></a>Opción 3: Configuración en Emacs/jupyter-python<br />
-<div class="outline-text-6" id="text-org63429c5">
+<li><a id="org68cdc76"></a>Opción 3: Configuración en Emacs/jupyter-python<br />
+<div class="outline-text-6" id="text-org68cdc76">
 <p>
 Si puedes modificar la configuración de Emacs que se carga, añade a tu init.el o a la cabecera de los bloques:
 </p>
@@ -681,8 +743,8 @@ Pero esto requeriría modificar los bloques, que quieres evitar.
 </li>
 </ul>
 </li>
-<li><a id="orgf4ad85a"></a>Resumen<br />
-<div class="outline-text-5" id="text-orgf4ad85a">
+<li><a id="orgb004b44"></a>Resumen<br />
+<div class="outline-text-5" id="text-orgb004b44">
 <ul class="org-ul">
 <li><b>El problema</b>: matplotlib necesita el backend "Agg" para funcionar headless.</li>
 <li><b>La solución sin modificar los bloques</b>: establece la variable de entorno `MPLBACKEND=Agg` en el workflow antes de ejecutar Emacs.</li>
@@ -706,11 +768,47 @@ El backend "Agg"  no me funcionó, por lo que opté por indicar explícitamente 
 </li>
 </ul>
 </div>
+<div id="outline-container-orgb2993dd" class="outline-4">
+<h4 id="orgb2993dd">Consulta sobre los núcleos de Jupyter</h4>
+<div class="outline-text-4" id="text-orgb2993dd">
+<p>
+Cuando ejecuto Actions en GitHub y Actions ejecuta un notebook de jupyter ¿En qué directorio lo hace? Me gustaria matar los procesos  python3 -m ipykernel_launcher tras ejecutar los notebooks
+</p>
+</div>
+<ul class="org-ul">
+<li><a id="orgc6cd2ff"></a>Respuesta<br />
+<div class="outline-text-5" id="text-orgc6cd2ff">
+<p>
+Cuando GitHub Actions ejecuta un notebook de Jupyter, lo hace en un entorno temporal que se crea para cada ejecución de la acción. Usualmente, el directorio de trabajo es el que se especifica en el archivo de configuración (`.yml`) de la acción, comúnmente en el directorio del repositorio.
+</p>
+
+<p>
+Si deseas matar los procesos de Jupyter después de que se ejecute un notebook en GitHub Actions, puedes agregar un paso en tu flujo de trabajo (workflow) que use un comando como `pkill` para terminar los procesos de Jupyter, tal como:
+</p>
+
+<p>
+```yaml
+</p>
+<ul class="org-ul">
+<li>name: Kill Jupyter processes
+run: pkill -f "python3 -m ipykernel_launcher"</li>
+</ul>
+<p>
+```
+</p>
+
+<p>
+Sin embargo, ten en cuenta que los entornos de GitHub Actions se eliminan después de que una ejecución finaliza, por lo que normalmente no es necesario matar procesos manualmente al final del trabajo.
+</p>
+</div>
+</li>
+</ul>
 </div>
 </div>
-<div id="outline-container-orgc4aae49" class="outline-2">
-<h2 id="orgc4aae49">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
-<div class="outline-text-2" id="text-orgc4aae49">
+</div>
+<div id="outline-container-org4e55a2e" class="outline-2">
+<h2 id="org4e55a2e">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
+<div class="outline-text-2" id="text-org4e55a2e">
 <p>
 Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
 </p>
@@ -730,9 +828,19 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
   <span style="font-style: italic;">"Publica un archivo Org como PDF tras ejecutar bloques de c&#243;digo."</span>
   (message <span style="font-style: italic;">"Exportando a PDF: %s"</span> filename)
   (<span style="font-weight: bold;">with-current-buffer</span> (find-file-noselect filename)
-    <span style="font-weight: bold; font-style: italic;">;</span><span style="font-weight: bold; font-style: italic;">(org-babel-execute-buffer)
-</span>    (org-latex-publish-to-pdf plist filename pub-dir)))
+    (org-babel-execute-buffer)
+    (sleep-for 20)
+    (save-buffer)
+    (org-latex-publish-to-pdf plist filename pub-dir)))
 
+<span style="font-weight: bold; font-style: italic;">;; </span><span style="font-weight: bold; font-style: italic;">(defun my-org-html-publish-to-html (plist filename pub-dir)
+</span><span style="font-weight: bold; font-style: italic;">;;   </span><span style="font-weight: bold; font-style: italic;">"Publica un archivo Org como PDF tras ejecutar bloques de c&#243;digo."
+</span><span style="font-weight: bold; font-style: italic;">;;   </span><span style="font-weight: bold; font-style: italic;">(message "Exportando a html: %s" filename)
+</span><span style="font-weight: bold; font-style: italic;">;;   </span><span style="font-weight: bold; font-style: italic;">(with-current-buffer (find-file-noselect filename)
+</span><span style="font-weight: bold; font-style: italic;">;;     </span><span style="font-weight: bold; font-style: italic;">(org-babel-execute-buffer)
+</span><span style="font-weight: bold; font-style: italic;">;;     </span><span style="font-weight: bold; font-style: italic;">(sleep-for 20)
+</span><span style="font-weight: bold; font-style: italic;">;;     </span><span style="font-weight: bold; font-style: italic;">(org-html-publish-to-html plist filename pub-dir)))
+</span>
 (<span style="font-weight: bold;">let*</span> ((base-directory <span style="font-style: italic;">"./"</span>))
   (<span style="font-weight: bold;">setq</span> org-publish-project-alist
         (append org-publish-project-alist
@@ -750,39 +858,39 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    <span style="font-weight: bold;">:with-toc</span> t
                    <span style="font-weight: bold;">:section-numbers</span> nil)
 
+                  (<span style="font-style: italic;">"pdf"</span>
+                   <span style="font-weight: bold;">:base-directory</span> <span style="font-style: italic;">"./Lecciones-tmp/"</span>
+                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"org"</span>
+                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs/Lecciones-pdf"</span>)
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">README.org</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">sitemap.org"</span>
+                   <span style="font-weight: bold;">:recursive</span> t
+                   <span style="font-weight: bold;">:auto-sitemap</span> nil
+                   <span style="font-weight: bold;">:publishing-function</span> my-org-latex-publish-to-pdf
+                   <span style="font-weight: bold;">:auto-preamble</span> t)
+                  
                   (<span style="font-style: italic;">"html"</span>
                    <span style="font-weight: bold;">:base-directory</span>  <span style="font-style: italic;">"./Lecciones-tmp/"</span>
                    <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"org"</span>
                    <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs/Lecciones-html"</span>)
-                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Calendario</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-lessons</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-practicas</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Lecciones-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Practicas-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">docs</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">chatCopilot.org</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-publish.org</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">README.org"</span>
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">README.org"</span>
                    <span style="font-weight: bold;">:recursive</span> t
-                   <span style="font-weight: bold;">:publishing-function</span> org-html-publish-to-html
-                   <span style="font-weight: bold;">:auto-preamble</span> t
+                   <span style="font-weight: bold;">:publishing-function</span> org-html-publish-to-html <span style="font-weight: bold; font-style: italic;">; </span><span style="font-weight: bold; font-style: italic;">my-org-html-publish-to-html ; 
+</span>                   <span style="font-weight: bold;">:auto-preamble</span> t
                    <span style="font-weight: bold;">:auto-sitemap</span> t
                    <span style="font-weight: bold;">:with-author</span> nil
                    <span style="font-weight: bold;">:with-creator</span> nil
                    <span style="font-weight: bold;">:with-toc</span> t
                    <span style="font-weight: bold;">:section-numbers</span> nil)
 
-                  (<span style="font-style: italic;">"pdf"</span>
-                   <span style="font-weight: bold;">:base-directory</span> <span style="font-style: italic;">"./Lecciones-tmp/"</span>
-                   <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"org"</span>
-                   <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs/Lecciones-pdf"</span>)
-                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-lessons</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-practicas</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">sitemap.org"</span>
-                   <span style="font-weight: bold;">:recursive</span> t
-                   <span style="font-weight: bold;">:auto-sitemap</span> nil
-                   <span style="font-weight: bold;">:publishing-function</span> my-org-latex-publish-to-pdf
-                   <span style="font-weight: bold;">:auto-preamble</span> t)
-                  
                   (<span style="font-style: italic;">"static-index"</span>
                    <span style="font-weight: bold;">:base-directory</span> ,base-directory
                    <span style="font-weight: bold;">:base-extension</span> <span style="font-style: italic;">"css</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">js</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">png</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">jpg</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">gif</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">dat</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">mov</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">txt</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">svg</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">aiff</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">inp"</span>
                    <span style="font-weight: bold;">:publishing-directory</span> ,(concat base-directory <span style="font-style: italic;">"docs"</span>)
-                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Calendario</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-lessons</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-practicas</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Lecciones-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Practicas-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">docs</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">chatCopilot.*</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-publish.*</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">README.org"</span>
+                   <span style="font-weight: bold;">:exclude</span> <span style="font-style: italic;">"src</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Calendario</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-lessons</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-practicas</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Lecciones-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">Practicas-tmp</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">docs</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">org-publish.*</span><span style="font-weight: bold; font-style: italic;">\\</span><span style="font-weight: bold; font-style: italic;">|</span><span style="font-style: italic;">README.org"</span>
                    <span style="font-weight: bold;">:recursive</span> t
                    <span style="font-weight: bold;">:publishing-function</span> org-publish-attachment)
 
-                  (<span style="font-style: italic;">"web-repositorio"</span> <span style="font-weight: bold;">:components</span> (<span style="font-style: italic;">"index"</span> <span style="font-style: italic;">"html"</span> <span style="font-style: italic;">"pdf"</span> <span style="font-style: italic;">"static-index"</span>)))))
+                  (<span style="font-style: italic;">"web-repositorio"</span> <span style="font-weight: bold;">:components</span> (<span style="font-style: italic;">"index"</span> <span style="font-style: italic;">"pdf"</span> <span style="font-style: italic;">"html"</span> <span style="font-style: italic;">"static-index"</span>)))))
 
   (message <span style="font-style: italic;">"&#128994; Iniciando publicaci&#243;n del &#237;ndice (web-repositorio)..."</span>)
   (org-publish <span style="font-style: italic;">"web-repositorio"</span> t)
@@ -801,9 +909,9 @@ Podemos chequear la versión local ejecutando en emacs el siguiente bloque
 </div>
 </div>
 </div>
-<div id="outline-container-orgf48a0da" class="outline-2">
-<h2 id="orgf48a0da">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
-<div class="outline-text-2" id="text-orgf48a0da">
+<div id="outline-container-orgb5aec55" class="outline-2">
+<h2 id="orgb5aec55">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
+<div class="outline-text-2" id="text-orgb5aec55">
 <p>
 Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
 </p>
@@ -885,9 +993,9 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
 </div>
 </div>
 </div>
-<div id="outline-container-org4bd5abb" class="outline-2">
-<h2 id="org4bd5abb">slides para GitHubpages</h2>
-<div class="outline-text-2" id="text-org4bd5abb">
+<div id="outline-container-orgc4832cb" class="outline-2">
+<h2 id="orgc4832cb">slides para GitHubpages</h2>
+<div class="outline-text-2" id="text-orgc4832cb">
 <p>
 Esta es la configuración para convertir los Notebooks de Jupyter en slides:
 </p>
@@ -929,13 +1037,13 @@ c.SlidesExporter.<span style="font-weight: bold; font-style: italic;">require_js
 </p>
 </div>
 </div>
-<div id="outline-container-org829cfc0" class="outline-2">
-<h2 id="org829cfc0">Directorio <code>.binder</code> para MyBinder</h2>
-<div class="outline-text-2" id="text-org829cfc0">
+<div id="outline-container-orgf9ef830" class="outline-2">
+<h2 id="orgf9ef830">Directorio <code>.binder</code> para MyBinder</h2>
+<div class="outline-text-2" id="text-orgf9ef830">
 </div>
-<div id="outline-container-orgae9df6a" class="outline-3">
-<h3 id="orgae9df6a">Fichero <code>environment.yml</code></h3>
-<div class="outline-text-3" id="text-orgae9df6a">
+<div id="outline-container-org6340413" class="outline-3">
+<h3 id="org6340413">Fichero <code>environment.yml</code></h3>
+<div class="outline-text-3" id="text-org6340413">
 <p>
 Dado que los notebooks del curso emplean algunos módulos de python, la ejecución online en <a href="https://mybinder.org/">MyBinder</a> de los correspondientes Notebooks de Jupyter requiere de la creación de un fichero que indique las dependencias necesarias para que se instale el software necesario (creo que <code>defaults</code> instala el latex necesario para los gráficos). 
 </p>
@@ -963,9 +1071,9 @@ dependencies:
 </div>
 </div>
 </div>
-<div id="outline-container-org749d3d3" class="outline-3">
-<h3 id="org749d3d3">Fichero <code>apt.txt</code></h3>
-<div class="outline-text-3" id="text-org749d3d3">
+<div id="outline-container-org9c17c7d" class="outline-3">
+<h3 id="org9c17c7d">Fichero <code>apt.txt</code></h3>
+<div class="outline-text-3" id="text-org9c17c7d">
 <p>
 Algunos gráficos de los notebooks usan \LaTeX{}. Este fichero indica a MyBinder qué paquetes debe instalar para cubrir las dependencias.
 </p>
@@ -984,7 +1092,7 @@ cm-super
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-09-02 Tue 14:30</p>
+<p class="date">Created: 2025-09-07 Sun 21:07</p>
 </div>
 </body>
 </html>
