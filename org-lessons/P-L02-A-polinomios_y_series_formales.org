@@ -1,18 +1,21 @@
 #    -*- mode: org -*-
 
-#+TITLE: Lección 2 --- polinomios y series formales
+#+TITLE: Practica lección 2 --- polinomios y series formales
 #+AUTHOR: Marcos Bujosa
 #+LANGUAGE: es
 #+OPTIONS: toc:nil
 # +OPTIONS: author:nil
 #+OPTIONS: date:nil
 
+#+TAGS: noexport pdfs
+#+EXCLUDE_TAGS: noexport
+
 # +PROPERTY: header-args :tangle ./guiones/lecc01-airlinePass.inp
 
 # +OPTIONS: :eval yes
 # +PROPERTY: header-args :eval yes
 
-#+INFOJS_OPT: view:overview
+# +INFOJS_OPT: view:overview
 
 # ###########
 # ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
@@ -37,16 +40,15 @@
 # (org-babel-tangle)
 # #+END_SRC
 
+#+LATEX: \maketitle
 
 #+BEGIN_SRC emacs-lisp :exports none :results silent
 (use-package ox-ipynb
   :load-path (lambda () (expand-file-name "ox-ipynb" scimax-dir)))
 (use-package htmlize)
-(org-babel-tangle)
+; (org-babel-tangle)
 #+END_SRC
 
-
-#+LATEX: \maketitle
 
 
 * Polinomios como series formales finitas
@@ -115,9 +117,7 @@ pinta(a)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[10 + 2z + 4z^{2} + 7z^{3} + 3z^{4}\]
-:END:
+: 96e053e4-f7c2-4107-a74a-da26ea0d5bcb
 
 
 Para ilustrar el producto por convolución también usaremos esta representación en forma de escalera tumbada y donde se destaca el coeficiente situado en la posición $0$.
@@ -127,11 +127,7 @@ a
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-$$\begin{array}{c|c|c|c|c|c|c|c|c} \hline \cdots 0 &
-{\color{blue}{\{10\}}} & 2 & 4 & 7 & 3 & 0 & 0 & \cdots
-\\\hline\end{array}$$
-:END:
+: 44ae5577-f340-46e8-a4bf-6f1b219d6739
 
 
 También usaremos representaciones gráfica de este tipo:
@@ -141,6 +137,7 @@ a.plot_serie(indices_previos_al_cogrado=2, title='$'+latex(a)+'$').savefig(image
 #+END_SRC
 
 #+RESULTS:
+: 66d04a5b-8119-402e-8ae6-e0830a236a49
 
 #+attr_org: :width 800
 #+attr_html: :width 600px
@@ -160,12 +157,7 @@ b
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[z^{4} + 2z^{5}\]
-$$\begin{array}{c|c|c|c|c|c|c|c|c|c} \hline \cdots 0 &
-{\color{blue}{\{0\}}} & 0 & 0 & 0 & 1 & 2 & 0 & 0 & \cdots
-\\\hline\end{array}$$
-:END:
+: 372714c3-c564-497b-bd73-e9f34c8e6db7
 
 
 
@@ -186,11 +178,7 @@ c
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[z^{-1} + 2\]
-$$\begin{array}{c|c|c|c|c|c} \hline \cdots 0 & 1 & {\color{blue}{\{2\}}}
-& 0 & 0 & \cdots \\\hline\end{array}$$
-:END:
+: 78c9a3ef-4b49-4eec-a347-10af7b104108
 
 
 
@@ -216,13 +204,7 @@ Fíjese que como el cogrado es negativo, esta secuencia NO es un polinomio.
     #+END_SRC
 
     #+RESULTS:
-    :RESULTS:
-    \[\begin{array}{c|c|c}
-{\color{blue}{z^0}} & z^{1} & z^{2} \\\hline\hline
-{\color{blue}{\{0\}}} & 1 & 2 \\\hline\hline
-{\color{blue}{\{1\}}} & -1 & 0 \\\hline
-\end{array}\]
-    :END:
+    : 93322556-b0a7-43de-9695-4742de3f1b7d
 
 El producto entre polinomios es un producto convolución.
 \[
@@ -235,9 +217,7 @@ pinta(SerieConPrincipio([1, 2], cogrado=1)*SerieConPrincipio([1,-1], cogrado=0))
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[z + z^{2} - 2z^{3}\]
-:END:
+: 2c03196d-5eeb-4076-b9d1-7f264ac1f764
 
 - Ejercicio B ::  Ejecute los siguientes pasos:
   - Multiplique el polinomio $x + 2x^{2} - x^{3}$ con el polinomio $x - x^{2} + x^{3}$.
@@ -251,13 +231,7 @@ pinta(SerieConPrincipio([1, 2], cogrado=1)*SerieConPrincipio([1,-1], cogrado=0))
     #+END_SRC
 
     #+RESULTS:
-    :RESULTS:
-    \[\begin{array}{c|c|c|c}
-{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} \\\hline\hline
-{\color{blue}{\{0\}}} & 1 & 2 & -1 \\\hline\hline
-{\color{blue}{\{0\}}} & 1 & -1 & 1 \\\hline
-\end{array}\]
-    :END:
+    : 18df6167-4d20-47c5-8ec8-eb6e5b9f960c
 
 El producto entre polinomios es un producto convolución.
 \[
@@ -270,9 +244,7 @@ pinta(SerieConPrincipio([1, 2,-1], cogrado=1)*SerieConPrincipio([1,-1, 1], cogra
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[z^{2} + z^{3} - 2z^{4} + 3z^{5} - z^{6}\]
-:END:
+: 575b903b-a6ba-4c3b-90a1-ead23ee73aca
 
 
 
@@ -296,9 +268,7 @@ pinta(p)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[1 -  az\]
-:END:
+: cff2aa01-ae38-46ee-bf21-8a76fc968166
 
 
 
@@ -309,9 +279,7 @@ pinta(p.inversa(número_coeficientes))
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[1 + az + a^{2}z^{2} + a^{3}z^{3} + a^{4}z^{4} + a^{5}z^{5} + a^{6}z^{6} + a^{7}z^{7} + a^{8}z^{8} + a^{9}z^{9} + a^{10}z^{10} + a^{11}z^{11} + \cdots\]
-:END:
+: 92cdc291-afed-4c69-9041-4797ce4f105d
 (donde hemos indicado el número de coeficientes que queremos mostrar, pero la secuencia tiene infinitos coeficientes no nulos si $a\ne0$; y por tanto NO es un polinomio si $a\ne0$).
 #+latex: \bigskip
 
@@ -330,9 +298,7 @@ pinta(q)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[z^{3} -  az^{4}\]
-:END:
+: c4638383-d75e-42d1-8a91-7f77a19492c3
 
 Su inversa con principio es
 #+BEGIN_SRC jupyter-python
@@ -340,9 +306,7 @@ pinta(q.inversa())
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[z^{-3} + az^{-2} + a^{2}z^{-1} + a^{3} + a^{4}z + \cdots\]
-:END:
+: 947699be-9c2c-4c24-8c85-dac4eac395de
 
 Que posee infinitos términos no nulos si $a\ne0$ (por tanto no puede ser un polinomio cuando $a\ne0$). Pero además tiene cogrado negativo (no es un polinomio ni siquiera cuando $a=0$).
 
@@ -475,13 +439,7 @@ EscalerasConvolucion(SerieConPrincipio([1,-2], cogrado=0),
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[\begin{array}{c|c|c|c|c|c|c|c}
-{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} & z^{4} & z^{5} & z^{6} & z^{7} \\\hline\hline
-{\color{blue}{\{1\}}} & -2 & 0 & 0 & 0 & 0 & 0 & 0 \\\hline\hline
-{\color{blue}{\{1\}}} & 2 & 4 & 8 & 16 & 32 & 64 & 128 \\\hline
-\end{array}\]
-:END:
+: a0f705f5-d318-489e-bc60-958d76e6e8f5
 
 Recuerde que el producto convolución entre secuencias es:
 \[
@@ -502,9 +460,7 @@ pinta(p * p.inversa())
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[1 -  a^{5}z^{5}\]
-:END:
+: f27aef84-ac6a-4bd2-b95b-f24e48bc8fe1
 
 
 
@@ -516,9 +472,7 @@ pinta(p * p.inversa(50))
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[1 -  a^{50}z^{50}\]
-:END:
+: 0125ebb0-15b8-45b7-867e-3f4e4c1b46ca
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 Con quinientos términos se anulan todos excepto el parámetro en la posición 500 (y el $1$ de la posición $0$):
@@ -528,9 +482,7 @@ pinta(p * p.inversa(500))
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[1 -  a^{500}z^{500}\]
-:END:
+: 6632ea1a-1354-4ad7-8b73-f17388089c22
 
 Dependiendo del valor de $a$, este producto puede estar arbitrariamente cerca, o arbitrariamente lejos de $1$ (dada la existencia del /n/-ésimo término $a^{n}$ donde $n$ es el número de coeficientes calculados)
 #+latex: \medskip
@@ -560,9 +512,7 @@ pinta(d)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[1.0 - 0.9z^{2} - 0.2z^{4} + 0.2z^{5}\]
-:END:
+: 97f320f7-afab-4c2f-baf1-36f183b99d7c
 
 #+BEGIN_SRC jupyter-python  :results silent
 d.inversa(35).subs((a,valor)).plot_serie(title=r'$(1.0 - 0.9z^{2} - 0.2z^{3} + 0.2z^{4})^{-\triangleright}$').savefig(imagenes_leccion + '/InversaPolinomio.png', dpi=300, bbox_inches='tight')
@@ -606,9 +556,7 @@ pinta(p2)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[1 -  az\]
-:END:
+: 0bb28634-d038-4e35-98e9-aa0501519067
 
 
 Su inversa $p^{\blacktriangleleft-}$ (en el conjunto de series /con final/) es:
@@ -617,9 +565,7 @@ pinta(p2.inversa())
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[\cdots -  \frac{1}{a^{5}}z^{-5} -  \frac{1}{a^{4}}z^{-4} -  \frac{1}{a^{3}}z^{-3} -  \frac{1}{a^{2}}z^{-2} -  \frac{1}{a}z^{-1}\]
-:END:
+: 453af1e2-7fdc-46a9-a4d4-b8d54235195e
 
 
 Fíjese que como el grado del polinomio ~p2~ es 1, el grado de $p^{\blacktriangleleft-}$ es $-1.$
@@ -753,13 +699,7 @@ EscalerasConvolucion(SerieConFinal([1,-Fraction(1,2)], grado=1),
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[\begin{array}{c|c|c|c|c|c|c|c|c|c}
-z^{-8} & z^{-7} & z^{-6} & z^{-5} & z^{-4} & z^{-3} & z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} \\\hline\hline
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & {\color{blue}{\{1\}}} & -1/2 \\\hline\hline
--256 & -128 & -64 & -32 & -16 & -8 & -4 & -2 & {\color{blue}{\{0\}}} & 0 \\\hline
-\end{array}\]
-:END:
+: 43503233-e88a-4dfc-810d-e1a2f0e92fd5
 
 Recuerde que el producto convolución entre secuencias es:
 \[
@@ -803,9 +743,7 @@ pinta(s_cp)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[z^{-1} - 0.1 - 0.75z\]
-:END:
+: abe7cfb3-c313-41c6-ab7b-c7721d1010b1
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -828,9 +766,7 @@ pinta(s_cf)
 #+END_SRC
 
 #+RESULTS:
-:RESULTS:
-\[z^{-1} - 0.1 - 0.75z\]
-:END:
+: ff734ac5-b079-412a-9577-0ac7f115cb17
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -854,10 +790,10 @@ Ambas son secuencias inversas de la expresión $z^{-1} - 0.1 - 0.75z$. Fíjese q
 (ox-ipynb-export-org-file-to-ipynb-file "P-L02-A-polinomios_y_series_formales.org")
 #+END_SRC
 
-#+BEGIN_SRC sh :results silent :eval yes
-# jupyter nbconvert --execute --inplace P-L02-A-polinomios_y_series_formales.ipynb
+#+BEGIN_SRC sh :results silent
+#jupyter nbconvert --execute --inplace P-L02-A-polinomios_y_series_formales.ipynb
 #+END_SRC
 
-#+BEGIN_SRC sh :results silent :eval yes
+#+BEGIN_SRC sh :results silent :eval no
 # jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute P-L02-A-polinomios_y_series_formales.ipynb
 #+END_SRC
