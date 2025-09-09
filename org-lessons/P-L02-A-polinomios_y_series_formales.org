@@ -117,19 +117,20 @@ def repr_png(tex, ImgFile):
 
 
 Recuerde que un polinomio tiene cogrado no negativo; por tanto la siguiente serie con principio y cogrado $0$ es un polinomio: 
-#+BEGIN_SRC jupyter-python 
+
+#+BEGIN_SRC jupyter-python :results raw
 a=SerieConPrincipio([10,2,4,7,3,0,0],0)
 pinta(a)
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[10 + 2z + 4z^{2} + 7z^{3} + 3z^{4}\]
+$$10 + 2z + 4z^{2} + 7z^{3} + 3z^{4}$$
 :END:
 
 
 Para ilustrar el producto por convolución también usaremos esta representación en forma de escalera tumbada y donde se destaca el coeficiente situado en la posición $0$.
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python :results raw
 a.RepEscalera=True
 a
 #+END_SRC
@@ -158,7 +159,7 @@ a.plot_serie(indices_previos_al_cogrado=2, title='$'+latex(a)+'$').savefig(image
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 La condición para que una secuencia sea un *polinomio* es que sea una serie formal (*/cogrado/ no negativo*) y que tenga final (*/grado/ finito*); consecuentemente, un polinomio solo tiene un /número finito de coeficientes no nulos/. Por tanto, también es polinomio la siguiente serie con principio, finita y con cogrado $4$:
-#+BEGIN_SRC jupyter-python #:display text/latex 
+#+BEGIN_SRC jupyter-python  :results raw
 b = SerieConPrincipio([1,2,0,0],4)
 pinta(b)
 b.RepEscalera=True
@@ -167,7 +168,7 @@ b
 
 #+RESULTS:
 :RESULTS:
-\[z^{4} + 2z^{5}\]
+$$z^{4} + 2z^{5}$$
 $$\begin{array}{c|c|c|c|c|c|c|c|c|c} \hline \cdots 0 &
 {\color{blue}{\{0\}}} & 0 & 0 & 0 & 1 & 2 & 0 & 0 & \cdots
 \\\hline\end{array}$$
@@ -191,7 +192,7 @@ b.plot_serie(indices_previos_al_cogrado=4, title='$'+latex(b)+'$').savefig(image
    :END:
 
 Sin embargo, esta serie con principio y cogrado $-1$ NO es un polinomio:
-#+BEGIN_SRC jupyter-python #:display text/latex
+#+BEGIN_SRC jupyter-python :results raw
 c=SerieConPrincipio([1,2,0,0],-1)
 pinta(c)
 c.RepEscalera=True
@@ -200,7 +201,7 @@ c
 
 #+RESULTS:
 :RESULTS:
-\[z^{-1} + 2\]
+$$z^{-1} + 2$$
 $$\begin{array}{c|c|c|c|c|c} \hline \cdots 0 & 1 & {\color{blue}{\{2\}}}
 & 0 & 0 & \cdots \\\hline\end{array}$$
 :END:
@@ -231,7 +232,7 @@ Fíjese que como el cogrado es negativo, esta secuencia NO es un polinomio.
     + Fíjese que agrega los términos de la misma potencia de \(x\).
   - Podemos realizar los mismos cálculos usando la siguiente representación, donde el coeficiente de cada potencia $k$ se calcula sumando los productos de los pares de números cuyos índices suman $k$.
 
-#+BEGIN_SRC jupyter-python :exports results
+#+BEGIN_SRC jupyter-python :exports results :results raw
 EscalerasConvolucion(SerieConPrincipio([1, 2], cogrado=1),
                      SerieConPrincipio([1,-1], cogrado=0))
 #+END_SRC
@@ -239,9 +240,9 @@ EscalerasConvolucion(SerieConPrincipio([1, 2], cogrado=1),
 #+RESULTS:
 :RESULTS:
 \[\begin{array}{c|c|c}
-{\color{blue}{z^0}} & z^{1} & z^{2} \\\hline\hline
-{\color{blue}{\{0\}}} & 1 & 2 \\\hline\hline
-{\color{blue}{\{1\}}} & -1 & 0 \\\hline
+{\color{blue}{z^0}} & z^{1} & z^{2} \hline\hline
+{\color{blue}{\{0\}}} & 1 & 2 \hline\hline
+{\color{blue}{\{1\}}} & -1 & 0 \hline
 \end{array}\]
 :END:
 
@@ -252,7 +253,7 @@ El producto entre polinomios es un producto convolución.
 \]
 Nótese que el /cogrado/ de la secuencia resultante necesariamente es /suma/ de los /cogrados/; y que el /grado/ del resultado necesariamente es /suma/ de los /grados/.
 
-#+BEGIN_SRC jupyter-python :exports results
+#+BEGIN_SRC jupyter-python :exports results :results raw
 display(SerieConPrincipio([1, 2], cogrado=1))
 display(SerieConPrincipio([1,-1], cogrado=0))
 display( SerieConPrincipio([1, 2], cogrado=1) * SerieConPrincipio([1,-1], cogrado=0) )
@@ -272,16 +273,16 @@ $z + z^{2} - 2z^{3}$
     + Fíjese que agrega los términos de la misma potencia de \(x\).
   - Podemos realizar los mismos cálculos usando la siguiente representación, donde el coeficiente de cada potencia $k$ se calcula sumando los productos de los pares de números cuyos índices suman $k$.
 
-#+BEGIN_SRC jupyter-python :exports results
+#+BEGIN_SRC jupyter-python :exports results  :results raw
 EscalerasConvolucion(SerieConPrincipio([1, 2,-1], cogrado=1), SerieConPrincipio([1,-1, 1], cogrado=1))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
 \[\begin{array}{c|c|c|c}
-{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} \\\hline\hline
-{\color{blue}{\{0\}}} & 1 & 2 & -1 \\\hline\hline
-{\color{blue}{\{0\}}} & 1 & -1 & 1 \\\hline
+{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} \hline\hline
+{\color{blue}{\{0\}}} & 1 & 2 & -1 \hline\hline
+{\color{blue}{\{0\}}} & 1 & -1 & 1 \hline
 \end{array}\]
 :END:
 
@@ -291,13 +292,13 @@ El producto entre polinomios es un producto convolución.
 \]
 Nótese que el /cogrado/ de la secuencia resultante necesariamente es /suma/ de los /cogrados/; y que el /grado/ del resultado necesariamente es /suma/ de los /grados/.
 
-#+BEGIN_SRC jupyter-python :exports results
+#+BEGIN_SRC jupyter-python :exports results  :results raw
 pinta(SerieConPrincipio([1, 2,-1], cogrado=1)*SerieConPrincipio([1,-1, 1], cogrado=1))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[z^{2} + z^{3} - 2z^{4} + 3z^{5} - z^{6}\]
+$$z^{2} + z^{3} - 2z^{4} + 3z^{5} - z^{6}$$
 :END:
 
 
@@ -315,27 +316,27 @@ a = symbols('a')
 #+END_SRC
 
 Definamos el polinomio $1 - az$ como una =SerieConPrincipio= con cogrado 0:
-#+BEGIN_SRC jupyter-python #:display text/latex
+#+BEGIN_SRC jupyter-python  :results raw
 p=SerieConPrincipio([1, -a],0)
 pinta(p)
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[1 -  az\]
+$$1 -  az$$
 :END:
 
 
 
 Su inversa $p^{-\triangleright}$ (en el conjunto de series /con principio/) es:
-#+BEGIN_SRC jupyter-python 
+#+BEGIN_SRC jupyter-python  :results raw
 número_coeficientes_a_mostar = 12
 pinta(p.inversa(número_coeficientes_a_mostar))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[1 + az + a^{2}z^{2} + a^{3}z^{3} + a^{4}z^{4} + a^{5}z^{5} + a^{6}z^{6} + a^{7}z^{7} + a^{8}z^{8} + a^{9}z^{9} + a^{10}z^{10} + a^{11}z^{11} + \cdots\]
+$$1 + az + a^{2}z^{2} + a^{3}z^{3} + a^{4}z^{4} + a^{5}z^{5} + a^{6}z^{6} + a^{7}z^{7} + a^{8}z^{8} + a^{9}z^{9} + a^{10}z^{10} + a^{11}z^{11} + \cdots$$
 :END:
 (recuerde que realmente la secuencia tiene infinitos coeficientes no nulos si $a \ne 0$; por lo tanto, NO es un polinomio si $a \ne 0$).
 #+latex: \bigskip
@@ -352,24 +353,24 @@ pinta(p.inversa(número_coeficientes_a_mostar))
 
 Fíjese que su inversa (/con principio/) tiene cogrado $0$ (el cogrado de la inversa es menos el cogrado de la serie. Veámoslo con un ejemplo: 
 
-#+BEGIN_SRC jupyter-python #:display text/latex
+#+BEGIN_SRC jupyter-python  :results raw
 q=SerieConPrincipio([1,-a],3)
 pinta(q)
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[z^{3} -  az^{4}\]
+$$z^{3} -  az^{4}$$
 :END:
 
 Su inversa con principio es
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python  :results raw
 pinta(q.inversa())
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[z^{-3} + az^{-2} + a^{2}z^{-1} + a^{3} + a^{4}z + \cdots\]
+$$z^{-3} + az^{-2} + a^{2}z^{-1} + a^{3} + a^{4}z + \cdots$$
 :END:
 
 Que posee infinitos términos no nulos si $a\ne0$ (por tanto no puede ser un polinomio cuando $a\ne0$). Pero además tiene cogrado negativo (no es un polinomio ni siquiera cuando $a=0$).
@@ -503,7 +504,7 @@ Nótese que no estamos multiplicando dos polinomios.
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
 Por ejemplo si el polinomio es $1-2z$:
 
-#+BEGIN_SRC jupyter-python :exports results
+#+BEGIN_SRC jupyter-python :exports results  :results raw
 EscalerasConvolucion(SerieConPrincipio([1,-2], cogrado=0),
                      SerieConPrincipio([1,-2], cogrado=0).inversa(8) )
 #+END_SRC
@@ -511,9 +512,9 @@ EscalerasConvolucion(SerieConPrincipio([1,-2], cogrado=0),
 #+RESULTS:
 :RESULTS:
 \[\begin{array}{c|c|c|c|c|c|c|c}
-{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} & z^{4} & z^{5} & z^{6} & z^{7} \\\hline\hline
-{\color{blue}{\{1\}}} & -2 & 0 & 0 & 0 & 0 & 0 & 0 \\\hline\hline
-{\color{blue}{\{1\}}} & 2 & 4 & 8 & 16 & 32 & 64 & 128 \\\hline
+{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} & z^{4} & z^{5} & z^{6} & z^{7} \hline\hline
+{\color{blue}{\{1\}}} & -2 & 0 & 0 & 0 & 0 & 0 & 0 \hline\hline
+{\color{blue}{\{1\}}} & 2 & 4 & 8 & 16 & 32 & 64 & 128 \hline
 \end{array}\]
 :END:
 
@@ -536,35 +537,35 @@ Así, el producto del polinomio por la serie calculada no es exactamente $1$, au
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 Si calculamos solo cinco términos de la inversa, se anulan todos los coeficientes excepto el quinto (y el $1$ de la posición $0$):
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python  :results raw
 pinta(p * p.inversa(5))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[1 -  a^{5}z^{5}\]
+$$1 -  a^{5}z^{5}$$
 :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
 Con solo cincuenta términos se anulan todos excepto el quincuagésimo (y el $1$ de la posición $0$):
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python  :results raw
 pinta(p * p.inversa(50))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[1 -  a^{50}z^{50}\]
+$$1 -  a^{50}z^{50}$$
 :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
 Con quinientos términos se anulan todos excepto el parámetro en la posición 500 (y el $1$ de la posición $0$):
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python :results raw
 pinta(p * p.inversa(500))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[1 -  a^{500}z^{500}\]
+$$1 -  a^{500}z^{500}$$
 :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
@@ -597,14 +598,14 @@ Fíjese que la serie ~p.inversa(500)~ solo tiene 500 términos no nulos; sin emb
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python :results raw
 d = SerieConPrincipio([1,  0, - 0.9, 0, - 0.2,  0.2],0)
 pinta(d)
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[1.0 - 0.9z^{2} - 0.2z^{4} + 0.2z^{5}\]
+$$1.0 - 0.9z^{2} - 0.2z^{4} + 0.2z^{5}$$
 :END:
 
 #+BEGIN_SRC jupyter-python  :results silent
@@ -639,7 +640,7 @@ d.inversa(35).subs((a,valor)).plot_serie(title=r'$(1.0 - 0.9z^{2} - 0.2z^{3} + 0
 Digo en general, pues si el grado y cogrado del polinomio son el mismo índice, la inversa sí es finita: $$(x^{2})*(x^{-2})=1.$$
 
 
-#+BEGIN_SRC jupyter-python :exports results
+#+BEGIN_SRC jupyter-python :exports results :results raw
 EscalerasConvolucion(SerieConPrincipio([1,], cogrado= 2),
                      SerieConPrincipio([1,], cogrado=-2) )
 #+END_SRC
@@ -647,9 +648,9 @@ EscalerasConvolucion(SerieConPrincipio([1,], cogrado= 2),
 #+RESULTS:
 :RESULTS:
 \[\begin{array}{c|c|c|c|c}
-z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} & z^{2} \\\hline\hline
-0 & 0 & {\color{blue}{\{0\}}} & 0 & 1 \\\hline\hline
-1 & 0 & {\color{blue}{\{0\}}} & 0 & 0 \\\hline
+z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} & z^{2} \hline\hline
+0 & 0 & {\color{blue}{\{0\}}} & 0 & 1 \hline\hline
+1 & 0 & {\color{blue}{\{0\}}} & 0 & 0 \hline
 \end{array}\]
 :END:
 
@@ -660,25 +661,25 @@ z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} & z^{2} \\\hline\hline
    :END:
 
 Ahora vamos a definir exactamente el mismo polinomio $1-ax$; pero en esta ocasión lo haremos como una =SerieConFinal= (con ~grado~ igual a 1).
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python :results raw
 p2=SerieConFinal([1,-a],1)
 pinta(p2)
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[1 -  az\]
+$$1 -  az$$
 :END:
 
 
 Su inversa $p^{\blacktriangleleft-}$ (en el conjunto de series /con final/) es:
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python :results raw
 pinta(p2.inversa())
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[\cdots -  \frac{1}{a^{5}}z^{-5} -  \frac{1}{a^{4}}z^{-4} -  \frac{1}{a^{3}}z^{-3} -  \frac{1}{a^{2}}z^{-2} -  \frac{1}{a}z^{-1}\]
+$$\cdots -  \frac{1}{a^{5}}z^{-5} -  \frac{1}{a^{4}}z^{-4} -  \frac{1}{a^{3}}z^{-3} -  \frac{1}{a^{2}}z^{-2} -  \frac{1}{a}z^{-1}$$
 :END:
 
 
@@ -809,7 +810,7 @@ Nótese que no estamos multiplicando dos polinomios.
 
 Por ejemplo si el polinomio es $1-\frac{1}{2}z$:
 
-#+BEGIN_SRC jupyter-python :exports results
+#+BEGIN_SRC jupyter-python :exports results :results raw
 EscalerasConvolucion(SerieConFinal([1,-Fraction(1,2)], grado=1),
                      SerieConFinal([1,-Fraction(1,2)], grado=1).inversa(8) )
 #+END_SRC
@@ -817,9 +818,9 @@ EscalerasConvolucion(SerieConFinal([1,-Fraction(1,2)], grado=1),
 #+RESULTS:
 :RESULTS:
 \[\begin{array}{c|c|c|c|c|c|c|c|c|c}
-z^{-8} & z^{-7} & z^{-6} & z^{-5} & z^{-4} & z^{-3} & z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} \\\hline\hline
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & {\color{blue}{\{1\}}} & -1/2 \\\hline\hline
--256 & -128 & -64 & -32 & -16 & -8 & -4 & -2 & {\color{blue}{\{0\}}} & 0 \\\hline
+z^{-8} & z^{-7} & z^{-6} & z^{-5} & z^{-4} & z^{-3} & z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} \hline\hline
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & {\color{blue}{\{1\}}} & -1/2 \hline\hline
+-256 & -128 & -64 & -32 & -16 & -8 & -4 & -2 & {\color{blue}{\{0\}}} & 0 \hline
 \end{array}\]
 :END:
 
@@ -860,7 +861,7 @@ Así pues, en Series Temporales, cuando se habla de "la" inversa de un polinomio
 Lo que hemos visto es un caso particular de las series con principio o las series con final (fíjese que los polinomios pertenecen a ambos tipos de secuencias a la vez).
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python
+#+BEGIN_SRC jupyter-python :results raw
 lista = [1, -.1, -.75]
 s_cp = SerieConPrincipio(lista, -1)
 pinta(s_cp)
@@ -868,7 +869,7 @@ pinta(s_cp)
 
 #+RESULTS:
 :RESULTS:
-\[z^{-1} - 0.1 - 0.75z\]
+$$z^{-1} - 0.1 - 0.75z$$
 :END:
 
 
