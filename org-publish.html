@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-09-08 Mon 18:46 -->
+<!-- 2025-09-09 Tue 08:13 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Publicación de los ficheros org en GitHub pages</title>
@@ -48,36 +48,36 @@
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org96d5a5d">Fichero <code>makefile</code></a>
+<li><a href="#orge2844fc">Fichero <code>makefile</code></a>
 <ul>
-<li><a href="#orga5169d4">Aclaraciones</a></li>
+<li><a href="#org2b67196">Aclaraciones</a></li>
 </ul>
 </li>
-<li><a href="#orge87ceda">Fichero <code>build.yml</code></a>
+<li><a href="#orgb3882c4">Fichero <code>build.yml</code></a>
 <ul>
-<li><a href="#orgac88326">Aclaraciones</a>
+<li><a href="#org042b62f">Aclaraciones</a>
 <ul>
-<li><a href="#orgc315695">Consulta a Copilot sobre la generación de figuras</a></li>
-<li><a href="#org84b387d">Consulta sobre los núcleos de Jupyter</a></li>
+<li><a href="#org81ca0a3">Consulta a Copilot sobre la generación de figuras</a></li>
+<li><a href="#org83856ab">Consulta sobre los núcleos de Jupyter</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgab4dd48">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
-<li><a href="#orgb42b9cf">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
-<li><a href="#orgf079a6a">slides para GitHubpages</a></li>
-<li><a href="#org2cabd5f">Directorio <code>.binder</code> para MyBinder</a>
+<li><a href="#org541a6e1">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
+<li><a href="#org36dea57">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></a></li>
+<li><a href="#org933da66">slides para GitHubpages</a></li>
+<li><a href="#orgb804540">Directorio <code>.binder</code> para MyBinder</a>
 <ul>
-<li><a href="#org80af52b">Fichero <code>environment.yml</code></a></li>
-<li><a href="#orgfd37cc7">Fichero <code>apt.txt</code></a></li>
+<li><a href="#orgf656a7a">Fichero <code>environment.yml</code></a></li>
+<li><a href="#orge64004a">Fichero <code>apt.txt</code></a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org96d5a5d" class="outline-2">
-<h2 id="org96d5a5d">Fichero <code>makefile</code></h2>
-<div class="outline-text-2" id="text-org96d5a5d">
+<div id="outline-container-orge2844fc" class="outline-2">
+<h2 id="orge2844fc">Fichero <code>makefile</code></h2>
+<div class="outline-text-2" id="text-orge2844fc">
 <p>
 Genera el directorio <code>docs</code> con los ficheros para GitPages con subdirectorios para los <code>CuadernosElectronicos</code>, <code>pdfs</code>, <code>Transparencias</code> y los ficheros con las lecciones en <code>html</code>.
 </p>
@@ -314,18 +314,18 @@ Genera el directorio <code>docs</code> con los ficheros para GitPages con subdir
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orga5169d4" class="outline-3">
-<h3 id="orga5169d4">Aclaraciones</h3>
-<div class="outline-text-3" id="text-orga5169d4">
+<div id="outline-container-org2b67196" class="outline-3">
+<h3 id="org2b67196">Aclaraciones</h3>
+<div class="outline-text-3" id="text-org2b67196">
 <p>
 El directorio <code>./Lecciones-tmp</code> es temporal (en el fichero <code>makefile</code> se hace referencia a él con <code>$(LECCIONES_tmp)</code>). En dicho directorio se ejecutan los notebooks. Los ficheros creados se copian en distintos subdirectorios del directorio de publicación <code>./docs</code> (en el fichero <code>makefile</code> es referenciado con <code>$(DOCS)</code> ). El subdirectorio <code>./docs</code> es el directorio de donde "cuelgan" las páginas web; dichas páginas se distribuyen desde la rama <code>gh-pages</code> del repositorio.
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orge87ceda" class="outline-2">
-<h2 id="orge87ceda">Fichero <code>build.yml</code></h2>
-<div class="outline-text-2" id="text-orge87ceda">
+<div id="outline-container-orgb3882c4" class="outline-2">
+<h2 id="orgb3882c4">Fichero <code>build.yml</code></h2>
+<div class="outline-text-2" id="text-orgb3882c4">
 <p>
 Contiene las instrucciones que ejecutará GitHub Actions en el repositorio cada vez que éste sea actualizado.
 </p>
@@ -368,6 +368,9 @@ jobs:
     - name: Install Python modules
       run: |
         pip install sympy numpy pandas matplotlib dataframe-image statsmodels seaborn scipy
+
+    - name: Exportar backend matplotlib
+      run: echo "MPLBACKEND=Agg" &gt;&gt; $GITHUB_ENV
 
     - name: Verify Jupyter Installation
       run: |
@@ -462,13 +465,13 @@ jobs:
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orgac88326" class="outline-3">
-<h3 id="orgac88326">Aclaraciones</h3>
-<div class="outline-text-3" id="text-orgac88326">
+<div id="outline-container-org042b62f" class="outline-3">
+<h3 id="org042b62f">Aclaraciones</h3>
+<div class="outline-text-3" id="text-org042b62f">
 </div>
 <ul class="org-ul">
-<li><a id="org9623059"></a>tlmgr<br />
-<div class="outline-text-5" id="text-org9623059">
+<li><a id="org4dd7ff9"></a>tlmgr<br />
+<div class="outline-text-5" id="text-org4dd7ff9">
 <p>
 Scimax intenta usar <code>tlmgr</code> para instalar paquetes de \(\LaTeX{}\), pero <code>Actions</code> de <code>GitHub</code> no lo permite. Las medidas tomadas para evitar este problema han sido 
 </p>
@@ -507,9 +510,9 @@ Quizá sea suficiente solo con esto segundo. Pero si quito el fichero <code>~/.e
 </div>
 </li>
 </ul>
-<div id="outline-container-orgc315695" class="outline-4">
-<h4 id="orgc315695">Consulta a Copilot sobre la generación de figuras</h4>
-<div class="outline-text-4" id="text-orgc315695">
+<div id="outline-container-org81ca0a3" class="outline-4">
+<h4 id="org81ca0a3">Consulta a Copilot sobre la generación de figuras</h4>
+<div class="outline-text-4" id="text-org81ca0a3">
 <p>
 Tuve dificultades para que la ejecución en GitHub Actions de los de los cuadernos electrónicos de Scimax creara las figuras. A continuación copio mi consulta a copilot: 
 </p>
@@ -546,10 +549,10 @@ Ahora, pasemos a analizar por qué el segundo bloque <b>no genera</b> el archivo
 <hr />
 </div>
 <ul class="org-ul">
-<li><a id="org92ed7a5"></a>Diagnóstico y causas probables<br />
+<li><a id="orgc0f7af9"></a>Diagnóstico y causas probables<br />
 <ul class="org-ul">
-<li><a id="orgcf291a3"></a>1. Diferencia clave entre ambos bloques<br />
-<div class="outline-text-6" id="text-orgcf291a3">
+<li><a id="org4c759f6"></a>1. Diferencia clave entre ambos bloques<br />
+<div class="outline-text-6" id="text-org4c759f6">
 <ul class="org-ul">
 <li><p>
 <b>Bloque que funciona:</b>
@@ -589,8 +592,8 @@ Ahora, pasemos a analizar por qué el segundo bloque <b>no genera</b> el archivo
 </ul>
 </div>
 </li>
-<li><a id="orge9bd889"></a>2. ¿Por qué falla el segundo bloque?<br />
-<div class="outline-text-6" id="text-orge9bd889">
+<li><a id="org358cee2"></a>2. ¿Por qué falla el segundo bloque?<br />
+<div class="outline-text-6" id="text-org358cee2">
 <ul class="org-ul">
 <li>El argumento `:file ./img/lecc01/PIB_UEM.png` espera que el último comando del bloque <b>guarde la imagen en ese path</b> (o devuelva una figura que org/jupyter pueda guardar ahí).</li>
 <li>El método `df1.plot(&hellip;).set_title(&hellip;)` crea y modifica una figura activa, pero <b>no la guarda</b>.</li>
@@ -603,15 +606,15 @@ Ahora, pasemos a analizar por qué el segundo bloque <b>no genera</b> el archivo
 </li>
 </ul>
 </li>
-<li><a id="orgb09abcb"></a>Solución recomendada<br />
-<div class="outline-text-5" id="text-orgb09abcb">
+<li><a id="org7e5a215"></a>Solución recomendada<br />
+<div class="outline-text-5" id="text-org7e5a215">
 <p>
 <b>Debes guardar la figura manualmente al path especificado</b>, y devolver ese path como resultado del bloque.
 </p>
 </div>
 <ul class="org-ul">
-<li><a id="orga78b17f"></a>Forma correcta:<br />
-<div class="outline-text-6" id="text-orga78b17f">
+<li><a id="orgb70ca47"></a>Forma correcta:<br />
+<div class="outline-text-6" id="text-orgb70ca47">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ax</span> = df1.plot(x=<span style="font-style: italic;">'obs'</span>, xlabel=<span style="font-style: italic;">''</span>, figsize=(15,4))
 ax.set_title(<span style="font-style: italic;">'PIB zona euro'</span>, fontsize=18)
@@ -626,8 +629,8 @@ plt.savefig(<span style="font-style: italic;">"./img/lecc01/PIB_UEM.png"</span>)
 </ul>
 </div>
 </li>
-<li><a id="org477ede6"></a>Alternativas<br />
-<div class="outline-text-6" id="text-org477ede6">
+<li><a id="org5b66d24"></a>Alternativas<br />
+<div class="outline-text-6" id="text-org5b66d24">
 <ul class="org-ul">
 <li>Si usas solo `:results file` sin `:file`, puedes devolver el nombre del archivo en la última línea.</li>
 <li>Siempre asegúrate de llamar a `plt.savefig()` <b>después</b> de crear el gráfico.</li>
@@ -638,8 +641,8 @@ plt.savefig(<span style="font-style: italic;">"./img/lecc01/PIB_UEM.png"</span>)
 </li>
 </ul>
 </li>
-<li><a id="orgced1102"></a>Resumen<br />
-<div class="outline-text-5" id="text-orgced1102">
+<li><a id="org0ec8f91"></a>Resumen<br />
+<div class="outline-text-5" id="text-org0ec8f91">
 <ul class="org-ul">
 <li>El bloque con `plt.savefig(&hellip;)` funciona porque guarda explícitamente la imagen.</li>
 <li>El bloque con pandas `plot` y solo `set_title()` <b>NO guarda la imagen</b>; debes añadir `plt.savefig()` y devolver el path.</li>
@@ -667,16 +670,16 @@ La diferencia entre tu entorno local y GitHub Actions suele deberse a <b>la conf
 <hr />
 </div>
 </li>
-<li><a id="org761dc39"></a>¿Por qué funciona localmente pero no en Actions?<br />
-<div class="outline-text-5" id="text-org761dc39">
+<li><a id="orgc5bd5bc"></a>¿Por qué funciona localmente pero no en Actions?<br />
+<div class="outline-text-5" id="text-orgc5bd5bc">
 <ul class="org-ul">
 <li><b>Localmente</b>, matplotlib tiene acceso a un entorno gráfico (X11, Wayland, etc.) y suele usar un backend como `TkAgg`, `Qt5Agg`,…</li>
 <li><b>En GitHub Actions</b> (o cualquier entorno headless), <b>matplotlib no tiene acceso a un display</b> y por defecto puede intentar usar un backend que requiere uno, lo que impide guardar imágenes.</li>
 </ul>
 </div>
 <ul class="org-ul">
-<li><a id="orgdce1bcd"></a>Backend headless necesario<br />
-<div class="outline-text-6" id="text-orgdce1bcd">
+<li><a id="org697ed8c"></a>Backend headless necesario<br />
+<div class="outline-text-6" id="text-org697ed8c">
 <p>
 Para guardar imágenes sin display, <b>matplotlib debe usar un backend como "Agg"</b>.
 </p>
@@ -686,15 +689,15 @@ Para guardar imágenes sin display, <b>matplotlib debe usar un backend como "Agg
 </li>
 </ul>
 </li>
-<li><a id="orga0bdce8"></a>Solución: Forzar el backend "Agg" para matplotlib<br />
-<div class="outline-text-5" id="text-orga0bdce8">
+<li><a id="org4b97269"></a>Solución: Forzar el backend "Agg" para matplotlib<br />
+<div class="outline-text-5" id="text-org4b97269">
 <p>
 Esto se puede hacer <b>sin modificar los bloques</b> añadiendo una configuración previa en tu flujo de trabajo o al comienzo de la ejecución.
 </p>
 </div>
 <ul class="org-ul">
-<li><a id="org1937630"></a>Opción 1: Variable de entorno en el workflow<br />
-<div class="outline-text-6" id="text-org1937630">
+<li><a id="org10e0240"></a>Opción 1: Variable de entorno en el workflow<br />
+<div class="outline-text-6" id="text-org10e0240">
 <p>
 Añade esto antes de ejecutar Emacs en tu `build.yml`:
 </p>
@@ -710,8 +713,8 @@ Matplotlib detectará esto y usará el backend adecuado.
 </p>
 </div>
 </li>
-<li><a id="orgfdd54ec"></a>Opción 2: Variable de entorno en shell<br />
-<div class="outline-text-6" id="text-orgfdd54ec">
+<li><a id="org300f14d"></a>Opción 2: Variable de entorno en shell<br />
+<div class="outline-text-6" id="text-org300f14d">
 <p>
 O directamente en el comando de ejecución:
 </p>
@@ -722,8 +725,8 @@ O directamente en el comando de ejecución:
 </div>
 </div>
 </li>
-<li><a id="org0fa07a9"></a>Opción 3: Configuración en Emacs/jupyter-python<br />
-<div class="outline-text-6" id="text-org0fa07a9">
+<li><a id="orga28b0a2"></a>Opción 3: Configuración en Emacs/jupyter-python<br />
+<div class="outline-text-6" id="text-orga28b0a2">
 <p>
 Si puedes modificar la configuración de Emacs que se carga, añade a tu init.el o a la cabecera de los bloques:
 </p>
@@ -743,8 +746,8 @@ Pero esto requeriría modificar los bloques, que quieres evitar.
 </li>
 </ul>
 </li>
-<li><a id="org6d1faae"></a>Resumen<br />
-<div class="outline-text-5" id="text-org6d1faae">
+<li><a id="org792ad97"></a>Resumen<br />
+<div class="outline-text-5" id="text-org792ad97">
 <ul class="org-ul">
 <li><b>El problema</b>: matplotlib necesita el backend "Agg" para funcionar headless.</li>
 <li><b>La solución sin modificar los bloques</b>: establece la variable de entorno `MPLBACKEND=Agg` en el workflow antes de ejecutar Emacs.</li>
@@ -768,16 +771,16 @@ El backend "Agg"  no me funcionó, por lo que opté por indicar explícitamente 
 </li>
 </ul>
 </div>
-<div id="outline-container-org84b387d" class="outline-4">
-<h4 id="org84b387d">Consulta sobre los núcleos de Jupyter</h4>
-<div class="outline-text-4" id="text-org84b387d">
+<div id="outline-container-org83856ab" class="outline-4">
+<h4 id="org83856ab">Consulta sobre los núcleos de Jupyter</h4>
+<div class="outline-text-4" id="text-org83856ab">
 <p>
 Cuando ejecuto Actions en GitHub y Actions ejecuta un notebook de jupyter ¿En qué directorio lo hace? Me gustaria matar los procesos  python3 -m ipykernel_launcher tras ejecutar los notebooks
 </p>
 </div>
 <ul class="org-ul">
-<li><a id="org978728d"></a>Respuesta<br />
-<div class="outline-text-5" id="text-org978728d">
+<li><a id="org5522e66"></a>Respuesta<br />
+<div class="outline-text-5" id="text-org5522e66">
 <p>
 Cuando GitHub Actions ejecuta un notebook de Jupyter, lo hace en un entorno temporal que se crea para cada ejecución de la acción. Usualmente, el directorio de trabajo es el que se especifica en el archivo de configuración (`.yml`) de la acción, comúnmente en el directorio del repositorio.
 </p>
@@ -806,9 +809,9 @@ Sin embargo, ten en cuenta que los entornos de GitHub Actions se eliminan despu�
 </div>
 </div>
 </div>
-<div id="outline-container-orgab4dd48" class="outline-2">
-<h2 id="orgab4dd48">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
-<div class="outline-text-2" id="text-orgab4dd48">
+<div id="outline-container-org541a6e1" class="outline-2">
+<h2 id="org541a6e1">Script <code>publica.el</code> de elisp para publicar las lecciones con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
+<div class="outline-text-2" id="text-org541a6e1">
 <p>
 Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
 </p>
@@ -909,9 +912,9 @@ Podemos chequear la versión local ejecutando en emacs el siguiente bloque
 </div>
 </div>
 </div>
-<div id="outline-container-orgb42b9cf" class="outline-2">
-<h2 id="orgb42b9cf">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
-<div class="outline-text-2" id="text-orgb42b9cf">
+<div id="outline-container-org36dea57" class="outline-2">
+<h2 id="org36dea57">Script <code>publica-practicas.el</code> de elisp para publicar las prácticas con formato <code>.org</code> como ficheros con formato <code>pdf</code> y <code>html</code></h2>
+<div class="outline-text-2" id="text-org36dea57">
 <p>
 Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
 </p>
@@ -993,9 +996,9 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
 </div>
 </div>
 </div>
-<div id="outline-container-orgf079a6a" class="outline-2">
-<h2 id="orgf079a6a">slides para GitHubpages</h2>
-<div class="outline-text-2" id="text-orgf079a6a">
+<div id="outline-container-org933da66" class="outline-2">
+<h2 id="org933da66">slides para GitHubpages</h2>
+<div class="outline-text-2" id="text-org933da66">
 <p>
 Esta es la configuración para convertir los Notebooks de Jupyter en slides:
 </p>
@@ -1037,13 +1040,13 @@ c.SlidesExporter.<span style="font-weight: bold; font-style: italic;">require_js
 </p>
 </div>
 </div>
-<div id="outline-container-org2cabd5f" class="outline-2">
-<h2 id="org2cabd5f">Directorio <code>.binder</code> para MyBinder</h2>
-<div class="outline-text-2" id="text-org2cabd5f">
+<div id="outline-container-orgb804540" class="outline-2">
+<h2 id="orgb804540">Directorio <code>.binder</code> para MyBinder</h2>
+<div class="outline-text-2" id="text-orgb804540">
 </div>
-<div id="outline-container-org80af52b" class="outline-3">
-<h3 id="org80af52b">Fichero <code>environment.yml</code></h3>
-<div class="outline-text-3" id="text-org80af52b">
+<div id="outline-container-orgf656a7a" class="outline-3">
+<h3 id="orgf656a7a">Fichero <code>environment.yml</code></h3>
+<div class="outline-text-3" id="text-orgf656a7a">
 <p>
 Dado que los notebooks del curso emplean algunos módulos de python, la ejecución online en <a href="https://mybinder.org/">MyBinder</a> de los correspondientes Notebooks de Jupyter requiere de la creación de un fichero que indique las dependencias necesarias para que se instale el software necesario (creo que <code>defaults</code> instala el latex necesario para los gráficos). 
 </p>
@@ -1071,9 +1074,9 @@ dependencies:
 </div>
 </div>
 </div>
-<div id="outline-container-orgfd37cc7" class="outline-3">
-<h3 id="orgfd37cc7">Fichero <code>apt.txt</code></h3>
-<div class="outline-text-3" id="text-orgfd37cc7">
+<div id="outline-container-orge64004a" class="outline-3">
+<h3 id="orge64004a">Fichero <code>apt.txt</code></h3>
+<div class="outline-text-3" id="text-orge64004a">
 <p>
 Algunos gráficos de los notebooks usan \LaTeX{}. Este fichero indica a MyBinder qué paquetes debe instalar para cubrir las dependencias.
 </p>
@@ -1092,7 +1095,7 @@ cm-super
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-09-08 Mon 18:46</p>
+<p class="date">Created: 2025-09-09 Tue 08:13</p>
 </div>
 </body>
 </html>
