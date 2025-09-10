@@ -301,13 +301,18 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y git emacs pandoc aspell aspell-en aspell-es zip gretl
+        sudo apt-get install -y git emacs pandoc aspell aspell-en aspell-es zip gretl wget
         pip install jupyter nbconvert
 
     - name: Crear carpeta e instalar la base de datos del Banco de España en Gretl
       run: |
         mkdir -p ~/.gretl/db
         cp -r db/* ~/.gretl/db/
+
+    - name: Crear carpeta e instalar arima_sim.gfn
+      run: |
+        mkdir -p ~/.gretl/functions
+        wget -O ~/.gretl/functions/arima_sim.gfn https://gretl.sourceforge.net/current_fnfiles/arima_sim.gfn	
 
     - name: Install Python modules
       run: |

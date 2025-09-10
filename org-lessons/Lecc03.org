@@ -399,7 +399,7 @@ Todas estas características resaltan la complejidad de los procesos subyacentes
 - sección cruzada :: asumimos que proceden de un el muestreo es aleatorio simple
   + i.e., los datos son realizaciones de variables aleatorias i.i.d.
 
-- series temporales :: dicha asunción resulta errónea
+- series temporales :: dicha asunción suele ser errónea
   + con frecuencia el nivel esperado (o la volatilidad) parece cambiar con $t$
   + con frecuencia hay dependencia temporal (correlación serial).
 
@@ -436,7 +436,7 @@ Si el proceso $\boldsymbol{X}$ fuera gaussiano, estos parámetros bastarían par
 
 - Necesitaríamos una muestra suficiente de cada $X_t$ para estimar los parámetros;
 
-  A cada $X_t$ le corresponden infinitos parámetros ($\mu_{t}$, $\;\sigma^2_{t}$, $\;\gamma_{t,{\color{OliveGreen}{k}}};\;\text{ donde } k\in\mathbb{Z}$);
+  A cada $X_t$ le corresponden infinitos parámetros: $\mu_{t}$, $\;\sigma^2_{t}$, $\;\gamma_{t,{\color{OliveGreen}{k}}};\;\text{ donde } k\in\mathbb{Z}$.
 
   Pero en una serie temporal $\boldsymbol{x}$ solo disponemos de /una/ realización para cada $X_t$.  
 
@@ -704,7 +704,8 @@ autocovarianzas es $$\boldsymbol{\gamma}(z)\;=\;\sigma^2
 z^0\;=\;(\ldots,0,0,\sigma^2,0,0,\ldots)$$
 
 - Es el proceso estacionario (no trivial) más sencillo.
-- *Este proceso es el pilar* sobre el que se construyen los demás procesos (débilmente) estacionarios.
+- *Este proceso es el pilar* sobre el que construiremos los procesos lineales.
+# demás procesos (débilmente) estacionarios.
 #+latex:\bigskip
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
@@ -778,14 +779,15 @@ estudio de este curso.
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
-Sea $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y sea
-$\;\boldsymbol{\psi}\in \ell^2\;$ una serie formal con _infinitos
-términos NO nulos_; entonces el proceso estocástico
-$\boldsymbol{\psi}*\boldsymbol{U}$, cuyos elementos son $$X_t
+Sea $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y sea $\;\boldsymbol{\psi}\in \ell^2\;$ una serie formal con _infinitos términos NO nulos_ y ${\color{#008000}{\psi_{0}=1}}$; 
+entonces el proceso estocástico $\boldsymbol{\psi}*\boldsymbol{U}$, cuyos elementos son 
+\[
+X_t
 \;=\;(\boldsymbol{\psi}*\boldsymbol{U})_t
 \;=\;\boldsymbol{\psi}(B)U_t \;=\;\sum_{j=0}^\infty \psi_j
-U_{t-j};\qquad t\in\mathbb{Z}$$ se denomina proceso de /media móvil
-infinita/ MA($\infty$).
+U_{t-j};\qquad t\in\mathbb{Z}
+\] 
+se denomina proceso de /media móvil infinita/ MA($\infty$).
 #+latex:\bigskip
 
 #+attr_ipynb: (slideshow . ((slide_type . slide)))
@@ -897,7 +899,7 @@ carece de sentido (pues la suma no converge).
 
    $$X_t=\boldsymbol{\phi}^{-1}(\mathsf{B})U_t=\sum_{j=0}^\infty a_j U_{t-j};\quad\text{donde } \boldsymbol{a}=\boldsymbol{\phi}^{-1}.$$
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
-   (¡de nuevo un proceso lineal causal!)
+   (¡de nuevo un proceso lineal causal! En particular es un MA($\infty$) pues ${\color{#008000}{a_0=1}}$ por ser ${\color{#008000}{\phi_{0}=1}}$) 
 #+latex:\bigskip
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
@@ -946,7 +948,7 @@ Consideremos un proceso $\boldsymbol{Y}$ con media
 distinta de cero, es decir, $$E(Y_t)=\mu\ne0$$ y definamos la
 secuencia constante $\boldsymbol{\mu}=\sum\limits_{j\in\mathbb{Z}} \mu
 z^j=(\ldots,\mu,\mu,\mu,\ldots)$. 
-\medskip
+#+latex:\medskip
 
 Decimos que $\boldsymbol{Y}$ es un proceso ARMA($p,q$) con media
 distinta de cero si $\boldsymbol{X}$ es ARMA($p,q$)
