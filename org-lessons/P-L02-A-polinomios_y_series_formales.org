@@ -60,9 +60,10 @@
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 El siguiente bloque de código es para que este cuaderno electrónico (notebook) cargue mi implementación de algunos objetos (no es una buena implementación, pero es suficiente para ilustrar algunas ideas). Puede consultar el código de mi [[file:./implementacion_series_formales.py][implementacion_series_formales.py]] en python con la definición las clases =SerieConPrincipio= y =SerieConFinal=:
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results silent
+#+BEGIN_SRC jupyter-python # :results silent
 %run -i src/implementacion_series_formales.py
 #+END_SRC
+
 # import warnings
 # warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -231,20 +232,27 @@ Fíjese que como el cogrado es negativo, esta secuencia NO es un polinomio.
     + Fíjese que multiplica cada elemento del primero por cada uno de los elementos del segundo.
     + Fíjese que agrega los términos de la misma potencia de \(x\).
   - Podemos realizar los mismos cálculos usando la siguiente representación, donde el coeficiente de cada potencia $k$ se calcula sumando los productos de los pares de números cuyos índices suman $k$.
+#+latex: \bigskip
 
-#+BEGIN_SRC jupyter-python :exports results :results raw
-EscalerasConvolucion(SerieConPrincipio([1, 2], cogrado=1),
-                     SerieConPrincipio([1,-1], cogrado=0))
+#+BEGIN_SRC jupyter-python :exports results
+display(Math(EscalerasConvolucion(SerieConPrincipio([1, 2], cogrado=1),
+                                  SerieConPrincipio([1,-1], cogrado=0))))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[\begin{array}{c|c|c}
-{\color{blue}{z^0}} & z^{1} & z^{2} \hline\hline
-{\color{blue}{\{0\}}} & 1 & 2 \hline\hline
-{\color{blue}{\{1\}}} & -1 & 0 \hline
-\end{array}\]
+\(\displaystyle \begin{array}{c|c|c}
+\hline
+{\color{blue}{z^0}} & z^{1} & z^{2} \\
+\hline\hline
+{\color{blue}{\{0\}}} & 1 & 2 \\
+\hline
+{\color{blue}{\{1\}}} & -1 & 0 \\
+\hline
+\end{array}\)
 :END:
+
+#+latex: \bigskip
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))  
 El producto entre polinomios es un producto convolución.
@@ -272,19 +280,27 @@ $z + z^{2} - 2z^{3}$
     + Fíjese que multiplica cada elemento del primero por cada uno de los elementos del segundo.
     + Fíjese que agrega los términos de la misma potencia de \(x\).
   - Podemos realizar los mismos cálculos usando la siguiente representación, donde el coeficiente de cada potencia $k$ se calcula sumando los productos de los pares de números cuyos índices suman $k$.
+#+latex: \bigskip
 
-#+BEGIN_SRC jupyter-python :exports results  :results raw
-EscalerasConvolucion(SerieConPrincipio([1, 2,-1], cogrado=1), SerieConPrincipio([1,-1, 1], cogrado=1))
+#+BEGIN_SRC jupyter-python :exports results
+display(Math(EscalerasConvolucion(SerieConPrincipio([1, 2,-1], cogrado=1),
+                                  SerieConPrincipio([1,-1, 1], cogrado=1))))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[\begin{array}{c|c|c|c}
-{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} \hline\hline
-{\color{blue}{\{0\}}} & 1 & 2 & -1 \hline\hline
-{\color{blue}{\{0\}}} & 1 & -1 & 1 \hline
-\end{array}\]
+\(\displaystyle \begin{array}{c|c|c|c}
+\hline
+{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} \\
+\hline\hline
+{\color{blue}{\{0\}}} & 1 & 2 & -1 \\
+\hline
+{\color{blue}{\{0\}}} & 1 & -1 & 1 \\
+\hline
+\end{array}\)
 :END:
+
+#+latex: \bigskip
 
 El producto entre polinomios es un producto convolución.
 \[
@@ -503,20 +519,27 @@ Nótese que no estamos multiplicando dos polinomios.
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
 Por ejemplo si el polinomio es $1-2z$:
+#+latex: \bigskip
 
-#+BEGIN_SRC jupyter-python :exports results  :results raw
-EscalerasConvolucion(SerieConPrincipio([1,-2], cogrado=0),
-                     SerieConPrincipio([1,-2], cogrado=0).inversa(8) )
+#+BEGIN_SRC jupyter-python :exports results 
+display(Math(EscalerasConvolucion(SerieConPrincipio([1,-2], cogrado=0),
+                                  SerieConPrincipio([1,-2], cogrado=0).inversa(8) )))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[\begin{array}{c|c|c|c|c|c|c|c}
-{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} & z^{4} & z^{5} & z^{6} & z^{7} \hline\hline
-{\color{blue}{\{1\}}} & -2 & 0 & 0 & 0 & 0 & 0 & 0 \hline\hline
-{\color{blue}{\{1\}}} & 2 & 4 & 8 & 16 & 32 & 64 & 128 \hline
-\end{array}\]
+\(\displaystyle \begin{array}{c|c|c|c|c|c|c|c}
+\hline
+{\color{blue}{z^0}} & z^{1} & z^{2} & z^{3} & z^{4} & z^{5} & z^{6} & z^{7} \\
+\hline\hline
+{\color{blue}{\{1\}}} & -2 & 0 & 0 & 0 & 0 & 0 & 0 \\
+\hline
+{\color{blue}{\{1\}}} & 2 & 4 & 8 & 16 & 32 & 64 & 128 \\
+\hline
+\end{array}\)
 :END:
+
+#+latex: \bigskip
 
 Recuerde que el producto convolución entre secuencias es:
 \[
@@ -638,22 +661,27 @@ d.inversa(35).subs((a,valor)).plot_serie(title=r'$(1.0 - 0.9z^{2} - 0.2z^{3} + 0
 #+latex: \medskip
 
 Digo en general, pues si el grado y cogrado del polinomio son el mismo índice, la inversa sí es finita: $$(x^{2})*(x^{-2})=1.$$
+#+latex: \bigskip
 
-
-#+BEGIN_SRC jupyter-python :exports results :results raw
-EscalerasConvolucion(SerieConPrincipio([1,], cogrado= 2),
-                     SerieConPrincipio([1,], cogrado=-2) )
+#+BEGIN_SRC jupyter-python :exports results
+display(Math(EscalerasConvolucion(SerieConPrincipio([1,], cogrado= 2),
+                                  SerieConPrincipio([1,], cogrado=-2) )))
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[\begin{array}{c|c|c|c|c}
-z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} & z^{2} \hline\hline
-0 & 0 & {\color{blue}{\{0\}}} & 0 & 1 \hline\hline
-1 & 0 & {\color{blue}{\{0\}}} & 0 & 0 \hline
-\end{array}\]
+\(\displaystyle \begin{array}{c|c|c|c|c}
+\hline
+z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} & z^{2} \\
+\hline\hline
+0 & 0 & {\color{blue}{\{0\}}} & 0 & 1 \\
+\hline
+1 & 0 & {\color{blue}{\{0\}}} & 0 & 0 \\
+\hline
+\end{array}\)
 :END:
 
+#+latex: \bigskip
 
 * Polinomio como secuencia con final y su secuencia inversa con final
    :PROPERTIES:
@@ -683,7 +711,7 @@ $$\cdots -  \frac{1}{a^{5}}z^{-5} -  \frac{1}{a^{4}}z^{-4} -  \frac{1}{a^{3}}z^{
 :END:
 
 
-Fíjese que como el grado del polinomio ~p2~ es 1, el grado de $p^{\blacktriangleleft-}$ es $-1.$
+Fíjese que como el grado del polinomio ~p2~ es 1, el grado de $p^{\blacktriangleleft-}$ es $-1$.
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 *Nota.* Al haber creado este polinomio como un elemento de la clase =SerieConFinal=, el procedimiento ~.inversa()~ genera la inversa como una serie con final (con grado). A esta inversa la hemos denotado con $p^{\blacktriangleleft-}$ en la lección correspondiente.
@@ -809,20 +837,27 @@ Nótese que no estamos multiplicando dos polinomios.
 \end{align*}
 
 Por ejemplo si el polinomio es $1-\frac{1}{2}z$:
+#+latex: \bigskip
 
-#+BEGIN_SRC jupyter-python :exports results :results raw
-EscalerasConvolucion(SerieConFinal([1,-Fraction(1,2)], grado=1),
-                     SerieConFinal([1,-Fraction(1,2)], grado=1).inversa(8) )
+#+BEGIN_SRC jupyter-python :exports results 
+display( Math( EscalerasConvolucion(SerieConFinal([1,-Fraction(1,2)], grado=1),
+                                         SerieConFinal([1,-Fraction(1,2)], grado=1).inversa(8) ) ) )
 #+END_SRC
 
 #+RESULTS:
 :RESULTS:
-\[\begin{array}{c|c|c|c|c|c|c|c|c|c}
-z^{-8} & z^{-7} & z^{-6} & z^{-5} & z^{-4} & z^{-3} & z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} \hline\hline
-0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & {\color{blue}{\{1\}}} & -1/2 \hline\hline
--256 & -128 & -64 & -32 & -16 & -8 & -4 & -2 & {\color{blue}{\{0\}}} & 0 \hline
-\end{array}\]
+\(\displaystyle \begin{array}{c|c|c|c|c|c|c|c|c|c}
+\hline
+z^{-8} & z^{-7} & z^{-6} & z^{-5} & z^{-4} & z^{-3} & z^{-2} & z^{-1} & {\color{blue}{z^0}} & z^{1} \\
+\hline\hline
+0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & {\color{blue}{\{1\}}} & -1/2 \\
+\hline
+-256 & -128 & -64 & -32 & -16 & -8 & -4 & -2 & {\color{blue}{\{0\}}} & 0 \\
+\hline
+\end{array}\)
 :END:
+
+#+latex: \bigskip
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 Recuerde que el producto convolución entre secuencias es:

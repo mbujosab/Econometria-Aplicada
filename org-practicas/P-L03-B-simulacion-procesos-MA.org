@@ -1,0 +1,449 @@
+#    -*- mode: org -*-
+
+#+Title: Lección 3.B - Simulación de procesos MA con una función de Gretl
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+# +PROPERTY: header-args :tangle ./guiones/lecc01-airlinePass.inp
+
+#+OPTIONS: :eval yes
+#+PROPERTY: header-args :eval yes
+
+#+INFOJS_OPT: view:overview
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+#+latex_class_options: [10pt]
+
+#+LATEX_HEADER: \usepackage[spanish]{babel}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+# +LaTeX_HEADER: \usepackage{framed}
+#+LaTeX_HEADER: \usepackage{listings}
+#+LaTeX_HEADER: \input{hansl.tex}
+#+LaTeX_HEADER: \lstnewenvironment{hansl-gretl}
+#+LaTeX_HEADER: {\lstset{language={hansl},basicstyle={\ttfamily\footnotesize},numbers,rame=single,breaklines=true}}
+#+LaTeX_HEADER: {}
+#+LaTeX_HEADER: \newcommand{\hansl}[1]{\lstset{language={hansl},basicstyle={\ttfamily\small}}\lstinline{#1}}
+
+#+LaTeX_HEADER: \lstset{backgroundcolor=\color{lightgray!20}, }
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no :eval yes
+(org-babel-tangle)
+#+END_SRC
+
+#+name: execute-gretl-practice
+#+PROPERTY: P-L03-B-simulacion-procesos-MA
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L03-B-simulacion-procesos-MA"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+#+begin_src gretl :tangle guiones/P-L03-B-simulacion-procesos-MA.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+# string directory = $(pwd) ~ "/P-L03-A-simulaciones"
+
+
+#+LATEX: \maketitle
+
+
+* Objetivo de la práctica
+
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-B-simulacion-procesos-MA.inp][P-L03-B-simulacion-procesos-MA.inp]] |
+
+En la práctica anterior hemos simulado procesos MA de manera rudimentaria. 
+En Gretl podemos definir funciones. 
+La ventaja de usar una función es que podemos simular los procesos MA de una manera más cómoda.
+
+*Objetivo*
+
+1. Escribir una función que, dado un polinomio MA, simule un proceso de media móvil.
+2. Usar la función en un bucle.
+
+
+* Actividad 1 - Conocer que se pueden definir funciones por parte del usuario
+
+El lenguaje de programación que acompaña a Gretl se denomina Hansl 
+(Hansl y Gretl van de la mano... como en el cuento).
+
+En los siguientes enlaces tiene abundante documentación 
+
+- https://users.wfu.edu/cottrell/hansl.pdf (artículo de Allin Cottrell, que es el autor de Gretl)
+- https://www.master203.com/wp-content/uploads/2023/06/Intro_to_Gretl.pdf  (una breve introducción al uso de Gretl vía scripts)
+- https://sourceforge.net/projects/gretl/files/manual/hansl-primer.pdf/download  (Manual de Hansl)
+- En el manual del Gretl tiene un capítulo dedicado a las funciones definidas por el usuario.
+
+Veamos un breve resumen sobre la definición de funciones.
+
+** Funciones definidas por el usuario
+
+#+latex: \noindent
+(/Lo que sigue está sacado del [[https://sourceforge.net/projects/gretl/files/manual/hansl-primer.pdf/download][manual de Hansl]]/.)
+#+latex: \bigskip
+
+La sintaxis para definir una función es la siguiente:
+
+#+BEGIN_SRC gretl :eval no
+function tipo nombre_funcion(parámetros)
+    cuerpo de la función
+end function
+#+END_SRC
+
+La línea inicial de la definición de función contiene los siguientes elementos, en estricto orden:
+
+1. La palabra clave =function=.
+2. =tipo=, que indica el tipo de valor que retorna la función, si corresponde. Debe ser uno de: =void= (si la función no retorna nada), =scalar=, =series=, =matrix=, =list=, =string=, =bundle=, o uno de los tipos de arreglo: =bundles=, =lists=, =matrices=, =strings=.
+3. =nombre_funcion=, el identificador único de la función. Los nombres de las funciones pueden tener hasta 31 caracteres, deben empezar con una letra y sólo pueden contener letras, números y guiones bajos (_). No pueden coincidir con los nombres de los comandos o funciones nativas.
+4. Los parámetros de la función, en forma de una lista separada por comas y entre paréntesis.
+
+Nota: los parámetros son la única forma en que una función hansl puede recibir algo “desde fuera”. En hansl no existen variables globales.
+
+Los parámetros de la función pueden ser de cualquiera de los siguientes tipos:
+
+| Tipo       | Descripción                                             |
+|------------+---------------------------------------------------------|
+| ~bool~     | variable escalar que actúa como interruptor Booleano    |
+| ~int~      | variable escalar que actúa como entero                  |
+| ~scalar~   | variable escalar                                        |
+| ~series~   | serie de datos                                          |
+| ~list~     | lista de nombres de series                              |
+| ~matrix~   | matriz o vector                                         |
+| ~string~   | variable o literal de texto                             |
+| ~bundle~   | contenedor multipropósito (ver sección correspondiente) |
+| ~matrices~ | arreglo de matrices (ver sección de arreglos)           |
+| ~bundles~  | arreglo de bundles                                      |
+| ~strings~  | arreglo de cadenas de texto                             |
+| ~arrays~   | arreglo de arreglos                                     |
+
+Cada parámetro debe incluir dos elementos: el especificador de tipo y el nombre por el cual será conocido dentro de la función. Por ejemplo:
+
+#+BEGIN_SRC gretl :eval no
+function scalar mi_funcion (series y, list xvars, bool parlanchin)
+#+END_SRC
+
+Puedes definir una función sin parámetros (a veces llamadas /rutinas/). En este caso, utiliza la palabra clave ~void~ en lugar de la lista de parámetros:
+
+#+BEGIN_SRC gretl :eval no
+function matrix mi_funcion2 (void)
+#+END_SRC
+
+**** COMMENT parámetros con asterisco
+
+Cada especificador de tipo, excepto ~list~ y ~string~, puede ser modificado anteponiendo un asterisco al nombre del parámetro, como en:
+
+#+BEGIN_SRC gretl :eval no
+function scalar mi_funcion (series *y, scalar *b)
+#+END_SRC
+
+La explicación de esta modificación está relacionada con el uso de argumentos tipo puntero en el lenguaje C (ver sección correspondiente del manual de Gretl).
+
+*** Cuerpo de la función
+
+El *cuerpo de la función* está compuesto por comandos de gretl o llamadas a funciones definidas por el usuario (es decir, las llamadas a funciones pueden estar anidadas). Una función puede llamarse a sí misma (es decir, las funciones pueden ser recursivas). 
+
+# El cuerpo de la función contiene (casi) cualquier código hansl, el cual debe calcular el valor de retorno, es decir, el valor que la función debe entregar. Toda variable declarada dentro de la función es local y dejará de existir al finalizar la función. (Sacado del Manual de Hansl)
+
+# Aunque el cuerpo de la función puede contener llamadas a otras funciones, no puede contener definiciones de funciones. Es decir, no se puede definir una función dentro de otra función. Para más detalles, consulta la sección correspondiente del manual. (Sacado del Manual de Gretl)
+
+El comando =return= se utiliza para detener la ejecución dentro de la función y entregar el resultado al código que llamó a la función. Esto suele hacerse al final del cuerpo de la función, pero no es obligatorio. La definición de la función debe terminar con la expresión =end function=, en una línea sola.
+
+☞ Atención: a diferencia de otros lenguajes (por ejemplo, Matlab o GAUSS), no puedes retornar múltiples salidas directamente desde una función. No obstante, puedes retornar un objeto que contenga múltiples elementos, como un arreglo (para salidas homogéneas) o un bundle (para elementos heterogéneos) y llenarlo con tantos objetos como desees.
+#+latex: \bigskip
+
+/He omitido bastante información. Para saber más, recurra a la documentación de Gretl y/o Hansl/.
+#+latex: \bigskip
+
+
+Para ver cómo funcionan las funciones en la práctica, vamos a crear una que simule procesos MA usando un polinomio mónico MA (es decir, que su primer componente es un $1$). 
+
+*** COMMENT Parámetros de función: refinamientos opcionales
+
+Además de los elementos requeridos mencionados antes, la especificación de un parámetro puede incluir los siguientes campos adicionales:
+
+- El modificador ~const~.
+- Para parámetros ~scalar~ o ~int~: valores mínimo, máximo y/o valor por defecto; o para ~bool~ solo valor por defecto. Además, para ~scalar~, un tamaño de paso.
+- Para argumentos opcionales distintos de ~scalar~, ~int~ y ~bool~, el valor especial por defecto ~null~.
+- Para todos los parámetros, una cadena descriptiva.
+- Para parámetros ~int~ con valor mínimo y máximo, un conjunto de etiquetas para asociar a los valores permitidos (etiquetas de valor).
+
+Las primeras tres opciones pueden ser útiles en varios contextos; las dos últimas son útiles si la función se empaqueta para usarse en la interfaz gráfica de gretl.
+
+- El modificador ~const~ debe preceder la especificación básica del parámetro, así:
+
+  #+BEGIN_SRC gretl :eval no
+  const matrix M
+  #+END_SRC
+
+  Esto indica que el argumento correspondiente no será modificado dentro de la función; gretl generará un error si se intenta modificarlo.
+
+- Valores mínimo, máximo y por defecto para tipos ~scalar~ o ~int~: estos valores siguen directamente al nombre del parámetro, entre corchetes y separados por dos puntos. Ejemplo, para un parámetro entero ~orden~ con mínimo 1, máximo 12 y por defecto 4:
+
+  #+BEGIN_SRC gretl :eval no
+  int orden[1:12:4]
+  #+END_SRC
+
+  Si deseas omitir algún campo, lo dejas vacío: ~[1::4]~ especifica mínimo 1 y por defecto 4, sin máximo. Si solo das un valor (sin ~:~), se toma como valor por defecto:
+
+  #+BEGIN_SRC gretl :eval no
+  int k[0]
+  #+END_SRC
+
+  Si quieres solo un mínimo de cero:
+
+  #+BEGIN_SRC gretl :eval no
+  int k[0::]
+  #+END_SRC
+
+  Para un parámetro ~bool~ (sus valores son 0 o distinto de cero), puedes indicar por defecto 1 (verdadero) o 0 (falso):
+
+  #+BEGIN_SRC gretl :eval no
+  bool verbose[0]
+  #+END_SRC
+
+- Cadena descriptiva: Aparecerá como ayuda para el usuario si la función está empaquetada y se llama desde la interfaz gráfica. Debe ir entre comillas dobles tras un espacio:
+
+  #+BEGIN_SRC gretl :eval no
+  series y "variable dependiente"
+  #+END_SRC
+
+- Etiquetas de valores: Sólo para parámetros ~int~ con mínimo y máximo especificados (número fijo de valores). Se usan en la interfaz gráfica en un menú desplegable. Van entre llaves, cada etiqueta entre comillas dobles y separadas por comas o espacios:
+
+  #+BEGIN_SRC gretl :eval no
+  int caso[1:3:1] {"Efectos fijos", "Modelo entre", "Efectos aleatorios"}
+  #+END_SRC
+
+- Tamaño de paso: Solo soportado en parámetros ~scalar~. Es relevante solo para la interfaz gráfica y se combina con los valores mínimo, máximo y por defecto. Permite que el selector visual cambie el valor por el paso indicado, por ejemplo:
+
+  #+BEGIN_SRC gretl :eval no
+  scalar x[1:10:4:0.1]
+  #+END_SRC
+
+Si se incluyen dos o más campos opcionales al final, deben darse en el orden antes mencionado: min/máx/defecto, descripción, etiquetas de valor. No se pueden incluir comillas dobles dentro de las cadenas descriptivas ni de etiquetas.
+
+Ejemplo completo de una función que usa todos los elementos anteriores:
+
+#+BEGIN_SRC gretl :eval no
+function matrix mi_funcion (series y "variable dependiente",
+                            list X "regresores",
+                            int p[0::1] "orden de rezago",
+                            int c[1:2:1] "criterio" {"AIC", "BIC"},
+                            bool quiet[0])
+#+END_SRC
+
+Una ventaja de especificar valores por defecto es que, en modo script o línea de comando, pueden omitirse los argumentos finales con valor por defecto. Por ejemplo, la función =mi_funcion= se podría invocar solo con =y= y =X=; implícitamente ~p = 1~, ~c = 1~ y ~quiet~ es falso.
+
+
+* Actividad 2 - Planificar la estructura de una función que simule procesos MA($q$)
+
+Ya simulamos procesos de media móvil en la práctica anterior. Por ello sabemos que necesitamos:
+- Simular un proceso de ruido blanco
+- Saber qué retardos vamos a emplear
+- Saber por qué parámetro se va a multiplicar cada retardo del proceso de ruido blanco
+La información relativa a los dos últimos pasos se puede obtener de un polinomio MA. Un modo de implementar un polinomio en un ordenador es con una secuencia (o vector) de números. 
+
+** Vectores y matrices (en Gretl son el mismo objeto)
+ 
+Gretl dispone de un tipo de objeto que denomina ~matrix~ (matriz) y que es un arreglo rectangular de números. Por eso usaremos una ~matrix~ con una única fila o una única columna en nuestra función. 
+
+Un ejemplo de matriz fila es 
+#+BEGIN_SRC gretl :eval no
+{1, 2, 3, 4}
+#+END_SRC
+donde los elementos (las columnas) son separados por comas. Un ejemplo de matriz columna es 
+#+BEGIN_SRC gretl :eval no
+{1; 2; 3; 4}
+#+END_SRC
+donde los elementos (las fila) son separados por comas. 
+#+latex: \bigskip
+
+En la /consola de gretl/ ejecute lo siguiente para comprobalo:
+#+BEGIN_SRC gretl :eval no
+print {1, 2, 3, 4}
+#+END_SRC
+luego
+#+BEGIN_SRC gretl :eval no
+print {1; 2; 3; 4}
+#+END_SRC
+y por último
+#+BEGIN_SRC gretl :eval no
+print {1, 2; 3, 4}
+#+END_SRC
+
+Con =cols(A)= obtenemos el número de columnas de la matriz ~A~; y con =rows(A)= el número de filas.
+
+Para obtener un elemento de una matriz fila o de una matriz columna, se escribe el nombre de la matriz seguido del índice de elemento que deseamos entre corchetes. Por ejemplo =A[3]= nos devuelve el tercer componente.
+
+(/El manual de Gretl tiene un capítulo dedicado a las matrices/.)
+
+** Estructura de nuestra función
+
+Así pues, como argumento de nuestra función usaremos una ~matrix~ con una única fila o columna que contenga los parámetros MA, y donde el primer parámetro sea un $1$. Llamaremos a este argumento =theta=. Es decir, nuestra función tendrá el siguiente aspecto
+
+#+BEGIN_SRC gretl :eval no
+# pseudo-código explicativo
+function series SimuladorMA(matrix theta)
+    Pasos a dar, que consisten en:
+    - simular un proceso de ruido blanco RW
+    - recorrer los valores contenidos en theta y para cada uno:
+        Agregar el múltiplos del correspondiente retardos de RW
+    - Devolver la serie temporal obtenida
+end function
+#+END_SRC
+
+** Un bucle para recorrer los parámetros MA
+
+El comando básico de hansl para crear bucles es (¡sorpresa!) =loop=, y tiene la forma:
+
+#+BEGIN_SRC gretl :eval no
+# pseudo-código explicativo
+loop <expresión-de-control> <opciones>
+    ...
+endloop
+#+END_SRC
+
+En otras palabras, la pareja de instrucciones =loop= y =endloop= encierra las sentencias que se repetirán. Por supuesto, los bucles pueden estar anidados. Se soportan varias variantes de la =<expresión-de-control>= para un bucle, como se muestra a continuación:
+
+1. Bucle incondicional
+2. Bucle while
+3. Bucle con índice
+4. Bucle foreach
+5. Bucle for
+
+
+Para nuestra función (en la que queremos recorrer lo componentes del vector =theta=) usaremos la modalidad =con índice=
+
+#+BEGIN_SRC gretl :eval no
+# pseudo-código explicativo
+loop i=1..cols(theta)
+    - En cada iteración el índice i aumenta en una unidad
+      (en la primera iteración vale 1).
+    - theta[i] tomará consecutivamente cada uno de los valores 
+      contenidos en la matriz theta.
+    - WN[1-i] es la serie temporal retardada [1-i] periodos; nótese
+      que WN y WN[0] son la misma serie temporal.
+endloop
+#+END_SRC
+
+- Es decir, si =theta= es la matriz fila ={1, 0.6, -0.3}=, el índice =i= recorrerá los valores $1$ a $3$. Por otra parte, =theta[2]= corresponderá al parámetro =0.6=. 
+
+- Como el polinomio MA correspondiente a esta matriz fila (o vector, si lo prefiere) es $1+0.6\,z-0.3\,z^2$, el /segundo/ parámetro corresponde al /primer retardo/. Consecuentemente en cada iteración, a la serie hay que añadirle =theta[i] * WN[1-i]=
+
+- Si llamamos =X= a la serie temporal que vamos a simular, inicialmente (y fuera del bucle) definiremos =X= como una serie temporal nula (~series X=0~). i.e., que solo contiene ceros.
+
+En cada iteración del bucle iremos añadiendo a =X= múltiplos del ruido blanco contemporáneos o retardados (según el índice =i= en cada iteración). Lo haremos con
+#+BEGIN_SRC gretl :eval no
+# pseudo-código explicativo
+series X = X + el_multiplo_del_retardo_de_RW_que_corresponda
+#+END_SRC
+Es decir, =X= es lo que fuera hasta el momento más el retardo del ruido blanco   =theta[i] * WN[1-i]= que corresponda a la vigente iteración del bucle.
+
+
+
+* Actividad 2 - Escribir nuestra función que simula procesos MA
+
+Para crear la función, primero hemos simulado manualmente algunos procesos MA (práctica anterior). Hemos analizado cómo sistematizar dichas simulaciones y qué estructura debería tener la función (argumentos y pasos necesarios). Tenga siempre presente que  el enfoque de programación implica primero planificar (es muy beneficioso esbozar ideas con lápiz y papel, y sin ordenador). También hay que consultar la documentación de las funciones que nos serán útiles para implementar nuestro plan. 
+Esta es la función:
+
+#+name: Función SimuladorMA
+#+BEGIN_SRC gretl :tangle ./guiones/P-L03-B-simulacion-procesos-MA.inp :eval no
+function series SimuladorMA(matrix theta)
+    # SimuladorMA(theta) simula un proceso MA(q), 
+    # donde theta es el polinomio (mónico) MA y q es su grado.
+    series WN = normal (0,1)
+    series X = 0
+
+    loop i=1..cols(theta)
+        # print i        # (descomente estos prints si no entiende el funcionamiento)
+        # print theta[i]
+        # print 1-i
+        X = X + theta[i]*WN(1-i)
+    endloop
+    
+    return X
+end function
+#+END_SRC
+
+Observará que he documentado la función y la naturaleza del argumento de entrada (es muy importante hacerlo siempre). También he incluido marcadores para visualizar los valores de determinadas variables en cada iteración. Estos están comentados porque no son esenciales, pero siéntase libre de descomentarlos (de esa manera, al ejecutar el código, podrá seguir cada paso para ver qué sucede). También los puede borrar. Veamos si funciona OK...
+
+#+BEGIN_SRC gretl :tangle ./guiones/P-L03-B-simulacion-procesos-MA.inp :eval no
+# establecemos la muestra
+nulldata 200
+setobs 12 1960:01 --time-series
+
+# Simulamos dos procesos MA usando nuestra función
+series X = SimuladorMA( {1, 0.9} )
+series Y = SimuladorMA( {1, 1.8, 0.9} )
+
+# Los graficamos juntos en un fichero 
+gnuplot X Y --time-series --with-lines  --output="MA2.png"
+
+#+END_SRC
+
+#+BEGIN_CENTER
+#+CAPTION: Figura con las dos series MA simuladas.
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[file:P-L03-B-simulacion-procesos-MA/MA2.png]]
+#+END_CENTER
+
+# +latex: \clearpage
+
+
+* Código completo de la práctica
+
+   | Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-B-simulacion-procesos-MA.inp][P-L03-B-simulacion-procesos-MA.inp]] |
+
+#+latex: \lstinputlisting{guiones/P-L03-B-simulacion-procesos-MA.inp}
+

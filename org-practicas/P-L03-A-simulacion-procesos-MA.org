@@ -1,0 +1,417 @@
+#    -*- mode: org -*-
+
+#+Title: Lección 3.A - Simulación de procesos MA de manera rudimentaria
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+# +PROPERTY: header-args :tangle ./guiones/lecc01-airlinePass.inp
+
+#+OPTIONS: :eval yes
+#+PROPERTY: header-args :eval yes
+
+#+INFOJS_OPT: view:overview
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+#+latex_class_options: [10pt]
+
+#+LATEX_HEADER: \usepackage[spanish]{babel}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+# +LaTeX_HEADER: \usepackage{framed}
+#+LaTeX_HEADER: \usepackage{listings}
+#+LaTeX_HEADER: \input{hansl.tex}
+#+LaTeX_HEADER: \lstnewenvironment{hansl-gretl}
+#+LaTeX_HEADER: {\lstset{language={hansl},basicstyle={\ttfamily\footnotesize},numbers,rame=single,breaklines=true}}
+#+LaTeX_HEADER: {}
+#+LaTeX_HEADER: \newcommand{\hansl}[1]{\lstset{language={hansl},basicstyle={\ttfamily\small}}\lstinline{#1}}
+
+#+LaTeX_HEADER: \lstset{backgroundcolor=\color{lightgray!20}, }
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no :eval yes
+(org-babel-tangle)
+#+END_SRC
+
+#+name: execute-gretl-practice
+#+PROPERTY: P-L03-A-simulacion-procesos-MA
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L03-A-simulacion-procesos-MA"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+#+begin_src gretl :tangle guiones/P-L03-A-simulacion-procesos-MA.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+# string directory = $(pwd) ~ "/P-L03-A-simulaciones"
+
+
+#+LATEX: \maketitle
+
+
+* Objetivo de la práctica
+
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-A-simulacion-procesos-MA.inp][P-L03-A-simulacion-procesos-MA.inp]] |
+
+*Objetivo*
+
+1. Simular un proceso de ruido blanco con distribución normal.
+2. Simular algunos procesos estocásticos de media móvil con procedimientos rudimentarios
+
+
+* Actividad 1 - Fijar el tamaño y fechas de la muestra
+
+Para simular series temporales es necesario establecer el tamaño de la muestra y a qué fechas corresponderán los datos simulados. Para lograrlo siga los siguientes pasos:
+
+- */~Archivo --> Nuevo conjunto de datos~/*
+- En la ventana emergente marcamos */~Serie temporal~/* y daremos un valor a */~T~/* (por ejemplo 300) y pulsaremos en */~Adelante~/*.
+- En una segunda ventana emergente indicaremos la frecuencia (por ejemplo trimestral) y pulsaremos en */~Adelante~/*.
+- En una tercera ventana emergente indicaremos la fecha de inicio de la muestra (por ejemplo el primer trimestre de 1960) y pulsaremos en */~Adelante~/*.
+- En una cuarta ventana emergente confirmaremos nuestra selección pulsando en */~Aplicar~/*.
+
+
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/
+(las líneas de documentación que comienzan con # no son necesarias):
+#+NAME: Lectura del fichero de datos
+#+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no
+### Establecemos la muestra para las simulaciones
+nulldata 300
+setobs 4 1960:01 --time-series
+#+end_src
+#+latex: }
+# nulldata --preserve 300
+
+
+* Actividad 2 - Simular un ruido blanco
+
+Gretl permite generar datos (pseudo)aleatorios con distintas distribuciones (teclee ~help randgen~ en la consola de Gretl para consultar la documentación sobre la /función/ ~randgen~). 
+Con los siguientes pasos generaremos un proceso de ruido blanco con distribución Normal$(0,1)$:
+
+- */~Añadir --> Variable aleatoria...~/*
+- En la ventana emergente pulsamos en la pestaña  */~Normal~/* e indicamos los valores para la media (~0~) y la desviación típica (~1~). También asignamos un nombre a la serie temporal generada (por ejemplo ~WN~).
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/O bien teclee en linea de comandos/: 
+#+NAME: Semilla y simulación ruido blanco
+#+BEGIN_SRC gretl :eval no
+# set seed 2025   # (si quiere generar siempre los mismos números fije la semilla a un valor concreto)
+series WN = normal(0,1)
+#+END_SRC
+
+#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none :noweb yes
+### Simulamos una serie temporal de ruido blanco con distribución normal
+<<Semilla y simulación ruido blanco>> 
+#+end_src
+
+#+latex: \noindent
+(la función ~randgen~ permite simular un montón de distribuciones, 
+pero en el script hemos empleado una función dedicada específicamente a la simulación de datos con distribución normal $N(\mu,\sigma)$. Teclee ~help normal~ para consultar su documentación.
+Si quiere usar otras distribuciones, use la función ~randgen~ siguiendo las instrucciones indicadas en la documentación).
+#+latex: }
+
+
+* Actividad 3 - Visualizar los datos generados y sus estadísticos
+
+Ya vimos en las prácticas anteriores cómo hacerlo (pinchando sobre la serie en cuestión con el botón derecho del ratón y seleccionando la opción apropiada del menú desplegable que aparece).
+
+#+latex: {\vspace{4pt} \footnotesize \color{gray!70!black}
+/O bien teclee en linea de comandos/:
+#+begin_src gretl  :eval no
+summary WN --simple
+RuidoBlanco <- gnuplot WN --time-series --with-lines
+#+end_src
+(En el guion [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-A-simulaciones.inp][P-L03-A-simulaciones.inp]], se muestra un procedimiento diferente que guarda los estadísticos en un archivo y el gráfico en otro, sin generar iconos.
+He utilizado los ficheros generados para poder mostrar los resultados a continuación).
+#+latex: }
+
+# El siguiente código hace lo mismo que el anterior pero guarda los resultados en sendos ficheros para poder ser visualizados en este documento.
+#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+### Estadísticos descriptivos básicos y gráfico
+outfile --quiet EstadisticosWN.txt
+    summary WN --simple
+end outfile
+gnuplot WN --time-series --with-lines  --output="WN.png"
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./P-L03-A-simulacion-procesos-MA/EstadisticosWN.txt example
+#+latex: }
+
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.55\textwidth :center
+[[file:P-L03-A-simulacion-procesos-MA/WN.png]]
+#+END_CENTER
+
+
+Observe que la media y la desviación típica muestrales no coinciden con los parámetros establecidos al generar los números aleatorios. Sin embargo, dado que estos estadísticos son buenos estimadores de los momentos teóricos de la distribución utilizada para crear los datos, sus valores se encuentran muy próximos a los parámetros establecidos en la simulación. 
+
+Dado que la semilla que he utilizado es diferente de la suya, los números (pseudo)aleatorios que usted ha obtenido resultarán distintos. Como consecuencia, también variarán los estadísticos y su gráfico, aunque lo que usted obtenga se asemejará bastante a lo que se presenta aquí.).
+
+
+** Un proceso de ruido blanco es estacionario
+
+Al ser =WN= la realización de un proceso de ruido blanco, cabe esperar que los estadísticos correspondientes a la primera mitad de la muestra se parezcan a los de la segunda.
+
+*** Restrinja la muestra a la primera mitad y visualice los estadísticos descriptivos
+
+- */~Muestra --> Establecer rango~/*
+- La ventana emergente cambie la fecha =Final= a =1997:2=
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+  /O bien teclee en linea de comandos/:
+  #+begin_src gretl :eval no 
+smpl 1960:4 1997:2
+summary WN --simple
+  #+end_src
+  #+latex: }
+- Observe los estadísticos descriptivos de =WN=
+
+# El siguiente código hace lo mismo que el anterior pero guarda los resultados
+#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+### Estadísticos descriptivos básicos para la submuestra hasta 1997:2
+smpl 1960:4 1997:2
+outfile --quiet EstadisticosWN-1992.txt
+    summary WN --simple
+end outfile
+#+END_SRC
+
+
+#+latex: {\footnotesize
+#+include: ./P-L03-A-simulacion-procesos-MA/EstadisticosWN-1992.txt example
+#+latex: }
+
+
+*** Restrinja la muestra a la segunda mitad, visualice los estadísticos descriptivos y compárelos con los anteriores
+
+Para ello antes hay que recuperar el rango completo... 
+
+- */~Muestra --> Recuperar el rango completo~/*
+- */~Muestra --> Establecer rango~/*
+- La ventana emergente cambie la fecha =Inicio= a =1997:3=
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+  /O bien teclee en linea de comandos/:
+  #+begin_src gretl :eval no 
+smpl 1997:3 2034:4
+summary WN --simple
+  #+end_src
+  #+latex: }
+- Observe los estadísticos descriptivos de =WN=
+
+# El siguiente código hace lo mismo que el anterior pero guarda los resultados
+#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+### Estadísticos descriptivos básicos para la submuestra desde 1997:3
+smpl 1997:3 2034:4
+outfile --quiet EstadisticosWN-2034.txt
+    summary WN --simple
+end outfile
+#+END_SRC
+
+
+#+latex: {\footnotesize
+#+include: ./P-L03-A-simulacion-procesos-MA/EstadisticosWN-2034.txt example
+#+latex: }
+
+
+* Actividad 2 - Generar procesos de media móvil
+
+Simulemos un proceso MA(1) a partir de la simulación de ruido blanco anterior; por ejemplo, el proceso:
+\[
+ X_t = U_t - \theta_1 U_{t-1},\quad \text{con } U_t\sim N(0,1) \text{ y } \theta_1 = 0.8.
+\]
+Lo primero de todo, recuperemos la muestra completa:
+- */~Muestra --> Recuperar el rango completo~/*
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+  /O bien teclee en linea de comandos/:
+  #+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no 
+### Recuperamos la muestra completa antes de generar una nueva serie temporal
+smpl 1960:4 2034:4
+  #+end_src
+  #+latex: }
+
+Y ahora simulemos el proceso de media móvil:
+
+- */~Añadir --> Definir nueva variable~/*
+- En la ventana emergente escribimos =X = WN + 0.8*WN(-1)=
+
+  (donde =WN(-1)= denota la serie =WN= retrasada un periodo).
+  
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+  /O bien teclee en linea de comandos/:
+  #+NAME: Guardamos scatterplot como icono
+  #+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no 
+### La serie X es la realización de un proceso MA(1)
+series X = WN + 0.8*WN(-1)
+  #+end_src
+  #+latex: }
+
+** Dibuje el proceso MA(1) que ha simulado y observe sus estadísticos
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl  :eval no
+MA1 <- gnuplot X --time-series --with-lines
+summary X --simple
+#+end_src
+#+latex: }
+
+# El siguiente código guarda los resultados.
+#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+### Gráfico y estadísticos descriptivos básicos
+gnuplot X --time-series --with-lines  --output="MA1.png"
+outfile --quiet EstadisticosMA1.txt
+    summary X --simple
+end outfile
+#+END_SRC
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.55\textwidth :center
+[[file:P-L03-A-simulacion-procesos-MA/MA1.png]]
+#+END_CENTER
+
+#+latex: {\footnotesize
+#+include: ./P-L03-A-simulacion-procesos-MA/EstadisticosMA1.txt example
+#+latex: }
+
+** Un proceso de ruido blanco es estacionario
+
+Al ser =WN= la realización de un proceso de ruido blanco, cabe esperar que los estadísticos correspondientes a la primera mitad de la muestra se parezcan a los de la segunda.
+
+*** Restrinja la muestra a la primera mitad y visualice los estadísticos descriptivos
+
+- */~Muestra --> Establecer rango~/*
+- La ventana emergente cambie la fecha =Final= a =1997:2=
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+  /O bien teclee en linea de comandos/:
+  #+begin_src gretl :eval no 
+smpl 1960:4 1997:2
+summary X --simple
+  #+end_src
+  #+latex: }
+
+- Observe los estadísticos descriptivos de =X=
+
+# El siguiente código hace lo mismo que el anterior pero guarda los resultados
+#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+### Estadísticos descriptivos básicos para la submuestra hasta 1997:2
+smpl 1960:4 1997:2
+outfile --quiet EstadisticosMA1-1992.txt
+    summary X --simple
+end outfile
+#+END_SRC
+
+
+#+latex: {\footnotesize
+#+include: ./P-L03-A-simulacion-procesos-MA/EstadisticosMA1-1992.txt example
+#+latex: }
+
+
+*** Restrinja la muestra a la segunda mitad, visualice los estadísticos descriptivos y compárelos con los anteriores
+
+Para ello antes hay que recuperar el rango completo... 
+
+- */~Muestra --> Recuperar el rango completo~/*
+- */~Muestra --> Establecer rango~/*
+- La ventana emergente cambie la fecha =Inicio= a =1997:3=
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+  /O bien teclee en linea de comandos/:
+  #+begin_src gretl :eval no 
+smpl 1997:3 2034:4
+summary X --simple
+  #+end_src
+  #+latex: }
+
+- Observe los estadísticos descriptivos de =X=
+
+# El siguiente código hace lo mismo que el anterior pero guarda los resultados
+#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+### Estadísticos descriptivos básicos para la submuestra desde 1997:3
+smpl 1997:3 2034:4
+outfile --quiet EstadisticosMA1-2034.txt
+    summary X --simple
+end outfile
+#+END_SRC
+
+
+#+latex: {\footnotesize
+#+include: ./P-L03-A-simulacion-procesos-MA/EstadisticosMA1-2034.txt example
+#+latex: }
+
+* Por su cuenta
+
+- Genere una serie temporal =Y= que sea la realización de un MA(1) con parámetro distinto; por ejemplo con $\theta_1 = -0.8$.
+- Genere una serie temporal =Z= que sea la realización de un MA(2).
+- Genere una serie temporal =W= que sea la realización de un MA(3).
+- Genere más ejemplos con distintos órdenes y/o parámetros.
+
+En cada caso genere los gráficos y los estadísticos. 
+Compare los estadísticos de las distintas sub-muestras. 
+#+latex: \medskip
+
+Comprobará que en todos los casos los estadísticos de la primera parte de la muestra serán similares a los de la segunda,
+pues los procesos MA siempre son estacionarios.
+
+
+* Código completo de la práctica
+
+   | Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-A-simulacion-procesos-MA.inp][P-L03-A-simulacion-procesos-MA.inp]] |
+
+#+latex: \lstinputlisting{guiones/P-L03-A-simulacion-procesos-MA.inp}
+

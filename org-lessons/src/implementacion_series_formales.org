@@ -1103,22 +1103,22 @@ def EscalerasConvolucion(secuencia1,secuencia2):
     serie1, origen1 = secuencia1.coeficientesEscalera()
     serie2, origen2 = secuencia2.coeficientesEscalera()
     
-    negativos1 = serie1[:origen1]
-    negativos2 = serie2[:origen2]
+    negativos1 = [str(c) for c in serie1[:origen1]]
+    negativos2 = [str(c) for c in serie2[:origen2]]
     negativos = max(len(negativos1), len(negativos2))
-    lista1neg = [0]*(negativos-len(negativos1)) + negativos1 # añadimos ceros si no hay suficientes coeficientes a la izquierda del origen
-    lista2neg = [0]*(negativos-len(negativos2)) + negativos2 # añadimos ceros si no hay suficientes coeficientes a la izquierda del origen
+    lista1neg = ['0']*(negativos-len(negativos1)) + negativos1 # añadimos ceros si no hay suficientes coeficientes a la izquierda del origen
+    lista2neg = ['0']*(negativos-len(negativos2)) + negativos2 # añadimos ceros si no hay suficientes coeficientes a la izquierda del origen
     cabeceraNeg = [r'z^{-' + str(i+1) +r'}' for i in reversed(range(len(lista1neg))) ]
     
     lista1origen = [r'{\color{blue}{\{' + str(serie1[origen1]) + '\}}}'] # destacamos el coeficiente situado en el origen
     lista2origen = [r'{\color{blue}{\{' + str(serie2[origen2]) + '\}}}'] # destacamos el coeficiente situado en el origen
     cabeceraOrigen = [r'{\color{blue}{z^0}}']
     
-    positivos1 = serie1[origen1+1:]
-    positivos2 = serie2[origen2+1:]
+    positivos1 = [str(c) for c in serie1[origen1+1:]]
+    positivos2 = [str(c) for c in serie2[origen2+1:]]
     positivos = max(len(positivos1), len(positivos2))
-    lista1pos = positivos1 + [0]*(positivos-len(positivos1)) #[0 if i>len(lista1)-1 else lista1[i] for i in range(positivos)]
-    lista2pos = positivos2 + [0]*(positivos-len(positivos2)) #=[0 if i>len(lista2)-1 else lista2[i] for i in range(positivos)]
+    lista1pos = positivos1 + ['0']*(positivos-len(positivos1))
+    lista2pos = positivos2 + ['0']*(positivos-len(positivos2))
     cabeceraPos = [r'z^{' + str(i+1) +r'}' for i,_ in (enumerate(lista1pos)) ]
     
     coeficientes1 = lista1neg + lista1origen + lista1pos
@@ -1127,18 +1127,26 @@ def EscalerasConvolucion(secuencia1,secuencia2):
     
     # Consigue el tamaño para la alineación de las columnas
     size = len(coeficientes1)-1
-    
+    contenidoCabecera = ' & '.join(cabecera)
+    contenidoCoeficientes1 = ' & '.join(coeficientes1)
+    contenidoCoeficientes2 = ' & '.join(coeficientes2)
+
     # Comenzamos a escribir la matriz en LaTeX
-    #latex_matrix = "\\begin{array}{|" + "c|"*size + "}\n" #\n\\hline\n"
-    latex_matrix = "\\begin{array}{" + "c|"*size + "c}\n" #\n\\hline\n"
-    latex_matrix += " & ".join(str(x) for x in cabecera) + " \\\\\\hline\\hline\n"
-    latex_matrix += " & ".join(str(x) for x in coeficientes1) + " \\\\\\hline\\hline\n"
-    latex_matrix += " & ".join(str(x) for x in coeficientes2) + " \\\\\\hline\n"
+    latex_matrix = "\\begin{array}{" + "c|"*size + "c}"
+    latex_matrix += "\n\\hline\n"    
+    #latex_matrix += f"{contenidoCabecera}\\\\\n\hline\n{contenidoCoeficientes1}\\\\\n\hline\n{contenidoCoeficientes2}"
+    latex_matrix += f"{contenidoCabecera} \\\\\n"
+    latex_matrix += r"\hline\hline" + "\n"
+    latex_matrix += f"{contenidoCoeficientes1} \\\\\n"
+    latex_matrix += r"\hline" + "\n"
+    latex_matrix += f"{contenidoCoeficientes2} \\\\\n"
+    latex_matrix += r"\hline" + "\n"
     latex_matrix += "\\end{array}"
 
     # Mostramos la matriz en el notebook de Jupyter
     #display(Math(r'\['+latex_matrix+r'\]'))
-    return Latex(r'\['+latex_matrix+r'\]')
+    #return Latex(r'\['+latex_matrix+r'\]')
+    return latex_matrix
 
 #+END_SRC
 

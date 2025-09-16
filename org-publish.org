@@ -738,7 +738,16 @@ Podemos chequear la versión local ejecutando en emacs el siguiente bloque
 Este script transforma los ficheros org de las lecciones en pdfs y htmls. 
 
 #+BEGIN_SRC  emacs-lisp :tangle publica-practicas.el :results silent
-;;; publica.el --- Publicación HTML y PDF para el repositorio Scimax-ELN
+;;; publica.el --- Publicación HTML y PDF de las prácticas para el repositorio
+
+
+;; Lo siguiente es para que se vean en pdf los bloques de código hanls
+;; Añade "listings" a org-latex-packages-alist
+(add-to-list 'org-latex-packages-alist '("" "listings"))
+;; Establece 'listings como valor para org-latex-listings
+(setq org-latex-listings 'listings)
+;(setq org-latex-listings 'minted)
+
 
 (require 'ox-publish)
 
@@ -753,6 +762,7 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
   (message "Exportando a PDF: %s" filename)
   (with-current-buffer (find-file-noselect filename)
     ;(org-babel-execute-buffer)
+    ;(org-latex-export-to-pdf)
     (org-latex-publish-to-pdf plist filename pub-dir)))
 
 (let* ((base-directory "./"))
