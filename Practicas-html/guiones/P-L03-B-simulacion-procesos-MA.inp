@@ -1,0 +1,37 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+function series SimuladorMA(matrix theta)
+    # SimuladorMA(theta) simula un proceso MA(q), 
+    # donde theta es el polinomio (mónico) MA y q es su grado.
+    series WN = normal (0,1)
+    series X = 0
+
+    loop i=1..cols(theta)
+        # print i        # (descomente estos prints si no entiende el funcionamiento)
+        # print theta[i]
+        # print 1-i
+        X = X + theta[i]*WN(1-i)
+    endloop
+    
+    return X
+end function
+
+# establecemos la muestra
+nulldata 200
+setobs 12 1960:01 --time-series
+
+# Simulamos dos procesos MA usando nuestra función
+series X = SimuladorMA( {1, 0.9} )
+series Y = SimuladorMA( {1, 1.8, 0.9} )
+
+# Los graficamos juntos en un fichero 
+gnuplot X Y --time-series --with-lines  --output="MA2.png"
