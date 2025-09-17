@@ -391,7 +391,7 @@ Es decir, =X= es lo que fuera hasta el momento más el retardo del ruido blanco 
 
 
 
-* Actividad 2 - Escribir nuestra función que simula procesos MA
+* Actividad 3 - Escribir nuestra función que simula procesos MA
 
 Para crear la función, primero hemos simulado manualmente algunos procesos MA (práctica anterior). Hemos analizado cómo sistematizar dichas simulaciones y qué estructura debería tener la función (argumentos y pasos necesarios). Tenga siempre presente que  el enfoque de programación implica primero planificar (es muy beneficioso esbozar ideas con lápiz y papel, y sin ordenador). También hay que consultar la documentación de las funciones que nos serán útiles para implementar nuestro plan. 
 Esta es la función:
@@ -439,6 +439,87 @@ gnuplot X Y --time-series --with-lines  --output="MA2.png"
 #+END_CENTER
 
 # +latex: \clearpage
+
+
+* Actividad 4 - Use su función en un bucle para generar muchos MA($q$) con el mismo modelo e inferir el comportamiento general
+
+#+BEGIN_SRC gretl :tangle ./guiones/P-L03-B-simulacion-procesos-MA.inp :eval no
+# Número de simulaciones
+scalar n = 300
+
+# Preasignamos una matriz para guardar los datos
+matrix M = zeros($nobs, n)
+
+matrix theta = SimuladorMA( {1, 1.8, 0.9} )
+
+# Bucle sobre las columnas
+loop j=1..n --quiet
+    # Simulamos un MA y copiamos la serie en la columna j de la matriz
+    M[, j] = SimuladorMA(theta)
+endloop
+
+gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosMA.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+CAPTION: Figura con la simulación de 200 MA con el mismo modelo
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+#+NAME: fig:MuchosMA
+[[file:P-L03-B-simulacion-procesos-MA/MuchosMA.png]]
+#+END_CENTER
+
+La figura [[fig:MuchosMA]] presenta 300 realizaciones del proceso MA simulado con la función que hemos programado. 
+Como podemos ver la media y varianza parecen similares. Pero no se ve muy bien. Mejor, hagamos un corte en los instantes \(t = 1, 70, 140\) y $200$ para crear un histograma de los valores tomados por las 300 simulaciones en esos instantes.
+
+#+BEGIN_SRC gretl :tangle ./guiones/P-L03-B-simulacion-procesos-MA.inp :eval no
+# Extraemos las filas como vectores columna.
+# la comilla (') es la transposición
+matrix v1 = M[1,]'
+matrix v2 = M[70,]'
+matrix v3 = M[140,]'
+matrix v4 = M[200,]'
+
+# Dibujar histograma
+freq --matrix=v1 --nbins=15 --normal --plot="histograma_t1.png"
+freq --matrix=v2 --nbins=15 --normal --plot="histograma_t70.png"
+freq --matrix=v3 --nbins=15 --normal --plot="histograma_t140.png"
+freq --matrix=v4 --nbins=15 --normal --plot="histograma_t200.png"
+
+#+END_SRC
+
+Las cuatro figuras proporcionan histogramas de la distribución de los 300 valores de la variable del proceso disponibles para los instantes temporales \(t = 1, 70, 140\) y $200$.
+Se observa que la media de estas distribuciones es aproximadamente cero en los cuatro casos, y que la desviación típica también es similar (alrededor de $2$). 
+Este resultado coincide con la [[fig:MuchosMA]], donde se observa que las realizaciones del proceso tienen un comportamiento homogéneo a lo largo del tiempo (no podía ser de otro modo, pues los procesos MA son estacionarios).
+
+#+BEGIN_EXPORT latex
+\begin{center}
+\begin{table}[htbp]
+\caption{Dispersión de los 300 procesos MA(q) en t=1, 70, 140 y 200}
+\centering
+\begin{tabular}{ll}
+\includegraphics[width=0.45\textwidth]{./P-L03-B-simulacion-procesos-MA/histograma_t1.png} & \includegraphics[width=0.45\textwidth]{./P-L03-B-simulacion-procesos-MA/histograma_t70.png}\\
+\includegraphics[width=0.45\textwidth]{./P-L03-B-simulacion-procesos-MA/histograma_t140.png} & \includegraphics[width=0.45\textwidth]{./P-L03-B-simulacion-procesos-MA/histograma_t200.png}\\
+\end{tabular}
+\end{table}
+\end{center}
+#+END_EXPORT
+
+#+BEGIN_EXPORT html
+<div class="row">
+  <div class="column">
+    <img src="./P-L03-B-simulacion-procesos-MA/histograma_t1.png" alt="histograma_t1.png"">
+    <img src="./P-L03-B-simulacion-procesos-MA/histograma_t70.png" alt="histograma_t70.png"">
+  </div>
+  <div class="column">
+    <img src="./P-L03-B-simulacion-procesos-MA/histograma_t140.png" alt="histograma_t140.png"">
+    <img src="./P-L03-B-simulacion-procesos-MA/histograma_t200.png" alt="histograma_t200.png"">
+  </div>
+</div>
+#+END_EXPORT
+
+#+latex: \clearpage
 
 
 * Código completo de la práctica
