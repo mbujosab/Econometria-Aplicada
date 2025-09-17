@@ -35,3 +35,32 @@ series Y = SimuladorMA( {1, 1.8, 0.9} )
 
 # Los graficamos juntos en un fichero 
 gnuplot X Y --time-series --with-lines  --output="MA2.png"
+
+# Número de simulaciones
+scalar n = 300
+
+# Preasignamos una matriz para guardar los datos
+matrix M = zeros($nobs, n)
+
+matrix theta = SimuladorMA( {1, 1.8, 0.9} )
+
+# Bucle sobre las columnas
+loop j=1..n --quiet
+    # Simulamos un MA y copiamos la serie en la columna j de la matriz
+    M[, j] = SimuladorMA(theta)
+endloop
+
+gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosMA.png"
+
+# Extraemos las filas como vectores columna.
+# la comilla (') es la transposición
+matrix v1 = M[1,]'
+matrix v2 = M[70,]'
+matrix v3 = M[140,]'
+matrix v4 = M[200,]'
+
+# Dibujar histograma
+freq --matrix=v1 --nbins=15 --normal --plot="histograma_t1.png"
+freq --matrix=v2 --nbins=15 --normal --plot="histograma_t70.png"
+freq --matrix=v3 --nbins=15 --normal --plot="histograma_t140.png"
+freq --matrix=v4 --nbins=15 --normal --plot="histograma_t200.png"
