@@ -51,7 +51,7 @@ SRC_FILES = $(LECCIONES_SRC)/*.org
 
 #.PHONY: cleanAll directorios programas_de_python calendario notebooksYslides limpia_kernels_jupyter practicas publicacion limpia_kernels_jupyter
 
-all: calendario notebooksYslides practicas publicacion limpia_kernels_jupyter
+all: calendario notebooksYslides practicas  publicacion-lecciones publicacion-practicas publicacion limpia_kernels_jupyter
 
 calendario: directorios $(DOCS)/Calendario-Econometria-Aplicada.pdf
 
@@ -59,7 +59,7 @@ $(DOCS)/Calendario-Econometria-Aplicada.pdf:
 	emacs --batch Calendario/README.org -l org -f org-babel-tangle
 	cd Calendario && make Calendario-Econometria-Aplicada.pdf
 
-publicacion: publicacion-lecciones publicacion-practicas
+publicacion:
 	cp -a README.org  $(DOCS)
 	mkdir -p $(DOCS)/Practicas-html/img
 	find . -wholename $(LECCIONES_tmp)/P-L*.pdf -exec cp {} $(DOCS)/Practicas-pdf/ \;
@@ -222,7 +222,7 @@ $(LECCIONES_tmp)/src/%.org: $(LECCIONES_SRC)/src/%.org
 	  --load ~/Software/scimax/init.el \
 	  --eval "(require 'ox-ipynb)" \
 	  --eval "(ox-ipynb-export-org-file-to-ipynb-file \"$(LECCIONES_tmp)/src/$*.org\")"
-	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/$*.ipynb
+	# jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/$*.ipynb
 	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/src/$*.ipynb
 	jupyter nbconvert --execute --to html $(LECCIONES_tmp)/src/$*.ipynb
 	cp -a $(LECCIONES_tmp)/src/$*.ipynb $(CUADERNOS)
@@ -392,6 +392,16 @@ jobs:
       run: |
         set -e
         make calendario
+
+    - name: Execute Makefile publicacion-lecciones
+      run: |
+        set -e
+        make publicacion-lecciones
+
+    - name: Execute Makefile publicacion-practicas
+      run: |
+        set -e
+        make publicacion-practicas
 
     - name: Execute Makefile publicacion
       run: |
@@ -630,6 +640,45 @@ Si deseas matar los procesos de Jupyter después de que se ejecute un notebook e
 ```
 
 Sin embargo, ten en cuenta que los entornos de GitHub Actions se eliminan después de que una ejecución finaliza, por lo que normalmente no es necesario matar procesos manualmente al final del trabajo.
+
+*** GitHub tokens
+
+Para solucionar el error de autenticación debido a un token de GitHub caducado y usar un nuevo token, sigue estos pasos:
+
+1. Genera un nuevo personal access token (PAT)
+Ve a tu perfil de GitHub > Settings > Developer settings > Personal access tokens.
+Haz clic en “Generate new token”.
+Selecciona los scopes necesarios. Para subir a GitHub Pages y realizar pushes, selecciona:
+repo (para acceso completo a los repositorios privados/públicos)
+workflow (si tu workflow lo requiere)
+Copia el token generado (no podrás verlo de nuevo).
+
+
+2. Guarda el nuevo token en los Secrets del repositorio
+Ve al repositorio: https://github.com/mbujosab/Econometria-Aplicada
+Settings > Secrets and variables > Actions.
+Haz clic en “New repository secret”.
+Nombra el secret, por ejemplo: GH_TOKEN o PERSONAL_TOKEN.
+Pega el token generado y guarda.
+3. Actualiza tu workflow para usar el nuevo token
+En tu archivo .github/workflows/build.yml (o el que corresponda), asegúrate de que el paso que hace git push o usa el token esté así:
+
+YAML
+- name: Push to GitHub Pages
+  run: git push origin gh-pages
+  env:
+    GITHUB_TOKEN: ${{ secrets.GH_TOKEN }} # O el nombre que hayas puesto
+O, si usas una acción como peaceiris/actions-gh-pages:
+
+YAML
+- name: Deploy to GitHub Pages
+  uses: peaceiris/actions-gh-pages@v3
+  with:
+    github_token: ${{ secrets.GH_TOKEN }}
+4. Confirma que el token tiene los permisos adecuados
+El token debe tener acceso de escritura al repo.
+Si usas una acción (como actions/checkout o actions-gh-pages), asegúrate de pasar el secret correcto.
+
 
 
 * Script =publica.el= de elisp para publicar las lecciones con formato =.org= como ficheros con formato =pdf= y ~html~
