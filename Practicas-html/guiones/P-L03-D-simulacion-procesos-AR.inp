@@ -1,0 +1,158 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+# establecemos la muestra
+nulldata 200
+setobs 12 1960:01 --time-series
+
+function series SimuladorAR(matrix phi)
+    # SimuladorAR(phi) simula un proceso AR(p), 
+    # donde phi es el polinomio (mónico) AR y p es su grado.
+
+    p = cols(phi)                             
+    
+    series U = normal(0,1)                    
+    series Y = 0                              
+    setinfo Y --description="Serie simulada"
+
+    loop i = (p+1)..$nobs                     
+    
+        comb_pasado_Yt = 0                         
+        perturbacion = U[i]
+    
+        loop j = 2..p                         
+            comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
+        endloop
+    
+        Y[i] = comb_pasado_Yt + perturbacion       
+    
+    endloop
+
+    return Y
+
+end function # aquí debe incluir su función 
+
+# Simulamos dos procesos AR usando nuestra función
+series X = SimuladorAR( {1, 0.9} )
+series Y = SimuladorAR( {1, -0.6, -0.3} )
+
+# Los graficamos juntos en un fichero 
+gnuplot X Y --time-series --with-lines  --output="RandomWalks.png"
+
+# Número de simulaciones
+scalar n = 300
+
+# Polinomio AR
+phi = {1, -1.6, 0.64}
+
+# Preasignamos una matriz para guardar los datos
+matrix M = zeros($nobs, n)
+
+# Bucle sobre las columnas
+loop j=1..n --quiet
+    # Simulamos un RW y Copiamos la serie en la columna j de la matriz
+    M[, j] = SimuladorAR( phi )
+endloop
+
+gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR2_I.png"
+
+# Extraemos las filas como vectores columna.
+# la comilla (') es la transposición
+matrix v1 = M[50,]'
+matrix v2 = M[100,]'
+matrix v3 = M[150,]'
+matrix v4 = M[200,]'
+
+# Dibujar histograma
+freq --matrix=v1 --nbins=15 --normal --plot="histograma_t50.png"
+freq --matrix=v2 --nbins=15 --normal --plot="histograma_t100.png"
+freq --matrix=v3 --nbins=15 --normal --plot="histograma_t150.png"
+freq --matrix=v4 --nbins=15 --normal --plot="histograma_t200.png"
+
+# Número de simulaciones
+scalar n = 300
+
+# Polinomio AR
+phi = {1, 0.2, -0.8}
+
+# Preasignamos una matriz para guardar los datos
+matrix M = zeros($nobs, n)
+
+# Bucle sobre las columnas
+loop j=1..n --quiet
+    # Simulamos un RW y Copiamos la serie en la columna j de la matriz
+    M[, j] = SimuladorAR( phi )
+endloop
+
+gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR2_II.png"
+
+# Extraemos las filas como vectores columna.
+# la comilla (') es la transposición
+matrix v1 = M[50,]'
+matrix v2 = M[100,]'
+matrix v3 = M[150,]'
+matrix v4 = M[200,]'
+
+# Dibujar histograma
+freq --matrix=v1 --nbins=15 --normal --plot="histograma_II_t50.png"
+freq --matrix=v2 --nbins=15 --normal --plot="histograma_II_t100.png"
+freq --matrix=v3 --nbins=15 --normal --plot="histograma_II_t150.png"
+freq --matrix=v4 --nbins=15 --normal --plot="histograma_II_t200.png"
+
+series RW = SimuladorAR( {1, -1} )
+gnuplot RW --time-series --with-lines  { set nokey; } --output="RW.png"
+
+# recuperamos nuesta función de la práctica anterior
+function series SimuladorMA(matrix theta)
+    # SimuladorMA(theta) simula un proceso MA(q), 
+    # donde theta es el polinomio (mónico) MA y q es su grado.
+    series WN = normal (0,1)
+    series X = 0
+
+    loop i=1..cols(theta)
+        # print i        # (descomente estos prints si no entiende el funcionamiento)
+        # print theta[i]
+        # print 1-i
+        X = X + theta[i]*WN(1-i)
+    endloop
+    
+    return X
+end function
+
+function series SimuladorARMA(matrix phi, matrix theta)
+    # SimuladorAR(phi) simula un proceso AR(p), 
+    # donde phi es el polinomio (mónico) AR y p es su grado.
+
+    p = cols(phi)                             
+    
+    series procesoMA = SimuladorMA(theta)
+    series Y = 0                              
+    setinfo Y --description="Serie simulada"
+
+    loop i = (p+1)..$nobs                     
+    
+        comb_pasado_Yt = 0                         
+        perturbacion = procesoMA[i]
+    
+        loop j = 2..p                         
+            comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
+        endloop
+    
+        Y[i] = comb_pasado_Yt + perturbacion
+    
+    endloop
+
+    return Y
+
+end function
+
+series Z = SimuladorARMA( {1, -0.6}, {1, 0.9} )
+gnuplot Z --time-series --with-lines  { set nokey; } --output="ARMA.png"
