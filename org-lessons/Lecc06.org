@@ -996,7 +996,65 @@ Desgraciadamente para los modelos ARMA tanto la ACF como la PACF tienen infinito
 | *PACF persistente* | _MA_: orden indicado por la ACF                          | _ARMA_                           |
 
 
-* Las Ecuaciones de Yule-Walker para un AR(p) estacionario
+* Función de autocovarianzas para un ARMA(p,q)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :ID:       315309b8-425e-48eb-a97d-083940275fe0
+   :END:
+
+
+# donde $$\boldsymbol{\phi}(z)=1-\phi_1z^1\cdots-\phi_pz^p \quad\text{y}\quad \boldsymbol{\theta}(z)=1-\theta_1z^1\cdots-\theta_qz^q.$$
+
+Sea un ARMA($p,q$) estacionario:
+$\boldsymbol{\phi}(\mathsf{B}){X_t}=\boldsymbol{\theta}(\mathsf{B}){U_t}\;$
+donde $\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ no tienen raíces
+comunes. Multiplicando por $X_{t-k}$, tomando esperanzas y
+sustituyendo $X_{t-k}$ por su representación MA($\infty$), donde
+$\boldsymbol{\psi}=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}$:
+$$\underbrace{E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot
+X_{t-k}\Big]}_{\boldsymbol{\phi}(\mathsf{B})\gamma_k\;(\text{por
+\ref{eqnLadoIzquierdoYW}})} =
+E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot X_{t-k}\Big]
+\;=\;
+\underbrace{E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot
+\Big(\boldsymbol{\psi}(\mathsf{B})U_{t-k}\Big)\Big]}_{\boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)}$$
+Donde hemos usando $\eqref{eqnLadoIzquierdoYW}$ y renombrando
+$\;\boldsymbol{\theta}(\mathsf{B})U_t=\boldsymbol{W}\;$ y
+$\;\boldsymbol{\psi}(\mathsf{B})U_t=\boldsymbol{Y}.\;$ Así:
+\begin{align*}
+  \boldsymbol{\phi}(\mathsf{B})\gamma_k & = \boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)\\
+  & =  \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{por } (5-Lecc 3)
+\end{align*}
+Por 
+Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogrado $-\infty$
+\begin{equation}
+  \boldsymbol{\phi}(\mathsf{B})\gamma_k = 
+  \begin{cases}
+     0 & k > q\quad \text{(como en un AR)}\\
+    \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & k\leq q
+   \quad \text{(que depende de $\boldsymbol{\theta}$ y $\boldsymbol{\phi}$)}
+  \end{cases}
+\end{equation}
+(Donde (5-Lecc 3) se refiere a la [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf#subsection.5.2][última ecuación de la Lección 3]])
+
+
+
+* COMMENT ipynb y slides                                           :noexport:
+
+#+BEGIN_SRC emacs-lisp :results silent :eval yes
+(require 'ox-ipynb)
+(ox-ipynb-export-org-file-to-ipynb-file "Lecc06.org")
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+#jupyter nbconvert --execute --inplace Lecc06.ipynb
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+#jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc06.ipynb
+#+END_SRC
+
+* COMMENT Las Ecuaciones de Yule-Walker para un AR(p) estacionario
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
@@ -1094,62 +1152,4 @@ $$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\rho_k=0\)}
 En resumen, la estructura autorregresiva del proceso impone que las
 autocovarianzas (y las autocorrelaciones) verifiquen las ecuaciones de
 Yule-Walker.
-
-** Función de autocovarianzas para un ARMA(p,q)
-   :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . slide)))
-   :ID:       315309b8-425e-48eb-a97d-083940275fe0
-   :END:
-
-
-# donde $$\boldsymbol{\phi}(z)=1-\phi_1z^1\cdots-\phi_pz^p \quad\text{y}\quad \boldsymbol{\theta}(z)=1-\theta_1z^1\cdots-\theta_qz^q.$$
-
-Sea un ARMA($p,q$) estacionario:
-$\boldsymbol{\phi}(\mathsf{B}){X_t}=\boldsymbol{\theta}(\mathsf{B}){U_t}\;$
-donde $\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ no tienen raíces
-comunes. Multiplicando por $X_{t-k}$, tomando esperanzas y
-sustituyendo $X_{t-k}$ por su representación MA($\infty$), donde
-$\boldsymbol{\psi}=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}$:
-$$\underbrace{E\Big[\Big(\boldsymbol{\phi}(\mathsf{B})X_t\Big)\cdot
-X_{t-k}\Big]}_{\boldsymbol{\phi}(\mathsf{B})\gamma_k\;(\text{por
-\ref{eqnLadoIzquierdoYW}})} =
-E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot X_{t-k}\Big]
-\;=\;
-\underbrace{E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot
-\Big(\boldsymbol{\psi}(\mathsf{B})U_{t-k}\Big)\Big]}_{\boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)}$$
-Donde hemos usando $\eqref{eqnLadoIzquierdoYW}$ y renombrando
-$\;\boldsymbol{\theta}(\mathsf{B})U_t=\boldsymbol{W}\;$ y
-$\;\boldsymbol{\psi}(\mathsf{B})U_t=\boldsymbol{Y}.\;$ Así:
-\begin{align*}
-  \boldsymbol{\phi}(\mathsf{B})\gamma_k & = \boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)\\
-  & =  \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{por } (5-Lecc 3)
-\end{align*}
-Por 
-Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogrado $-\infty$
-\begin{equation}
-  \boldsymbol{\phi}(\mathsf{B})\gamma_k = 
-  \begin{cases}
-     0 & k > q\quad \text{(como en un AR)}\\
-    \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & k\leq q
-   \quad \text{(que depende de $\boldsymbol{\theta}$ y $\boldsymbol{\phi}$)}
-  \end{cases}
-\end{equation}
-(Donde (5-Lecc 3) se refiere a la [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf#subsection.5.2][última ecuación de la Lección 3]])
-
-
-
-* COMMENT ipynb y slides                                           :noexport:
-
-#+BEGIN_SRC emacs-lisp :results silent :eval yes
-(require 'ox-ipynb)
-(ox-ipynb-export-org-file-to-ipynb-file "Lecc06.org")
-#+END_SRC
-
-#+BEGIN_SRC sh :results silent :eval yes
-#jupyter nbconvert --execute --inplace Lecc06.ipynb
-#+END_SRC
-
-#+BEGIN_SRC sh :results silent :eval yes
-#jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc06.ipynb
-#+END_SRC
 
