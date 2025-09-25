@@ -1,0 +1,87 @@
+# Necesario para que gretl guarde los ficheros en el directorio de la práctica.
+# Si no funciona, comente la primera línea y descomente la segunda (asegurándose de que el directoro de trabajo de gretl, $(pwd), es el correcto, i.e, que Gretl puede encontrar el guión):
+
+string directory = getenv("DIRECTORIO")
+#string directory = $(pwd) ~ "/Examen-SaldoOtrosActivosPasivosRespectoMundo" 
+set workdir "@directory"
+
+open be.bin
+data BE_2_5_8_16
+
+gnuplot BE_2_5_8_16 --time-series --with-lines --output="otros.png"
+corrgm BE_2_5_8_16 14 --plot="otrosACF-PACF.png"
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet otrosACF-PACF.txt
+  corrgm BE_2_5_8_16 10 --quiet
+end outfile
+
+adf 4 BE_2_5_8_16 --nc --test-down=AIC
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet ADF_otros.txt
+  adf 4 BE_2_5_8_16 --nc --test-down=AIC
+end outfile
+
+kpss 4 BE_2_5_8_16
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet KPSS_otros.txt
+  kpss 4 BE_2_5_8_16
+end outfile
+
+diff BE_2_5_8_16
+
+gnuplot d_BE_2_5_8_16 --time-series --with-lines --output="d_otros.png"
+corrgm d_BE_2_5_8_16 10 --plot="d_otrosACF-PACF.png"
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet d_otrosACF-PACF.txt
+  corrgm d_BE_2_5_8_16 10 --quiet
+end outfile
+
+adf 4 d_BE_2_5_8_16 --nc --test-down=AIC
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet ADF_d_otros.txt
+  adf 4 d_BE_2_5_8_16 --nc --test-down=AIC
+end outfile
+
+kpss 4 d_BE_2_5_8_16
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet KPSS_d_otros.txt
+  kpss 4 d_BE_2_5_8_16
+end outfile
+
+arima 2 1 0 ; BE_2_5_8_16
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet modelo1.txt
+  arima 2 1 0 ; BE_2_5_8_16 
+end outfile
+
+res1 = $uhat
+gnuplot res1 --time-series --with-lines --output="res1.png"
+corrgm res1 10 --plot="res1_ACF-PACF.png"
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet res1_ACF-PACF.txt
+    corrgm res1 10 --quiet
+end outfile
+
+arima 0 1 2 ; BE_2_5_8_16
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet modelo2.txt
+  arima 0 1 2 ; BE_2_5_8_16 
+end outfile
+
+res2 = $uhat
+gnuplot res2 --time-series --with-lines --output="res2.png"
+corrgm res1 10 --plot="res2_ACF-PACF.png"
+
+# añadido para guardar los resultados en un fichero de texto
+outfile --quiet res2_ACF-PACF.txt
+    corrgm res2 10 --quiet
+end outfile
