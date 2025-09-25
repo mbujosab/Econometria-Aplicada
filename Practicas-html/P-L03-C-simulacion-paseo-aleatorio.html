@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-09-23 Tue 09:15 -->
+<!-- 2025-09-25 Thu 16:55 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 3.C - Simulación de paseos aleatorios</title>
@@ -101,34 +101,34 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0930349">Objetivo de la práctica</a></li>
-<li><a href="#org7f62b9e">Actividad 1 - Estudiar teóricamente los paseos aleatorios</a></li>
-<li><a href="#org75ff389">Actividad 2 - Simular un paseo aleatorio</a></li>
-<li><a href="#org48e2236">Actividad 3 - Genere una función que simule un paseo aleatorio</a>
+<li><a href="#orgec5549c">Objetivo de la práctica</a></li>
+<li><a href="#org8182898">Actividad 1 - Estudiar teóricamente los paseos aleatorios</a></li>
+<li><a href="#orgac8fbdd">Actividad 2 - Simular un paseo aleatorio</a></li>
+<li><a href="#org95c9675">Actividad 3 - Genere una función que simule un paseo aleatorio</a>
 <ul>
-<li><a href="#orgf98779a">Para intrépidos (opcional)</a></li>
-<li><a href="#org1c483af">Ejemplo de funcionamiento</a></li>
+<li><a href="#orgbb197a0">Para intrépidos (opcional)</a></li>
+<li><a href="#org7212c8c">Ejemplo de funcionamiento</a></li>
 </ul>
 </li>
-<li><a href="#orgfc1a6b5">Actividad 4 - Use su función en un bucle para generar muchos paseos aleatorios e inferir el comportamiento general</a></li>
-<li><a href="#org7404a2b">Código completo de la práctica</a></li>
-<li><a href="#orgca08c46">Posibles resoluciones</a>
+<li><a href="#org85f1712">Actividad 4 - Use su función en un bucle para generar muchos paseos aleatorios e inferir el comportamiento general</a></li>
+<li><a href="#org33ad1e7">Código completo de la práctica</a></li>
+<li><a href="#org586d759">Posibles resoluciones</a>
 <ul>
-<li><a href="#orgfbdd877">Actividad 2</a></li>
-<li><a href="#orgd7ceced">Actividad 3</a>
+<li><a href="#orgbdbe52b">Actividad 2</a></li>
+<li><a href="#org13d8f89">Actividad 3</a>
 <ul>
-<li><a href="#org7b3cb43">Para gente intrépida</a></li>
+<li><a href="#org786e724">Para gente intrépida</a></li>
 </ul>
 </li>
-<li><a href="#org89eb4df">Actividad 4</a></li>
+<li><a href="#orgad6460f">Actividad 4</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org0930349" class="outline-2">
-<h2 id="org0930349">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-org0930349">
+<div id="outline-container-orgec5549c" class="outline-2">
+<h2 id="orgec5549c">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-orgec5549c">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -161,15 +161,15 @@ En las prácticas anteriores hemos simulado procesos estacionarios MA. Ahora vam
 </ol>
 </div>
 </div>
-<div id="outline-container-org7f62b9e" class="outline-2">
-<h2 id="org7f62b9e">Actividad 1 - Estudiar teóricamente los paseos aleatorios</h2>
-<div class="outline-text-2" id="text-org7f62b9e">
+<div id="outline-container-org8182898" class="outline-2">
+<h2 id="org8182898">Actividad 1 - Estudiar teóricamente los paseos aleatorios</h2>
+<div class="outline-text-2" id="text-org8182898">
 <p>
 Consideremos el proceso estocástico definido por:
 \[
 Y_t = Y_{t-1} + U_t, \qquad t \in \mathbb{N};
 \]
-donde las variables \(U_t\) son normales con media cero, varianza \(\sigma^2\) constante a lo largo del tiempo e independientes entre sí. 
+donde las variables \(U_t\) son normales con media cero, varianza \(\sigma^2\) y \(Cov(U_t,U_j)=0\) si \(\t\ne j\).
 Nótese que suponemos que el proceso comienza en un instante \(t = 0\) (por ejemplo con con \(Y_0 = 0\)).
 Este proceso se conoce con el nombre de <i>paseo aleatorio</i>.
 </p>
@@ -228,11 +228,11 @@ Esto se debería apreciar al simular paseos aleatorios.
 </p>
 </div>
 </div>
-<div id="outline-container-org75ff389" class="outline-2">
-<h2 id="org75ff389">Actividad 2 - Simular un paseo aleatorio</h2>
-<div class="outline-text-2" id="text-org75ff389">
+<div id="outline-container-orgac8fbdd" class="outline-2">
+<h2 id="orgac8fbdd">Actividad 2 - Simular un paseo aleatorio</h2>
+<div class="outline-text-2" id="text-orgac8fbdd">
 <p>
-Algunas cosas que len pueden resultar útiles son
+Algunas cosas que le pueden resultar útiles son
 </p>
 <ul class="org-ul">
 <li><p>
@@ -244,7 +244,7 @@ setobs 4 1960:01 --time-series
 </code></pre>
 </div>
 <p>
-la variable interna <code>$nobs</code> devuelve un número entero con la cantidad total de observaciones que están seleccionadas en la muestra vigente (en el ejemplo \(300\)).
+la variable interna <code>$nobs</code> devuelve un número entero con la cantidad total de observaciones que están seleccionadas en la muestra vigente (en el ejemplo <code>$nobs</code> es <code>300</code>).
 </p></li>
 <li><p>
 Si tenemos definida una serie temporal (<code>series</code>), sus valores se pueden modificar uno a uno. Por ejemplo
@@ -266,13 +266,13 @@ Es decir <code>Z[k]</code> corresponde al <i>k</i>-ésimo elemento de <code>Z</c
 
 
 <p>
-Piense en cómo construir, partiendo de una serie de ruido blanco un paseo aleatorio (en inglés <i>Random Walk</i> o <code>RW</code>). Diseñe los pasos en un papel y luego intente implementarlos en un guión de Gretl. Por sencillez, asuma que el valor inicial es <code>RW_0=0</code>, donde he llamado <code>RW</code> a la simulación del paseo aleatorio.
+Piense en cómo construir, partiendo de una serie de ruido blanco un paseo aleatorio (en inglés <i>Random Walk</i> o <code>RW</code>). Diseñe los pasos en un papel y luego intente implementarlos en un guión de Gretl. Por sencillez, asuma que el valor inicial el anterior a <code>RW[1]</code> sería <code>0</code>; de manera que <code>RW[1]=0+U[1]</code>, y donde he llamado <code>RW</code> a la simulación del paseo aleatorio y <code>U</code> al proceso de ruido blanco.
 </p>
 </div>
 </div>
-<div id="outline-container-org48e2236" class="outline-2">
-<h2 id="org48e2236">Actividad 3 - Genere una función que simule un paseo aleatorio</h2>
-<div class="outline-text-2" id="text-org48e2236">
+<div id="outline-container-org95c9675" class="outline-2">
+<h2 id="org95c9675">Actividad 3 - Genere una función que simule un paseo aleatorio</h2>
+<div class="outline-text-2" id="text-org95c9675">
 <p>
 Generalice lo anterior escribiendo una función que devuelva realizaciones de paseos aleatorios.
 </p>
@@ -286,11 +286,12 @@ Generalice lo anterior escribiendo una función que devuelva realizaciones de pa
 Cuando tenga su función, pruebe su funcionamiento con algún script o guión.
 </p>
 </div>
-<div id="outline-container-orgf98779a" class="outline-3">
-<h3 id="orgf98779a">Para intrépidos (opcional)</h3>
-<div class="outline-text-3" id="text-orgf98779a">
+<div id="outline-container-orgbb197a0" class="outline-3">
+<h3 id="orgbb197a0">Para intrépidos (opcional)</h3>
+<div class="outline-text-3" id="text-orgbb197a0">
 <p>
-Puede generalizar su función añadiendo un parámetro que fije el valor inicial del paseo aleatorio, u otro para añadir una deriva (un incremento constante del proceso) para simular un paseo aleatorio con deriva:
+Puede generalizar su función añadiendo un parámetro que fije el valor inicial del paseo aleatorio, 
+u otro para añadir una deriva (un incremento constante del proceso) para simular un <i>paseo aleatorio con deriva</i>:
 \[Y_t = d + Y_{t-1} + U_t.\]
 </p>
 
@@ -324,9 +325,9 @@ Gretl crea una nueva serie cuyos valores son los de <code>Y</code> pero incremen
 </ul>
 </div>
 </div>
-<div id="outline-container-org1c483af" class="outline-3">
-<h3 id="org1c483af">Ejemplo de funcionamiento</h3>
-<div class="outline-text-3" id="text-org1c483af">
+<div id="outline-container-org7212c8c" class="outline-3">
+<h3 id="org7212c8c">Ejemplo de funcionamiento</h3>
+<div class="outline-text-3" id="text-org7212c8c">
 <div class="org-src-container">
 <pre class="src src-gretl"><code># establecemos la muestra
 nulldata 200
@@ -347,7 +348,7 @@ gnuplot X Y --time-series --with-lines  --output="RandomWalks.png"
 
 <div class="org-center">
 
-<div id="org9a4478b" class="figure">
+<div id="orgd7d9e31" class="figure">
 <p><img src="P-L03-C-simulacion-paseo-aleatorio/RandomWalks.png" alt="RandomWalks.png" />
 </p>
 <p><span class="figure-number">Figura 1: </span>Figura con la simulación de dos paseos aleatorios.</p>
@@ -356,14 +357,14 @@ gnuplot X Y --time-series --with-lines  --output="RandomWalks.png"
 </div>
 </div>
 </div>
-<div id="outline-container-orgfc1a6b5" class="outline-2">
-<h2 id="orgfc1a6b5">Actividad 4 - Use su función en un bucle para generar muchos paseos aleatorios e inferir el comportamiento general</h2>
-<div class="outline-text-2" id="text-orgfc1a6b5">
+<div id="outline-container-org85f1712" class="outline-2">
+<h2 id="org85f1712">Actividad 4 - Use su función en un bucle para generar muchos paseos aleatorios e inferir el comportamiento general</h2>
+<div class="outline-text-2" id="text-org85f1712">
 <div class="org-src-container">
 <pre class="src src-gretl"><code># Número de simulaciones
 scalar n = 300
 
-# Preasignamos una matriz para guardar los datos
+# Preasignamos una matriz para guardar cada simulación en una columna
 matrix M = zeros($nobs, n)
 
 # Bucle sobre las columnas
@@ -379,7 +380,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosRa
 
 <div class="org-center">
 
-<div id="org2f33a58" class="figure">
+<div id="org56a2cff" class="figure">
 <p><img src="P-L03-C-simulacion-paseo-aleatorio/MuchosRandomWalks.png" alt="MuchosRandomWalks.png" />
 </p>
 <p><span class="figure-number">Figura 2: </span>Figura con la simulación de 300 paseos aleatorios.</p>
@@ -387,7 +388,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosRa
 </div>
 
 <p>
-La figura <a href="#org2f33a58">2</a> presenta 300 realizaciones del proceso de paseo aleatorio con la función que hemos programado. 
+La figura <a href="#org56a2cff">2</a> presenta 300 realizaciones del proceso de paseo aleatorio con la función que hemos programado. 
 El proceso comienza siempre con el valor cero, pero la probabilidad de que tome valores alejados de cero crece con el tiempo. 
 </p>
 
@@ -426,9 +427,9 @@ pero la desviación típica aumenta con el tiempo (tal como vimos al estudiar te
 </div>
 </div>
 </div>
-<div id="outline-container-org7404a2b" class="outline-2">
-<h2 id="org7404a2b">Código completo de la práctica</h2>
-<div class="outline-text-2" id="text-org7404a2b">
+<div id="outline-container-org33ad1e7" class="outline-2">
+<h2 id="org33ad1e7">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-org33ad1e7">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -446,15 +447,15 @@ pero la desviación típica aumenta con el tiempo (tal como vimos al estudiar te
 </table>
 </div>
 </div>
-<div id="outline-container-orgca08c46" class="outline-2">
-<h2 id="orgca08c46">Posibles resoluciones</h2>
-<div class="outline-text-2" id="text-orgca08c46">
+<div id="outline-container-org586d759" class="outline-2">
+<h2 id="org586d759">Posibles resoluciones</h2>
+<div class="outline-text-2" id="text-org586d759">
 </div>
-<div id="outline-container-orgfbdd877" class="outline-3">
-<h3 id="orgfbdd877">Actividad 2</h3>
-<div class="outline-text-3" id="text-orgfbdd877">
+<div id="outline-container-orgbdbe52b" class="outline-3">
+<h3 id="orgbdbe52b">Actividad 2</h3>
+<div class="outline-text-3" id="text-orgbdbe52b">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org02af566"><code>nulldata 300
+<pre class="src src-gretl" id="org29298b8"><code>nulldata 300
 setobs 4 1960:01 --time-series
 # set seed 3213789
 
@@ -469,7 +470,7 @@ endloop
 
 
 <div class="org-src-container">
-<pre class="src src-gretl" id="org4c6639f"><code>nulldata 300
+<pre class="src src-gretl" id="org3243589"><code>nulldata 300
 setobs 4 1960:01 --time-series
 
 series RW = normal(0,1)
@@ -481,7 +482,7 @@ endloop
 </div>
 
 <div class="org-src-container">
-<pre class="src src-gretl" id="orgc1b2252"><code>nulldata 300
+<pre class="src src-gretl" id="org1a4b6f4"><code>nulldata 300
 setobs 4 1960:01 --time-series
 
 Valor_Inicial = 30
@@ -497,11 +498,11 @@ endloop
 </div>
 </div>
 </div>
-<div id="outline-container-orgd7ceced" class="outline-3">
-<h3 id="orgd7ceced">Actividad 3</h3>
-<div class="outline-text-3" id="text-orgd7ceced">
+<div id="outline-container-org13d8f89" class="outline-3">
+<h3 id="org13d8f89">Actividad 3</h3>
+<div class="outline-text-3" id="text-org13d8f89">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org68eba0f"><code>function series SimuladorRW(void)
+<pre class="src src-gretl" id="org4bfbe32"><code>function series SimuladorRW(void)
     # Simula un paseo aleatorio de longitud igual al tamaño de la muestra
     # a partir de un proceso de ruido blanco gausiano.
 
@@ -520,7 +521,7 @@ end function
 </div>
 
 <div class="org-src-container">
-<pre class="src src-gretl" id="orgf6c4651"><code>function series SimuladorRW(scalar valor_inicial[0])
+<pre class="src src-gretl" id="orgdce39c4"><code>function series SimuladorRW(scalar valor_inicial[0])
     # Simula un paseo aleatorio de longitud igual al tamaño de la muestra
     # y con un valor_inicial; a partir de un proceso de ruido blanco gausiano.
 
@@ -540,11 +541,11 @@ end function
 </code></pre>
 </div>
 </div>
-<div id="outline-container-org7b3cb43" class="outline-4">
-<h4 id="org7b3cb43">Para gente intrépida</h4>
-<div class="outline-text-4" id="text-org7b3cb43">
+<div id="outline-container-org786e724" class="outline-4">
+<h4 id="org786e724">Para gente intrépida</h4>
+<div class="outline-text-4" id="text-org786e724">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org9925bde"><code>function series SimuladorRWconDeriva(scalar valor_inicial[0], scalar deriva[0])
+<pre class="src src-gretl" id="orgd79c2cf"><code>function series SimuladorRWconDeriva(scalar valor_inicial[0], scalar deriva[0])
     # Simula un paseo aleatorio con deriva de longitud igual al tamaño de la muestra 
     # y con un valor_inicial; a partir de un proceso de ruido blanco gausiano.
 
@@ -566,11 +567,11 @@ end function
 </div>
 </div>
 </div>
-<div id="outline-container-org89eb4df" class="outline-3">
-<h3 id="org89eb4df">Actividad 4</h3>
-<div class="outline-text-3" id="text-org89eb4df">
+<div id="outline-container-orgad6460f" class="outline-3">
+<h3 id="orgad6460f">Actividad 4</h3>
+<div class="outline-text-3" id="text-orgad6460f">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org2328081"><code># Número de simulaciones
+<pre class="src src-gretl" id="orgd36aa8a"><code># Número de simulaciones
 scalar n = 200
 
 # Preasignamos una matriz para guardar los datos
@@ -598,13 +599,13 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosRa
 
 <div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">En este caso no podemos suponer que \(t\) recorre todos los enteros desde \(-\infty\), pues en  tal caso la suma de los infinitos \(U_t\) no sería convergente y por tanto \(Y_t\) no estaría defindo.</p></div></div>
 
-<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">y \(Var(Y_t)\) es 0 para \(t<1\).</p></div></div>
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">aunque \(Var(Y_t)\) es 0 para \(t<1\).</p></div></div>
 
 
 </div>
 </div></div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-09-23 Tue 09:15</p>
+<p class="date">Created: 2025-09-25 Thu 16:55</p>
 </div>
 </body>
 </html>

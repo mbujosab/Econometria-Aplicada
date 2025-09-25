@@ -39,10 +39,14 @@ gnuplot X Y --time-series --with-lines  --output="MA2.png"
 # Número de simulaciones
 scalar n = 300
 
-# Preasignamos una matriz para guardar los datos
-matrix M = zeros($nobs, n)
+# Definimos el polinomio MA y registramos su orden
+matrix theta = {1, 1.8, 0.9}
+scalar q = cols(theta) - 1
 
-matrix theta = SimuladorMA( {1, 1.8, 0.9} )
+# Preasignamos una matriz para guardar los datos
+matrix M = zeros($nobs-q, n)   # fíjese que perdemos q observaciones en la simulación
+
+matrix theta = {1, 1.8, 0.9}
 
 # Bucle sobre las columnas
 loop j=1..n --quiet
@@ -57,7 +61,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosMA
 matrix v1 = M[1,]'
 matrix v2 = M[70,]'
 matrix v3 = M[140,]'
-matrix v4 = M[200,]'
+matrix v4 = M[200-q,]'
 
 # Dibujar histograma
 freq --matrix=v1 --nbins=15 --normal --plot="histograma_t1.png"

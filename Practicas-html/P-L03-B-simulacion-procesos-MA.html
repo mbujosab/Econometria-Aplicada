@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-09-23 Tue 09:15 -->
+<!-- 2025-09-25 Thu 16:55 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 3.B - Simulación de procesos MA con una función de Gretl</title>
@@ -101,32 +101,32 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org31d309b">Objetivo de la práctica</a></li>
-<li><a href="#orgc0ea7c7">Actividad 1 - Conocer que se pueden definir funciones por parte del usuario</a>
+<li><a href="#org774b535">Objetivo de la práctica</a></li>
+<li><a href="#orgdd4efda">Actividad 1 - Conocer que se pueden definir funciones por parte del usuario</a>
 <ul>
-<li><a href="#orgd9d4730">Funciones definidas por el usuario</a>
+<li><a href="#org4c847e2">Funciones definidas por el usuario</a>
 <ul>
-<li><a href="#org59be3f4">Cuerpo de la función</a></li>
+<li><a href="#orga299fc8">Cuerpo de la función</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgc1c9ac4">Actividad 2 - Planificar la estructura de una función que simule procesos MA(\(q\))</a>
+<li><a href="#org65062d5">Actividad 2 - Planificar la estructura de una función que simule procesos MA(\(q\))</a>
 <ul>
-<li><a href="#orgbf68e5e">Vectores y matrices (en Gretl son el mismo objeto)</a></li>
-<li><a href="#org6225a9e">Estructura de nuestra función</a></li>
-<li><a href="#org5549252">Un bucle para recorrer los parámetros MA</a></li>
+<li><a href="#org6547a07">Vectores y matrices (en Gretl son el mismo objeto)</a></li>
+<li><a href="#org6276106">Estructura de nuestra función</a></li>
+<li><a href="#org9a47e83">Un bucle para recorrer los parámetros MA</a></li>
 </ul>
 </li>
-<li><a href="#org42fb6f9">Actividad 3 - Escribir nuestra función que simula procesos MA</a></li>
-<li><a href="#org0aab00c">Actividad 4 - Use su función en un bucle para generar muchos MA(\(q\)) con el mismo modelo e inferir el comportamiento general</a></li>
-<li><a href="#org6d54b0e">Código completo de la práctica</a></li>
+<li><a href="#org59c29b4">Actividad 3 - Escribir nuestra función que simula procesos MA</a></li>
+<li><a href="#orge272f6c">Actividad 4 - Use su función en un bucle para generar muchos MA(\(q\)) con el mismo modelo e inferir el comportamiento general</a></li>
+<li><a href="#org438ba61">Código completo de la práctica</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org31d309b" class="outline-2">
-<h2 id="org31d309b">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-org31d309b">
+<div id="outline-container-org774b535" class="outline-2">
+<h2 id="org774b535">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-org774b535">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -156,13 +156,13 @@ La ventaja de usar una función es que podemos simular los procesos MA de una ma
 <ol class="org-ol">
 <li>Escribir una función que, dado un polinomio MA, simule un proceso de media móvil.</li>
 <li>Usar dicha función en un guión de Gretl.</li>
-<li>Usar dicha función en un bucle para comprobar empíricamente los procesos MA son estacionarios.</li>
+<li>Usar dicha función en un bucle para comprobar empíricamente que los procesos MA son estacionarios.</li>
 </ol>
 </div>
 </div>
-<div id="outline-container-orgc0ea7c7" class="outline-2">
-<h2 id="orgc0ea7c7">Actividad 1 - Conocer que se pueden definir funciones por parte del usuario</h2>
-<div class="outline-text-2" id="text-orgc0ea7c7">
+<div id="outline-container-orgdd4efda" class="outline-2">
+<h2 id="orgdd4efda">Actividad 1 - Conocer que se pueden definir funciones por parte del usuario</h2>
+<div class="outline-text-2" id="text-orgdd4efda">
 <p>
 El lenguaje de programación que acompaña a Gretl se denomina Hansl 
 (Hansl y Gretl van de la mano&hellip; como en el cuento).
@@ -183,9 +183,9 @@ En los siguientes enlaces tiene abundante documentación
 Veamos un breve resumen sobre la definición de funciones.
 </p>
 </div>
-<div id="outline-container-orgd9d4730" class="outline-3">
-<h3 id="orgd9d4730">Funciones definidas por el usuario</h3>
-<div class="outline-text-3" id="text-orgd9d4730">
+<div id="outline-container-org4c847e2" class="outline-3">
+<h3 id="org4c847e2">Funciones definidas por el usuario</h3>
+<div class="outline-text-3" id="text-org4c847e2">
 <p>
 (<i>Lo que sigue está sacado del <a href="https://sourceforge.net/projects/gretl/files/manual/hansl-primer.pdf/download">manual de Hansl</a></i>.)
 </p>
@@ -297,7 +297,8 @@ Los parámetros de la función pueden ser de cualquiera de los siguientes tipos:
 </table>
 
 <p>
-Cada parámetro debe incluir dos elementos: el especificador de tipo y el nombre por el cual será conocido dentro de la función. Por ejemplo:
+Cada parámetro debe incluir dos elementos: el especificador de tipo y el nombre por el cual será conocido dentro de la función. 
+Por ejemplo, la siguiente función usa tres parámetros (<code>y</code>, <code>xvars</code> y <code>parlanchín</code>) de tres tipo distintos (<code>series</code>, <code>list</code>  y <code>bool</code>):
 </p>
 
 <div class="org-src-container">
@@ -306,7 +307,7 @@ Cada parámetro debe incluir dos elementos: el especificador de tipo y el nombre
 </div>
 
 <p>
-Puedes definir una función sin parámetros (a veces llamadas <i>rutinas</i>). En este caso, utiliza la palabra clave <code>void</code> en lugar de la lista de parámetros:
+Se puede definir una función sin parámetros (a veces llamadas <i>rutinas</i>). En este caso, debe utilizarse la palabra clave <code>void</code> en lugar de la lista de parámetros:
 </p>
 
 <div class="org-src-container">
@@ -314,19 +315,22 @@ Puedes definir una función sin parámetros (a veces llamadas <i>rutinas</i>). E
 </code></pre>
 </div>
 </div>
-<div id="outline-container-org59be3f4" class="outline-4">
-<h4 id="org59be3f4">Cuerpo de la función</h4>
-<div class="outline-text-4" id="text-org59be3f4">
+<div id="outline-container-orga299fc8" class="outline-4">
+<h4 id="orga299fc8">Cuerpo de la función</h4>
+<div class="outline-text-4" id="text-orga299fc8">
 <p>
-El <b>cuerpo de la función</b> está compuesto por comandos de gretl o llamadas a funciones definidas por el usuario (es decir, las llamadas a funciones pueden estar anidadas). Una función puede llamarse a sí misma (es decir, las funciones pueden ser recursivas). 
+El <b>cuerpo de la función</b> está compuesto por comandos de gretl o llamadas a funciones definidas por el usuario (es decir, las llamadas a funciones pueden estar anidadas). 
+Una función puede llamarse a sí misma (es decir, las funciones pueden ser recursivas). 
 </p>
 
 <p>
-El comando <code>return</code> se utiliza para detener la ejecución dentro de la función y entregar el resultado al código que llamó a la función. Esto suele hacerse al final del cuerpo de la función, pero no es obligatorio. La definición de la función debe terminar con la expresión <code>end function</code>, en una línea sola.
+El comando <code>return</code> se utiliza para detener la ejecución dentro de la función y entregar el resultado al código que llamó a la función. 
+Esto suele hacerse al final del cuerpo de la función, pero no es obligatorio. La definición de la función debe terminar con la expresión <code>end function</code>, en una línea sola.
 </p>
 
 <p>
-☞ Atención: a diferencia de otros lenguajes (por ejemplo, Matlab o GAUSS), no puedes retornar múltiples salidas directamente desde una función. No obstante, puedes retornar un objeto que contenga múltiples elementos, como un arreglo (para salidas homogéneas) o un bundle (para elementos heterogéneos) y llenarlo con tantos objetos como desees.
+☞ Atención: a diferencia de otros lenguajes (por ejemplo, Matlab o GAUSS), no puede retornar múltiples salidas directamente desde una función. 
+No obstante, puede retornar un objeto que contenga múltiples elementos, como un arreglo (para salidas homogéneas) o un bundle (para elementos heterogéneos) y llenarlo con tantos objetos como desee.
 </p>
 <p>
 <i>He omitido bastante información. Para saber más, recurra a la documentación de Gretl y/o Hansl</i>.
@@ -338,9 +342,9 @@ Para ver cómo funcionan las funciones en la práctica, vamos a crear una que si
 </div>
 </div>
 </div>
-<div id="outline-container-orgc1c9ac4" class="outline-2">
-<h2 id="orgc1c9ac4">Actividad 2 - Planificar la estructura de una función que simule procesos MA(\(q\))</h2>
-<div class="outline-text-2" id="text-orgc1c9ac4">
+<div id="outline-container-org65062d5" class="outline-2">
+<h2 id="org65062d5">Actividad 2 - Planificar la estructura de una función que simule procesos MA(\(q\))</h2>
+<div class="outline-text-2" id="text-org65062d5">
 <p>
 Ya simulamos procesos de media móvil en la práctica anterior. Por ello sabemos que necesitamos:
 </p>
@@ -350,17 +354,16 @@ Ya simulamos procesos de media móvil en la práctica anterior. Por ello sabemos
 <li>Saber por qué parámetro se va a multiplicar cada retardo del proceso de ruido blanco</li>
 </ul>
 <p>
-La información relativa a los dos últimos pasos se puede obtener de un polinomio MA. Un modo de implementar un polinomio en un ordenador es con una secuencia (o vector) de números. 
+La información relativa a los dos últimos pasos se puede obtener de un polinomio MA. 
+Un modo de implementar un polinomio en un ordenador es con una secuencia (o vector) de números. 
 </p>
 </div>
-<div id="outline-container-orgbf68e5e" class="outline-3">
-<h3 id="orgbf68e5e">Vectores y matrices (en Gretl son el mismo objeto)</h3>
-<div class="outline-text-3" id="text-orgbf68e5e">
+<div id="outline-container-org6547a07" class="outline-3">
+<h3 id="org6547a07">Vectores y matrices (en Gretl son el mismo objeto)</h3>
+<div class="outline-text-3" id="text-org6547a07">
 <p>
-Gretl dispone de un tipo de objeto que denomina <code>matrix</code> (matriz) y que es un arreglo rectangular de números. Por eso usaremos una <code>matrix</code> con una única fila o una única columna en nuestra función. 
-</p>
-
-<p>
+Gretl dispone de un tipo de objeto que denomina <code>matrix</code> (matriz) y que es un arreglo rectangular de números. 
+Usaremos una <code>matrix</code> con una única fila o una única columna para implementar un polinomio dentro de nuestra función. 
 Un ejemplo de matriz fila es 
 </p>
 <div class="org-src-container">
@@ -378,24 +381,14 @@ donde los elementos (las columnas) son separados por comas. Un ejemplo de matriz
 donde los elementos (las fila) son separados por comas. 
 </p>
 <p>
-En la <i>consola de gretl</i> ejecute lo siguiente para comprobalo:
+En la <i>consola de gretl</i> ejecute cada uno de los siguientes <code>print</code> para comprobarlo:
 </p>
 <div class="org-src-container">
 <pre class="src src-gretl"><code>print {1, 2, 3, 4}
-</code></pre>
-</div>
-<p>
-luego
-</p>
-<div class="org-src-container">
-<pre class="src src-gretl"><code>print {1; 2; 3; 4}
-</code></pre>
-</div>
-<p>
-y por último
-</p>
-<div class="org-src-container">
-<pre class="src src-gretl"><code>print {1, 2; 3, 4}
+
+print {1; 2; 3; 4}
+
+print {1, 2; 3, 4}
 </code></pre>
 </div>
 
@@ -404,7 +397,9 @@ Con <code>cols(A)</code> obtenemos el número de columnas de la matriz <code>A</
 </p>
 
 <p>
-Para obtener un elemento de una matriz fila o de una matriz columna, se escribe el nombre de la matriz seguido del índice de elemento que deseamos entre corchetes. Por ejemplo <code>A[3]</code> nos devuelve el tercer componente.
+Para obtener un elemento de una matriz fila o de una matriz columna, se escribe el nombre de la matriz seguido del índice de elemento que deseamos entre corchetes. 
+Por ejemplo <code>A[3]</code> nos devuelve el tercer componente si la matriz tiene una sola columna o una sola fila.
+Para matrices rectangulares: <code>A[3,2]</code> nos devuelve el tercer componente de la segunda columna; <code>A[3,]</code> nos devuelve la tercera fila y <code>A[,2]</code> nos devuelve la segunda columna.
 </p>
 
 <p>
@@ -412,11 +407,13 @@ Para obtener un elemento de una matriz fila o de una matriz columna, se escribe 
 </p>
 </div>
 </div>
-<div id="outline-container-org6225a9e" class="outline-3">
-<h3 id="org6225a9e">Estructura de nuestra función</h3>
-<div class="outline-text-3" id="text-org6225a9e">
+<div id="outline-container-org6276106" class="outline-3">
+<h3 id="org6276106">Estructura de nuestra función</h3>
+<div class="outline-text-3" id="text-org6276106">
 <p>
-Así pues, como argumento de nuestra función usaremos una <code>matrix</code> con una única fila o columna que contenga los parámetros MA, y donde el primer parámetro sea un \(1\). Llamaremos a este argumento <code>theta</code>. Es decir, nuestra función tendrá el siguiente aspecto
+Así pues, como argumento de nuestra función usaremos una <code>matrix</code> con una única fila o columna que contenga los parámetros MA, y donde el primer parámetro será un \(1\). 
+Llamaremos a este argumento <code>theta</code>. 
+Es decir, nuestra función tendrá el siguiente aspecto
 </p>
 
 <div class="org-src-container">
@@ -425,18 +422,18 @@ function series SimuladorMA(matrix theta)
     Pasos a dar, que consisten en:
     - simular un proceso de ruido blanco RW
     - recorrer los valores contenidos en theta y para cada uno:
-        Agregar el múltiplos del correspondiente retardos de RW
+        Agregar el múltiplos del correspondiente retardo de RW
     - Devolver la serie temporal obtenida
 end function
 </code></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org5549252" class="outline-3">
-<h3 id="org5549252">Un bucle para recorrer los parámetros MA</h3>
-<div class="outline-text-3" id="text-org5549252">
+<div id="outline-container-org9a47e83" class="outline-3">
+<h3 id="org9a47e83">Un bucle para recorrer los parámetros MA</h3>
+<div class="outline-text-3" id="text-org9a47e83">
 <p>
-El comando básico de hansl para crear bucles es (¡sorpresa!) <code>loop</code>, y tiene la forma:
+El comando básico de hansl para crear bucles es <code>loop</code>; y tiene la forma:
 </p>
 
 <div class="org-src-container">
@@ -448,7 +445,9 @@ endloop
 </div>
 
 <p>
-En otras palabras, la pareja de instrucciones <code>loop</code> y <code>endloop</code> encierra las sentencias que se repetirán. Por supuesto, los bucles pueden estar anidados. Se soportan varias variantes de la <code>&lt;expresión-de-control&gt;</code> para un bucle, como se muestra a continuación:
+En otras palabras, la pareja de instrucciones <code>loop</code> y <code>endloop</code> encierra las sentencias que se repetirán. 
+Por supuesto, los bucles pueden estar anidados. 
+Se soportan varias variantes de la <code>&lt;expresión-de-control&gt;</code> para un bucle, como se muestra a continuación:
 </p>
 
 <ol class="org-ol">
@@ -458,7 +457,6 @@ En otras palabras, la pareja de instrucciones <code>loop</code> y <code>endloop<
 <li>Bucle foreach</li>
 <li>Bucle for</li>
 </ol>
-
 
 <p>
 Para nuestra función (en la que queremos recorrer lo componentes del vector <code>theta</code>) usaremos la modalidad <code>con índice</code>
@@ -480,7 +478,8 @@ endloop
 <ul class="org-ul">
 <li>Es decir, si <code>theta</code> es la matriz fila <code>{1, 0.6, -0.3}</code>, el índice <code>i</code> recorrerá los valores \(1\) a \(3\). Por otra parte, <code>theta[2]</code> corresponderá al parámetro <code>0.6</code>.</li>
 
-<li>Como el polinomio MA correspondiente a esta matriz fila (o vector, si lo prefiere) es \(1+0.6\,z-0.3\,z^2\), el <i>segundo</i> parámetro corresponde al <i>primer retardo</i>. Consecuentemente en cada iteración, a la serie hay que añadirle <code>theta[i] * WN[1-i]</code></li>
+<li>Como el polinomio MA correspondiente a esta matriz fila es \(1+0.6\,z-0.3\,z^2\), fíjese que el <i>segundo</i> parámetro corresponde al <i>primer retardo</i>. 
+Consecuentemente en cada iteración, a la serie hay que añadirle <code>theta[i] * WN[1-i]</code></li>
 
 <li>Si llamamos <code>X</code> a la serie temporal que vamos a simular, inicialmente (y fuera del bucle) definiremos <code>X</code> como una serie temporal nula (<code>series X=0</code>). i.e., que solo contiene ceros.</li>
 </ul>
@@ -499,16 +498,16 @@ Es decir, <code>X</code> es lo que fuera hasta el momento más el retardo del ru
 </div>
 </div>
 </div>
-<div id="outline-container-org42fb6f9" class="outline-2">
-<h2 id="org42fb6f9">Actividad 3 - Escribir nuestra función que simula procesos MA</h2>
-<div class="outline-text-2" id="text-org42fb6f9">
+<div id="outline-container-org59c29b4" class="outline-2">
+<h2 id="org59c29b4">Actividad 3 - Escribir nuestra función que simula procesos MA</h2>
+<div class="outline-text-2" id="text-org59c29b4">
 <p>
 Para crear la función, primero hemos simulado manualmente algunos procesos MA (práctica anterior). Hemos analizado cómo sistematizar dichas simulaciones y qué estructura debería tener la función (argumentos y pasos necesarios). Tenga siempre presente que  el enfoque de programación implica primero planificar (es muy beneficioso esbozar ideas con lápiz y papel, y sin ordenador). También hay que consultar la documentación de las funciones que nos serán útiles para implementar nuestro plan. 
 Esta es la función:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-gretl" id="orgfa082ef"><code>function series SimuladorMA(matrix theta)
+<pre class="src src-gretl" id="org9015f69"><code>function series SimuladorMA(matrix theta)
     # SimuladorMA(theta) simula un proceso MA(q), 
     # donde theta es el polinomio (mónico) MA y q es su grado.
     series WN = normal (0,1)
@@ -547,7 +546,7 @@ gnuplot X Y --time-series --with-lines  --output="MA2.png"
 
 <div class="org-center">
 
-<div id="orgacd9756" class="figure">
+<div id="org984c2f8" class="figure">
 <p><img src="P-L03-B-simulacion-procesos-MA/MA2.png" alt="MA2.png" />
 </p>
 <p><span class="figure-number">Figura 1: </span>Figura con las dos series MA simuladas.</p>
@@ -555,17 +554,21 @@ gnuplot X Y --time-series --with-lines  --output="MA2.png"
 </div>
 </div>
 </div>
-<div id="outline-container-org0aab00c" class="outline-2">
-<h2 id="org0aab00c">Actividad 4 - Use su función en un bucle para generar muchos MA(\(q\)) con el mismo modelo e inferir el comportamiento general</h2>
-<div class="outline-text-2" id="text-org0aab00c">
+<div id="outline-container-orge272f6c" class="outline-2">
+<h2 id="orge272f6c">Actividad 4 - Use su función en un bucle para generar muchos MA(\(q\)) con el mismo modelo e inferir el comportamiento general</h2>
+<div class="outline-text-2" id="text-orge272f6c">
 <div class="org-src-container">
 <pre class="src src-gretl"><code># Número de simulaciones
 scalar n = 300
 
-# Preasignamos una matriz para guardar los datos
-matrix M = zeros($nobs, n)
+# Definimos el polinomio MA y registramos su orden
+matrix theta = {1, 1.8, 0.9}
+scalar q = cols(theta) - 1
 
-matrix theta = SimuladorMA( {1, 1.8, 0.9} )
+# Preasignamos una matriz para guardar los datos
+matrix M = zeros($nobs-q, n)   # fíjese que perdemos q observaciones en la simulación
+
+matrix theta = {1, 1.8, 0.9}
 
 # Bucle sobre las columnas
 loop j=1..n --quiet
@@ -580,16 +583,18 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosMA
 
 <div class="org-center">
 
-<div id="orge235a31" class="figure">
+<div id="org563ef2e" class="figure">
 <p><img src="P-L03-B-simulacion-procesos-MA/MuchosMA.png" alt="MuchosMA.png" />
 </p>
-<p><span class="figure-number">Figura 2: </span>Figura con la simulación de 200 MA con el mismo modelo</p>
+<p><span class="figure-number">Figura 2: </span>Figura con la simulación de 300 MA(2) con el mismo modelo</p>
 </div>
 </div>
 
 <p>
-La figura <a href="#orge235a31">2</a> presenta 300 realizaciones del proceso MA simulado con la función que hemos programado. 
-Como podemos ver la media y varianza parecen similares. Pero no se ve muy bien. Mejor, hagamos un corte en los instantes \(t = 1, 70, 140\) y \(200\) para crear un histograma de los valores tomados por las 300 simulaciones en esos instantes.
+La figura <a href="#org563ef2e">2</a> presenta 300 realizaciones del proceso MA simulado con la función que hemos programado. 
+Como podemos ver, la media y varianza parecen similares. 
+Pero no se ve muy bien. 
+Mejor, hagamos un corte en los instantes \(t = 1, 70, 140\) y \((200-q)\) para crear un histograma de los valores tomados por las 300 simulaciones en esos instantes.
 </p>
 
 <div class="org-src-container">
@@ -598,7 +603,7 @@ Como podemos ver la media y varianza parecen similares. Pero no se ve muy bien. 
 matrix v1 = M[1,]'
 matrix v2 = M[70,]'
 matrix v3 = M[140,]'
-matrix v4 = M[200,]'
+matrix v4 = M[200-q,]'
 
 # Dibujar histograma
 freq --matrix=v1 --nbins=15 --normal --plot="histograma_t1.png"
@@ -610,9 +615,9 @@ freq --matrix=v4 --nbins=15 --normal --plot="histograma_t200.png"
 </div>
 
 <p>
-Las cuatro figuras proporcionan histogramas de la distribución de los 300 valores de la variable del proceso disponibles para los instantes temporales \(t = 1, 70, 140\) y \(200\).
+Las cuatro figuras proporcionan histogramas de la distribución de los 300 valores de la variable del proceso disponibles para los instantes temporales \(t = 1, 70, 140\) y \((200-q)\).
 Se observa que la media de estas distribuciones es aproximadamente cero en los cuatro casos, y que la desviación típica también es similar (alrededor de \(2\)). 
-Este resultado coincide con la <a href="#orge235a31">2</a>, donde se observa que las realizaciones del proceso tienen un comportamiento homogéneo a lo largo del tiempo (no podía ser de otro modo, pues los procesos MA son estacionarios).
+Este resultado coincide con la figura <a href="#org563ef2e">2</a>, donde se observa que las realizaciones del proceso tienen un comportamiento homogéneo a lo largo del tiempo (no podía ser de otro modo, pues los procesos MA son estacionarios).
 </p>
 
 <div class="row">
@@ -627,9 +632,9 @@ Este resultado coincide con la <a href="#orge235a31">2</a>, donde se observa que
 </div>
 </div>
 </div>
-<div id="outline-container-org6d54b0e" class="outline-2">
-<h2 id="org6d54b0e">Código completo de la práctica</h2>
-<div class="outline-text-2" id="text-org6d54b0e">
+<div id="outline-container-org438ba61" class="outline-2">
+<h2 id="org438ba61">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-org438ba61">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -649,7 +654,7 @@ Este resultado coincide con la <a href="#orge235a31">2</a>, donde se observa que
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-09-23 Tue 09:15</p>
+<p class="date">Created: 2025-09-25 Thu 16:55</p>
 </div>
 </body>
 </html>
