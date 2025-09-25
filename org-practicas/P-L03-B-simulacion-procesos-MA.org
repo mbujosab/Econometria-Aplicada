@@ -111,7 +111,7 @@ La ventaja de usar una función es que podemos simular los procesos MA de una ma
 
 1. Escribir una función que, dado un polinomio MA, simule un proceso de media móvil.
 2. Usar dicha función en un guión de Gretl.
-3. Usar dicha función en un bucle para comprobar empíricamente los procesos MA son estacionarios.
+3. Usar dicha función en un bucle para comprobar empíricamente que los procesos MA son estacionarios.
 
 
 * Actividad 1 - Conocer que se pueden definir funciones por parte del usuario
@@ -168,13 +168,14 @@ Los parámetros de la función pueden ser de cualquiera de los siguientes tipos:
 | ~strings~  | arreglo de cadenas de texto                             |
 | ~arrays~   | arreglo de arreglos                                     |
 
-Cada parámetro debe incluir dos elementos: el especificador de tipo y el nombre por el cual será conocido dentro de la función. Por ejemplo:
+Cada parámetro debe incluir dos elementos: el especificador de tipo y el nombre por el cual será conocido dentro de la función. 
+Por ejemplo, la siguiente función usa tres parámetros (=y=, =xvars= y =parlanchín=) de tres tipo distintos (=series=, =list=  y =bool=):
 
 #+BEGIN_SRC gretl :eval no
 function scalar mi_funcion (series y, list xvars, bool parlanchin)
 #+END_SRC
 
-Puedes definir una función sin parámetros (a veces llamadas /rutinas/). En este caso, utiliza la palabra clave ~void~ en lugar de la lista de parámetros:
+Se puede definir una función sin parámetros (a veces llamadas /rutinas/). En este caso, debe utilizarse la palabra clave ~void~ en lugar de la lista de parámetros:
 
 #+BEGIN_SRC gretl :eval no
 function matrix mi_funcion2 (void)
@@ -192,15 +193,18 @@ La explicación de esta modificación está relacionada con el uso de argumentos
 
 *** Cuerpo de la función
 
-El *cuerpo de la función* está compuesto por comandos de gretl o llamadas a funciones definidas por el usuario (es decir, las llamadas a funciones pueden estar anidadas). Una función puede llamarse a sí misma (es decir, las funciones pueden ser recursivas). 
+El *cuerpo de la función* está compuesto por comandos de gretl o llamadas a funciones definidas por el usuario (es decir, las llamadas a funciones pueden estar anidadas). 
+Una función puede llamarse a sí misma (es decir, las funciones pueden ser recursivas). 
 
 # El cuerpo de la función contiene (casi) cualquier código hansl, el cual debe calcular el valor de retorno, es decir, el valor que la función debe entregar. Toda variable declarada dentro de la función es local y dejará de existir al finalizar la función. (Sacado del Manual de Hansl)
 
 # Aunque el cuerpo de la función puede contener llamadas a otras funciones, no puede contener definiciones de funciones. Es decir, no se puede definir una función dentro de otra función. Para más detalles, consulta la sección correspondiente del manual. (Sacado del Manual de Gretl)
 
-El comando =return= se utiliza para detener la ejecución dentro de la función y entregar el resultado al código que llamó a la función. Esto suele hacerse al final del cuerpo de la función, pero no es obligatorio. La definición de la función debe terminar con la expresión =end function=, en una línea sola.
+El comando =return= se utiliza para detener la ejecución dentro de la función y entregar el resultado al código que llamó a la función. 
+Esto suele hacerse al final del cuerpo de la función, pero no es obligatorio. La definición de la función debe terminar con la expresión =end function=, en una línea sola.
 
-☞ Atención: a diferencia de otros lenguajes (por ejemplo, Matlab o GAUSS), no puedes retornar múltiples salidas directamente desde una función. No obstante, puedes retornar un objeto que contenga múltiples elementos, como un arreglo (para salidas homogéneas) o un bundle (para elementos heterogéneos) y llenarlo con tantos objetos como desees.
+☞ Atención: a diferencia de otros lenguajes (por ejemplo, Matlab o GAUSS), no puede retornar múltiples salidas directamente desde una función. 
+No obstante, puede retornar un objeto que contenga múltiples elementos, como un arreglo (para salidas homogéneas) o un bundle (para elementos heterogéneos) y llenarlo con tantos objetos como desee.
 #+latex: \bigskip
 
 /He omitido bastante información. Para saber más, recurra a la documentación de Gretl y/o Hansl/.
@@ -292,12 +296,13 @@ Ya simulamos procesos de media móvil en la práctica anterior. Por ello sabemos
 - Simular un proceso de ruido blanco
 - Saber qué retardos vamos a emplear
 - Saber por qué parámetro se va a multiplicar cada retardo del proceso de ruido blanco
-La información relativa a los dos últimos pasos se puede obtener de un polinomio MA. Un modo de implementar un polinomio en un ordenador es con una secuencia (o vector) de números. 
+La información relativa a los dos últimos pasos se puede obtener de un polinomio MA. 
+Un modo de implementar un polinomio en un ordenador es con una secuencia (o vector) de números. 
 
 ** Vectores y matrices (en Gretl son el mismo objeto)
  
-Gretl dispone de un tipo de objeto que denomina ~matrix~ (matriz) y que es un arreglo rectangular de números. Por eso usaremos una ~matrix~ con una única fila o una única columna en nuestra función. 
-
+Gretl dispone de un tipo de objeto que denomina ~matrix~ (matriz) y que es un arreglo rectangular de números. 
+Usaremos una ~matrix~ con una única fila o una única columna para implementar un polinomio dentro de nuestra función. 
 Un ejemplo de matriz fila es 
 #+BEGIN_SRC gretl :eval no
 {1, 2, 3, 4}
@@ -309,28 +314,28 @@ donde los elementos (las columnas) son separados por comas. Un ejemplo de matriz
 donde los elementos (las fila) son separados por comas. 
 #+latex: \bigskip
 
-En la /consola de gretl/ ejecute lo siguiente para comprobalo:
+En la /consola de gretl/ ejecute cada uno de los siguientes =print= para comprobarlo:
 #+BEGIN_SRC gretl :eval no
 print {1, 2, 3, 4}
-#+END_SRC
-luego
-#+BEGIN_SRC gretl :eval no
+
 print {1; 2; 3; 4}
-#+END_SRC
-y por último
-#+BEGIN_SRC gretl :eval no
+
 print {1, 2; 3, 4}
 #+END_SRC
 
 Con =cols(A)= obtenemos el número de columnas de la matriz ~A~; y con =rows(A)= el número de filas.
 
-Para obtener un elemento de una matriz fila o de una matriz columna, se escribe el nombre de la matriz seguido del índice de elemento que deseamos entre corchetes. Por ejemplo =A[3]= nos devuelve el tercer componente.
+Para obtener un elemento de una matriz fila o de una matriz columna, se escribe el nombre de la matriz seguido del índice de elemento que deseamos entre corchetes. 
+Por ejemplo =A[3]= nos devuelve el tercer componente si la matriz tiene una sola columna o una sola fila.
+Para matrices rectangulares: =A[3,2]= nos devuelve el tercer componente de la segunda columna; =A[3,]= nos devuelve la tercera fila y =A[,2]= nos devuelve la segunda columna.
 
 (/El manual de Gretl tiene un capítulo dedicado a las matrices/.)
 
 ** Estructura de nuestra función
 
-Así pues, como argumento de nuestra función usaremos una ~matrix~ con una única fila o columna que contenga los parámetros MA, y donde el primer parámetro sea un $1$. Llamaremos a este argumento =theta=. Es decir, nuestra función tendrá el siguiente aspecto
+Así pues, como argumento de nuestra función usaremos una ~matrix~ con una única fila o columna que contenga los parámetros MA, y donde el primer parámetro será un $1$. 
+Llamaremos a este argumento =theta=. 
+Es decir, nuestra función tendrá el siguiente aspecto
 
 #+BEGIN_SRC gretl :eval no
 # pseudo-código explicativo
@@ -338,14 +343,14 @@ function series SimuladorMA(matrix theta)
     Pasos a dar, que consisten en:
     - simular un proceso de ruido blanco RW
     - recorrer los valores contenidos en theta y para cada uno:
-        Agregar el múltiplos del correspondiente retardos de RW
+        Agregar el múltiplos del correspondiente retardo de RW
     - Devolver la serie temporal obtenida
 end function
 #+END_SRC
 
 ** Un bucle para recorrer los parámetros MA
 
-El comando básico de hansl para crear bucles es (¡sorpresa!) =loop=, y tiene la forma:
+El comando básico de hansl para crear bucles es =loop=; y tiene la forma:
 
 #+BEGIN_SRC gretl :eval no
 # pseudo-código explicativo
@@ -354,14 +359,15 @@ loop <expresión-de-control> <opciones>
 endloop
 #+END_SRC
 
-En otras palabras, la pareja de instrucciones =loop= y =endloop= encierra las sentencias que se repetirán. Por supuesto, los bucles pueden estar anidados. Se soportan varias variantes de la =<expresión-de-control>= para un bucle, como se muestra a continuación:
+En otras palabras, la pareja de instrucciones =loop= y =endloop= encierra las sentencias que se repetirán. 
+Por supuesto, los bucles pueden estar anidados. 
+Se soportan varias variantes de la =<expresión-de-control>= para un bucle, como se muestra a continuación:
 
 1. Bucle incondicional
 2. Bucle while
 3. Bucle con índice
 4. Bucle foreach
 5. Bucle for
-
 
 Para nuestra función (en la que queremos recorrer lo componentes del vector =theta=) usaremos la modalidad =con índice=
 
@@ -379,7 +385,8 @@ endloop
 
 - Es decir, si =theta= es la matriz fila ={1, 0.6, -0.3}=, el índice =i= recorrerá los valores $1$ a $3$. Por otra parte, =theta[2]= corresponderá al parámetro =0.6=. 
 
-- Como el polinomio MA correspondiente a esta matriz fila (o vector, si lo prefiere) es $1+0.6\,z-0.3\,z^2$, el /segundo/ parámetro corresponde al /primer retardo/. Consecuentemente en cada iteración, a la serie hay que añadirle =theta[i] * WN[1-i]=
+- Como el polinomio MA correspondiente a esta matriz fila es $1+0.6\,z-0.3\,z^2$, fíjese que el /segundo/ parámetro corresponde al /primer retardo/. 
+  Consecuentemente en cada iteración, a la serie hay que añadirle =theta[i] * WN[1-i]=
 
 - Si llamamos =X= a la serie temporal que vamos a simular, inicialmente (y fuera del bucle) definiremos =X= como una serie temporal nula (~series X=0~). i.e., que solo contiene ceros.
 
@@ -389,7 +396,6 @@ En cada iteración del bucle iremos añadiendo a =X= múltiplos del ruido blanco
 series X = X + el_multiplo_del_retardo_de_RW_que_corresponda
 #+END_SRC
 Es decir, =X= es lo que fuera hasta el momento más el retardo del ruido blanco   =theta[i] * WN[1-i]= que corresponda a la vigente iteración del bucle.
-
 
 
 * Actividad 3 - Escribir nuestra función que simula procesos MA
@@ -448,10 +454,14 @@ gnuplot X Y --time-series --with-lines  --output="MA2.png"
 # Número de simulaciones
 scalar n = 300
 
-# Preasignamos una matriz para guardar los datos
-matrix M = zeros($nobs, n)
+# Definimos el polinomio MA y registramos su orden
+matrix theta = {1, 1.8, 0.9}
+scalar q = cols(theta) - 1
 
-matrix theta = SimuladorMA( {1, 1.8, 0.9} )
+# Preasignamos una matriz para guardar los datos
+matrix M = zeros($nobs-q, n)   # fíjese que perdemos q observaciones en la simulación
+
+matrix theta = {1, 1.8, 0.9}
 
 # Bucle sobre las columnas
 loop j=1..n --quiet
@@ -464,7 +474,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosMA
 
 
 #+BEGIN_CENTER
-#+CAPTION: Figura con la simulación de 200 MA con el mismo modelo
+#+CAPTION: Figura con la simulación de 300 MA(2) con el mismo modelo
 #+attr_org: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
 #+NAME: fig:MuchosMA
@@ -472,7 +482,9 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosMA
 #+END_CENTER
 
 La figura [[fig:MuchosMA]] presenta 300 realizaciones del proceso MA simulado con la función que hemos programado. 
-Como podemos ver la media y varianza parecen similares. Pero no se ve muy bien. Mejor, hagamos un corte en los instantes \(t = 1, 70, 140\) y $200$ para crear un histograma de los valores tomados por las 300 simulaciones en esos instantes.
+Como podemos ver, la media y varianza parecen similares. 
+Pero no se ve muy bien. 
+Mejor, hagamos un corte en los instantes \(t = 1, 70, 140\) y $(200-q)$ para crear un histograma de los valores tomados por las 300 simulaciones en esos instantes.
 
 #+BEGIN_SRC gretl :tangle ./guiones/P-L03-B-simulacion-procesos-MA.inp :eval no
 # Extraemos las filas como vectores columna.
@@ -480,7 +492,7 @@ Como podemos ver la media y varianza parecen similares. Pero no se ve muy bien. 
 matrix v1 = M[1,]'
 matrix v2 = M[70,]'
 matrix v3 = M[140,]'
-matrix v4 = M[200,]'
+matrix v4 = M[200-q,]'
 
 # Dibujar histograma
 freq --matrix=v1 --nbins=15 --normal --plot="histograma_t1.png"
@@ -490,9 +502,9 @@ freq --matrix=v4 --nbins=15 --normal --plot="histograma_t200.png"
 
 #+END_SRC
 
-Las cuatro figuras proporcionan histogramas de la distribución de los 300 valores de la variable del proceso disponibles para los instantes temporales \(t = 1, 70, 140\) y $200$.
+Las cuatro figuras proporcionan histogramas de la distribución de los 300 valores de la variable del proceso disponibles para los instantes temporales \(t = 1, 70, 140\) y $(200-q)$.
 Se observa que la media de estas distribuciones es aproximadamente cero en los cuatro casos, y que la desviación típica también es similar (alrededor de $2$). 
-Este resultado coincide con la [[fig:MuchosMA]], donde se observa que las realizaciones del proceso tienen un comportamiento homogéneo a lo largo del tiempo (no podía ser de otro modo, pues los procesos MA son estacionarios).
+Este resultado coincide con la figura [[fig:MuchosMA]], donde se observa que las realizaciones del proceso tienen un comportamiento homogéneo a lo largo del tiempo (no podía ser de otro modo, pues los procesos MA son estacionarios).
 
 #+BEGIN_EXPORT latex
 \begin{center}

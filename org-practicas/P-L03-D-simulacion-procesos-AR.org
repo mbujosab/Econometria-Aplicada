@@ -111,12 +111,12 @@ En las prácticas anteriores hemos simulado procesos estacionarios MA. Ahora vam
 1. Advertir que un proceso AR es recursivo, por lo que el modo de simularlo es esencialmente distinto de un proceso MA
 2. Simular un proceso AR de un modo rudimentario
 3. Escribir una función que simule procesos AR
-4. Usar dicha función en un bucle para comprobar empíricamente que en unos casos simulamos procesos AR estacionarios y en otros procesos NO estacionarios.
+4. Usar dicha función en un bucle para comprobar empíricamente que en unos casos simulamos procesos AR estacionarios y en otros casos procesos NO estacionarios.
 
 
 * Actividad 1 - Procesos auto-regresivos
 
-Consideremos el proceso estocástico $\boldsymbol{Y}$ definido como la solución de la ecuación en diferencias:
+Consideremos un proceso estocástico $\boldsymbol{Y}$ solución de la siguiente ecuación en diferencias:
 \[
  \boldsymbol{\phi}(\mathsf{B})Y_t
  \;=\;
@@ -124,7 +124,7 @@ Consideremos el proceso estocástico $\boldsymbol{Y}$ definido como la solución
 \]
 donde \(\boldsymbol{\phi}(\mathsf{B})\) es un polinomio en el operador retardo, 
 \(\boldsymbol{U}\) es un proceso de ruido blanco y $t\in\mathbb{Z}$.
-Este proceso se conoce con el nombre de /proceso auto-regresivo/.
+Si alguna solución es estacionaria, nos referimos a ella con el nombre de /proceso auto-regresivo/.
 # O si lo prefiere
 # \[
 #  \sum_{j=0}^p \phi_j Y_{t-j}
@@ -145,7 +145,7 @@ Es decir, para calcular $Y_t$ recurrimos al pasado de $Y_t.\;$
 Esto no ocurre con un proceso $\boldsymbol{X}$ de /media móvil/ donde, para calcular $X_t$, se recurre al presente y pasado de *otro proceso* distinto que es $\boldsymbol{U}$.
 
 
-Como en los casos anteriores, para poder simularlo necesitamos cambiar el escenario y asumir que el proceso comienza en un instante \(t = 0\) (por ejemplo con con \(Y_0 = 0\)); pero además la estrategia debe ser distinta, pues cada valor $Y_t$ simulado debe emplearse para calcular uno o más valores futuros $Y_j$.[fn::En el caso del paseo aleatorio pudimos proceder de este nuevo modo, pero optamos por simularlo como una suma acumulada de los valores tomados por $\boldsymbol{U}$.]
+Como en los casos anteriores, para poder simularlo necesitamos cambiar el escenario y asumir que el proceso comienza en un instante \(t = 0\) (por ejemplo con \(Y_0 = 0\)); además la estrategia debe ser distinta, pues cada valor $Y_t$ simulado debe emplearse para calcular uno o más valores futuros $Y_j$.[fn::En el caso del paseo aleatorio pudimos proceder de este nuevo modo, pero en la práctica anterior optamos por simularlo como una suma acumulada de los valores tomados por $\boldsymbol{U}$.]
 #+latex: \bigskip
 
 
@@ -153,7 +153,7 @@ Como en los casos anteriores, para poder simularlo necesitamos cambiar el escena
 
 ** Muestra y argumentos necesarios
 
-Como en casos anteriores, debemos fijar un tamaño de muestra; y también unas fechas por tratarse de un ejemplo de series temporales. Ya sabemos que lo podemos lograr ejecutando por ejemplo:
+Como en casos anteriores, debemos fijar un tamaño muestral y unas fechas; por tratarse de un ejemplo de series temporales. Ya sabemos que lo podemos lograr ejecutando por ejemplo:
 #+BEGIN_SRC gretl :eval no
 nulldata 300
 setobs 4 1960:01 --time-series
@@ -163,49 +163,49 @@ También necesitamos un proceso de ruido blanco; por ejemplo:
 #+BEGIN_SRC gretl :eval no
 series U = normal(0,1)
 #+END_SRC
-
-Y necesitamos definir un polinomio autoregresivo. 
-Implementamos el polinomio con un vector fila; por ejemplo:
+\noindent
+... y un polinomio autoregresivo. Lo implementamos con una matriz fila (un vector); por ejemplo:
 #+BEGIN_SRC gretl :eval no
 matrix phi = {1, -0.6, -0.3}
 #+END_SRC
-
-Pero también podríamos implementarlo con un vector columna; como por ejemplo:
+Aunque también podemos implementarlo con una matriz columna; como por ejemplo:
 #+BEGIN_SRC gretl :eval no
 {1; -0.6; -0.3}
 #+END_SRC
 
-En este ejemplo el polinomio es de grado 2, pero podría ser de un grado distinto. Las funciones =rows(A)= y =cols(A)= nos devuelven las filas y las columnas de la matriz =A= respectivamente. Al generalizar nuestro código, necesitaremos invocar a alguna de estas dos funciones para obtener el grado (como hemos incluido el =1= inicial el polinomio, deberemos restar una unidad al resultado de =cols(A)= (o de =rows(A)= si trabajamos con vectores columna).
+En este ejemplo $\boldsymbol{\phi}$ es de grado 2, pero podría tener un grado distinto. 
+Las funciones =rows(A)= y =cols(A)= devuelven las filas y las columnas de la matriz =A= respectivamente. 
+Para generalizar nuestro código necesitaremos invocar a alguna de estas dos funciones y obtener el grado de $\boldsymbol{\phi}$ (al incluir el =1= inicial del polinomio, deberemos restar una unidad a =cols(A)= (o =rows(A)= si trabajamos con vectores columna).
 
 
 ** Valores iniciales
 
-Si el polinomio AR es de grado $p$, significa que para calcular $y_t$ necesito conocer los $p$ valores previos a $y_t$. 
+Si el polinomio AR es de grado $p$, para calcular $y_t$ necesito conocer los $p$ valores previos a $y_t$. 
 
 Dicho de otro modo, si no dispongo de $p$ valores iniciales no puedo simular el proceso. 
 Lo habitual es asumir que los $p$ valores iniciales son cero: $y_{1}=0,\ldots,y_{p}=0$... y ahora qué...
 
-Pues ahora hay que recordar que $y_t$ es la suma de dos partes:
+Pues ahora hay que recordar que $Y_t$ es la suma de dos partes:
 \[
  Y_t = \underbrace{\phi_1 Y_{t-1} + \cdots +\phi_p Y_{t-p}}_{\text{combinación del pasado de } Y_t} + \underbrace{U_t.}_{\text{perturbación aleatoria}}
 \]
-La segunda parte es inmediata. Para la primera hay que recorrer los parámetros del polinomio $\phi$ desde el segundo hasta el último multiplicándolos por los correspondientes retardos de $Y_t$.
+La segunda parte es inmediata. Para la primera hay que recorrer los parámetros del polinomio $\boldsymbol{\phi}$ desde el segundo hasta el último multiplicándolos por los correspondientes retardos de $Y_t$.
 
-... además debemos calcular los valores de toda la muestra del proceso simulado, es decir, desde $t=p+1$ a $t=300$ (o el tamaño de muestra que hayamos indicado). 
-Para cada instante, cada una de las partes en la suma es distinta, pues debe calcularse con valores distintos.
+Además debemos calcular los valores de toda la muestra del proceso simulado, es decir, desde $t=p+1$ a $t=300$ (o el tamaño de muestra que hayamos indicado):
+para cada instante $t$, cada una de las partes en la suma es distinta, pues debe calcularse con valores distintos.
 
 ** Estructura del programa que necesita
 
 1. Piense cuantos bucles necesita.
 2. Diseñe en un papel la estructura del programa que necesita.
 3. Escriba su guión en Gretl y pruebe si funciona. 
-   Si no lo hace, piense cuál puede ser el error y corríjalo.
+   Si no funciona piense cuál puede ser el error y corríjalo.
 
 
 * Actividad 3 - Genere una función que simule un paseo aleatorio
 
 Generalice lo anterior escribiendo una función que devuelva realizaciones de procesos AR(p) a partir de polinomios AR.
-- Piense si necesita algún parámetro (si no lo necesita, recuerde indicar como parámetro =void=).
+- Piense si necesita algún parámetro (si no fuera necesario recuerde indicar como parámetro =void=).
 - Piense si necesita emplear uno o más bucles y qué recorrido deben seguir.
 - Recuerde cuál es la estructura de una función en Gretl y que su función debe retornar los valores simulados.
 
@@ -247,7 +247,7 @@ Por ejemplo con el polinomio $\boldsymbol{\phi}(\mathsf{B}) = 1-1.6\mathsf{B}+0.
 \[
  (1-1.6\mathsf{B}+.64\mathsf{B}^2)Y_t = U_t,\quad t>0.
 \]
-Expresado de otra forma: \(Y_t = 1.6Y_{t-1} - 0.64Y_{t-2} + U_t\).
+O expresándolo de otra forma: \(\;Y_t = 1.6Y_{t-1} - 0.64Y_{t-2} + U_t\).
 #+BEGIN_SRC gretl :tangle ./guiones/P-L03-D-simulacion-procesos-AR.inp :eval no
 # Número de simulaciones
 scalar n = 300
@@ -277,9 +277,9 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR
 #+END_CENTER
 
 La figura [[fig:MuchosAR2_I]] presenta 300 realizaciones del proceso
-\((1-1.6\mathsf{B}+.64\mathsf{B}^2)Y_t = U_t\); 
+\((1-1.6\mathsf{B}+0.64\mathsf{B}^2)Y_t = U_t\); 
 con la función que hemos programado. 
-El proceso comienza siempre con el valor cero, pero la probabilidad de que tome valores alejados de cero crece rápidamente y para estabilizarse inmediatamente. 
+El proceso comienza siempre con el valor cero, pero la probabilidad de que tome valores alejados de cero crece rápidamente, pero se estabiliza inmediatamente. 
 
 #+BEGIN_SRC gretl :tangle ./guiones/P-L03-D-simulacion-procesos-AR.inp :eval no
 # Extraemos las filas como vectores columna.
@@ -299,7 +299,7 @@ freq --matrix=v4 --nbins=15 --normal --plot="histograma_t200.png"
 
 Las cuatro figuras proporcionan histogramas de la distribución de los 300 valores de la variable del proceso disponibles para los instantes temporales \(t = 50, 100, 150\) y $200$.
 Se observa que la media de estas distribuciones es aproximadamente cero en los cuatro casos, 
-y la desviación típica es aproximadamente $6$. Si calcula las raíces de este polinomio comprobará que son dos raíces de módulo $1.25$, es decir, el proceso es estacionario y las simulaciones lo reflejan.[fn::*Nota técnica para puristas*. En realidad el proceso simulado no es estacionario. Para que lo fuera, el índice $t$ debería recorrer todos los enteros desde $-\infty$ hasta $\infty$; y que para todo $t$ la esperanza y varianza deberían ser constantes; y las covarianzas $Cov(Y_t,Y_{t-k})$ deberían estar definidas y depender solo de $|k|$ para todo $t$. Pero en este proceso las variables aleatorias $Y_t$ son $0$ para $t\leq p$ (donde $p$ es el orden del proceso AR($p$)). Por tanto, la varianza también es nula si $t\leq p$ (y luego va creciendo hasta estabilizarse). De hecho, desde un punto de vista matemático, cualquier proceso finito no puede ser estrictamente estacionario (al aproximarnos a los extremos para todo $k$ suficientemente grande $Cov(Y_t,Y_{t-k})\ne Cov(Y_t,Y_{t+k})$). Por otra parte, el intervalo hasta alcanzar la estabilidad se denomina ``transitorio'' y es habitual al simular cualquier proceso estocástico, generar muchos datos y descartar los primeros para que los datos considerados en la simulación no contengan el tramo ``transitorio''. En esta práctica no hemos tenido dicha precaución.]
+y la desviación típica es aproximadamente $6$. Si calcula las raíces de este polinomio comprobará que son dos raíces de módulo $1.25$, es decir, el proceso es estacionario y las simulaciones lo reflejan.[fn::*Nota técnica para puristas*. En realidad el proceso simulado no es estacionario. Para que lo fuera, el índice $t$ debería recorrer todos los enteros desde $-\infty$ hasta $\infty$; y para todo $t$ la esperanza y varianza deberían ser constantes; y las covarianzas $Cov(Y_t,Y_{t-k})$ deberían estar definidas y depender solo de $|k|$. Pero en este proceso las variables aleatorias $Y_t$ son $0$ para $t\leq p$ (donde $p$ es el orden del proceso AR($p$)). Por tanto, la varianza también es nula si $t\leq p$ (y luego va creciendo hasta estabilizarse). De hecho, desde un punto de vista matemático, cualquier proceso finito no puede ser estrictamente estacionario (al aproximarnos a los extremos para todo $k$ suficientemente grande $Cov(Y_t,Y_{t-k})\ne Cov(Y_t,Y_{t+k})$). Por otra parte, el intervalo hasta alcanzar la estabilidad se denomina ``transitorio'' y es habitual, al simular cualquier proceso estocástico, generar muchos datos y descartar los primeros para que los datos considerados en la simulación no contengan el tramo ``transitorio''. En esta práctica no hemos tenido dicha precaución.]
 
 #+BEGIN_EXPORT latex
 \begin{center}
@@ -329,11 +329,11 @@ y la desviación típica es aproximadamente $6$. Si calcula las raíces de este 
 
 ** Y ahora pruebe con otro polinomio
 
-Por ejemplo con el polinomio $\boldsymbol{\phi}(\mathsf{B}) = 1+0.1\mathsf{B}-0.9\mathsf{B}^2  = (1+\mathsf{B})(1-0.8\mathsf{B})$; es decir, simule el modelo
+Por ejemplo con el polinomio $\boldsymbol{\phi}(\mathsf{B}) = 1+0.2\mathsf{B}-0.8\mathsf{B}^2  = (1+\mathsf{B})(1-0.8\mathsf{B})$; es decir, simule el modelo
 \[
  (1+0.1\mathsf{B}-0.9\mathsf{B}^2)Y_t = U_t,\quad t>0.
 \]
-Expresado de otra forma: \(Y_t = -0.1Y_{t-1} + 0.9Y_{t-2} + U_t\).
+O expresado de otra manera: \(\;Y_t = -0.2Y_{t-1} + 0.8Y_{t-2} + U_t\).
 #+BEGIN_SRC gretl :tangle ./guiones/P-L03-D-simulacion-procesos-AR.inp :eval no
 # Número de simulaciones
 scalar n = 300
@@ -355,7 +355,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR
 
 
 #+BEGIN_CENTER
-#+CAPTION: Figura con 300 simulaciones del modelo \(Y_t = -0.1Y_{t-1} + 0.9Y_{t-2} + U_t\).
+#+CAPTION: Figura con 300 simulaciones del modelo \(Y_t = -0.2Y_{t-1} + 0.8Y_{t-2} + U_t\).
 #+attr_org: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
 #+NAME: fig:MuchosAR2_II
@@ -384,8 +384,8 @@ freq --matrix=v4 --nbins=15 --normal --plot="histograma_II_t200.png"
 #+END_SRC
 
 Las cuatro figuras proporcionan histogramas de la distribución de los 300 valores simulados para los índices temporales \(t = 50, 100, 150\) y $200$.
-Se observa que la media de estas distribuciones es aproximadamente cero en los cuatro casos, 
-y que la desviación típica no deja de crecer. Si calcula las raíces de este polinomio comprobará que son dos raíces, una es $-1$ y otra es $1.25$, es decir, el proceso no es estacionario ya que no todas sus raíces tienen un módulo mayor que $1$; y las simulaciones lo reflejan.
+Se observa que la media de estas distribuciones es aproximadamente cero en los cuatro casos, y que la desviación típica no deja de crecer. 
+Si calcula las raíces de $\boldsymbol{\phi}(z)=1+0.2\,z-0.8\,z^2$ comprobará que una es $-1$ y la otra es $1.25$, es decir, el proceso no es estacionario ya que no todas sus raíces tienen un módulo mayor que $1$; y las simulaciones lo reflejan.
 
 #+BEGIN_EXPORT latex
 \begin{center}
@@ -432,7 +432,7 @@ y que la desviación típica no deja de crecer. Si calcula las raíces de este p
 ** Piense cómo generalizar su función para simular un proceso ARMA(p,q)
 
 *Pista*: Escriba el modelo de un proceso ARMA $\boldsymbol(Y)$, despeje $Y_t$. 
-Analice la composición  de lado de la derecha de la ecuación. 
+Analice la composición del lado de la derecha de la ecuación. 
 Una parte es una combinación del pasado de $Y_t$... y la otra parte es... 
 
 Si se da cuenta, con esta práctica (y las anteriores) quizá ya tiene todas las piezas necesarias.
@@ -640,11 +640,11 @@ function series simARMA(matrix phi "Polinomio AR", matrix theta "Polinomio MA")
 
 end function
 
-series AR             = simARMA( {1, -0.6})
+series AR             = simARMA( {1, -0.6}, {1})
 series MA             = simARMA( {1}, {1, -0.6})
 series ARMA           = simARMA( {1, -0.6}, {1, 0.9} )
 series RuidoBlanco    = simARMA( {1,}, {1,} )
-series PaseoAleatorio = simARMA( {1, -1}, {1,} )
+series PaseoAleatorio = simARMA( {1, -1}, {1} )
 
 #+END_SRC
 

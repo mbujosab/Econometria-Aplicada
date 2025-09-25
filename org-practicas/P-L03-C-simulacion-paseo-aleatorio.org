@@ -120,7 +120,7 @@ Consideremos el proceso estocástico definido por:
 \[
 Y_t = Y_{t-1} + U_t, \qquad t \in \mathbb{N};
 \]
-donde las variables \(U_t\) son normales con media cero, varianza \(\sigma^2\) constante a lo largo del tiempo e independientes entre sí. 
+donde las variables \(U_t\) son normales con media cero, varianza \(\sigma^2\) y \(Cov(U_t,U_j)=0\) si $\t\ne j$.
 Nótese que suponemos que el proceso comienza en un instante \(t = 0\) (por ejemplo con con \(Y_0 = 0\)).
 Este proceso se conoce con el nombre de /paseo aleatorio/.
 #+latex: \bigskip
@@ -174,19 +174,19 @@ Var(Y_t) = Var\Big(\sum_{j=1}^t U_j\Big) = \sum_{j=1}^t Var(U_j) = t\, \sigma^2
 \]
 pues cada $U_t$ tiene distribución N$(0,\sigma^2)$ y covarianza nula con $U_k$ para $t\ne k$.
 Por tanto este proceso NO es estacionario. 
-Su varianza crece con $t$ cuando $t\geq1$.[fn::y $Var(Y_t)$ es 0 para $t<1$.]
+Su varianza crece con $t$ cuando $t\geq1$.[fn::aunque $Var(Y_t)$ es 0 para $t<1$.]
 Esto se debería apreciar al simular paseos aleatorios.
 
 
 * Actividad 2 - Simular un paseo aleatorio
 
-Algunas cosas que len pueden resultar útiles son
+Algunas cosas que le pueden resultar útiles son
 - Cuando la muestra está definida, por ejemplo con
   #+BEGIN_SRC gretl :eval no
 nulldata 300
 setobs 4 1960:01 --time-series
   #+END_SRC
-  la variable interna =$nobs= devuelve un número entero con la cantidad total de observaciones que están seleccionadas en la muestra vigente (en el ejemplo $300$).
+  la variable interna =$nobs= devuelve un número entero con la cantidad total de observaciones que están seleccionadas en la muestra vigente (en el ejemplo =$nobs= es =300=).
 - Si tenemos definida una serie temporal (=series=), sus valores se pueden modificar uno a uno. Por ejemplo
   #+BEGIN_SRC gretl :eval no
 Y[5] = Z[3] + 2
@@ -200,7 +200,7 @@ Y[5] = Z[3] + 2
 
 #+latex: \bigskip
 
-Piense en cómo construir, partiendo de una serie de ruido blanco un paseo aleatorio (en inglés /Random Walk/ o =RW=). Diseñe los pasos en un papel y luego intente implementarlos en un guión de Gretl. Por sencillez, asuma que el valor inicial es =RW_0=0=, donde he llamado =RW= a la simulación del paseo aleatorio.
+Piense en cómo construir, partiendo de una serie de ruido blanco un paseo aleatorio (en inglés /Random Walk/ o =RW=). Diseñe los pasos en un papel y luego intente implementarlos en un guión de Gretl. Por sencillez, asuma que el valor inicial el anterior a =RW[1]= sería =0=; de manera que =RW[1]=0+U[1]=, y donde he llamado =RW= a la simulación del paseo aleatorio y =U= al proceso de ruido blanco.
 
 
 * Actividad 3 - Genere una función que simule un paseo aleatorio
@@ -214,7 +214,8 @@ Cuando tenga su función, pruebe su funcionamiento con algún script o guión.
 
 ** Para intrépidos (opcional)
 
-Puede generalizar su función añadiendo un parámetro que fije el valor inicial del paseo aleatorio, u otro para añadir una deriva (un incremento constante del proceso) para simular un paseo aleatorio con deriva:
+Puede generalizar su función añadiendo un parámetro que fije el valor inicial del paseo aleatorio, 
+u otro para añadir una deriva (un incremento constante del proceso) para simular un /paseo aleatorio con deriva/:
 \[Y_t = d + Y_{t-1} + U_t.\]
 
 Si se decide, aquí tiene algunas cosas que le pueden resultar útiles:
@@ -265,7 +266,7 @@ gnuplot X Y --time-series --with-lines  --output="RandomWalks.png"
 # Número de simulaciones
 scalar n = 300
 
-# Preasignamos una matriz para guardar los datos
+# Preasignamos una matriz para guardar cada simulación en una columna
 matrix M = zeros($nobs, n)
 
 # Bucle sobre las columnas
