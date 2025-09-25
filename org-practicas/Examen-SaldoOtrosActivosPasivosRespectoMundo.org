@@ -4,10 +4,11 @@
 #+author: Marcos Bujosa
 #+LANGUAGE: es
 #+OPTIONS: toc:nil
-#+OPTIONS: author:nil
+# +OPTIONS: author:nil
 #+OPTIONS: date:nil
 
-#+options: num:3
+#+OPTIONS: :eval yes
+#+PROPERTY: header-args :eval yes
 
 #+INFOJS_OPT: view:overview
 
@@ -18,11 +19,47 @@
 #+SETUPFILE: ../css/bigblow_inline.theme
 # ###########
 
-#+LATEX_HEADER: \usepackage[spanish]{babel}
-#+LATEX_HEADER: \usepackage{fontspec}
 #+latex_class_options: [10pt]
 
-#+LATEX: \maketitle
+#+LATEX_HEADER: \usepackage[spanish]{babel}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+# +LaTeX_HEADER: \usepackage{framed}
+#+LaTeX_HEADER: \usepackage{listings}
+#+LaTeX_HEADER: \input{hansl.tex}
+#+LaTeX_HEADER: \lstnewenvironment{hansl-gretl}
+#+LaTeX_HEADER: {\lstset{language={hansl},basicstyle={\ttfamily\footnotesize},numbers,rame=single,breaklines=true}}
+#+LaTeX_HEADER: {}
+#+LaTeX_HEADER: \newcommand{\hansl}[1]{\lstset{language={hansl},basicstyle={\ttfamily\small}}\lstinline{#1}}
+
+#+LaTeX_HEADER: \lstset{backgroundcolor=\color{lightgray!20}, }
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
 
 #+NAME: if-no-guiones-makedir
 #+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
@@ -37,25 +74,21 @@
 
 
 #+name: execute-gretl-practice
-#+PROPERTY: SerieCuentasFinancierasBE
-#+BEGIN_SRC sh  :exports none  :results silent :var practica="SerieCuentasFinancierasBE"
-rm -fr $(pwd)/SerieCuentasFinancierasBE
-mkdir -p $(pwd)/SerieCuentasFinancierasBE 
-DIRECTORIO="$(pwd)/SerieCuentasFinancierasBE" gretlcli -b $(pwd)/guiones/SerieCuentasFinancierasBE.inp
-# zip SerieCuentasFinancierasBE SerieCuentasFinancierasBE.* SerieCuentasFinancierasBE/*
-#+END_SRC
-
-#+BEGIN_SRC sh  :exports none :results silent :var practica="SerieCuentasFinancierasBE" :eval no
-zip SerieCuentasFinancierasBE SerieCuentasFinancierasBE.* SerieCuentasFinancierasBE/*
+#+PROPERTY: Examen-SaldoOtrosActivosPasivosRespectoMundo
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="Examen-SaldoOtrosActivosPasivosRespectoMundo"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
 #+END_SRC
 
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :exports none :eval no
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :exports none :eval no
 # Necesario para que gretl guarde los ficheros en el directorio de la práctica.
 # Si no funciona, comente la primera línea y descomente la segunda (asegurándose de que el directoro de trabajo de gretl, $(pwd), es el correcto, i.e, que Gretl puede encontrar el guión):
 
 string directory = getenv("DIRECTORIO")
-#string directory = $(pwd) ~ "/SerieCuentasFinancierasBE" 
+#string directory = $(pwd) ~ "/Examen-SaldoOtrosActivosPasivosRespectoMundo" 
 set workdir "@directory"
  
 #+end_src
@@ -66,11 +99,12 @@ set workdir "@directory"
 # activos no financieros/. Zona euro. Total, Millones de Euros *Fuente
 # Banco de España*
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :exports none  :eval no
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :exports none  :eval no
 open be.bin
 data BE_2_5_8_16
 #+end_src
 
+#+LATEX: \maketitle
 
 * Los datos
 
@@ -84,155 +118,155 @@ Para abrir los datos, debe estar instalada la base de datos del Banco de España
 
 - Ficheros 
    - Versiones: [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Practicas/SerieCuentasFinancierasBE.pdf][pdf]]; [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Practicas/SerieCuentasFinancierasBE.pdf][html]].
-   - Datos: [[https://mbujosab.github.io/Econometria-Aplicada/datos/SerieCuentasFinancierasBE.gdt][SerieCuentasFinancierasBE.gdt]]
-   - Guión de gretl: [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Practicas/guiones/SerieCuentasFinancierasBE.inp][SerieCuentasFinancierasBE.inp]]
+   - Datos: [[https://mbujosab.github.io/Econometria-Aplicada/datos/SerieCuentasFinancierasBE.gdt][Examen-SaldoOtrosActivosPasivosRespectoMundo.gdt]]
+   - Guión de gretl: [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Practicas/guiones/SerieCuentasFinancierasBE.inp][Examen-SaldoOtrosActivosPasivosRespectoMundo.inp]]
 
 * Cuentas Financieras. Metodología SEC2010. Saldo. Otros activos/pasivos. Todos los sectores. Resto del mundo, Miles de Euros
 
 ** Gráfico de la serie temporal y su correlograma:
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports code 
 gnuplot BE_2_5_8_16 --time-series --with-lines --output="otros.png"
 corrgm BE_2_5_8_16 14 --plot="otrosACF-PACF.png"
 #+end_src
 
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width 0.5\textwidth :center 
-[[./SerieCuentasFinancierasBE/otros.png]] 
+[[./Examen-SaldoOtrosActivosPasivosRespectoMundo/otros.png]] 
 #+ATTR_LATEX: :width 0.4\textwidth :center
-[[./SerieCuentasFinancierasBE/otrosACF-PACF.png]] 
+[[./Examen-SaldoOtrosActivosPasivosRespectoMundo/otrosACF-PACF.png]] 
 #+END_CENTER
 
 *** Estadístico Ljung-Box para los primeros retardos
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet otrosACF-PACF.txt
   corrgm BE_2_5_8_16 10 --quiet
 end outfile 
 #+end_src
 
-#+include: ./SerieCuentasFinancierasBE/otrosACF-PACF.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/otrosACF-PACF.txt example
 
 ** Contrastes de raíz unitaria
 *** Contraste Dickey-Fuller aumentado de raíz unitaria
 
 #+NAME: Test ADF Otros en niveles
-#+BEGIN_SRC R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports code
+#+BEGIN_SRC R :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports code
 adf 4 BE_2_5_8_16 --nc --test-down=AIC
 #+END_SRC
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none :noweb no-export 
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none :noweb no-export 
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet ADF_otros.txt
   <<Test ADF Otros en niveles>>
 end outfile
 #+end_src
 
-#+include: ./SerieCuentasFinancierasBE/ADF_otros.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/ADF_otros.txt example
 
 *** Contraste KPSS de estacionariedad
 
 #+NAME: Test KPSS Otros en niveles
-#+BEGIN_SRC R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports code
+#+BEGIN_SRC R :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports code
 kpss 4 BE_2_5_8_16
 #+END_SRC
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none :noweb yes 
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none :noweb yes 
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet KPSS_otros.txt
   <<Test KPSS Otros en niveles>>
 end outfile
 #+end_src
 
-#+include: ./SerieCuentasFinancierasBE/KPSS_otros.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/KPSS_otros.txt example
 
 
 * Datos en primeras diferencias
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports code 
 diff BE_2_5_8_16
 #+end_src
 
 ** Gráfico de la serie temporal en diferencias y su correlograma:
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports code 
 gnuplot d_BE_2_5_8_16 --time-series --with-lines --output="d_otros.png"
 corrgm d_BE_2_5_8_16 10 --plot="d_otrosACF-PACF.png"
 #+end_src
 
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width 0.5\textwidth :center 
-[[./SerieCuentasFinancierasBE/d_otros.png]] 
+[[./Examen-SaldoOtrosActivosPasivosRespectoMundo/d_otros.png]] 
 #+ATTR_LATEX: :width 0.4\textwidth :center
-[[./SerieCuentasFinancierasBE/d_otrosACF-PACF.png]]
+[[./Examen-SaldoOtrosActivosPasivosRespectoMundo/d_otrosACF-PACF.png]]
 #+END_CENTER
 
 *** Estadístico Ljung-Box para los primeros retardos
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet d_otrosACF-PACF.txt
   corrgm d_BE_2_5_8_16 10 --quiet
 end outfile
 #+end_src
 
-#+include: ./SerieCuentasFinancierasBE/d_otrosACF-PACF.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/d_otrosACF-PACF.txt example
 
 ** Contrastes de raíz unitaria
 *** Contraste Dickey-Fuller aumentado de raíz unitaria
 
 #+NAME: Test ADF Otros en diferencias
-#+BEGIN_SRC R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports code
+#+BEGIN_SRC R :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports code
 adf 4 d_BE_2_5_8_16 --nc --test-down=AIC
 #+END_SRC
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none :noweb yes
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet ADF_d_otros.txt
   <<Test ADF Otros en diferencias>>
 end outfile
 #+end_src
 
-#+include: ./SerieCuentasFinancierasBE/ADF_d_otros.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/ADF_d_otros.txt example
 
 *** Contraste KPSS de estacionariedad
 
 #+NAME: Test KPSS Otros en diferencias
-#+BEGIN_SRC R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports code
+#+BEGIN_SRC R :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports code
 kpss 4 d_BE_2_5_8_16
 #+END_SRC
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none :noweb yes
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet KPSS_d_otros.txt
   <<Test KPSS Otros en diferencias>>
 end outfile
 #+end_src
 
-#+include: ./SerieCuentasFinancierasBE/KPSS_d_otros.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/KPSS_d_otros.txt example
 
 
 * Primer modelo univariante tentativo
 
 
 #+NAME: Modelo ARIMA 2 1 0
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none
 arima 2 1 0 ; BE_2_5_8_16 
 #+end_src
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none :noweb yes
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet modelo1.txt
   <<Modelo ARIMA 2 1 0>>
 end outfile
 #+end_src
 
-#+include: ./SerieCuentasFinancierasBE/modelo1.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/modelo1.txt example
 
 ** Residuos y su correlograma
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports code 
 res1 = $uhat
 gnuplot res1 --time-series --with-lines --output="res1.png"
 corrgm res1 10 --plot="res1_ACF-PACF.png"
@@ -240,22 +274,22 @@ corrgm res1 10 --plot="res1_ACF-PACF.png"
 
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width 0.5\textwidth :center 
-[[./SerieCuentasFinancierasBE/res1.png]] 
+[[./Examen-SaldoOtrosActivosPasivosRespectoMundo/res1.png]] 
 #+ATTR_LATEX: :width 0.4\textwidth :center
-[[./SerieCuentasFinancierasBE/res1_ACF-PACF.png]]
+[[./Examen-SaldoOtrosActivosPasivosRespectoMundo/res1_ACF-PACF.png]]
 #+END_CENTER
 
 
 *** Estadístico Ljung-Box para los residuos
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet res1_ACF-PACF.txt
     corrgm res1 10 --quiet
 end outfile
 #+end_src
 
-#+include: ./SerieCuentasFinancierasBE/res1_ACF-PACF.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/res1_ACF-PACF.txt example
 
 
 # +latex: \newpage
@@ -263,11 +297,11 @@ end outfile
 * Segundo modelo univariante tentativo
 
 #+NAME: Modelo ARIMA 0 1 2
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none
 arima 0 1 2 ; BE_2_5_8_16 
 #+end_src
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none :noweb yes
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet modelo2.txt
   <<Modelo ARIMA 0 1 2>>
@@ -275,12 +309,12 @@ end outfile
 #+end_src
 
 #+ATTR_LATEX: :float nil
-#+include: ./SerieCuentasFinancierasBE/modelo2.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/modelo2.txt example
 
 
 ** Residuos y su correlograma
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports code 
 res2 = $uhat
 gnuplot res2 --time-series --with-lines --output="res2.png"
 corrgm res1 10 --plot="res2_ACF-PACF.png"
@@ -288,22 +322,22 @@ corrgm res1 10 --plot="res2_ACF-PACF.png"
 
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width 0.5\textwidth :center 
-[[./SerieCuentasFinancierasBE/res2.png]] 
+[[./Examen-SaldoOtrosActivosPasivosRespectoMundo/res2.png]] 
 #+ATTR_LATEX: :width 0.4\textwidth :center
-[[./SerieCuentasFinancierasBE/res2_ACF-PACF.png]]
+[[./Examen-SaldoOtrosActivosPasivosRespectoMundo/res2_ACF-PACF.png]]
 #+END_CENTER
 
 
 *** Estadístico Ljung-Box para los residuos
 
-#+begin_src R :tangle guiones/SerieCuentasFinancierasBE.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-SaldoOtrosActivosPasivosRespectoMundo.inp :eval no :exports none
 # añadido para guardar los resultados en un fichero de texto
 outfile --quiet res2_ACF-PACF.txt
     corrgm res2 10 --quiet
 end outfile
 #+end_src
 
-#+include: ./SerieCuentasFinancierasBE/res2_ACF-PACF.txt example
+#+include: ./Examen-SaldoOtrosActivosPasivosRespectoMundo/res2_ACF-PACF.txt example
 
 
 # +latex: \newpage
@@ -346,6 +380,8 @@ Compare los dos modelos univariantes. ¿Cuál considera que es mejor? ¿por qué
 2. Escriba el segundo modelo univariante en forma de ecuación ARIMA.
 
 ([[Respuesta 6]])
+
+#+latex: \clearpage
 
 * Respuestas
 
