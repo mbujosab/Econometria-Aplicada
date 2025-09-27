@@ -128,6 +128,7 @@ $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	cp -a $< $(LECCIONES_tmp)
 	echo "EJECUCION DEL NOTEBOOK DE ORG: $(LECCIONES_tmp)/$(@F:.ipynb=.org)..."
 	emacs -Q -l ~/Software/scimax/init.el $(LECCIONES_tmp)/$(@F:.ipynb=.org) --batch --eval "(org-babel-execute-buffer)" --eval "(save-buffer)" --kill
+	cp -a $(LECCIONES_tmp)/$(@F) $(CUADERNOS)
 	echo "EJECUCION DEL NOTEBOOK DE JUPYTER..."
 	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/$(@F) 
 	echo "FICHEROS EN ./lecciones?..."
@@ -138,7 +139,6 @@ $(CUADERNOS)/%.ipynb $(TRANSPARENCIAS)/%.slides.html: $(LECCIONES_SRC)/%.org
 	echo "Contenido de img tras notebook:"
 #	find $(LECCIONES_tmp)/img
 	echo "COPIO LO QUE SE HA GENERADO (.ipynb sin ejecutar y las imágenes) A ./docs..."
-	cp -a $(LECCIONES_tmp)/$(@F) $(CUADERNOS)
 	ln -snf -r $(DOCS)/Lecciones-html/img/ $(TRANSPARENCIAS)/
 	ln -snf -r $(DOCS)/Lecciones-html/img/ $(CUADERNOS)/
 #	# Ejecutar el notebook con jupyter nbconvert
@@ -222,7 +222,7 @@ $(LECCIONES_tmp)/src/%.org: $(LECCIONES_SRC)/src/%.org
 	  --load ~/Software/scimax/init.el \
 	  --eval "(require 'ox-ipynb)" \
 	  --eval "(ox-ipynb-export-org-file-to-ipynb-file \"$(LECCIONES_tmp)/src/$*.org\")"
-	# jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/$*.ipynb
+	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/$*.ipynb
 	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/src/$*.ipynb
 	jupyter nbconvert --execute --to html $(LECCIONES_tmp)/src/$*.ipynb
 	cp -a $(LECCIONES_tmp)/src/$*.ipynb $(CUADERNOS)
@@ -859,7 +859,7 @@ Este script transforma los ficheros org de las lecciones en pdfs y htmls.
                    :base-directory "./Practicas-tmp/"
                    :base-extension "css\\|js\\|png\\|jpg\\|gif\\|dat\\|mov\\|txt\\|svg\\|aiff\\|inp"
                    :publishing-directory ,(concat base-directory "docs/Practicas-html")
-                   :exclude "hansl.tex"
+                   :exclude "datos\\|hansl.tex"
                    :recursive t
                    :publishing-function org-publish-attachment)
 

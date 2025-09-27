@@ -1,0 +1,340 @@
+#+TITLE: Simulación de múltiples modelos lineales
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+
+#+OPTIONS: toc:nil
+
+#+EXCLUDE_TAGS: noexport
+
+#+startup: shrink
+
+#+LATEX_HEADER_EXTRA: \usepackage[spanish]{babel}
+#+LATEX_HEADER_EXTRA: \usepackage{lmodern}
+#+LATEX_HEADER_EXTRA: \usepackage{tabularx}
+#+LATEX_HEADER_EXTRA: \usepackage{booktabs}
+
+#+LATEX: \maketitle
+
+
+* Objetivo
+
+Que el estudiante tenga una gran batería de series para ejercitar la
+identificación. Los nombres de los ficheros impiden saber a priori de
+qué modelo se trata en cada caso (cada serie tiene un hash único). El
+alumno tendrá que observar el gráfico /rango-media/ para decidir
+primero si la serie necesita la transformación logarítmica. Después
+tendrá que ir mirando el gráfico de las series, de los residuos, los
+correlogramas (también es útil mirar el gráfico del espectro del
+modelo junto al periodograma) para intentar indentificar el modelo
+lineal con el que se ha simulado la serie temporal.
+
+Los ficheros =Etiqueta.txt= almacenan el tipo de modelo que se ha
+simulado en cada caso. Por tanto, una vez se ha identificado un
+modelo, se puede verificar si efectivamente ese ha sido el modelo
+usado al crear la serie buscando el hash del fichero en la primera
+columna de =Etiqueta.txt=.
+
+
+* Qué hace el código de más abajo
+
+Simula desde procesos de ruido blanco a procesos
+ARIMA$(p,d,q)\times(P,D,Q)_S$, con transformaciones exponenciales en
+algunos casos y con medias distintas de cero en otros.
+
+En total se simulan 320 modelos con periodicidad trimestral y 320 con
+periodicidad mensual.
+
+Las series se simulan con la librería =tfarima= de R escrita por José
+Luis Gallego y cada una de ellas se graba en un fichero =csv= con un
+nombre anonimizado (mediante un hash) para ocultar cualquier pista
+sobre cuál es el modelo subyacente.
+
+Para mayor comodidad del estudiante, cada serie es leída
+posteriormente con GRETL y guardada en formato Gretl (=*.gdt=) en el
+directorio [[file:IdentificaEstosARIMA/][IdentificaEstosARIMA]] (manteniendo los nombres anonimizados
+pero añadiendo tras un guión la supuesta periodicidad de los datos).
+
+
+#+BEGIN_SRC jupyter-python
+import itertools
+import hashlib
+import subprocess
+import os
+
+ar  = [ '(1 - 0.8B)', '(1 + 0.8B)', '(1 - 0.8BS)' ]
+ma =  [ '(1 - 0.65B)', '(1 + 0.65B)', '(1 - 0.65BS)']
+I   = [ '(1 - B)', '(1 - BS)']
+
+def simulacion(lista_AR, lista_MA, lista_I, PeriodoEstacional=12):
+    S = str(PeriodoEstacional)
+    directorio = "SeriesSimuladas"+S
+    d = os.path.join(directorio)
+    if not os.path.exists(d):
+        os.makedirs(d)
+
+    def polinomios(monomios, S, NOlimita=1):
+        polinomios = []
+        for i in range(3):
+            for c in itertools.combinations(monomios, i):
+                cc = ''.join(c).replace("S", S)
+                #polinomios = polinomios + [cc] if ((i < len(monomios)) | NOlimita) else polinomios
+                polinomios = polinomios + [cc] 
+        return polinomios
+
+    SampleSize = 40*PeriodoEstacional
+    numero_de_modelos = 0
+    etiqueta = []
+    for ca,ma in enumerate(polinomios(lista_MA,str(S),0)):
+        for cb,ar in enumerate(polinomios(lista_AR,str(S),0)):
+            for cc,i in enumerate(polinomios(lista_I,str(S))):
+                for l in range(2):
+                    if len(ar)<18 or len(ma)<18:
+                        numero_de_modelos += 1 
+                        parametros = "ar = '%s', ma = '%s', i = '%s'"  % (ar,ma,i)
+                        modelo = "ARIMA <- um(%s)"  % (parametros)
+                        if l: 
+                            sim   = 'y = exp((sim(ARIMA, n = %d)) * 0.1 + 2.5)' % (SampleSize,)
+                            logs  = 'logs'
+                            media = 'mu = 2.5'
+                        else:
+                            sim   = 'y = (sim(ARIMA, n = 200))'
+                            logs  = '    '
+                            media = 'mu = 0.0'
+
+                        # script de R
+                        caso = chr(ca*1000+cb*100+cc*10+l)
+                        label = (hashlib.shake_128(caso.encode()).hexdigest(3))
+                        características = logs + ',\t' + media + ',\t' + parametros
+                        etiqueta = etiqueta + [label + ',\t' + características]
+                        fichero = "write.csv(y, file='%s/%s.csv')"  % (directorio,label)
+                        with open('Rscript.r', 'w') as f:
+                            f.write('library(tfarima)'+'\n')
+                            f.write(modelo+'\n')
+                            f.write(sim+'\n')
+                            f.write(fichero+'\n')                            
+                        subprocess.call (["/usr/bin/Rscript", "--vanilla", "./Rscript.r"])
+
+                        # script de Gretl
+                        TamañoMuestral = 'nulldata %d' % SampleSize
+                        Dir          = 'string directory = $(pwd) ~ "/IdentificaEstosARIMA"'
+                        DirTrabajo   = 'set workdir "@directory"'
+                        periodicidad = 'setobs %s 1985:1 --time-series' % (S,)
+                        datos        = 'open %s/%s.csv' % (directorio,label,)
+                        guardado     = 'store %s-%s.gdt x' % (label,S)
+                        Guion = "GRETLscript"+S+".inp"
+                        with open(Guion, 'w') as f:
+                            f.write(Dir+'\n'+DirTrabajo+'\n'+datos+'\n'+periodicidad+'\n'+guardado)
+                            
+                        subprocess.call (["/usr/bin/gretlcli", "-b", Guion])
+                        
+    print(numero_de_modelos)
+
+    with open(directorio+'/Etiquetas.txt', 'w') as f:
+        f.write('etiqueta' + ',\t' + 'logs' + ',\t' + 'mu' + ',\t' + 'ar' + ',\t' + 'ma'+',\t' + 'nabla' + '\n')
+        for e in etiqueta:
+            f.write(e+'\n')
+    
+#+END_SRC
+
+#+RESULTS:
+
+
+#+BEGIN_SRC jupyter-python :results silent
+ar  = [ '(1 - 0.8B)', '(1 + 0.8B)', '(1 - 0.8BS)']
+ma =  [ '(1 - 0.55B)', '(1 + 0.55B)', '(1 + 0.55BS)']
+I   = [ '(1 - B)', '(1 - BS)']
+_ = simulacion(ar, ma, I, 4)
+_ = simulacion(ar, ma, I, 12)
+#+END_SRC
+
+
+#+name: Copia las etiquetas en los directorios con los ficheros en formato Gretl
+#+BEGIN_SRC sh  :exports none :results silent
+cp -a $(pwd)/SeriesSimuladas4/Etiquetas.txt $(pwd)/IdentificaEstosARIMA/000-Etiquetas-4.info
+cp -a $(pwd)/SeriesSimuladas12/Etiquetas.txt $(pwd)/IdentificaEstosARIMA/000-Etiquetas-12.info
+#+END_SRC
+
+
+#+name: Borra las series simuladas
+#+BEGIN_SRC sh  :exports none :results silent
+# rm $(pwd)/SeriesSimuladas4/*.csv
+# rm $(pwd)/SeriesSimuladas12/*.csv
+#+END_SRC
+
+
+* COMMENT basura
+
+#+BEGIN_SRC sh  :exports none :results silent
+rm -fr $(pwd)/IdentificaEstosARIMA 
+mkdir -p $(pwd)/IdentificaEstosARIMA 
+gretlcli -b $(pwd)/IdentificaEstosARIMA.inp
+#+END_SRC
+
+
+# set workdir /home/marcos/SynologyDrive/ReposGH/Docencia/POM-EconometriaAplicada-SRC/GretlScripts/IdentificaEstosARIMA
+#+begin_src R :tangle IdentificaEstosARIMA.inp :exports none
+# para que gretl guarde los ficheros en el directorio de la práctica
+string directory = $(pwd) ~ "/IdentificaEstosARIMA"
+set workdir "@directory" 
+#+end_src
+
+
+#+BEGIN_ABSTRACT
+Los datos de este ejercicio son simulados.
+#+END_ABSTRACT
+
+#+BEGIN_SRC R :tangle IdentificaEstosARIMA.inp :exports none
+#nulldata 480
+setobs 12 1985:1 --time-series
+
+open /home/marcos/SynologyDrive/ReposGH/Docencia/EconometriaAplicada-SRC/EjerciciosHide/SeriesSimuladas12/3fc69e.csv
+
+#nulldata 160
+setobs 4 1960:1 --time-series
+
+
+
+foreign language=R --send-data #--quiet
+  library(tfarima)      # librería de José Luis Gallego para Time Series
+  #ma1p <- um(ma = "(1 - 0.9B)")
+  ARIMA <- um(ma = "(1 - 0.8B12)", i = "(1 - B)")
+  y = sim(ARIMA, n = 480)
+  gretl.export(y)
+  #library(xts)
+  #dates <- seq(as.Date("1915-01-01"), 
+  #             length = 400, 
+  #             by = "months")
+  #dat <- xts(x = y, order.by = dates)
+  #write.zoo(dat, file="/home/marcos/gretl/dat.csv", sep=",", col.names=TRUE, index.name = "date",)
+end foreign
+append "/home/marcos/.gretl/y.csv" --time-series
+#append "/home/marcos/gretl/dat.csv" --time-series
+
+#gnuplot y --time-series --with-lines --output="SerieTemporal_y.png"
+#corrgm y 38 --plot="ACF-PACF_serie_y.png"
+store serie1.gdt y
+delete y
+#+END_SRC
+
+
+
+#+BEGIN_SRC jupyter-python
+import hashlib
+my_string = '4201'
+print(hashlib.shake_256(my_string.encode()).hexdigest(3))
+print(hashlib.shake_128(my_string.encode()).hexdigest(3))
+
+#+END_SRC
+
+#+RESULTS:
+: ec7f51
+: 01201c
+
+
+#+BEGIN_SRC jupyter-python
+import hashlib
+c=0
+etiqueta = []
+for ca,ma in enumerate(MA4):
+    for cb,ar in enumerate(AR4):
+        for cc,i in enumerate(I4):
+            for l in range(2):
+                modelo = "ARIMA <- um(ar = '%s', ma = '%s', i = '%s')\n"  %(ma,ar,i)
+                caso = chr(ca*1000+cb*100+cc*10+l)
+                c=c+1
+                etiqueta = etiqueta + [(hashlib.shake_128(caso.encode()).hexdigest(3))]
+
+print(c)
+print(etiqueta)
+#+END_SRC
+
+
+
+#+BEGIN_SRC jupyter-python
+
+lista = [MA4a,AR4,I4]
+#a = itertools.combinations(l, 3) 
+#y = [' '.join(i) for i in a]
+combinations = list(itertools.combinations(lista, 3))
+
+# Print the list of combinations to the console
+print(len(combinations[0]))
+
+for p in (combinations[0][2]):
+    print(p)
+#print(l)
+#+END_SRC
+
+#+RESULTS:
+: 3
+: 
+: (1 - B)
+: (1 - B4)
+: (1 - B)(1 - B4)
+
+
+
+#+BEGIN_SRC jupyter-python
+import itertools
+
+ar = [ '(1 - 0.8B)', '(1 + 0.8B)', '(1 - 0.8BS)', '(1 + 0.8BS)' ]
+ma1 = [ '(1 - 0.7B)', '(1 + 0.7B)', '(1 - 0.7BS)']
+ma2 = [ '(1 - 0.7B)', '(1 + 0.7B)', '(1 + 0.7BS)']
+
+polinomio = ar
+S = '4'
+
+def polinomios(monimios, S):
+    polinomios = []
+    for i in range(len(monomios)+1):
+        for c in itertools.combinations(monomios, i):
+            if i < len(monomios):
+                cc = ''.join(c).replace("S", S)
+                polinomios = polinomios + [cc]
+    return polinomios
+                
+AR = []; polinomio = ar; S='4'
+for i in range(len(polinomio)+1):
+    #print(i)
+    for c in itertools.combinations(polinomio, i):
+        if i < len(polinomio):
+            cc = ''.join(c).replace("S", S)
+            AR = AR + [cc]
+            print(cc)
+AR4 = AR
+            
+AR12 = []; polinomio = ar; S='12'
+for i in range(len(polinomio)+1):
+    #print(i)
+    for c in itertools.combinations(polinomio, i):
+        if i < len(polinomio):
+            cc = ''.join(c).replace("S", S)
+            AR4 = AR4 + [cc]
+            print(cc)
+print(AR4)
+#+END_SRC
+
+#+RESULTS:
+#+begin_example
+0
+
+1
+(1 - 0.8B)
+(1 + 0.8B)
+(1 - 0.8B4)
+(1 + 0.8B4)
+2
+(1 - 0.8B)(1 + 0.8B)
+(1 - 0.8B)(1 - 0.8B4)
+(1 - 0.8B)(1 + 0.8B4)
+(1 + 0.8B)(1 - 0.8B4)
+(1 + 0.8B)(1 + 0.8B4)
+(1 - 0.8B4)(1 + 0.8B4)
+3
+(1 - 0.8B)(1 + 0.8B)(1 - 0.8B4)
+(1 - 0.8B)(1 + 0.8B)(1 + 0.8B4)
+(1 - 0.8B)(1 - 0.8B4)(1 + 0.8B4)
+(1 + 0.8B)(1 - 0.8B4)(1 + 0.8B4)
+4
+['', '(1 - 0.8B)', '(1 + 0.8B)', '(1 - 0.8B4)', '(1 + 0.8B4)', '(1 - 0.8B)(1 + 0.8B)', '(1 - 0.8B)(1 - 0.8B4)', '(1 - 0.8B)(1 + 0.8B4)', '(1 + 0.8B)(1 - 0.8B4)', '(1 + 0.8B)(1 + 0.8B4)', '(1 - 0.8B4)(1 + 0.8B4)', '(1 - 0.8B)(1 + 0.8B)(1 - 0.8B4)', '(1 - 0.8B)(1 + 0.8B)(1 + 0.8B4)', '(1 - 0.8B)(1 - 0.8B4)(1 + 0.8B4)', '(1 + 0.8B)(1 - 0.8B4)(1 + 0.8B4)']
+#+end_example

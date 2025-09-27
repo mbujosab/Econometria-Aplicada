@@ -1,0 +1,606 @@
+#    -*- mode: org -*-
+
+#+title:  Índice de precios de viviendas nuevas y de segunda mano
+# +author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+OPTIONS: :eval yes
+#+PROPERTY: header-args :eval yes
+
+# M-x org-num-mode para secciones con números
+
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+#+INFOJS_OPT: view:overview
+
+#+latex_class_options: [10pt]
+
+#+LATEX_HEADER: \usepackage[spanish]{babel}
+#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
+# +LaTeX_HEADER: \usepackage{framed}
+#+LaTeX_HEADER: \usepackage{listings}
+#+LaTeX_HEADER: \input{hansl.tex}
+#+LaTeX_HEADER: \lstnewenvironment{hansl-gretl}
+#+LaTeX_HEADER: {\lstset{language={hansl},basicstyle={\ttfamily\footnotesize},numbers,rame=single,breaklines=true}}
+#+LaTeX_HEADER: {}
+#+LaTeX_HEADER: \newcommand{\hansl}[1]{\lstset{language={hansl},basicstyle={\ttfamily\small}}\lstinline{#1}}
+
+#+LaTeX_HEADER: \lstset{backgroundcolor=\color{lightgray!20}, }
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+
+#+NAME: if-no-guiones-makedir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: Examen-IndicePreciosViviendasNuevasYdeSegundaMano
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="Examen-IndicePreciosViviendasNuevasYdeSegundaMano"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :exports none :eval no
+# Necesario para que gretl guarde los ficheros en el directorio de la práctica.
+# Si no funciona, comente la primera línea y descomente la segunda (asegurándose de que el directoro de trabajo de gretl, $(pwd), es el correcto, i.e, que Gretl puede encontrar el guión):
+
+string directory = getenv("DIRECTORIO")
+#string directory = $(pwd) ~ "/Examen-IndicePreciosViviendasNuevasYdeSegundaMano" 
+set workdir "@directory"
+ 
+#+end_src
+
+
+#+LATEX: \maketitle
+
+* Los datos
+
+Los datos de este ejercicio corresponden a los índices de precios de
+vivienda nueva y de segunda mano con base 2015. La muestra disponible
+incluye 64 observaciones trimestrales, comprendidas entre el primer
+trimestre de 2007 y el cuarto de 2022. *Fuente:* Instituto Nacional de
+Estadística.
+#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+open ../datos/IndicePreciosViviendasNuevasYdeSegundaMano.gdt
+#+end_src
+- =IPVN= :: Índice de precios de vivienda nueva, base 2015.
+- =IPV2M= :: Índice de precios de vivienda de segunda mano, base 2015.
+A partir de esta muestra, se calculan las tasas de variación anual:
+| $T4IPVN_t=100\times\left(\frac{IPVN_t}{IPVN_{t-1}}-1\right);\quad$ | $T4IPV2M_t=100\times\left(\frac{IPV2M_t}{IPV2M_{t-1}}-1\right)$. |
+- =T4IPVN= :: Tasa de variación anual de =IPVN=.
+- =T4IPV2M= :: Tasa de variación anual de =IPV2M=.
+  
+
+- Ficheros 
+   - Versiones: [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-pdf/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.pdf][pdf]]; [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.html][html]].
+   - Datos: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/datos/SerieCuentasFinancierasBE.gdt][Examen-IndicePreciosViviendasNuevasYdeSegundaMano.gdt]]
+   - Guión de gretl: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/Practicas-html/guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp][Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp]]
+
+
+* Gráfico de las tasas de variación los índices de precios
+
+#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+gnuplot T4IPVN T4IPV2M  --time-series --with-lines --output="TasasDeVariacionAnual.png"
+#+end_src
+
+#+name: GráficoTasasVariación
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.5\textwidth :center 
+[[./Examen-IndicePreciosViviendasNuevasYdeSegundaMano/TasasDeVariacionAnual.png]]
+#+END_CENTER
+
+El perfil de las series que se muestran en la [[Gráfico de las tasas
+de variación los índices de precios][figura anterior]] sugiere que
+ambas podrían estar cointegradas. Para estudiar esta posibilidad se
+estiman:
+- [[Modelos ARIMA][modelos ARIMA]] para las series =T4IPVN= y =T4IPV2M=, así como
+- [[Modelo ARMAX][un modelo AR(1) para la serie =T4IPVN= con =T4IPV2M= y como input
+  exógeno]].
+
+
+* Modelos ARIMA
+
+** Vivienda nueva 
+
+Se ajusta el siguiente modelo estacional para  =T4IPVN=:
+#+NAME: Modelo ARIMA_T4IPVN
+#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+ARIMA_T4IPVN <- arima 0 1 0 ; 0 0 1 ; T4IPVN --nc
+modtest --normality --quiet
+modtest --arch --quiet
+modtest --autocorr 15 --quiet
+#+end_src
+
+#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes
+outfile --quiet ARIMA_T4IPVN.txt
+  <<Modelo ARIMA_T4IPVN>>
+end outfile
+#+end_src
+
+#+include: ./Examen-IndicePreciosViviendasNuevasYdeSegundaMano/ARIMA_T4IPVN.txt example
+
+
+** Vivienda de segunda mano
+
+Se ajusta el siguiente modelo estacional para =T4IPV2M=:
+#+NAME: Modelo ARIMA_T4IPV2M
+#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+ARIMA_T4IPV2M <- arima 2 1 0 ; 0 0 1 ; T4IPV2M --nc
+modtest --normality --quiet
+modtest --arch --quiet
+modtest --autocorr 15 --quiet
+#+end_src
+
+#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes
+outfile --quiet ARIMA_T4IPV2M.txt
+  <<Modelo ARIMA_T4IPV2M>>
+end outfile
+#+end_src
+
+#+include: ./Examen-IndicePreciosViviendasNuevasYdeSegundaMano/ARIMA_T4IPV2M.txt example
+
+
+* Modelo ARMAX
+
+Se ajusta el siguiente modelo autorregresivo para =T4IPVN=, con una
+constante y =T4IPV2M= como variables exógenas:
+
+#+NAME: Modelo ARMAX_T4IPVN
+#+BEGIN_SRC  R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+ARMAX_T4IPVN <- arima 1 0 0 ; T4IPVN T4IPV2M 0
+modtest --normality --quiet
+modtest --arch --quiet
+modtest --autocorr 15 --quiet
+#+END_SRC
+
+#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes
+outfile --quiet ARMAX_T4IPVN.txt
+  <<Modelo ARMAX_T4IPVN>>
+end outfile
+#+end_src
+
+#+include: ./Examen-IndicePreciosViviendasNuevasYdeSegundaMano/ARMAX_T4IPVN.txt example
+
+** Intervalo de confianza de los parámetros estimados
+
+Los intervalos de confianza al 95 para los coeficientes del modelo
+anterior se muestra a continuación.
+
+#+BEGIN_EXAMPLE
+z(0,025) = 1,9600
+
+      VARIABLE         COEFICIENTE      INTERVALO DE CONFIANZA 95%
+
+         const            2,36047        -0,239821      4,96075
+         phi_1            0,821915        0,653645     0,990186
+       T4IPV2M            0,612342        0,364146     0,860538
+#+END_EXAMPLE
+
+
+* Preguntas
+
+** Pregunta 1
+
+Comente exhaustivamente los resultados de estimación y diagnosis de
+los [[Modelos ARIMA][modelos ARIMA]] estimados. 
+
+# El coeficiente de determinación
+# \(R^2\)... ¿Puede interpretarse como el porcentaje de varianza de la
+# variable endógena que explica el modelo? ¿O es tan sólo una medida de
+# ajuste? ¿En qué unidades está medida la desviación típica de las
+# innovaciones?
+
+([[Respuesta 1]])
+
+** Pregunta 2
+
+Compare de todas las formas posibles los modelos [[Modelos ARIMA][ARIMA]] y [[Modelo ARMAX][ARMAX]] de la
+variable =T4IPVN=. ¿Cuál de los dos modelos
+- ajusta mejor la muestra?
+- cabe esperar que produzca mejores previsiones extra-muestrales?
+  (suponiendo que se conoce el valor de la variable explicativa en el
+  caso del modelo [[Modelo ARMAX][ARMAX]])
+- cabe esperar que esté mejor especificado?
+
+Argumente su respuesta de todas las formas posibles.
+
+([[Respuesta 2]])
+
+** Pregunta 3
+
+A) Suponga que los modelos [[Modelos ARIMA][ARIMA]] (para =T4IPVN= y =T4IPV2M=) y [[Modelo ARMAX][ARMAX]]
+   (para =T4IPVN=) están correctamente identificados y
+   estimados. Considerando las estimaciones puntuales que se muestran,
+   discuta detalladamente si las series =T4IPVN= y =T4IPV2M= están
+   cointegradas (en este caso indique cuál es el vector de
+   cointegración) o si, por el contrario, no lo están.
+
+B) Los [[Intervalo de confianza de los parámetros estimados][intervalos de confianza de los parámetros estimados]] ¿Introducen
+   algún matiz en su respuesta previa? ¿O no la afectan en absoluto?
+
+([[Respuesta 3]])
+
+** Pregunta 4
+
+Indique cuáles de las siguientes expresiones representan el modelo [[Modelos
+ ARIMA][ARIMA]] ajustado a =T4IPV2M= con un redondeo a tres decimales.
+
+Indique cuáles de las siguientes expresiones NO están bien definidas.
+
+
+# (0.2 puntos por respuesta correcta, -0.2 puntos por respuesta
+# incorrecta, 0 puntos por respuesta “en blanco”):
+
+- Expresión 1 :: $\nabla x_t = \frac{1-0.844 \, \mathsf{B}^4}{1 - 0.291 \mathsf{B} -0.511 \mathsf{B}^2} \hat{a}_t$
+- Expresión 2 :: $\nabla x_t = \frac{1-0.844 \, \mathsf{B}^4}{1 + 0.291 \mathsf{B} +0.511 \mathsf{B}^2} \hat{a}_t$
+- Expresión 3 :: $\nabla x_t = \frac{1+0.844 \, \mathsf{B}^4}{1 - 0.291 \mathsf{B} -0.511 \mathsf{B}^2} \hat{a}_t$
+- Expresión 4 :: $x_t = \frac{1+0.844 \, \mathsf{B}^4}{\nabla(1 + 0.291 \mathsf{B} +0.511 \mathsf{B}^2)} \hat{a}_t$
+- Expresión 5 :: $x_t = \frac{1-0.844 \, \mathsf{B}^4}{\nabla(1 + 0.291 \mathsf{B} +0.511 \mathsf{B}^2)} \hat{a}_t$
+- Expresión 6 :: $x_t-X_{t-1} = \frac{1-0.844 \, \mathsf{B}^4}{1 - 0.291 \mathsf{B} -0.511 \mathsf{B}^2} \hat{a}_t$
+- Expresión 7 :: $x_t-X_{t-1} = \frac{1-0.844 \, \mathsf{B}^4}{1 + 0.291 \mathsf{B} +0.511 \mathsf{B}^2} \hat{a}_t$
+- Expresión 8 :: $x_t+X_{t-1} = \frac{1+0.844 \, \mathsf{B}^4}{1 - 0.291 \mathsf{B} -0.511 \mathsf{B}^2} \hat{a}_t$
+- Expresión 9 :: $\nabla (1 - 0.291 \mathsf{B} - 0.511 \mathsf{B}^2) x_t = (1 - 0.844 \mathsf{B}^4) \hat{a}_t$
+- Expresión 10 :: $\nabla (1 + 0.291 \mathsf{B} + 0.511 \mathsf{B}^2) x_t = (1 - 0.844 \mathsf{B}^4) \hat{a}_t$
+- Expresión 11 :: $\nabla (1 - 0.291 \mathsf{B} - 0.511 \mathsf{B}^2) x_t = (1 + 0.844 \mathsf{B}^4) \hat{a}_t$
+- Expresión 12 :: $\frac{1 -0.291 \mathsf{B} - 0.511 \mathsf{B}^2}{1 - 0.844 \mathsf{B}^4}\nabla x_t = \hat{a}_t$
+- Expresión 13 :: $\frac{1}{1 - 0.844 \mathsf{B}^4}\nabla x_t = \frac{1}{1 -0.291 \mathsf{B} - 0.511 \mathsf{B}^2} \hat{a}_t$
+- Expresión 14 :: $\frac{1}{1 + 0.844 \mathsf{B}^4} x_t = \frac{1}{\nabla(1 -0.291 \mathsf{B} - 0.511 \mathsf{B}^2)} \hat{a}_t$
+- Expresión 15 :: $\frac{1}{1 - 0.844 \mathsf{B}^4} x_t = \frac{1}{\nabla(1 +0.291 \mathsf{B} + 0.511 \mathsf{B}^2)} \hat{a}_t$
+
+ ([[Respuesta 4]])
+
+** Pregunta 5
+
+Indique cuáles de las siguientes expresiones representan el modelo [[Modelo
+ ARMAX][ARMAX]] ajustado a =T4IPVN= con un redondeo a tres decimales.
+
+- Expresión 1 :: $T4IPVN_t = 2.361 + 0.612 \, (T4IPV2M_t) + \frac{1}{1 + 0.822 \mathsf{B}} \hat{a}_t$
+- Expresión 2 :: $T4IPVN_t = 2.361 + 0.612 \, (T4IPV2M_t) + \frac{1}{1 - 0.822 \mathsf{B}} \hat{a}_t$
+- Expresión 3 :: $(1 - 0.822 \mathsf{B}) T4IPVN_t = 2.361 + 0.612 \, (T4IPV2M_t) + \hat{a}_t$
+- Expresión 4 :: $(1 - 0.822 \mathsf{B}) (T4IPVN_t - 2.361) =  0.612 \, (T4IPV2M_t) + \hat{a}_t$
+- Expresión 5 :: $(1 - 0.822 \mathsf{B}) \big(T4IPVN_t - 0.612 \, (T4IPV2M_t) - 2.361\big) = \hat{a}_t$
+
+([[Respuesta 5]])
+
+** Pregunta 6
+
+Indique si es cierta o no la siguiente afirmación:
+#+BEGIN_QUOTE
+El criterio de Akaike del modelo [[Modelos ARIMA][ARIMA]] ajustado a =T4IPV2M= es menor
+que el del modelo [[Modelos ARIMA][ARIMA]] ajustado a =T4IPVN=, lo que indica que el
+primer modelo probablemente predecirá fuera de la muestra mejor que el
+segundo.
+#+END_QUOTE
+
+([[Respuesta 6]])
+
+** Pregunta 7
+
+Indique si es cierta o no la siguiente afirmación:
+
+#+BEGIN_QUOTE
+La pendiente estimada de la variable =T4IPV2M= en el modelo [[Modelo ARMAX][ARMAX]]
+indica que, si aumenta en un =1%= la tasa anual de variación del
+índice de precios de la vivienda de segunda mano =T4IPV2M=, cabe
+esperar que la tasa de variación del índice de precios de la vivienda
+nueva =T4IPVN_t= aumente en un =0.612%=.
+#+END_QUOTE
+
+([[Respuesta 7]])
+
+** Pregunta 8
+
+Indique si es cierta o no la siguiente afirmación:
+
+#+BEGIN_QUOTE
+La pendiente estimada de la variable =T4IPV2M= en el modelo [[Modelo ARMAX][ARMAX]]
+indica que, si aumenta en un punto porcentual la tasa anual de
+variación del índice de precios de la vivienda de segunda mano
+=T4IPV2M=, cabe esperar que la tasa de variación del índice de precios
+de la vivienda nueva =T4IPVN= aumente en =0.612= puntos.
+#+END_QUOTE
+
+([[Respuesta 8]])
+
+** Pregunta 9
+
+Indique si es cierta o no la siguiente afirmación:
+
+#+BEGIN_QUOTE
+Los resultados que se muestran en la tabla de [[Intervalo de confianza de los parámetros estimados][intervalos de confianza]]
+indican que debe rechazarse la hipótesis nula de que el parámetro
+$\phi_1$ sea igual a 1 con un 10% de significación.
+#+END_QUOTE
+
+([[Respuesta 9]])
+
+** Pregunta 10
+
+Indique si es cierta o no la siguiente afirmación:
+
+#+BEGIN_QUOTE
+Los resultados que se muestran en la tabla de [[Intervalo de confianza de los parámetros estimados][intervalos de confianza]]
+sugieren que probablemente no se rechazaría la hipótesis nula de que
+el parámetro $phi_1$ sea igual a 1 con un 1% de significación.
+#+END_QUOTE
+
+([[Respuesta 10]])
+
+
+* Respuestas
+
+** Respuesta 1
+
+En ambos modelos
+
+- todos los coeficientes estimados son significativos a los niveles de
+  confianza habituales, y
+
+- los contrastes residuales no rechazan a los niveles de confianza habituales las hipótesis nulas de 
+  a) normalidad, 
+  b) homoscedasticidad (ausencia de efectos ARCH) y
+  c) ausencia de autocorrelación.
+
+- En ambos casos son modelos ARIMA no estacionarios.
+
+# Se trata de modelos ARIMA no estacionarios, por lo que la media
+# incondicional de la variable endógena no está definida y,
+# consecuentemente, tampoco lo está la varianza. Por tanto, los valores
+# del \(R^2\) sólo pueden interpretarse como medidas de ajuste a los
+# valores observados en la muestra.
+
+# La desviación típica de las innovaciones está medida en las mismas
+# unidades que la variable endógena, es decir, en puntos porcentuales.
+
+([[Pregunta 1]])
+
+** Respuesta 2
+
+
+El modelo [[Modelo ARMAX][ARMAX]] se ajusta mejor la muestra ya que
+- tiene coeficientes de determinación más elevados; tanto el
+  ordinario, $R^2$, (=0,917639= frente a =0,889602=) como el corregido
+  por los grados de libertad (=0,916219= frente a =0,889602=) y
+- tiene una menor desviación típica de las innovaciones (=1,943328=
+  frente a =2,208917=).
+
+Por otra parte, los criterios de información del modelo [[Modelo ARMAX][ARMAX]] toman un
+valor menores, es decir, son mejores, por lo que
+- cabe esperar que este modelo prediga mejor fuera de la muestra
+  (criterios de Akaike y Hannan-Quinn), y también
+- cabe esperar que esté mejor especificado (criterio de Schwarz).
+
+([[Pregunta 2]])
+
+** Respuesta 3
+
+A) Los modelos estimados sugieren que las series =T4IPVN= y =T4IPV2M=
+   están cointegradas, con un vector de cointegración =[1 -
+   0.612]=. Esta respuesta se apoya en que
+  - los modelos [[Modelos ARIMA][ARIMA]] para las series =T4IPVN= y =T4IPV2M= son
+    ARIMA$(0,1,0)\times(0,0,1)_{12}$ y
+    ARIMA$(2,1,0)\times(0,0,1)_{12}$, respectivamente, por lo que
+    ambas series son integradas de primer orden, y
+  - el modelo [[Modelo ARMAX][ARMAX]] tiene un término de error estacionario, ya que la
+    raíz del término AR(1) está fuera del círculo de radio unidad
+    (=1,2167=) y el correlograma de los residuos refuerza la hipótesis
+    de que los residuos son estacionarios.
+
+  Por tanto, al relacionar ambas series mediante un modelo lineal, es
+   razonable asumir que los errores de la relación son estacionarios
+   en media.
+
+
+B) Las estimaciones puntuales del modelo [[Modelo ARMAX][ARMAX]] sugieren que los
+   residuos son estacionarios. Sin embargo, al mirar los [[Intervalo de confianza de los parámetros estimados][intervalos de
+   confianza de los parámetros estimados]] se ve que el límite superior
+   del intervalo de confianza al 95% para el coeficiente
+   autorregresivo es =0,990186= por lo que, aunque un contraste al 5%
+   de significación rechaza la hipótesis de una raíz unitaria, no cabe
+   descartar que el valor del coeficiente pueda ser =1= cuando
+   empleamos un nivel de confianza ligeramente mayor (digamos un 97%,
+   i.e., un $\alpha$ al 3%); en tal caso no podríamos concluir que las
+   series están cointegradas, pues los residuos de la relación
+   encontrada no serían $I(0)$).
+
+([[Pregunta 3]])
+
+** Respuesta 4
+
+Recuerde que signo de los parámetros MA en las salidas de Gretl tienen
+el signo cambiado respecto a convenio habitual en los manuales de
+series temporales, es decir, para los polinomios AR
+$(1-\phi_1\mathsf{B}-\cdots-\phi_p\mathsf{B}^p)$, tenemos que =phi_j=
+es "$\phi_j$" (es decir, al escribir el modelo el signo del parámetro
+=phi_j= aparece con un menos delante); pero para los MA
+$(1-\theta_1\mathsf{B}-\cdots-\theta_p\mathsf{B}^p)$, tenemos que
+=theta_j= es "$-\theta_j$"; es decir, al escribir no cambiamos el
+signo de parámetro =theta_j= pues ya lleva el "$-$" incorporado, ya
+que Gretl escribe asume que los modelos ARIMA se representan del
+siguiente modo:
+$$(1-\phi_1\mathsf{B}-\cdots-\phi_p\mathsf{B}^p)X_t= (1+\theta_1\mathsf{B}+\cdots+\theta_p\mathsf{B}^p)U_t.$$
+en lugar del habitual
+$$(1-\phi_1\mathsf{B}-\cdots-\phi_p\mathsf{B}^p)X_t= (1-\theta_1\mathsf{B}-\cdots-\theta_p\mathsf{B}^p)U_t.$$
+Por tanto, 
+
+- Expresiones correctas :: son
+
+  - Expresión 1 :: Representación en forma MA$(\infty)$ de $\nabla x_t$: $\qquad \nabla x_t = \frac{1-0.844 \, \mathsf{B}^4}{1 - 0.291 \mathsf{B} -0.511 \mathsf{B}^2} \hat{a}_t$
+  - Expresión 6 :: Representación en forma MA$(\infty)$ de $\nabla x_t$: $\qquad x_t-x_{t-1} = \frac{1-0.844 \, \mathsf{B}^4}{1 - 0.291 \mathsf{B} -0.511 \mathsf{B}^2} \hat{a}_t$ 
+  - Expresión 9 :: Representación en forma ARIMA$(2,1,0)\times(0,0,1)_4$
+    de $x_t$: @@latex:\newline @@ $\qquad (1 - 0.291 \mathsf{B} -
+    0.511 \mathsf{B}^2)\nabla x_t = (1 - 0.844 \mathsf{B}^4) \hat{a}_t$
+  - Expresión 12 :: Representación en forma AR$(\infty)$ de $\nabla x_t$: $\qquad \frac{1 -0.291 \mathsf{B} - 0.511 \mathsf{B}^2}{1 - 0.844 \mathsf{B}^4}\nabla x_t = \hat{a}_t$
+  - Expresión 13 :: Representación en forma ARMA$(\infty,\infty)$ de $\nabla x_t$: $\qquad\frac{1}{1 - 0.844 \mathsf{B}^4}\nabla x_t = \frac{1}{1 -0.291 \mathsf{B} - 0.511 \mathsf{B}^2} \hat{a}_t$
+
+- Expresiones que carecen de sentido :: (por no estar definidas) son
+  las expresiones *4*, *5*, *14* y *15* (fíjese que en las cuatro
+  expresiones $\nabla=(1-\mathsf{B})$ aparece en el denominador, es
+  decir, que en el denominador aparece un polinomio con una raíz 1).
+
+¡Ojo! aunque estas expresiones son relativamente habituales en algunos
+textos, debe recordar que son un incorrecto abuso de notación, ya que
+la expresión
+$\;x_t=\frac{\theta(\mathsf{B})}{\phi(\mathsf{B})}\hat{a}_t\;$
+significa que
+$\;\boldsymbol{x}=\frac{1}{\boldsymbol{\phi}}*\boldsymbol{\theta}*\hat{\boldsymbol{a}}\;$
+donde $\frac{1}{\boldsymbol{\phi}}$ es una secuencia absolutamente
+sumable tal que
+$\frac{1}{\boldsymbol{\phi}}*\boldsymbol{\phi}=1$. /Pero cuando
+$\boldsymbol{\phi}$ es un polinomio con raíces de módulo uno, una
+secuencia $\frac{1}{\boldsymbol{\phi}}$ con dichas características NO
+existe/.
+
+([[Pregunta 4]])
+
+** Respuesta 5
+
+Son correctas 
+- la *expresión 2*, donde, teniendo en cuenta que Gretl devuelve la
+  estimación de $\phi_1$ del modelo del error, el modelo puede
+  escribirse tal como indica el enunciado.
+
+- la *expresión 5*, donde la constante y el término causal de
+  regresión se han pasado al lado izquierdo de la igualdad y, en la
+  expresión resultante, el inverso (sumable) del polinomio AR aparece
+  multiplicando el lado izquierdo (es decir, el último sumando es una
+  media móvil infinita).
+
+([[Pregunta 5]])
+
+** Respuesta 6
+
+*Falso*. Los criterios de información no son comparables ya que
+corresponden a ajustes de modelos para variables endógenas distintas
+(el primero es un modelo para =T4IPVN= y el segundo un modelo para
+=T4IPV2M=)
+
+([[Pregunta 6]])
+
+** Respuesta 7
+
+*Falso*. Sería correcto si las variables dependiente y explicativa
+fueran /tasas logarítmicas/ anuales, en cuyo caso el coeficiente
+podría interpretarse como una elasticidad. Como se trata de tasas
+porcentuales ordinarias, la interpretación no es correcta.
+
+([[Pregunta 7]])
+
+** Respuesta 8
+
+*Verdadero*. Las variables dependiente y explicativa son tasas
+porcentuales de variación anual y la pendiente, por tanto, se
+interpreta como el aumento esperado en la variable endógena cuando la
+explicativa crece en una unidad.
+
+([[Pregunta 8]])
+
+** Respuesta 9
+
+*Verdadero*. El intervalo de confianza indica que la hipótesis nula
+$H_0:\; \phi_1=1$ se rechaza con un nivel de significación del
+5%. Consecuentemente, también se rechaza si se aumenta el nivel de
+significación al 10% ya que el correspondiente intervalo de confianza
+al 90% es aún más reducido.
+
+([[Pregunta 9]])
+
+** Respuesta 10
+
+*Cierto*. El valor =1= queda fuera del del intervalo de confianza al
+95%, pero está muy, muy próximo al límite superior de dicho intervalo.
+Por tanto, una ligera ampliación del intervalo de confianza hará que
+=1= acabe dentro del nuevo intervalo. Y como reducir la significación
+al 1% supone ampliar el intervalo de confianza asociado (pues ahora
+corresponderá a una confianza del 99%) es previsible que al 1% no se
+rechace $H_0:\; \phi_1=1$ (/de hecho lo puede comprobar si quiere
+abriendo la base de datos en Gretl/).
+
+([[Pregunta 10]])
+
+
+
+* COMMENT Basura
+
+#  #+begin_src R :tangle EjercicioIdentificacionARIMA.inp :results none :exports code 
+#  series residuos = $uhat
+#  #+end_src
+#  
+#  #+name: correlograma de los residuos
+#  #+begin_src R :tangle EjercicioIdentificacionARIMA.inp :results none :exports code 
+#  corrgm residuos 13
+#  #+end_src
+#  
+#  
+#  #+begin_src R :tangle EjercicioIdentificacionARIMA.inp :results none :exports none :noweb yes
+#  outfile --quiet ResiduosACF-PACF.txt
+#     <<correlograma de los residuos>> --quiet
+#  end outfile
+#  #+end_src
+#  
+#  #+include: ./EjercicioIdentificacionARIMA/ResiduosACF-PACF.txt example
+
+** COMMENT Pregunta 11
+
+Indique si es cierta o no la siguiente afirmación:
+
+Si no se cumple la hipótesis de normalidad el estimador MCO ya no es
+eficiencia aunque se cumplan el resto de las hipótesis.
+
+([[Respuesta 11]])
+
+
+
+#+latex: \newpage
+
+** COMMENT Respuesta 11
+
+*Falso*. El teorema de Gauss-Markov muestra que el estimador MCO es el
+más eficiente de la familia de estimadores lineales e insesgados del
+vector de parámetros.
+
+([[Pregunta 11]])
+
