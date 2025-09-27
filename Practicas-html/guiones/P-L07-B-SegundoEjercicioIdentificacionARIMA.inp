@@ -1,0 +1,81 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../datos/IdentificaEstosARIMA/00c296-12.gdt
+
+gnuplot x --time-series --with-lines --output="SerieEnNiveles.png"
+rmplot  x --output="rango-media.png"
+
+corrgm x 36 --plot="x_ACF-PACF.png"
+
+ARIMA000X100 <- arima 0 0 0 ; 1 0 0 ; x
+
+outfile --quiet ARIMA000x100.txt
+  ARIMA000X100 <- arima 0 0 0 ; 1 0 0 ; x 
+end outfile
+
+sdiff x
+gnuplot sd_x --time-series --with-lines --output="SerieEnDiferencias.png"
+
+corrgm sd_x 36 --plot="sd_x_ACF-PACF.png"
+
+ARIMA110 <- arima 1 1 0 ; x
+
+outfile --quiet ARIMA110.txt
+  ARIMA110 <- arima 1 1 0 ; x
+end outfile
+
+adf -1 sd_x --c --gls --test-down --perron-qu
+
+outfile --quiet test_ADF_en_diff.txt
+    adf -1 sd_x --c --gls --test-down --perron-qu 
+end outfile
+
+kpss -1 sd_x
+
+outfile --quiet test_KPSS_en_diff.txt
+    kpss -1 sd_x 
+end outfile
+
+ARIMA110cte <- arima 1 0 0; 0 1 0 ; x
+
+outfile --quiet ARIMA110cte.txt
+  ARIMA110cte <- arima 1 0 0; 0 1 0 ; x 
+end outfile
+
+ARIMA110 <- arima 1 0 0; 0 1 0 ; x --nc
+
+outfile --quiet ARIMA100x010.txt
+  ARIMA110 <- arima 1 0 0; 0 1 0 ; x --nc
+end outfile
+
+series residuos = $uhat
+
+gnuplot residuos --time-series --with-lines --output="Residuos.png"
+corrgm residuos 60 --plot="residuosACF-PACF.png"
+
+corrgm residuos 15
+
+outfile --quiet ResiduosACF-PACF.txt
+   corrgm residuos 15 --quiet
+end outfile
+
+normtest residuos --all
+
+outfile --quiet ContrasteNormalidadResiduos.txt
+   normtest residuos --all
+end outfile
+
+ARIMAsimulado <- arima 2 0 1; 0 1 0 ; x --nc
+
+outfile --quiet ARIMAsimulado.txt
+  ARIMAsimulado <- arima 2 0 1; 0 1 0 ; x --nc 
+end outfile

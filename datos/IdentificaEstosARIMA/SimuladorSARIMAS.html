@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+<!-- 2025-09-27 Sat 20:05 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Simulación de múltiples modelos lineales</title>
+<meta name="generator" content="Org Mode" />
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Simulación de múltiples modelos lineales</h1>
+<div id="outline-container-orgea164d6" class="outline-2">
+<h2 id="orgea164d6">Objetivo</h2>
+<div class="outline-text-2" id="text-orgea164d6">
+<p>
+Que el estudiante tenga una gran batería de series para ejercitar la
+identificación. Los nombres de los ficheros impiden saber a priori de
+qué modelo se trata en cada caso (cada serie tiene un hash único). El
+alumno tendrá que observar el gráfico <i>rango-media</i> para decidir
+primero si la serie necesita la transformación logarítmica. Después
+tendrá que ir mirando el gráfico de las series, de los residuos, los
+correlogramas (también es útil mirar el gráfico del espectro del
+modelo junto al periodograma) para intentar indentificar el modelo
+lineal con el que se ha simulado la serie temporal.
+</p>
+
+<p>
+Los ficheros <code>Etiqueta.txt</code> almacenan el tipo de modelo que se ha
+simulado en cada caso. Por tanto, una vez se ha identificado un
+modelo, se puede verificar si efectivamente ese ha sido el modelo
+usado al crear la serie buscando el hash del fichero en la primera
+columna de <code>Etiqueta.txt</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-orgba09b4e" class="outline-2">
+<h2 id="orgba09b4e">Qué hace el código de más abajo</h2>
+<div class="outline-text-2" id="text-orgba09b4e">
+<p>
+Simula desde procesos de ruido blanco a procesos
+ARIMA\((p,d,q)\times(P,D,Q)_S\), con transformaciones exponenciales en
+algunos casos y con medias distintas de cero en otros.
+</p>
+
+<p>
+En total se simulan 320 modelos con periodicidad trimestral y 320 con
+periodicidad mensual.
+</p>
+
+<p>
+Las series se simulan con la librería <code>tfarima</code> de R escrita por José
+Luis Gallego y cada una de ellas se graba en un fichero <code>csv</code> con un
+nombre anonimizado (mediante un hash) para ocultar cualquier pista
+sobre cuál es el modelo subyacente.
+</p>
+
+<p>
+Para mayor comodidad del estudiante, cada serie es leída
+posteriormente con GRETL y guardada en formato Gretl (<code>*.gdt</code>) en el
+directorio <a href="IdentificaEstosARIMA/">IdentificaEstosARIMA</a> (manteniendo los nombres anonimizados
+pero añadiendo tras un guión la supuesta periodicidad de los datos).
+</p>
+
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold;">import</span> itertools
+<span style="font-weight: bold;">import</span> hashlib
+<span style="font-weight: bold;">import</span> subprocess
+<span style="font-weight: bold;">import</span> os
+
+<span style="font-weight: bold; font-style: italic;">ar</span>  = [ <span style="font-style: italic;">'(1 - 0.8B)'</span>, <span style="font-style: italic;">'(1 + 0.8B)'</span>, <span style="font-style: italic;">'(1 - 0.8BS)'</span> ]
+<span style="font-weight: bold; font-style: italic;">ma</span> =  [ <span style="font-style: italic;">'(1 - 0.65B)'</span>, <span style="font-style: italic;">'(1 + 0.65B)'</span>, <span style="font-style: italic;">'(1 - 0.65BS)'</span>]
+<span style="font-weight: bold; font-style: italic;">I</span>   = [ <span style="font-style: italic;">'(1 - B)'</span>, <span style="font-style: italic;">'(1 - BS)'</span>]
+
+<span style="font-weight: bold;">def</span> <span style="font-weight: bold;">simulacion</span>(lista_AR, lista_MA, lista_I, PeriodoEstacional=12):
+    <span style="font-weight: bold; font-style: italic;">S</span> = <span style="font-weight: bold;">str</span>(PeriodoEstacional)
+    <span style="font-weight: bold; font-style: italic;">directorio</span> = <span style="font-style: italic;">"SeriesSimuladas"</span>+S
+    <span style="font-weight: bold; font-style: italic;">d</span> = os.path.join(directorio)
+    <span style="font-weight: bold;">if</span> <span style="font-weight: bold;">not</span> os.path.exists(d):
+        os.makedirs(d)
+
+    <span style="font-weight: bold;">def</span> <span style="font-weight: bold;">polinomios</span>(monomios, S, NOlimita=1):
+        <span style="font-weight: bold; font-style: italic;">polinomios</span> = []
+        <span style="font-weight: bold;">for</span> i <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(3):
+            <span style="font-weight: bold;">for</span> c <span style="font-weight: bold;">in</span> itertools.combinations(monomios, i):
+                <span style="font-weight: bold; font-style: italic;">cc</span> = <span style="font-style: italic;">''</span>.join(c).replace(<span style="font-style: italic;">"S"</span>, S)
+                <span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">polinomios = polinomios + [cc] if ((i &lt; len(monomios)) | NOlimita) else polinomios
+</span>                <span style="font-weight: bold; font-style: italic;">polinomios</span> = polinomios + [cc] 
+        <span style="font-weight: bold;">return</span> polinomios
+
+    <span style="font-weight: bold; font-style: italic;">SampleSize</span> = 40*PeriodoEstacional
+    <span style="font-weight: bold; font-style: italic;">numero_de_modelos</span> = 0
+    <span style="font-weight: bold; font-style: italic;">etiqueta</span> = []
+    <span style="font-weight: bold;">for</span> ca,ma <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">enumerate</span>(polinomios(lista_MA,<span style="font-weight: bold;">str</span>(S),0)):
+        <span style="font-weight: bold;">for</span> cb,ar <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">enumerate</span>(polinomios(lista_AR,<span style="font-weight: bold;">str</span>(S),0)):
+            <span style="font-weight: bold;">for</span> cc,i <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">enumerate</span>(polinomios(lista_I,<span style="font-weight: bold;">str</span>(S))):
+                <span style="font-weight: bold;">for</span> l <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(2):
+                    <span style="font-weight: bold;">if</span> <span style="font-weight: bold;">len</span>(ar)&lt;18 <span style="font-weight: bold;">or</span> <span style="font-weight: bold;">len</span>(ma)&lt;18:
+                        <span style="font-weight: bold; font-style: italic;">numero_de_modelos</span> += 1 
+                        <span style="font-weight: bold; font-style: italic;">parametros</span> = <span style="font-style: italic;">"ar = '%s', ma = '%s', i = '%s'"</span>  % (ar,ma,i)
+                        <span style="font-weight: bold; font-style: italic;">modelo</span> = <span style="font-style: italic;">"ARIMA &lt;- um(%s)"</span>  % (parametros)
+                        <span style="font-weight: bold;">if</span> l: 
+                            <span style="font-weight: bold; font-style: italic;">sim</span>   = <span style="font-style: italic;">'y = exp((sim(ARIMA, n = %d)) * 0.1 + 2.5)'</span> % (SampleSize,)
+                            <span style="font-weight: bold; font-style: italic;">logs</span>  = <span style="font-style: italic;">'logs'</span>
+                            <span style="font-weight: bold; font-style: italic;">media</span> = <span style="font-style: italic;">'mu = 2.5'</span>
+                        <span style="font-weight: bold;">else</span>:
+                            <span style="font-weight: bold; font-style: italic;">sim</span>   = <span style="font-style: italic;">'y = (sim(ARIMA, n = 200))'</span>
+                            <span style="font-weight: bold; font-style: italic;">logs</span>  = <span style="font-style: italic;">'    '</span>
+                            <span style="font-weight: bold; font-style: italic;">media</span> = <span style="font-style: italic;">'mu = 0.0'</span>
+
+                        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">script de R
+</span>                        <span style="font-weight: bold; font-style: italic;">caso</span> = <span style="font-weight: bold;">chr</span>(ca*1000+cb*100+cc*10+l)
+                        <span style="font-weight: bold; font-style: italic;">label</span> = (hashlib.shake_128(caso.encode()).hexdigest(3))
+                        <span style="font-weight: bold; font-style: italic;">caracter&#237;sticas</span> = logs + <span style="font-style: italic;">',</span><span style="font-weight: bold; text-decoration: underline;">\t</span><span style="font-style: italic;">'</span> + media + <span style="font-style: italic;">',</span><span style="font-weight: bold; text-decoration: underline;">\t</span><span style="font-style: italic;">'</span> + parametros
+                        <span style="font-weight: bold; font-style: italic;">etiqueta</span> = etiqueta + [label + <span style="font-style: italic;">',</span><span style="font-weight: bold; text-decoration: underline;">\t</span><span style="font-style: italic;">'</span> + caracter&#237;sticas]
+                        <span style="font-weight: bold; font-style: italic;">fichero</span> = <span style="font-style: italic;">"write.csv(y, file='%s/%s.csv')"</span>  % (directorio,label)
+                        <span style="font-weight: bold;">with</span> <span style="font-weight: bold;">open</span>(<span style="font-style: italic;">'Rscript.r'</span>, <span style="font-style: italic;">'w'</span>) <span style="font-weight: bold;">as</span> f:
+                            f.write(<span style="font-style: italic;">'library(tfarima)'</span>+<span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>)
+                            f.write(modelo+<span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>)
+                            f.write(sim+<span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>)
+                            f.write(fichero+<span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>)                            
+                        subprocess.call ([<span style="font-style: italic;">"/usr/bin/Rscript"</span>, <span style="font-style: italic;">"--vanilla"</span>, <span style="font-style: italic;">"./Rscript.r"</span>])
+
+                        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">script de Gretl
+</span>                        <span style="font-weight: bold; font-style: italic;">Tama&#241;oMuestral</span> = <span style="font-style: italic;">'nulldata %d'</span> % SampleSize
+                        <span style="font-weight: bold; font-style: italic;">Dir</span>          = <span style="font-style: italic;">'string directory = $(pwd) ~ "/IdentificaEstosARIMA"'</span>
+                        <span style="font-weight: bold; font-style: italic;">DirTrabajo</span>   = <span style="font-style: italic;">'set workdir "@directory"'</span>
+                        <span style="font-weight: bold; font-style: italic;">periodicidad</span> = <span style="font-style: italic;">'setobs %s 1985:1 --time-series'</span> % (S,)
+                        <span style="font-weight: bold; font-style: italic;">datos</span>        = <span style="font-style: italic;">'open %s/%s.csv'</span> % (directorio,label,)
+                        <span style="font-weight: bold; font-style: italic;">guardado</span>     = <span style="font-style: italic;">'store %s-%s.gdt x'</span> % (label,S)
+                        <span style="font-weight: bold; font-style: italic;">Guion</span> = <span style="font-style: italic;">"GRETLscript"</span>+S+<span style="font-style: italic;">".inp"</span>
+                        <span style="font-weight: bold;">with</span> <span style="font-weight: bold;">open</span>(Guion, <span style="font-style: italic;">'w'</span>) <span style="font-weight: bold;">as</span> f:
+                            f.write(Dir+<span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>+DirTrabajo+<span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>+datos+<span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>+periodicidad+<span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>+guardado)
+                            
+                        subprocess.call ([<span style="font-style: italic;">"/usr/bin/gretlcli"</span>, <span style="font-style: italic;">"-b"</span>, Guion])
+                        
+    <span style="font-weight: bold;">print</span>(numero_de_modelos)
+
+    <span style="font-weight: bold;">with</span> <span style="font-weight: bold;">open</span>(directorio+<span style="font-style: italic;">'/Etiquetas.txt'</span>, <span style="font-style: italic;">'w'</span>) <span style="font-weight: bold;">as</span> f:
+        f.write(<span style="font-style: italic;">'etiqueta'</span> + <span style="font-style: italic;">',</span><span style="font-weight: bold; text-decoration: underline;">\t</span><span style="font-style: italic;">'</span> + <span style="font-style: italic;">'logs'</span> + <span style="font-style: italic;">',</span><span style="font-weight: bold; text-decoration: underline;">\t</span><span style="font-style: italic;">'</span> + <span style="font-style: italic;">'mu'</span> + <span style="font-style: italic;">',</span><span style="font-weight: bold; text-decoration: underline;">\t</span><span style="font-style: italic;">'</span> + <span style="font-style: italic;">'ar'</span> + <span style="font-style: italic;">',</span><span style="font-weight: bold; text-decoration: underline;">\t</span><span style="font-style: italic;">'</span> + <span style="font-style: italic;">'ma'</span>+<span style="font-style: italic;">',</span><span style="font-weight: bold; text-decoration: underline;">\t</span><span style="font-style: italic;">'</span> + <span style="font-style: italic;">'nabla'</span> + <span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>)
+        <span style="font-weight: bold;">for</span> e <span style="font-weight: bold;">in</span> etiqueta:
+            f.write(e+<span style="font-style: italic;">'</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">'</span>)
+    
+</code></pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar</span>  = [ <span style="font-style: italic;">'(1 - 0.8B)'</span>, <span style="font-style: italic;">'(1 + 0.8B)'</span>, <span style="font-style: italic;">'(1 - 0.8BS)'</span>]
+<span style="font-weight: bold; font-style: italic;">ma</span> =  [ <span style="font-style: italic;">'(1 - 0.55B)'</span>, <span style="font-style: italic;">'(1 + 0.55B)'</span>, <span style="font-style: italic;">'(1 + 0.55BS)'</span>]
+<span style="font-weight: bold; font-style: italic;">I</span>   = [ <span style="font-style: italic;">'(1 - B)'</span>, <span style="font-style: italic;">'(1 - BS)'</span>]
+<span style="font-weight: bold; font-style: italic;">_</span> = simulacion(ar, ma, I, 4)
+<span style="font-weight: bold; font-style: italic;">_</span> = simulacion(ar, ma, I, 12)
+</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Created: 2025-09-27 Sat 20:05</p>
+</div>
+</body>
+</html>
