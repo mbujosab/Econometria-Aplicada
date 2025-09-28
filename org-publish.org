@@ -291,9 +291,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+    #- name: Checkout repository
+    #  uses: actions/checkout@v3
 
+    - name: Checkout del repositorio principal
+      uses: actions/checkout@v4
 
     - name: Checkout del repositorio de datos
       uses: actions/checkout@v4
@@ -301,10 +303,13 @@ jobs:
         repository: mbujosab/TimeSeriesData
         path: datos_temp
 
-    - name: Copiar archivos de datos del repositorio de datos al directorio datos
+    - name: Borrar contenido antiguo del directorio datos
       run: |
-        rm -rf ~/datos/       # Elimina contenido del antiguo directorio datos (si existe)
-        cp -R datos_temp  ~/datos
+        rm -rf datos/*
+
+    - name: Copiar archivos del repositorio de datos al directorio datos
+      run: |
+        cp -r datos_temp/* datos/
 
     - name: Comprobar contenido de datos antes de seguir
       run: |
