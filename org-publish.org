@@ -218,13 +218,14 @@ $(LECCIONES_tmp)/src/%.org: $(LECCIONES_SRC)/src/%.org
 	emacs -q --batch $(LECCIONES_tmp)/src/$*.org -l org -f org-babel-tangle
 	cp -a $(LECCIONES_tmp)/src/$*.py $(CUADERNOS)/src/
 	ln -sf -r $(CUADERNOS)/src/$*.py $(CUADERNOS)/
-	emacs -q --batch \
-	  --load ~/Software/scimax/init.el \
-	  --eval "(require 'ox-ipynb)" \
-	  --eval "(ox-ipynb-export-org-file-to-ipynb-file \"$(LECCIONES_tmp)/src/$*.org\")"
-	jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/$*.ipynb
-	jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/src/$*.ipynb
-	jupyter nbconvert --execute --to html $(LECCIONES_tmp)/src/$*.ipynb
+	emacs -Q -l ~/Software/scimax/init.el $(LECCIONES_tmp)/$(@F:.ipynb=.org) --batch --eval "(org-babel-execute-buffer)" --eval "(save-buffer)" --kill
+	#emacs -q --batch \
+	#  --load ~/Software/scimax/init.el \
+	#  --eval "(require 'ox-ipynb)" \
+	#  --eval "(ox-ipynb-export-org-file-to-ipynb-file \"$(LECCIONES_tmp)/src/$*.org\")"
+	#jupyter nbconvert --execute --inplace $(LECCIONES_tmp)/src/$*.ipynb
+	#jupyter nbconvert --config mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute $(LECCIONES_tmp)/src/$*.ipynb
+	#jupyter nbconvert --execute --to html $(LECCIONES_tmp)/src/$*.ipynb
 	cp -a $(LECCIONES_tmp)/src/$*.ipynb $(CUADERNOS)
 	cp -a $(LECCIONES_tmp)/src/$*.slides.html $(TRANSPARENCIAS)
 	cp -a $(LECCIONES_tmp)/src/$*.html $(DOCS)/Lecciones-html/src/
@@ -292,6 +293,18 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+
+
+    - name: Checkout del repositorio de datos
+      uses: actions/checkout@v4
+      with:
+        repository: mbujosab/TimeSeriesData
+        path: datos_temp
+
+    - name: Copiar archivos de datos del repositorio de datos al directorio datos
+      run: |
+        rm -rf econometria-aplicada/datos      # Elimina el antiguo directorio datos (si existe)
+        cp -R datos_temp econometria-aplicada/datos
 
     - name: Set up Python
       uses: actions/setup-python@v4

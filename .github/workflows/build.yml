@@ -13,6 +13,18 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+
+    - name: Checkout del repositorio de datos
+      uses: actions/checkout@v4
+      with:
+        repository: mbujosab/TimeSeriesData
+        path: datos_temp
+
+    - name: Copiar archivos de datos del repositorio de datos al directorio datos
+      run: |
+        rm -rf econometria-aplicada/datos      # Elimina el antiguo directorio datos (si existe)
+        cp -R datos_temp econometria-aplicada/datos
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
