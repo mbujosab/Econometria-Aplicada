@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+<!-- 2025-10-01 Wed 16:51 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lección 5.C - Simulación de procesos AR(1) y exploración de sus correlogramas</title>
+<meta name="generator" content="Org Mode" />
+
+<script src="https://orgmode.org/org-info.js">
+// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&amp;dn=gpl-3.0.txt GPL-v3-or-Later
+// @license-end
+</script>
+
+<script>
+// @license magnet:?xt=urn:btih:1f739d935676111cfff4b4693e3816e664797050&amp;dn=gpl-3.0.txt GPL-v3-or-Later
+org_html_manager.set("TOC_DEPTH", "3");
+org_html_manager.set("LINK_HOME", "");
+org_html_manager.set("LINK_UP", "");
+org_html_manager.set("LOCAL_TOC", "1");
+org_html_manager.set("VIEW_BUTTONS", "0");
+org_html_manager.set("MOUSE_HINT", "underline");
+org_html_manager.set("FIXED_TOC", "0");
+org_html_manager.set("TOC", "0");
+org_html_manager.set("VIEW", "overview");
+org_html_manager.setup();  // activate after the parameters are set
+// @license-end
+</script>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Lección 5.C - Simulación de procesos AR(1) y exploración de sus correlogramas</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>&Iacute;ndice</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#org685a4ca">Objetivo de la práctica</a></li>
+<li><a href="#org336ace2">Actividad 2 - Modelos AR(\(1\)) parámetro positivo</a></li>
+<li><a href="#org16e671d">Actividad 1 - Modelos AR(\(1\)) parámetro negativo</a></li>
+<li><a href="#org7f6b1f7">Código completo de la práctica</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org685a4ca" class="outline-2">
+<h2 id="org685a4ca">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-org685a4ca">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Guión:</td>
+<td class="org-left"><a href="https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L05-C-simulacion-procesos-AR.inp">P-L05-C-simulacion-procesos-AR.inp</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>Objetivo</b>
+</p>
+
+<ol class="org-ol">
+<li>Observar la ACF y PACF de distintos modelos AR(\(1\)).
+<ul class="org-ul">
+<li>Observar que el signo y la magnitud de \(\theta_1\) afecta al signo y magnitud de la autocorrelación de orden 1.</li>
+<li>Observar que el signo y la magnitud de \(\theta_1\) afecta al comportamiento de la PACF y su velocidad de decaimiento.</li>
+</ul></li>
+</ol>
+
+<p>
+<b>Requerimientos previos</b>
+</p>
+
+<p>
+Programe o recupere de una práctica anterior una función que simule procesos AR(\(q\))
+</p>
+<div class="org-src-container">
+<pre class="src src-gretl" id="orgffa4dab"><code>function series SimuladorAR(matrix phi)
+    # SimuladorAR(phi) simula un proceso AR(p), 
+    # donde phi es el polinomio AR y p es su grado.
+
+    p = cols(phi)                             
+    
+    series U = normal(0,1)                    
+    series Y = 0                              
+    setinfo Y --description="Serie simulada"
+
+    loop i = (p+1)..$nobs                     
+    
+        comb_pasado_Yt = 0                         
+        perturbacion = U[i]
+    
+        loop j = 2..p                         
+            comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
+        endloop
+    
+        Y[i] = comb_pasado_Yt + perturbacion       
+    
+    endloop
+
+    return Y
+
+end function
+</code></pre>
+</div>
+
+<p>
+Para que se observe bien la estructura de las ACF y PACF estimadas, establezca un tamaño de muestra suficientemente grande.
+</p>
+<div class="org-src-container">
+<pre class="src src-gretl"><code># establecemos la muestra
+nulldata 1500
+setobs 12 1900:01 --time-series
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org336ace2" class="outline-2">
+<h2 id="org336ace2">Actividad 2 - Modelos AR(\(1\)) parámetro positivo</h2>
+<div class="outline-text-2" id="text-org336ace2">
+<p>
+Pruebe a simular modelos AR(\(1\)) 
+\[
+(1-\theta\mathsf{B})*\boldsymbol{X}=\boldsymbol{U}
+\]
+donde \(\boldsymbol{U}\sim WN(0,1)\), con valores paramétricos: entre \(0\) y \(1\); y estime los correlogramas.
+</p>
+
+<ul class="org-ul">
+<li>Para \(\theta_1\approx0,\quad0.2,\quad0.4,\quad0.6,\quad0.8,\quad1\).</li>
+</ul>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-1(0.0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-2(0.2).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-3(0.4).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-4(0.6).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-5(0.8).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-6(1.0).png" style="max-width:17%; height:auto;"/>
+</div>
+</div>
+</div>
+<div id="outline-container-org16e671d" class="outline-2">
+<h2 id="org16e671d">Actividad 1 - Modelos AR(\(1\)) parámetro negativo</h2>
+<div class="outline-text-2" id="text-org16e671d">
+<p>
+Pruebe a simular modelos AR(\(1\)) 
+\[
+(1-\theta\mathsf{B})*\boldsymbol{X}=\boldsymbol{U}
+\]
+donde \(\boldsymbol{U}\sim WN(0,1)\), con valores paramétricos: entre \(-1\) y \(0\); y estime los correlogramas.
+</p>
+
+<ul class="org-ul">
+<li>Para \(\theta_1\approx-1,\quad-0.8,\quad-0.6,\quad-0.4,\quad-0.2,\quad0\).</li>
+</ul>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-1(-1.0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-2(-0.8).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-3(-0.6).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-4(-0.4).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-5(-0.2).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-6(-0.0).png" style="max-width:17%; height:auto;"/>
+</div>
+</div>
+</div>
+<div id="outline-container-org7f6b1f7" class="outline-2">
+<h2 id="org7f6b1f7">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-org7f6b1f7">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Guión completo:</td>
+<td class="org-left"><a href="https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L05-C-simulacion-procesos-AR.inp">P-L05-C-simulacion-procesos-AR.inp</a></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Created: 2025-10-01 Wed 16:51</p>
+</div>
+</body>
+</html>
