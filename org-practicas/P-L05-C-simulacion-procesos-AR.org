@@ -1,0 +1,340 @@
+#    -*- mode: org -*-
+
+#+Title: Lección 5.C - Simulación de procesos AR(1) y exploración de sus correlogramas
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+#+INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+# +SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: P-L05-C-simulacion-procesos-AR
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L05-C-simulacion-procesos-AR"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+#+begin_src gretl :tangle guiones/P-L05-C-simulacion-procesos-AR.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+# string directory = $(pwd) ~ "/P-L03-A-simulaciones"
+
+
+#+LATEX: \maketitle
+
+
+* Objetivo de la práctica
+
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L05-C-simulacion-procesos-AR.inp][P-L05-C-simulacion-procesos-AR.inp]] |
+
+*Objetivo*
+
+1. Observar la ACF y PACF de distintos modelos AR($1$).
+   - Observar que el signo y la magnitud de $\theta_1$ afecta al signo y magnitud de la autocorrelación de orden 1. 
+   - Observar que el signo y la magnitud de $\theta_1$ afecta al comportamiento de la PACF y su velocidad de decaimiento. 
+
+*Requerimientos previos*
+
+Programe o recupere de una práctica anterior una función que simule procesos AR($q$)
+#+name: Función SimuladorAR
+#+BEGIN_SRC gretl :tangle ./guiones/P-L05-C-simulacion-procesos-AR.inp :eval no
+function series SimuladorAR(matrix phi)
+    # SimuladorAR(phi) simula un proceso AR(p), 
+    # donde phi es el polinomio AR y p es su grado.
+
+    p = cols(phi)                             
+    
+    series U = normal(0,1)                    
+    series Y = 0                              
+    setinfo Y --description="Serie simulada"
+
+    loop i = (p+1)..$nobs                     
+    
+        comb_pasado_Yt = 0                         
+        perturbacion = U[i]
+    
+        loop j = 2..p                         
+            comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
+        endloop
+    
+        Y[i] = comb_pasado_Yt + perturbacion       
+    
+    endloop
+
+    return Y
+
+end function
+#+END_SRC
+
+Para que se observe bien la estructura de las ACF y PACF estimadas, establezca un tamaño de muestra suficientemente grande.
+#+BEGIN_SRC gretl :tangle ./guiones/P-L05-C-simulacion-procesos-AR.inp :eval no
+# establecemos la muestra
+nulldata 1500
+setobs 12 1900:01 --time-series
+#+END_SRC
+
+
+* Actividad 2 - Modelos AR($1$) parámetro positivo
+
+Pruebe a simular modelos AR($1$) 
+\[
+(1-\theta\mathsf{B})*\boldsymbol{X}=\boldsymbol{U}
+\]
+donde $\boldsymbol{U}\sim WN(0,1)$, con valores paramétricos: entre $0$ y $1$; y estime los correlogramas.
+
+- Para $\theta_1\approx0,\quad0.2,\quad0.4,\quad0.6,\quad0.8,\quad1$.
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L05-C-simulacion-procesos-AR.inp :eval no  :exports results
+n = 0
+loop for (r=0; r<=1.1; r+=0.2)
+    n += 1
+    scalar theta1 = r
+    nombre = sprintf("PhiPositivo-%d(%1.1f)", n, theta1)
+    sname = sprintf("Caso_%d", n)
+    series @sname = SimuladorAR( {1, -theta1} )
+    corrgm @sname 12 --plot=@nombre.png
+endloop
+#+END_SRC
+
+#+BEGIN_SRC bash :var dir="./P-L05-C-simulacion-procesos-AR/" :exports results :results raw
+# Inicia el bloque de exportación a LaTeX
+echo "#+BEGIN_EXPORT latex"
+echo "\\begin{figure}[H]"
+echo "\\centering"
+# echo "\\captionsetup[figure]{labelformat=empty}" # Opcional: Oculta la etiqueta "Figure X"
+
+# Itera sobre los archivos .png encontrados y genera el código minipage
+find "$dir" -maxdepth 1 -type f -iname "PhiPositivo-*.png" -print0 | sort -z | while IFS= read -r -d $'\0' file; do
+    echo "\\begin{minipage}{0.17\\textwidth}"
+    echo "  \\includegraphics[width=\\textwidth]{$file}"
+    echo "\\end{minipage}%" # El '%' es CRUCIAL para evitar un salto de línea entre minipages
+done
+
+# Finaliza el entorno de figura
+# echo "\\caption{Correlogramas en zona 1: Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. En todos los casos $\theta_2=0.5$.}"
+echo "\\end{figure}"
+echo "#+END_EXPORT"
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiPositivo-1(0,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiPositivo-2(0,2).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiPositivo-3(0,4).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiPositivo-4(0,6).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiPositivo-5(0,8).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiPositivo-6(1,0).png}
+\end{minipage}%
+\end{figure}
+#+END_EXPORT
+
+
+#+begin_src emacs-lisp :results raw :exports results
+(let ((imagenes (directory-files "P-L05-C-simulacion-procesos-AR/" t "^PhiPositivo-.*\\.png$")))
+  (concat "#+BEGIN_EXPORT HTML\n"
+          "<div style=\"display: flex; justify-content: center; gap: 10px;\">\n"
+          (mapconcat (lambda (f)
+                       (format "<img src=\"%s\" style=\"max-width:17%%; height:auto;\"/>"
+                               (file-relative-name f)))
+                     imagenes
+                     "\n")
+          "\n</div>\n#+END_EXPORT"))
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT HTML
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-1(0,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-2(0,2).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-3(0,4).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-4(0,6).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-5(0,8).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiPositivo-6(1,0).png" style="max-width:17%; height:auto;"/>
+</div>
+#+END_EXPORT
+
+
+
+* Actividad 1 - Modelos AR($1$) parámetro negativo
+
+Pruebe a simular modelos AR($1$) 
+\[
+(1-\theta\mathsf{B})*\boldsymbol{X}=\boldsymbol{U}
+\]
+donde $\boldsymbol{U}\sim WN(0,1)$, con valores paramétricos: entre $-1$ y $0$; y estime los correlogramas.
+
+- Para $\theta_1\approx-1,\quad-0.8,\quad-0.6,\quad-0.4,\quad-0.2,\quad0$.
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L05-C-simulacion-procesos-AR.inp :eval no  :exports results
+n = 0
+loop for (r=-1; r<=0.1; r+=0.2)
+    n += 1
+    scalar theta1 = r
+    nombre = sprintf("PhiNegativo-%d(%1.1f)", n, theta1)
+    sname = sprintf("Caso_%d", n)
+    series @sname = SimuladorAR( {1, -theta1} )
+    corrgm @sname 12 --plot=@nombre.png
+endloop
+#+END_SRC
+
+#+BEGIN_SRC bash :var dir="./P-L05-C-simulacion-procesos-AR/" :exports results :results raw
+# Inicia el bloque de exportación a LaTeX
+echo "#+BEGIN_EXPORT latex"
+echo "\\begin{figure}[H]"
+echo "\\centering"
+# echo "\\captionsetup[figure]{labelformat=empty}" # Opcional: Oculta la etiqueta "Figure X"
+
+# Itera sobre los archivos .png encontrados y genera el código minipage
+find "$dir" -maxdepth 1 -type f -iname "PhiNegativo-*.png" -print0 | sort -z | while IFS= read -r -d $'\0' file; do
+    echo "\\begin{minipage}{0.17\\textwidth}"
+    echo "  \\includegraphics[width=\\textwidth]{$file}"
+    echo "\\end{minipage}%" # El '%' es CRUCIAL para evitar un salto de línea entre minipages
+done
+
+# Finaliza el entorno de figura
+# echo "\\caption{Correlogramas en zona 1: Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. En todos los casos $\theta_2=0.5$.}"
+echo "\\end{figure}"
+echo "#+END_EXPORT"
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiNegativo-1(-1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiNegativo-2(-0,8).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiNegativo-3(-0,6).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiNegativo-4(-0,4).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiNegativo-5(-0,2).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L05-C-simulacion-procesos-AR/PhiNegativo-6(-0,0).png}
+\end{minipage}%
+\end{figure}
+#+END_EXPORT
+
+
+#+begin_src emacs-lisp :results raw :exports results
+(let ((imagenes (directory-files "P-L05-C-simulacion-procesos-AR/" t "^PhiNegativo-.*\\.png$")))
+  (concat "#+BEGIN_EXPORT HTML\n"
+          "<div style=\"display: flex; justify-content: center; gap: 10px;\">\n"
+          (mapconcat (lambda (f)
+                       (format "<img src=\"%s\" style=\"max-width:17%%; height:auto;\"/>"
+                               (file-relative-name f)))
+                     imagenes
+                     "\n")
+          "\n</div>\n#+END_EXPORT"))
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT HTML
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-1(-1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-2(-0,8).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-3(-0,6).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-4(-0,4).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-5(-0,2).png" style="max-width:17%; height:auto;"/>
+<img src="P-L05-C-simulacion-procesos-AR/PhiNegativo-6(-0,0).png" style="max-width:17%; height:auto;"/>
+</div>
+#+END_EXPORT
+
+
+
+
+
+
+#+latex: \clearpage
+
+
+* Código completo de la práctica
+
+   | Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L05-C-simulacion-procesos-AR.inp][P-L05-C-simulacion-procesos-AR.inp]] |
+
+#+latex: \lstinputlisting{guiones/P-L05-C-simulacion-procesos-AR.inp}
+
