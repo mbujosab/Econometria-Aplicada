@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-10-01 Wed 10:52 -->
+<!-- 2025-10-01 Wed 14:23 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 1. Transformación de datos</title>
@@ -66,30 +66,30 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org618635c">Procesos estocásticos y datos de series temporales</a>
+<li><a href="#org9da0610">Procesos estocásticos y datos de series temporales</a>
 <ul>
-<li><a href="#org09d9d0d">Datos de sección cruzada vs datos de series temporales</a></li>
-<li><a href="#orgfd9ee9d">El desafío</a></li>
+<li><a href="#org4d88f88">Datos de sección cruzada vs datos de series temporales</a></li>
+<li><a href="#org68e371a">El desafío</a></li>
 </ul>
 </li>
-<li><a href="#org508b81d">Estacionariedad</a>
+<li><a href="#org3f42955">Estacionariedad</a>
 <ul>
-<li><a href="#orgb715e71">Estacionariedad en sentido débil</a></li>
-<li><a href="#org4e990a9">Función de autocovarianzas y función de autocorrelación</a></li>
+<li><a href="#org2c93b35">Estacionariedad en sentido débil</a></li>
+<li><a href="#org5579ac4">Función de autocovarianzas y función de autocorrelación</a></li>
 </ul>
 </li>
-<li><a href="#orgb07bdcc">Transformaciones de realizaciones de procesos estocásticos NO estacionarios</a>
+<li><a href="#orga144761">Transformaciones de realizaciones de procesos estocásticos NO estacionarios</a>
 <ul>
-<li><a href="#org1d93ab5">Internat. airline passengers: monthly totals in thousands. Jan 49 – Dec 60</a>
+<li><a href="#orge6036e6">Internat. airline passengers: monthly totals in thousands. Jan 49 – Dec 60</a>
 <ul>
-<li><a href="#orgb1d882e">Trasformación logarítmica de los datos</a></li>
-<li><a href="#org91b94ce">Primera diferencia del logarítmo de los datos</a></li>
-<li><a href="#org885275e">Diferencia estacional de la primera diferencia del logarítmo de los datos</a></li>
+<li><a href="#org21e1113">Trasformación logarítmica de los datos</a></li>
+<li><a href="#org96d7ea5">Primera diferencia del logarítmo de los datos</a></li>
+<li><a href="#orgc88532d">Diferencia estacional de la primera diferencia del logarítmo de los datos</a></li>
 </ul>
 </li>
-<li><a href="#org24d0bb6">Tasa logarítmica de crecimiento</a>
+<li><a href="#org7daee29">Tasa logarítmica de crecimiento</a>
 <ul>
-<li><a href="#orgf6de123">Comentarios y/o interpretaciones de los datos transformados</a></li>
+<li><a href="#org5da9eaa">Comentarios y/o interpretaciones de los datos transformados</a></li>
 </ul>
 </li>
 </ul>
@@ -97,7 +97,7 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 </ul>
 </div>
 </div>
-<div class="abstract" id="org768b23e">
+<div class="abstract" id="org1c011e3">
 <p>
 En esta lección veremos algunas transformaciones de los datos para <i>"hacerlos estacionarios"</i>; y daremos interpretación a los datos transformados.
 </p>
@@ -107,9 +107,9 @@ En esta lección veremos algunas transformaciones de los datos para <i>"hacerlos
 <ul class="org-ul">
 <li>(<a href="https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc01.slides.html">slides</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc01.html">html</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc01.pdf">pdf</a>) &mdash; (<a href="https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc01.ipynb">mybinder</a>)</li>
 </ul>
-<div id="outline-container-orga92566d" class="outline-4">
-<h4 id="orga92566d">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-orga92566d">
+<div id="outline-container-orgab71540" class="outline-4">
+<h4 id="orgab71540">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-orgab71540">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python
 </span><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra
@@ -122,8 +122,8 @@ En esta lección veremos algunas transformaciones de los datos para <i>"hacerlos
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org151f22e"></a>Creación del directorio auxiliar para albergar las figuras de la lección<br />
-<div class="outline-text-5" id="text-org151f22e">
+<li><a id="orge24d461"></a>Creación del directorio auxiliar para albergar las figuras de la lección<br />
+<div class="outline-text-5" id="text-orge24d461">
 <p>
 Para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
@@ -137,9 +137,9 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 </li>
 </ul>
 </div>
-<div id="outline-container-org618635c" class="outline-2">
-<h2 id="org618635c">Procesos estocásticos y datos de series temporales</h2>
-<div class="outline-text-2" id="text-org618635c">
+<div id="outline-container-org9da0610" class="outline-2">
+<h2 id="org9da0610">Procesos estocásticos y datos de series temporales</h2>
+<div class="outline-text-2" id="text-org9da0610">
 <dl class="org-dl">
 <dt>Proceso estocástico</dt><dd>es una secuencia de variables aleatorias, \(X_t\) donde el índice \(t\) recorre el conjunto de números enteros \((\mathbb{Z})\).  
 \[ \boldsymbol{X}\;=\;
@@ -159,9 +159,9 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 Nótese que en el <b>proceso estocástico</b> el índice \(t\) recorre los infinitos números enteros mientras que en la <b>muestra</b> solo recorre los naturales entre \(1\) y \(n\).
 </p>
 </div>
-<div id="outline-container-org09d9d0d" class="outline-3">
-<h3 id="org09d9d0d">Datos de sección cruzada vs datos de series temporales</h3>
-<div class="outline-text-3" id="text-org09d9d0d">
+<div id="outline-container-org4d88f88" class="outline-3">
+<h3 id="org4d88f88">Datos de sección cruzada vs datos de series temporales</h3>
+<div class="outline-text-3" id="text-org4d88f88">
 <p>
 Consideremos dos tipos de muestras \(\boldsymbol{x} = (x_1, x_2,\ldots x_n):\)
 </p>
@@ -184,9 +184,9 @@ Consideremos dos tipos de muestras \(\boldsymbol{x} = (x_1, x_2,\ldots x_n):\)
 </dl>
 </div>
 </div>
-<div id="outline-container-orgfd9ee9d" class="outline-3">
-<h3 id="orgfd9ee9d">El desafío</h3>
-<div class="outline-text-3" id="text-orgfd9ee9d">
+<div id="outline-container-org68e371a" class="outline-3">
+<h3 id="org68e371a">El desafío</h3>
+<div class="outline-text-3" id="text-org68e371a">
 <p>
 El análisis de <i>series temporales</i> trata sobre la inferencia estadística de muestras que <b>frecuentemente NO podemos asumir que sean realizaciones</b> de variables aleatorias <i>i.i.d.</i> (<i>independientes e idénticamente distribuidas</i>). 
 </p>
@@ -222,7 +222,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/PIB_UEM.png'</span>,
 </div>
 
 
-<div id="orge53774c" class="figure">
+<div id="orgdb9f5de" class="figure">
 <p><img src="./img/lecc01/PIB_UEM.png" alt="PIB_UEM.png" width="900px" />
 </p>
 </div>
@@ -234,7 +234,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/ProduccionCemento.pn
 </div>
 
 
-<div id="orgcb41fa0" class="figure">
+<div id="orgeafe509" class="figure">
 <p><img src="./img/lecc01/ProduccionCemento.png" alt="ProduccionCemento.png" width="900px" />
 </p>
 </div>
@@ -246,7 +246,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/IBEX35.png'</span>, 
 </div>
 
 
-<div id="org5b71906" class="figure">
+<div id="org52db408" class="figure">
 <p><img src="./img/lecc01/IBEX35.png" alt="IBEX35.png" width="900px" />
 </p>
 </div>
@@ -258,7 +258,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/ExportacionDeAcero.p
 </div>
 
 
-<div id="org2a16d6d" class="figure">
+<div id="orge31b7fc" class="figure">
 <p><img src="./img/lecc01/ExportacionDeAcero.png" alt="ExportacionDeAcero.png" width="900px" />
 </p>
 </div>
@@ -278,9 +278,9 @@ transformar los datos estacionarios en "<b><i>ruido blanco</i></b>" (!!)
 </div>
 </div>
 </div>
-<div id="outline-container-org508b81d" class="outline-2">
-<h2 id="org508b81d">Estacionariedad</h2>
-<div class="outline-text-2" id="text-org508b81d">
+<div id="outline-container-org3f42955" class="outline-2">
+<h2 id="org3f42955">Estacionariedad</h2>
+<div class="outline-text-2" id="text-org3f42955">
 <p>
 El primer objetivo del <i>análisis de series temporales</i> es inferir la distribución de \(\boldsymbol{X}=(X_t \mid t\in\mathbb{Z})\) usando una muestra finita (serie temporal) \(\boldsymbol{x}=(x_t \mid t=1:n)\).  
 </p>
@@ -300,27 +300,27 @@ Pero esto es inabordable si la evolución de los datos es inestable en el tiempo
 Por tanto, algún tipo de <span class="underline">estabilidad</span> (o <span class="underline">estacionariedad</span>) es necesaria.
 </p>
 </div>
-<div id="outline-container-orgb715e71" class="outline-3">
-<h3 id="orgb715e71">Estacionariedad en sentido débil</h3>
-<div class="outline-text-3" id="text-orgb715e71">
+<div id="outline-container-org2c93b35" class="outline-3">
+<h3 id="org2c93b35">Estacionariedad en sentido débil</h3>
+<div class="outline-text-3" id="text-org2c93b35">
 <p>
 Un proceso estocástico \(\boldsymbol{X}\) se dice <b>estacionario</b> (<i>en sentido débil</i>) si para todo \(t,k\in\mathbb{Z}\)
 </p>
 
 \begin{equation}
-\label{org1ba4581}
+\label{orgac6def2}
 E(X_t)  = \mu
 \end{equation}
 
 \begin{equation}
-\label{org3fb680e}
+\label{org6398cbf}
 Cov(X_t,X_{t-k}) = \gamma_k 
 \end{equation}
 
 <ul class="org-ul">
-<li>(\eqref{org1ba4581}) sugiere que las realizaciones de \(\boldsymbol{X}\) aparecerán entorno al valor \(\mu\).</li>
+<li>(\eqref{orgac6def2}) sugiere que las realizaciones de \(\boldsymbol{X}\) aparecerán entorno al valor \(\mu\).</li>
 <li><p>
-(\eqref{org3fb680e}) entre otras cosas, sugiere que la variabilidad de las realizaciones de \(\boldsymbol{X}\) entorno a \(\mu\) es constante, ya que para el caso particular \(k=0\)
+(\eqref{org6398cbf}) entre otras cosas, sugiere que la variabilidad de las realizaciones de \(\boldsymbol{X}\) entorno a \(\mu\) es constante, ya que para el caso particular \(k=0\)
 \[ Cov(X_t,X_{t-0})=Var(X_t) = \gamma_0\quad\text{ para todo } t, \]
 </p>
 <p>
@@ -347,7 +347,7 @@ np.random.seed(12345)
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="orgcd54ad6"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">creamos el gr&#225;fico de la serie simulada
+<pre class="src src-jupyter-python" id="org270a5b8"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">creamos el gr&#225;fico de la serie simulada
 </span>plt.figure(figsize=(15,5))
 plt.title(<span style="font-style: italic;">"Realizaci&#243;n de un proceso estacionario (con $\mu=0$)"</span>, fontsize=20)
 plt.xlabel(<span style="font-style: italic;">"&#205;ndice $t$"</span>, fontsize=16)
@@ -360,15 +360,15 @@ plt.savefig(<span style="font-style: italic;">"./img/lecc01/stationaryTimeSeries
 
 
 
-<div id="org93e2895" class="figure">
+<div id="orgcb21056" class="figure">
 <p><img src="./img/lecc01/stationaryTimeSeriesExample.png" alt="stationaryTimeSeriesExample.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org4e990a9" class="outline-3">
-<h3 id="org4e990a9">Función de autocovarianzas y función de autocorrelación</h3>
-<div class="outline-text-3" id="text-org4e990a9">
+<div id="outline-container-org5579ac4" class="outline-3">
+<h3 id="org5579ac4">Función de autocovarianzas y función de autocorrelación</h3>
+<div class="outline-text-3" id="text-org5579ac4">
 <p>
 Cuando \(\boldsymbol{X}\) es un proceso estocástico (débilmente) <b>estacionario</b>:
 </p>
@@ -391,9 +391,9 @@ se denomina <i>función de autocorrelación</i> (ACF).</li>
 </div>
 </div>
 </div>
-<div id="outline-container-orgb07bdcc" class="outline-2">
-<h2 id="orgb07bdcc">Transformaciones de realizaciones de procesos estocásticos NO estacionarios</h2>
-<div class="outline-text-2" id="text-orgb07bdcc">
+<div id="outline-container-orga144761" class="outline-2">
+<h2 id="orga144761">Transformaciones de realizaciones de procesos estocásticos NO estacionarios</h2>
+<div class="outline-text-2" id="text-orga144761">
 <p>
 Un proceso estocástico \(\boldsymbol{X}=(X_t \mid t\in\mathbb{Z})\) puede ser:
 </p>
@@ -418,9 +418,9 @@ y algunos intentos de transformación para obtener datos "<b>estacionarios</b>" 
 </p></li>
 </ul>
 </div>
-<div id="outline-container-org1d93ab5" class="outline-3">
-<h3 id="org1d93ab5">Internat. airline passengers: monthly totals in thousands. Jan 49 – Dec 60</h3>
-<div class="outline-text-3" id="text-org1d93ab5">
+<div id="outline-container-orge6036e6" class="outline-3">
+<h3 id="orge6036e6">Internat. airline passengers: monthly totals in thousands. Jan 49 – Dec 60</h3>
+<div class="outline-text-3" id="text-orge6036e6">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Leemos los datos de un fichero csv y generamos un dataframe de pandas.
 </span><span style="font-weight: bold; font-style: italic;">OrigData</span> = pd.read_csv(<span style="font-style: italic;">'../datos/airline-passengers.csv'</span>)
@@ -433,7 +433,7 @@ y algunos intentos de transformación para obtener datos "<b>estacionarios</b>" 
 
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="orgd194dee"><code>plt.figure(figsize=(15,5))
+<pre class="src src-jupyter-python" id="org7c57abe"><code>plt.figure(figsize=(15,5))
 plt.subplot(1, 2, 1)
 plt.plot(OrigData[<span style="font-style: italic;">'Passengers'</span>])
 plt.xlabel(<span style="font-style: italic;">"Month"</span>, fontsize=16)
@@ -449,7 +449,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/airlinepass+hist.png
 </div>
 
 
-<div id="org4764430" class="figure">
+<div id="org1310fd5" class="figure">
 <p><img src="./img/lecc01/airlinepass+hist.png" alt="airlinepass+hist.png" width="900px" />
 </p>
 </div>
@@ -466,9 +466,9 @@ Serie <i>"no estacionaria"</i> (!!):
 <li>La variabilidad estacional crece con el nivel (creciente diferencia entre el verano y el otoño).</li>
 </ul>
 </div>
-<div id="outline-container-orgb1d882e" class="outline-4">
-<h4 id="orgb1d882e">Trasformación logarítmica de los datos</h4>
-<div class="outline-text-4" id="text-orgb1d882e">
+<div id="outline-container-org21e1113" class="outline-4">
+<h4 id="org21e1113">Trasformación logarítmica de los datos</h4>
+<div class="outline-text-4" id="text-org21e1113">
 <ul class="org-ul">
 <li>Al aplicar la función logarítmica transformamos <b>monótonamente</b> los datos estabilizando la varianza cuando los valores son mayores que 0.567 (aprox.)</li>
 <li>Pero ocurre lo contrario cuando los valores son pequeños (aumenta el valor absoluto de aquellos entre 0 y 0.567 aprox.). De hecho, \(\lim\limits_{x\to0} \ln(x)=-\infty\).</li>
@@ -479,7 +479,7 @@ Recuerde que <i>el logaritmo no está definido para valores negativos</i>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="org800fce2"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir el rango de valores para x (empezando desde un n&#250;mero positivo ya que log(0) no est&#225; definido)
+<pre class="src src-jupyter-python" id="orge0a230e"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir el rango de valores para x (empezando desde un n&#250;mero positivo ya que log(0) no est&#225; definido)
 </span><span style="font-weight: bold; font-style: italic;">x</span> = np.linspace(0.01, 7, 400)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Valores de 0.1 a 10
 </span><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Calcular y = log(x)
 </span><span style="font-weight: bold; font-style: italic;">y</span> = np.log(x)
@@ -502,7 +502,7 @@ plt.savefig(<span style="font-style: italic;">"./img/lecc01/funcion_logaritmica.
 
 
 
-<div id="org8ebefc0" class="figure">
+<div id="orgd7ab822" class="figure">
 <p><img src="./img/lecc01/funcion_logaritmica.png" alt="funcion_logaritmica.png" width="900px" />
 </p>
 </div>
@@ -518,11 +518,11 @@ plt.savefig(<span style="font-style: italic;">"./img/lecc01/funcion_logaritmica.
 </div>
 </div>
 </div>
-<div id="outline-container-org9e0ba9d" class="outline-4">
-<h4 id="org9e0ba9d">Transformación logarítmica de los datos</h4>
-<div class="outline-text-4" id="text-org9e0ba9d">
+<div id="outline-container-orgf2e2709" class="outline-4">
+<h4 id="orgf2e2709">Transformación logarítmica de los datos</h4>
+<div class="outline-text-4" id="text-orgf2e2709">
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="orgb3f5dec"><code>plt.figure(figsize=(15,5))
+<pre class="src src-jupyter-python" id="orgd714652"><code>plt.figure(figsize=(15,5))
 plt.subplot(1, 2, 1)
 plt.plot(TransformedData[<span style="font-style: italic;">'dataLog'</span>])
 plt.xlabel(<span style="font-style: italic;">"Month"</span>, fontsize=16)
@@ -538,7 +538,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/airlinepass_log+hist
 </div>
 
 
-<div id="org30082f2" class="figure">
+<div id="org1c7d701" class="figure">
 <p><img src="./img/lecc01/airlinepass_log+hist.png" alt="airlinepass_log+hist.png" width="900px" />
 </p>
 </div>
@@ -556,11 +556,11 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/airlinepass_log+hist
 </ul>
 </div>
 </div>
-<div id="outline-container-org91b94ce" class="outline-4">
-<h4 id="org91b94ce">Primera diferencia del logarítmo de los datos</h4>
-<div class="outline-text-4" id="text-org91b94ce">
+<div id="outline-container-org96d7ea5" class="outline-4">
+<h4 id="org96d7ea5">Primera diferencia del logarítmo de los datos</h4>
+<div class="outline-text-4" id="text-org96d7ea5">
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="org268fc2a"><code>plt.figure(figsize=(15,5))
+<pre class="src src-jupyter-python" id="org7ab5f8b"><code>plt.figure(figsize=(15,5))
 plt.subplot(1, 2, 1)
 plt.plot(TransformedData[<span style="font-style: italic;">'dataLogDiff'</span>])
 plt.xlabel(<span style="font-style: italic;">"Month"</span>, fontsize=16)
@@ -576,7 +576,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/airlinepass_logDiff+
 </div>
 
 
-<div id="org10b2b47" class="figure">
+<div id="org05602ba" class="figure">
 <p><img src="./img/lecc01/airlinepass_logDiff+hist.png" alt="airlinepass_logDiff+hist.png" width="900px" />
 </p>
 </div>
@@ -593,11 +593,11 @@ Esta serie tampoco parece "<i>estacionaria</i>" (!!):
 </ul>
 </div>
 </div>
-<div id="outline-container-org885275e" class="outline-4">
-<h4 id="org885275e">Diferencia estacional de la primera diferencia del logarítmo de los datos</h4>
-<div class="outline-text-4" id="text-org885275e">
+<div id="outline-container-orgc88532d" class="outline-4">
+<h4 id="orgc88532d">Diferencia estacional de la primera diferencia del logarítmo de los datos</h4>
+<div class="outline-text-4" id="text-orgc88532d">
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="orgfa311dd"><code>plt.figure(figsize=(15,5))
+<pre class="src src-jupyter-python" id="org3128300"><code>plt.figure(figsize=(15,5))
 plt.subplot(1, 2, 1)
 plt.plot(TransformedData[<span style="font-style: italic;">'dataLogDiffDiff12'</span>])
 plt.xlabel(<span style="font-style: italic;">"Month"</span>, fontsize=16)
@@ -613,7 +613,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/airlinepass_logDiffD
 </div>
 
 
-<div id="orgb9c75e4" class="figure">
+<div id="orgced710f" class="figure">
 <p><img src="./img/lecc01/airlinepass_logDiffDiff12+hist.png" alt="airlinepass_logDiffDiff12+hist.png" width="900px" />
 </p>
 </div>
@@ -632,9 +632,9 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc01/airlinepass_logDiffD
 </div>
 </div>
 </div>
-<div id="outline-container-org24d0bb6" class="outline-3">
-<h3 id="org24d0bb6">Tasa logarítmica de crecimiento</h3>
-<div class="outline-text-3" id="text-org24d0bb6">
+<div id="outline-container-org7daee29" class="outline-3">
+<h3 id="org7daee29">Tasa logarítmica de crecimiento</h3>
+<div class="outline-text-3" id="text-org7daee29">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">START</span> = 100
 <span style="font-weight: bold; font-style: italic;">UnoPorCiento</span> = <span style="font-weight: bold;">lambda</span> n0, t: n0 <span style="font-weight: bold;">if</span> t&lt;=1 <span style="font-weight: bold;">else</span> 1.01 * UnoPorCiento(n0, t-1)
@@ -658,14 +658,14 @@ y se <i>aproxima</i> a la tasa de crecimiento (en tanto por uno) si el increment
 
 
 
-<div id="org79d5b48" class="figure">
+<div id="org113022b" class="figure">
 <p><img src="./img/lecc01/TasaLogCrecimiento.png" alt="TasaLogCrecimiento.png" width="500px" />
 </p>
 </div>
 </div>
-<div id="outline-container-orgf6de123" class="outline-4">
-<h4 id="orgf6de123">Comentarios y/o interpretaciones de los datos transformados</h4>
-<div class="outline-text-4" id="text-orgf6de123">
+<div id="outline-container-org5da9eaa" class="outline-4">
+<h4 id="org5da9eaa">Comentarios y/o interpretaciones de los datos transformados</h4>
+<div class="outline-text-4" id="text-org5da9eaa">
 <style>
 .reveal  td {font-size: 90%;}
 </style>
@@ -721,7 +721,7 @@ y se <i>aproxima</i> a la tasa de crecimiento (en tanto por uno) si el increment
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-10-01 Wed 10:52</p>
+<p class="date">Created: 2025-10-01 Wed 14:23</p>
 </div>
 </body>
 </html>

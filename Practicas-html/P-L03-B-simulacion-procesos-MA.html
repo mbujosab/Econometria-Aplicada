@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-10-01 Wed 10:53 -->
+<!-- 2025-10-01 Wed 14:23 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 3.B - Simulación de procesos MA con una función de Gretl</title>
@@ -101,32 +101,32 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgc0bebf8">Objetivo de la práctica</a></li>
-<li><a href="#org1651f49">Actividad 1 - Conocer que se pueden definir funciones por parte del usuario</a>
+<li><a href="#org2afb50a">Objetivo de la práctica</a></li>
+<li><a href="#org24012c1">Actividad 1 - Conocer que se pueden definir funciones por parte del usuario</a>
 <ul>
-<li><a href="#org94a8990">Funciones definidas por el usuario</a>
+<li><a href="#orge0485b5">Funciones definidas por el usuario</a>
 <ul>
-<li><a href="#orgd0aba68">Cuerpo de la función</a></li>
+<li><a href="#org2ed08b1">Cuerpo de la función</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org4e6b804">Actividad 2 - Planificar la estructura de una función que simule procesos MA(\(q\))</a>
+<li><a href="#orgae55f08">Actividad 2 - Planificar la estructura de una función que simule procesos MA(\(q\))</a>
 <ul>
-<li><a href="#orge8fd994">Vectores y matrices (en Gretl son el mismo objeto)</a></li>
-<li><a href="#orgcbac51b">Estructura de nuestra función</a></li>
-<li><a href="#orgdeb2cfb">Un bucle para recorrer los parámetros MA</a></li>
+<li><a href="#org779ca5d">Vectores y matrices (en Gretl son el mismo objeto)</a></li>
+<li><a href="#org01f9ecd">Estructura de nuestra función</a></li>
+<li><a href="#orgf63d1d4">Un bucle para recorrer los parámetros MA</a></li>
 </ul>
 </li>
-<li><a href="#orgf7c7499">Actividad 3 - Escribir nuestra función que simula procesos MA</a></li>
-<li><a href="#org62df65f">Actividad 4 - Use su función en un bucle para generar muchos MA(\(q\)) con el mismo modelo e inferir el comportamiento general</a></li>
-<li><a href="#orgb26be1b">Código completo de la práctica</a></li>
+<li><a href="#org31aa0fa">Actividad 3 - Escribir nuestra función que simula procesos MA</a></li>
+<li><a href="#org10bdcd9">Actividad 4 - Use su función en un bucle para generar muchos MA(\(q\)) con el mismo modelo e inferir el comportamiento general</a></li>
+<li><a href="#orgfa05930">Código completo de la práctica</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orgc0bebf8" class="outline-2">
-<h2 id="orgc0bebf8">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-orgc0bebf8">
+<div id="outline-container-org2afb50a" class="outline-2">
+<h2 id="org2afb50a">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-org2afb50a">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -160,9 +160,9 @@ La ventaja de usar una función es que podemos simular los procesos MA de una ma
 </ol>
 </div>
 </div>
-<div id="outline-container-org1651f49" class="outline-2">
-<h2 id="org1651f49">Actividad 1 - Conocer que se pueden definir funciones por parte del usuario</h2>
-<div class="outline-text-2" id="text-org1651f49">
+<div id="outline-container-org24012c1" class="outline-2">
+<h2 id="org24012c1">Actividad 1 - Conocer que se pueden definir funciones por parte del usuario</h2>
+<div class="outline-text-2" id="text-org24012c1">
 <p>
 El lenguaje de programación que acompaña a Gretl se denomina Hansl 
 (Hansl y Gretl van de la mano&hellip; como en el cuento).
@@ -183,9 +183,9 @@ En los siguientes enlaces tiene abundante documentación
 Veamos un breve resumen sobre la definición de funciones.
 </p>
 </div>
-<div id="outline-container-org94a8990" class="outline-3">
-<h3 id="org94a8990">Funciones definidas por el usuario</h3>
-<div class="outline-text-3" id="text-org94a8990">
+<div id="outline-container-orge0485b5" class="outline-3">
+<h3 id="orge0485b5">Funciones definidas por el usuario</h3>
+<div class="outline-text-3" id="text-orge0485b5">
 <p>
 (<i>Lo que sigue está sacado del <a href="https://sourceforge.net/projects/gretl/files/manual/hansl-primer.pdf/download">manual de Hansl</a></i>.)
 </p>
@@ -315,9 +315,9 @@ Se puede definir una función sin parámetros (a veces llamadas <i>rutinas</i>).
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orgd0aba68" class="outline-4">
-<h4 id="orgd0aba68">Cuerpo de la función</h4>
-<div class="outline-text-4" id="text-orgd0aba68">
+<div id="outline-container-org2ed08b1" class="outline-4">
+<h4 id="org2ed08b1">Cuerpo de la función</h4>
+<div class="outline-text-4" id="text-org2ed08b1">
 <p>
 El <b>cuerpo de la función</b> está compuesto por comandos de gretl o llamadas a funciones definidas por el usuario (es decir, las llamadas a funciones pueden estar anidadas). 
 Una función puede llamarse a sí misma (es decir, las funciones pueden ser recursivas). 
@@ -342,9 +342,9 @@ Para ver cómo funcionan las funciones en la práctica, vamos a crear una que si
 </div>
 </div>
 </div>
-<div id="outline-container-org4e6b804" class="outline-2">
-<h2 id="org4e6b804">Actividad 2 - Planificar la estructura de una función que simule procesos MA(\(q\))</h2>
-<div class="outline-text-2" id="text-org4e6b804">
+<div id="outline-container-orgae55f08" class="outline-2">
+<h2 id="orgae55f08">Actividad 2 - Planificar la estructura de una función que simule procesos MA(\(q\))</h2>
+<div class="outline-text-2" id="text-orgae55f08">
 <p>
 Ya simulamos procesos de media móvil en la práctica anterior. Por ello sabemos que necesitamos:
 </p>
@@ -358,9 +358,9 @@ La información relativa a los dos últimos pasos se puede obtener de un polinom
 Un modo de implementar un polinomio en un ordenador es con una secuencia (o vector) de números. 
 </p>
 </div>
-<div id="outline-container-orge8fd994" class="outline-3">
-<h3 id="orge8fd994">Vectores y matrices (en Gretl son el mismo objeto)</h3>
-<div class="outline-text-3" id="text-orge8fd994">
+<div id="outline-container-org779ca5d" class="outline-3">
+<h3 id="org779ca5d">Vectores y matrices (en Gretl son el mismo objeto)</h3>
+<div class="outline-text-3" id="text-org779ca5d">
 <p>
 Gretl dispone de un tipo de objeto que denomina <code>matrix</code> (matriz) y que es un arreglo rectangular de números. 
 Usaremos una <code>matrix</code> con una única fila o una única columna para implementar un polinomio dentro de nuestra función. 
@@ -407,9 +407,9 @@ Para matrices rectangulares: <code>A[3,2]</code> nos devuelve el tercer componen
 </p>
 </div>
 </div>
-<div id="outline-container-orgcbac51b" class="outline-3">
-<h3 id="orgcbac51b">Estructura de nuestra función</h3>
-<div class="outline-text-3" id="text-orgcbac51b">
+<div id="outline-container-org01f9ecd" class="outline-3">
+<h3 id="org01f9ecd">Estructura de nuestra función</h3>
+<div class="outline-text-3" id="text-org01f9ecd">
 <p>
 Así pues, como argumento de nuestra función usaremos una <code>matrix</code> con una única fila o columna que contenga los parámetros MA, y donde el primer parámetro será un \(1\). 
 Llamaremos a este argumento <code>theta</code>. 
@@ -429,9 +429,9 @@ end function
 </div>
 </div>
 </div>
-<div id="outline-container-orgdeb2cfb" class="outline-3">
-<h3 id="orgdeb2cfb">Un bucle para recorrer los parámetros MA</h3>
-<div class="outline-text-3" id="text-orgdeb2cfb">
+<div id="outline-container-orgf63d1d4" class="outline-3">
+<h3 id="orgf63d1d4">Un bucle para recorrer los parámetros MA</h3>
+<div class="outline-text-3" id="text-orgf63d1d4">
 <p>
 El comando básico de hansl para crear bucles es <code>loop</code>; y tiene la forma:
 </p>
@@ -498,16 +498,16 @@ Es decir, <code>X</code> es lo que fuera hasta el momento más el retardo del ru
 </div>
 </div>
 </div>
-<div id="outline-container-orgf7c7499" class="outline-2">
-<h2 id="orgf7c7499">Actividad 3 - Escribir nuestra función que simula procesos MA</h2>
-<div class="outline-text-2" id="text-orgf7c7499">
+<div id="outline-container-org31aa0fa" class="outline-2">
+<h2 id="org31aa0fa">Actividad 3 - Escribir nuestra función que simula procesos MA</h2>
+<div class="outline-text-2" id="text-org31aa0fa">
 <p>
 Para crear la función, primero hemos simulado manualmente algunos procesos MA (práctica anterior). Hemos analizado cómo sistematizar dichas simulaciones y qué estructura debería tener la función (argumentos y pasos necesarios). Tenga siempre presente que  el enfoque de programación implica primero planificar (es muy beneficioso esbozar ideas con lápiz y papel, y sin ordenador). También hay que consultar la documentación de las funciones que nos serán útiles para implementar nuestro plan. 
 Esta es la función:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-gretl" id="orga7fbb0b"><code>function series SimuladorMA(matrix theta)
+<pre class="src src-gretl" id="orgb6f6945"><code>function series SimuladorMA(matrix theta)
     # SimuladorMA(theta) simula un proceso MA(q), 
     # donde theta es el polinomio MA y q es su grado.
     series WN = normal (0,1)
@@ -546,7 +546,7 @@ gnuplot X Y --time-series --with-lines  --output="MA2.png"
 
 <div class="org-center">
 
-<div id="orged8f4e9" class="figure">
+<div id="orgbacaa14" class="figure">
 <p><img src="P-L03-B-simulacion-procesos-MA/MA2.png" alt="MA2.png" />
 </p>
 <p><span class="figure-number">Figura 1: </span>Figura con las dos series MA simuladas.</p>
@@ -554,9 +554,9 @@ gnuplot X Y --time-series --with-lines  --output="MA2.png"
 </div>
 </div>
 </div>
-<div id="outline-container-org62df65f" class="outline-2">
-<h2 id="org62df65f">Actividad 4 - Use su función en un bucle para generar muchos MA(\(q\)) con el mismo modelo e inferir el comportamiento general</h2>
-<div class="outline-text-2" id="text-org62df65f">
+<div id="outline-container-org10bdcd9" class="outline-2">
+<h2 id="org10bdcd9">Actividad 4 - Use su función en un bucle para generar muchos MA(\(q\)) con el mismo modelo e inferir el comportamiento general</h2>
+<div class="outline-text-2" id="text-org10bdcd9">
 <div class="org-src-container">
 <pre class="src src-gretl"><code># Número de simulaciones
 scalar n = 300
@@ -583,7 +583,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosMA
 
 <div class="org-center">
 
-<div id="org4ef2f1f" class="figure">
+<div id="org45daa41" class="figure">
 <p><img src="P-L03-B-simulacion-procesos-MA/MuchosMA.png" alt="MuchosMA.png" />
 </p>
 <p><span class="figure-number">Figura 2: </span>Figura con la simulación de 300 MA(2) con el mismo modelo</p>
@@ -591,7 +591,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosMA
 </div>
 
 <p>
-La figura <a href="#org4ef2f1f">2</a> presenta 300 realizaciones del proceso MA simulado con la función que hemos programado. 
+La figura <a href="#org45daa41">2</a> presenta 300 realizaciones del proceso MA simulado con la función que hemos programado. 
 Como podemos ver, la media y varianza parecen similares. 
 Pero no se ve muy bien. 
 Mejor, hagamos un corte en los instantes \(t = 1, 70, 140\) y \((200-q)\) para crear un histograma de los valores tomados por las 300 simulaciones en esos instantes.
@@ -617,7 +617,7 @@ freq --matrix=v4 --nbins=15 --normal --plot="histograma_t200.png"
 <p>
 Las cuatro figuras proporcionan histogramas de la distribución de los 300 valores de la variable del proceso disponibles para los instantes temporales \(t = 1, 70, 140\) y \((200-q)\).
 Se observa que la media de estas distribuciones es aproximadamente cero en los cuatro casos, y que la desviación típica también es similar (alrededor de \(2\)). 
-Este resultado coincide con la figura <a href="#org4ef2f1f">2</a>, donde se observa que las realizaciones del proceso tienen un comportamiento homogéneo a lo largo del tiempo (no podía ser de otro modo, pues los procesos MA son estacionarios).
+Este resultado coincide con la figura <a href="#org45daa41">2</a>, donde se observa que las realizaciones del proceso tienen un comportamiento homogéneo a lo largo del tiempo (no podía ser de otro modo, pues los procesos MA son estacionarios).
 </p>
 
 <div class="row">
@@ -632,9 +632,9 @@ Este resultado coincide con la figura <a href="#org4ef2f1f">2</a>, donde se obse
 </div>
 </div>
 </div>
-<div id="outline-container-orgb26be1b" class="outline-2">
-<h2 id="orgb26be1b">Código completo de la práctica</h2>
-<div class="outline-text-2" id="text-orgb26be1b">
+<div id="outline-container-orgfa05930" class="outline-2">
+<h2 id="orgfa05930">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-orgfa05930">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -654,7 +654,7 @@ Este resultado coincide con la figura <a href="#org4ef2f1f">2</a>, donde se obse
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-10-01 Wed 10:53</p>
+<p class="date">Created: 2025-10-01 Wed 14:23</p>
 </div>
 </body>
 </html>

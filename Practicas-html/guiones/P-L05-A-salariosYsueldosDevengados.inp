@@ -1,0 +1,31 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../../datos/WASCUR.csv
+setobs 4 1947:1
+setinfo WASCUR --description="salarios y sueldos devengados en EEUU"
+
+wascur <- gnuplot WASCUR --time-series --with-lines  --output="WASCUR.png"
+
+rmplot  WASCUR --output="rango-media.png"
+
+ldiff WASCUR
+
+Dif_wascur <- gnuplot ld_WASCUR --time-series --with-lines --output="Dif_WASCUR.png"
+
+smpl 1947:1 2007:4
+corrgm ld_WASCUR 31 --plot="Dif_WASCUR-ACF-PACF.png"
+
+pergm ld_WASCUR --plot="Dif_WASCUR-Periodograma.png"
+
+smpl 1947:1 2025:2
+corrgm ld_WASCUR 31 --plot="Dif_WASCUR-ACF-PACF-2025.png"
+pergm  ld_WASCUR    --plot="Dif_WASCUR-Periodograma-2025.png"
