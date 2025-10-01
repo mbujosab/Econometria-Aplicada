@@ -1,0 +1,447 @@
+#    -*- mode: org -*-
+
+#+Title: Lección 4.B - Simulación de procesos MA(1) y exploración de sus correlogramas
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+#+INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: P-L04-B-simulacion-procesos-MA
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L04-B-simulacion-procesos-MA"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+#+begin_src gretl :tangle guiones/P-L04-B-simulacion-procesos-MA.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+# string directory = $(pwd) ~ "/P-L03-A-simulaciones"
+
+
+#+LATEX: \maketitle
+
+
+* Objetivo de la práctica
+
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L04-B-simulacion-procesos-MA.inp][P-L04-B-simulacion-procesos-MA.inp]] |
+
+*Objetivo*
+
+1. Observar la ACF y PACF de distintos modelos MA($1$).
+   - Observar que el signo y la magnitud de $\theta_1$ afecta al signo y magnitud de la autocorrelación de orden 1. 
+   - Observar que el signo y la magnitud de $\theta_1$ afecta al comportamiento de la PACF y su velocidad de decaimiento. 
+   - Observar que la ACF y PACF de un modelo MA y su versión no invertible tienen idénticas ACF y PACF estimadas (si se fija la semilla... /las ACF y PACF teóricas son siempre idénticas/).
+
+
+*Requerimientos previos*
+
+Programe o recupere de una práctica anterior una función que simule procesos MA($q$)
+#+name: Función SimuladorMA
+#+BEGIN_SRC gretl :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+function series SimuladorMA(matrix theta)
+    # SimuladorMA(theta) simula un proceso MA(q), 
+    # donde theta es el polinomio MA y q es su grado.
+    series WN = normal (0,1)
+    series X = 0
+
+    loop i=1..cols(theta)
+        X = X + theta[i]*WN(1-i)
+    endloop
+    
+    return X
+end function
+#+END_SRC
+
+Para que se observe bien la estructura de las ACF y PACF estimadas, establezca un tamaño de muestra suficientemente grande.
+#+BEGIN_SRC gretl :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+# establecemos la muestra
+nulldata 600
+setobs 12 1900:01 --time-series
+#+END_SRC
+
+
+* Actividad 1 - Modelos MA($1$) parámetro negativo
+
+Pruebe a simular modelos MA($1$) 
+\[
+\boldsymbol{X}=(1-\theta\mathsf{B})*\boldsymbol{U}
+\quad\text{ y }\quad
+\boldsymbol{X}=(1-\frac{1}{\theta}\mathsf{B})*\boldsymbol{U}
+\]
+donde $\boldsymbol{U}\sim WN(0,1)$, con los siguientes valores paramétricos: $\theta=-0.9$, $\theta=-0.8$,  $\theta=-0.5$ y $\theta=-0.25$; y estime los correlogramas.
+
+
+** Parámetro negativo $-0.9$ y $-\frac{1}{0.9}$
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+scalar theta = -0.9
+set seed 123409
+series X = SimuladorMA( {1, -theta} )
+gnuplot X --time-series --with-lines  --output="MA-0.9.png"
+corrgm X 20 --plot="MA-0.9-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA-0.9.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA-0.9-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+set seed 123409
+series XNI = SimuladorMA( {1, -1/theta} )
+gnuplot XNI --time-series --with-lines  --output="MA-1.111.png"
+corrgm XNI 20 --plot="MA-1.111-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA-1.111.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA-1.111-ACF-PACF.png]]
+#+END_CENTER
+
+#+latex: \clearpage
+
+** Parámetro negativo $-0.8$ y $-\frac{1}{0.8}$
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+scalar theta = -0.8
+set seed 123408
+series Y = SimuladorMA( {1, -theta} )
+gnuplot Y --time-series --with-lines  --output="MA-0.8.png"
+corrgm Y 20 --plot="MA-0.8-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA-0.8.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA-0.8-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+set seed 123408
+series YNI = SimuladorMA( {1, -1/theta} )
+gnuplot YNI --time-series --with-lines  --output="MA-1.25.png"
+corrgm YNI 20 --plot="MA-1.25-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA-1.25.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA-1.25-ACF-PACF.png]]
+#+END_CENTER
+
+#+latex: \clearpage
+
+** Parámetro negativo $-0.5$ y $-\frac{1}{0.5}$
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+scalar theta = -0.5
+set seed 123405
+series Z = SimuladorMA( {1, -theta} )
+gnuplot Z --time-series --with-lines  --output="MA-0.5.png"
+corrgm Z 20 --plot="MA-0.5-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA-0.5.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA-0.5-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+set seed 123405
+series ZNI = SimuladorMA( {1, -1/theta} )
+gnuplot ZNI --time-series --with-lines  --output="MA-2.png"
+corrgm ZNI 20 --plot="MA-2-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA-2.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA-2-ACF-PACF.png]]
+#+END_CENTER
+
+#+latex: \clearpage
+
+** Parámetro negativo $-0.25$ y $-\frac{1}{0.25}$
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+scalar theta = -0.25
+set seed 123425
+series W = SimuladorMA( {1, -theta} )
+gnuplot W --time-series --with-lines  --output="MA-0.25.png"
+corrgm W 20 --plot="MA-0.25-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA-0.25.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA-0.25-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+set seed 123425
+series WNI = SimuladorMA( {1, -1/theta} )
+gnuplot WNI --time-series --with-lines  --output="MA-4.png"
+corrgm WNI 20 --plot="MA-4-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA-4.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA-4-ACF-PACF.png]]
+#+END_CENTER
+
+
+
+* Actividad 2 - Modelos MA($1$) parámetro positivo
+
+Pruebe a simular modelos MA($1$) 
+\[
+\boldsymbol{X}=(1-\theta\mathsf{B})*\boldsymbol{U}
+\quad\text{ y }\quad
+\boldsymbol{X}=(1-\frac{1}{\theta}\mathsf{B})*\boldsymbol{U}
+\]
+donde $\boldsymbol{U}\sim WN(0,1)$, con los siguientes valores paramétricos: $\theta=0.9$, $\theta=0.8$,  $\theta=0.5$ y $\theta=0.25$; y estime los correlogramas.
+
+#+latex: \clearpage
+
+** Parámetro negativo $0.9$ y $\frac{1}{0.9}$
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+scalar theta = 0.9
+set seed 123409
+series A = SimuladorMA( {1, -theta} )
+gnuplot A --time-series --with-lines  --output="MA+0.9.png"
+corrgm A 20 --plot="MA+0.9-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA+0.9.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA+0.9-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+set seed 123409
+series ANI = SimuladorMA( {1, -1/theta} )
+gnuplot ANI --time-series --with-lines  --output="MA+1.111.png"
+corrgm ANI 20 --plot="MA+1.111-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA+1.111.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA+1.111-ACF-PACF.png]]
+#+END_CENTER
+
+#+latex: \clearpage
+
+** Parámetro negativo $0.8$ y $\frac{1}{0.8}$
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+scalar theta = 0.8
+set seed 123408
+series B = SimuladorMA( {1, -theta} )
+gnuplot B --time-series --with-lines  --output="MA+0.8.png"
+corrgm B 20 --plot="MA+0.8-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA+0.8.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA+0.8-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+set seed 123408
+series BNI = SimuladorMA( {1, -1/theta} )
+gnuplot BNI --time-series --with-lines  --output="MA+1.25.png"
+corrgm BNI 20 --plot="MA+1.25-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA+1.25.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA+1.25-ACF-PACF.png]]
+#+END_CENTER
+
+#+latex: \clearpage
+
+** Parámetro negativo $0.5$ y $\frac{1}{0.5}$
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+scalar theta = 0.5
+set seed 123405
+series C = SimuladorMA( {1, -theta} )
+gnuplot C --time-series --with-lines  --output="MA+0.5.png"
+corrgm C 20 --plot="MA+0.5-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA+0.5.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA+0.5-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+set seed 123405
+series CNI = SimuladorMA( {1, -1/theta} )
+gnuplot CNI --time-series --with-lines  --output="MA+2.png"
+corrgm CNI 20 --plot="MA+2-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA+2.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA+2-ACF-PACF.png]]
+#+END_CENTER
+
+#+latex: \clearpage
+
+** Parámetro negativo $0.25$ y $\frac{1}{0.25}$
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+set seed 123425
+scalar theta = 0.25
+series W = SimuladorMA( {1, -theta} )
+gnuplot W --time-series --with-lines  --output="MA+0.25.png"
+corrgm W 20 --plot="MA+0.25-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA+0.25.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA+0.25-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-B-simulacion-procesos-MA.inp :eval no
+set seed 123425
+series WNI = SimuladorMA( {1, -1/theta} )
+gnuplot WNI --time-series --with-lines  --output="MA+4.png"
+corrgm WNI 20 --plot="MA+4-ACF-PACF.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.4\textwidth :center 
+[[file:P-L04-B-simulacion-procesos-MA/MA+4.png]]
+#+ATTR_LATEX: :width 0.4\textwidth :center
+[[file:P-L04-B-simulacion-procesos-MA/MA+4-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+latex: \clearpage
+
+
+* Código completo de la práctica
+
+   | Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L04-B-simulacion-procesos-MA.inp][P-L04-B-simulacion-procesos-MA.inp]] |
+
+#+latex: \lstinputlisting{guiones/P-L04-B-simulacion-procesos-MA.inp}
+

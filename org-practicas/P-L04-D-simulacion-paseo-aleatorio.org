@@ -1,38 +1,20 @@
 
 #    -*- mode: org -*-
 
-#+Title: Lección 3.C - Simulación de paseos aleatorios
+#+Title: Lección 4.D - Simulación de paseos aleatorios
 #+author: Marcos Bujosa
 #+LANGUAGE: es
 #+OPTIONS: toc:nil
 # +OPTIONS: author:nil
 #+OPTIONS: date:nil
 
-# +PROPERTY: header-args :tangle ./guiones/lecc01-airlinePass.inp
-
-#+OPTIONS: :eval yes
-#+PROPERTY: header-args :eval yes
+#+include: 00preambulo_practicas.txt
 
 #+INFOJS_OPT: view:overview
-
 # ###########
 # ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
 #+SETUPFILE: ../css/bigblow_inline.theme
 # ###########
-
-#+latex_class_options: [10pt]
-
-#+LATEX_HEADER: \usepackage[spanish]{babel}
-#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
-# +LaTeX_HEADER: \usepackage{framed}
-#+LaTeX_HEADER: \usepackage{listings}
-#+LaTeX_HEADER: \input{hansl.tex}
-#+LaTeX_HEADER: \lstnewenvironment{hansl-gretl}
-#+LaTeX_HEADER: {\lstset{language={hansl},basicstyle={\ttfamily\footnotesize},numbers,rame=single,breaklines=true}}
-#+LaTeX_HEADER: {}
-#+LaTeX_HEADER: \newcommand{\hansl}[1]{\lstset{language={hansl},basicstyle={\ttfamily\small}}\lstinline{#1}}
-
-#+LaTeX_HEADER: \lstset{backgroundcolor=\color{lightgray!20}, }
 
 #+name: setup-listings
 #+begin_src emacs-lisp :exports none :results silent :tangle no
@@ -61,7 +43,6 @@
        (format "\\%s{%s}" path desc)))))
 #+end_src
 
-
 #+NAME: if-no--guiones-makefir
 #+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
 (unless (file-directory-p "guiones")
@@ -69,20 +50,27 @@
 #+END_SRC
 
 #+NAME: tangle-all-code-blocks
-#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no :eval yes
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
 (org-babel-tangle)
 #+END_SRC
 
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
 #+name: execute-gretl-practice
-#+PROPERTY: P-L03-C-simulacion-paseo-aleatorio
-#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L03-C-simulacion-paseo-aleatorio"
+#+PROPERTY: P-L04-D-simulacion-paseo-aleatorio
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L04-D-simulacion-paseo-aleatorio"
 rm -fr $(pwd)/$practica
 mkdir -p $(pwd)/$practica 
 DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
 # zip $practica $practica.* $practica/*
 #+END_SRC
 
-#+begin_src gretl :tangle guiones/P-L03-C-simulacion-paseo-aleatorio.inp :exports none :eval no
+#+begin_src gretl :tangle guiones/P-L04-D-simulacion-paseo-aleatorio.inp :exports none :eval no
 # Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
 # al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
 #
@@ -94,7 +82,7 @@ DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
 string directory = getenv("DIRECTORIO")
 set workdir "@directory"
 #+end_src
-# string directory = $(pwd) ~ "/P-L03-A-simulaciones"
+# string directory = $(pwd) ~ "/P-L04-A-simulaciones"
 
 
 #+LATEX: \maketitle
@@ -102,9 +90,10 @@ set workdir "@directory"
 
 * Objetivo de la práctica
 
-   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-C-simulacion-paseo-aleatorio.inp][P-L03-C-simulacion-paseo-aleatorio.inp]] |
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L04-D-simulacion-paseo-aleatorio.inp][P-L04-D-simulacion-paseo-aleatorio.inp]] |
 
-En las prácticas anteriores hemos simulado procesos estacionarios MA. Ahora vamos a simular un proceso no estacionario en varianza.
+En las prácticas anteriores hemos simulado procesos estacionarios MA($q$), donde $q$ es finito.
+En contraste, ahora simularemos un proceso *que ni es un MA($q$), ni tampoco es estacionario* (en varianza).
 
 *Objetivo*
 
@@ -235,7 +224,7 @@ series X = Y + 0.3
 
 ** Ejemplo de funcionamiento
 
-#+BEGIN_SRC gretl  :noweb tangle  :tangle ./guiones/P-L03-C-simulacion-paseo-aleatorio.inp :eval no
+#+BEGIN_SRC gretl  :noweb tangle  :tangle ./guiones/P-L04-D-simulacion-paseo-aleatorio.inp :eval no
 # establecemos la muestra
 nulldata 200
 setobs 12 1960:01 --time-series
@@ -256,13 +245,13 @@ gnuplot X Y --time-series --with-lines  --output="RandomWalks.png"
 #+CAPTION: Figura con la simulación de dos paseos aleatorios.
 #+attr_org: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
-[[file:P-L03-C-simulacion-paseo-aleatorio/RandomWalks.png]]
+[[file:P-L04-D-simulacion-paseo-aleatorio/RandomWalks.png]]
 #+END_CENTER
 
 
 * Actividad 4 - Use su función en un bucle para generar muchos paseos aleatorios e inferir el comportamiento general
 
-#+BEGIN_SRC gretl :tangle ./guiones/P-L03-C-simulacion-paseo-aleatorio.inp :eval no
+#+BEGIN_SRC gretl :tangle ./guiones/P-L04-D-simulacion-paseo-aleatorio.inp :eval no
 # Número de simulaciones
 scalar n = 300
 
@@ -284,13 +273,13 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosRa
 #+attr_org: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
 #+NAME: fig:MuchosRW
-[[file:P-L03-C-simulacion-paseo-aleatorio/MuchosRandomWalks.png]]
+[[file:P-L04-D-simulacion-paseo-aleatorio/MuchosRandomWalks.png]]
 #+END_CENTER
 
 La figura [[fig:MuchosRW]] presenta 300 realizaciones del proceso de paseo aleatorio con la función que hemos programado. 
 El proceso comienza siempre con el valor cero, pero la probabilidad de que tome valores alejados de cero crece con el tiempo. 
 
-#+BEGIN_SRC gretl :tangle ./guiones/P-L03-C-simulacion-paseo-aleatorio.inp :eval no
+#+BEGIN_SRC gretl :tangle ./guiones/P-L04-D-simulacion-paseo-aleatorio.inp :eval no
 # Extraemos las filas como vectores columna.
 # la comilla (') es la transposición
 matrix v1 = M[1,]'
@@ -316,8 +305,8 @@ pero la desviación típica aumenta con el tiempo (tal como vimos al estudiar te
 \caption{Dispersión de los 300 paseos aleatorios en t=1, 70, 140 y 200}
 \centering
 \begin{tabular}{ll}
-\includegraphics[width=0.45\textwidth]{./P-L03-C-simulacion-paseo-aleatorio/histograma_t1.png} & \includegraphics[width=0.45\textwidth]{./P-L03-C-simulacion-paseo-aleatorio/histograma_t70.png}\\
-\includegraphics[width=0.45\textwidth]{./P-L03-C-simulacion-paseo-aleatorio/histograma_t140.png} & \includegraphics[width=0.45\textwidth]{./P-L03-C-simulacion-paseo-aleatorio/histograma_t200.png}\\
+\includegraphics[width=0.45\textwidth]{./P-L04-D-simulacion-paseo-aleatorio/histograma_t1.png} & \includegraphics[width=0.45\textwidth]{./P-L04-D-simulacion-paseo-aleatorio/histograma_t70.png}\\
+\includegraphics[width=0.45\textwidth]{./P-L04-D-simulacion-paseo-aleatorio/histograma_t140.png} & \includegraphics[width=0.45\textwidth]{./P-L04-D-simulacion-paseo-aleatorio/histograma_t200.png}\\
 \end{tabular}
 \end{table}
 \end{center}
@@ -326,23 +315,66 @@ pero la desviación típica aumenta con el tiempo (tal como vimos al estudiar te
 #+BEGIN_EXPORT html
 <div class="row">
   <div class="column">
-    <img src="./P-L03-C-simulacion-paseo-aleatorio/histograma_t1.png" alt="histograma_t1.png"">
-    <img src="./P-L03-C-simulacion-paseo-aleatorio/histograma_t70.png" alt="histograma_t70.png"">
+    <img src="./P-L04-D-simulacion-paseo-aleatorio/histograma_t1.png" alt="histograma_t1.png"">
+    <img src="./P-L04-D-simulacion-paseo-aleatorio/histograma_t70.png" alt="histograma_t70.png"">
   </div>
   <div class="column">
-    <img src="./P-L03-C-simulacion-paseo-aleatorio/histograma_t140.png" alt="histograma_t140.png"">
-    <img src="./P-L03-C-simulacion-paseo-aleatorio/histograma_t200.png" alt="histograma_t200.png"">
+    <img src="./P-L04-D-simulacion-paseo-aleatorio/histograma_t140.png" alt="histograma_t140.png"">
+    <img src="./P-L04-D-simulacion-paseo-aleatorio/histograma_t200.png" alt="histograma_t200.png"">
   </div>
 </div>
 #+END_EXPORT
 
-#+latex: \clearpage
+
+* Actividad 5 - Estimación de la ACF y la PACF ("muestrales")
+
+- Genere un paseo aleatorio.
+- Dibuje los datos simulados
+- Estime la ACF y la PACF de los datos simulados
+- Calcule el periodograma de los datos simulados
+
+*Nota*: Dado que estamos trabajando con una muestra /finita/ de datos, es posible realizar cálculos para obtener los estimadores muestrales de la ACF, la PACF y el periodograma. Sin embargo, en este contexto, donde el modelo subyacente es un proceso estocástico no estacionario, estos estadísticos *no pueden ser una estimación* de las funciones ACF, PACF y densidad espectral que hemos discutido en clase. Estas funciones dependen de los segundos momentos de un proceso estocástico infinito, que en el caso de un paseo aleatorio doblemente infinito no están definidos.
+
+#+BEGIN_SRC gretl :tangle ./guiones/P-L04-D-simulacion-paseo-aleatorio.inp :eval no
+series Z = SimuladorRW()
+gnuplot Z --time-series --with-lines  --output="RandomWalk.png" # graficamos los datos simulados 
+corrgm Z 20 --plot="ACF-PACF-RW.png"                            # correlograma
+pergm Z --plot="Periodograma-RW.png"                            # periodograma
+#+END_SRC
+
+
+
+#+BEGIN_CENTER
+#+CAPTION: Figura con la simulación de un paseo aleatorio
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+#+NAME: fig:RW
+[[file:P-L04-D-simulacion-paseo-aleatorio/RandomWalk.png]]
+#+END_CENTER
+
+#+BEGIN_CENTER
+#+CAPTION: Figura con el correlograma de los datos simulados
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+#+NAME: fig:RW
+[[file:P-L04-D-simulacion-paseo-aleatorio/ACF-PACF-RW.png]]
+#+END_CENTER
+
+#+BEGIN_CENTER
+#+CAPTION: Figura con el periodograma de los datos simulados
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+#+NAME: fig:RW
+[[file:P-L04-D-simulacion-paseo-aleatorio/Periodograma-RW.png]]
+#+END_CENTER
+
+# +latex: \clearpage
 
 * Código completo de la práctica
 
-   | Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-C-simulacion-paseo-aleatorio.inp][P-L03-C-simulacion-paseo-aleatorio.inp]] |
+   | Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L04-D-simulacion-paseo-aleatorio.inp][P-L04-D-simulacion-paseo-aleatorio.inp]] |
 
-#+latex: \lstinputlisting{guiones/P-L03-C-simulacion-paseo-aleatorio.inp}
+#+latex: \lstinputlisting{guiones/P-L04-D-simulacion-paseo-aleatorio.inp}
 
 
 * Posibles resoluciones

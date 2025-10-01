@@ -1,0 +1,734 @@
+#    -*- mode: org -*-
+
+#+Title: Lección 4.C - Simulación de procesos MA(2) en la región de invertibilidad
+
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+# +INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+# +SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: P-L04-C-simulacion-procesos-MA
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L04-C-simulacion-procesos-MA"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+#+begin_src gretl :tangle guiones/P-L04-C-simulacion-procesos-MA.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+# string directory = $(pwd) ~ "/P-L03-A-simulaciones"
+
+
+#+LATEX: \maketitle
+
+
+* Objetivo de la práctica
+
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L04-C-simulacion-procesos-MA.inp][P-L04-C-simulacion-procesos-MA.inp]] |
+
+*Objetivo*
+
+1. Observar la ACF y PACF de distintos modelos MA($2$) en las distintas regiones del triángulo de invertibilidad.
+
+*Requerimientos previos*
+
+Programe o recupere de una práctica anterior una función que simule procesos MA($q$)
+#+name: Función SimuladorMA
+#+BEGIN_SRC gretl :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no
+function series SimuladorMA(matrix theta)
+    # SimuladorMA(theta) simula un proceso MA(q), 
+    # donde theta es el polinomio MA y q es su grado.
+    series WN = normal (0,1)
+    series X = 0
+
+    loop i=1..cols(theta)
+        X = X + theta[i]*WN(1-i)
+    endloop
+    
+    return X
+end function
+#+END_SRC
+
+Para que se observe bien la estructura de las ACF y PACF estimadas, establezca un tamaño de muestra suficientemente grande.
+#+BEGIN_SRC gretl :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no
+# establecemos la muestra
+nulldata 3500
+setobs 12 1900:01 --time-series
+#+END_SRC
+
+Recuerde cómo usar la función
+#+BEGIN_SRC gretl :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no
+scalar theta1 = 0
+scalar theta2 = 0.8
+series X = SimuladorMA( {1, -theta1,  -theta2} )
+figura <- corrgm X 12
+#+END_SRC
+
+#+latex: \clearpage
+
+* Actividad 1 - Probando pares de valores en distintas regiones de invertibilidad
+
+Asigne varios pares de valores $\theta_1$ y $\theta_2$ que pertenezcan a cada una de las regiones indicadas en la figura y explore cómo se comportan la AFC y PACF en cada caso.
+
+#+BEGIN_CENTER
+#+attr_html: :width 600px
+#+ATTR_LATEX: :width 0.6\textwidth :center 
+[[file:~/SynologyDrive/ReposGH/Docencia/Econometria-Aplicada/Lecciones-tmp/img/lecc04/MA2roots.png]]
+#+END_CENTER
+# \[\gamma_1=-\theta_1(1-\theta_2)\sigma^2\;\qquad\gamma_2=-\theta_2\sigma^2\]
+\[
+\rho_1=\frac{-\theta_1(1-\theta_2)}{1+\theta_1^2++\theta_2^2}
+;\qquad
+\rho_2=\frac{-\theta_2}{1+\theta_1^2++\theta_2^2}
+;\qquad
+\pi_1=\rho_1
+;\qquad
+\pi_2=\frac{\rho_2-\rho_1^2}{1-\rho_1^2}
+;\qquad
+\pi_3=\frac{\rho_1^3-\rho_1\rho_2(2-\rho_2)}{1-\rho_1^2-2\rho_1^2(1-\rho_2)}
+;\quad\dots
+\]
+
+** Zona 1
+
+Correlogramas en zona 3
+- $\theta_2=0.5$
+- $\theta_1=0,\quad0.1,\quad0.2,\quad0.3,\quad0.4,\quad0.5$.
+
+# Correlogramas en zona 1 (En todos los casos $\theta_2=0.5$):
+
+# Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. 
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
+scalar theta2 = 0.5
+n = 0
+loop for (r=0; r<=1-theta2; r+=.1)
+    n += 1
+    scalar theta1 = r
+    nombre = sprintf("Zona1-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    sname = sprintf("Caso_%d", n)
+    series @sname = SimuladorMA( {1, -theta1,  -theta2} )
+    corrgm @sname 12 --plot=@nombre.png
+endloop
+#+END_SRC
+
+#+BEGIN_SRC bash :var dir="./P-L04-C-simulacion-procesos-MA/" :exports results :results raw
+# Inicia el bloque de exportación a LaTeX
+echo "#+BEGIN_EXPORT latex"
+echo "\\begin{figure}[H]"
+echo "\\centering"
+# echo "\\captionsetup[figure]{labelformat=empty}" # Opcional: Oculta la etiqueta "Figure X"
+
+# Itera sobre los archivos .png encontrados y genera el código minipage
+find "$dir" -maxdepth 1 -type f -iname "Zona1-*.png" -print0 | sort -z | while IFS= read -r -d $'\0' file; do
+    echo "\\begin{minipage}{0.17\\textwidth}"
+    echo "  \\includegraphics[width=\\textwidth]{$file}"
+    echo "\\end{minipage}%" # El '%' es CRUCIAL para evitar un salto de línea entre minipages
+done
+
+# Finaliza el entorno de figura
+# echo "\\caption{Correlogramas en zona 1: Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. En todos los casos $\theta_2=0.5$.}"
+echo "\\end{figure}"
+echo "#+END_EXPORT"
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-1(0,0-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-2(0,1-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-3(0,2-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-4(0,3-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-5(0,4-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-6(0,5-0,5).png}
+\end{minipage}%
+\end{figure}
+#+END_EXPORT
+
+# +name: insertar-filas
+#+begin_src emacs-lisp :results raw :exports results
+(let ((imagenes (directory-files "P-L04-C-simulacion-procesos-MA/" t "^Zona1-.*\\.png$")))
+  (concat "#+BEGIN_EXPORT HTML\n"
+          "<div style=\"display: flex; justify-content: center; gap: 10px;\">\n"
+          (mapconcat (lambda (f)
+                       (format "<img src=\"%s\" style=\"max-width:16%%; height:auto;\"/>"
+                               (file-relative-name f)))
+                     imagenes
+                     "\n")
+          "\n</div>\n#+END_EXPORT"))
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT HTML
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-1(0,0-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-2(0,1-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-3(0,2-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-4(0,3-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-5(0,4-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-6(0,5-0,5).png" style="max-width:17%; height:auto;"/>
+</div>
+#+END_EXPORT
+
+
+
+
+** Zona 2
+
+Correlogramas en zona 3
+- $\theta_2=-0.5$
+- $\theta_1=-0.5,\quad-0.4,\quad-0.3,\quad-0.2,\quad-0.1,\quad0$.
+
+# Correlogramas en zona 2 (En todos los casos $\theta_2=0.5$):
+
+# Caso 1: $\theta_1=-0.5$, Caso 2: $\theta_1=-0.4$, Caso 3: $\theta_1=-0.3$, Caso 4: $\theta_1=-0.2$, Caso 5: $\theta_1=-0.1$ y Caso 6: $\theta_1=0.0$. 
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
+scalar theta2 = 0.5
+n = 0
+loop for (r=theta2-1; r<=0; r+=.1)
+    n += 1
+    scalar theta1 = r
+    nombre = sprintf("Zona2-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    sname = sprintf("Caso_%d", n)
+    series @sname = SimuladorMA( {1, -theta1,  -theta2} )
+    corrgm @sname 12 --plot=@nombre.png
+endloop
+#+END_SRC
+
+#+BEGIN_SRC bash :var dir="./P-L04-C-simulacion-procesos-MA/" :exports results :results raw
+# Inicia el bloque de exportación a LaTeX
+echo "#+BEGIN_EXPORT latex"
+echo "\\begin{figure}[H]"
+echo "\\centering"
+# Itera sobre los archivos .png encontrados y genera el código minipage
+find "$dir" -maxdepth 1 -type f -iname "Zona2-*.png" -print0 | sort -z | while IFS= read -r -d $'\0' file; do
+    echo "\\begin{minipage}{0.17\\textwidth}"
+    echo "  \\includegraphics[width=\\textwidth]{$file}"
+    echo "\\end{minipage}%" # El '%' es CRUCIAL para evitar un salto de línea entre minipages
+done
+# Finaliza el entorno de figura
+echo "\\end{figure}"
+echo "#+END_EXPORT"
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-1(-0,5-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-2(-0,4-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-3(-0,3-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-4(-0,2-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-5(-0,1-0,5).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-6(-0,0-0,5).png}
+\end{minipage}%
+\end{figure}
+#+END_EXPORT
+
+
+#+begin_src emacs-lisp :results raw :exports results
+(let ((imagenes (directory-files "P-L04-C-simulacion-procesos-MA/" t "^Zona2-.*\\.png$")))
+  (concat "#+BEGIN_EXPORT HTML\n"
+          "<div style=\"display: flex; justify-content: center; gap: 10px;\">\n"
+          (mapconcat (lambda (f)
+                       (format "<img src=\"%s\" style=\"max-width:16%%; height:auto;\"/>"
+                               (file-relative-name f)))
+                     imagenes
+                     "\n")
+          "\n</div>\n#+END_EXPORT"))
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT HTML
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-1(-0,5-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-2(-0,4-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-3(-0,3-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-4(-0,2-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-5(-0,1-0,5).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-6(-0,0-0,5).png" style="max-width:17%; height:auto;"/>
+</div>
+#+END_EXPORT
+
+
+# +latex: \clearpage
+
+
+** Zona 3
+
+Correlogramas en zona 3
+- $\theta_2=-0.99$
+- $\theta_1=-1.99,\quad-1.6,\quad-1.2,\quad-0.8,\quad-0.4,\quad0$.
+
+# +latex: \noindent
+# Correlogramas en zona 3 (En todos los casos $\theta_3=-0.75$):
+
+# +latex: \noindent
+# Caso 1: $\theta_1=-1.75$, Caso 2: $\theta_1\quad=-1.4$, Caso 3: $\theta_1=-1.05$, Caso 4: $\theta_1=-0.7$, Caso 5: $\theta_1=-0.35$ y Caso 6: $\theta_1=0.0$. 
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
+#scalar theta2 = -0.75
+scalar theta2 = -0.99
+n = 0
+#loop for (r=theta2-1; r<=0.01; r+=.35)
+loop for (r=theta2-1; r<=0.01; r+=.39)
+    n += 1
+    scalar theta1 = r
+    nombre = sprintf("Zona3-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    sname = sprintf("Caso_%d", n)
+    series @sname = SimuladorMA( {1, -theta1,  -theta2} )
+    corrgm @sname 12 --plot=@nombre.png
+endloop
+#+END_SRC
+
+#+BEGIN_SRC bash :var dir="./P-L04-C-simulacion-procesos-MA/" :exports results :results raw
+# Inicia el bloque de exportación a LaTeX
+echo "#+BEGIN_EXPORT latex"
+echo "\\begin{figure}[H]"
+echo "\\centering"
+# Itera sobre los archivos .png encontrados y genera el código minipage
+find "$dir" -maxdepth 1 -type f -iname "Zona3-*.png" -print0 | sort -z | while IFS= read -r -d $'\0' file; do
+    echo "\\begin{minipage}{0.17\\textwidth}"
+    echo "  \\includegraphics[width=\\textwidth]{$file}"
+    echo "\\end{minipage}%" # El '%' es CRUCIAL para evitar un salto de línea entre minipages
+done
+# Finaliza el entorno de figura
+echo "\\end{figure}"
+echo "#+END_EXPORT"
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-1(-2,0--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-2(-1,6--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-3(-1,2--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-4(-0,8--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-5(-0,4--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-6(-0,0--1,0).png}
+\end{minipage}%
+\end{figure}
+#+END_EXPORT
+
+#+begin_src emacs-lisp :results raw :exports results
+(let ((imagenes (directory-files "P-L04-C-simulacion-procesos-MA/" t "^Zona3-.*\\.png$")))
+  (concat "#+BEGIN_EXPORT HTML\n"
+          "<div style=\"display: flex; justify-content: center; gap: 10px;\">\n"
+          (mapconcat (lambda (f)
+                       (format "<img src=\"%s\" style=\"max-width:16%%; height:auto;\"/>"
+                               (file-relative-name f)))
+                     imagenes
+                     "\n")
+          "\n</div>\n#+END_EXPORT"))
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT HTML
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-1(-2,0--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-2(-1,6--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-3(-1,2--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-4(-0,8--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-5(-0,4--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-6(-0,0--1,0).png" style="max-width:17%; height:auto;"/>
+</div>
+#+END_EXPORT
+
+# +latex: \clearpage
+
+
+** Zona 4
+
+Correlogramas en zona 4
+- $\theta_2=-0.99$
+- $\theta_1=0,\quad0.4,\quad0.8,\quad1.2,\quad1.6,\quad1.99$.
+
+# Caso 1: $0$, Caso 2: $\theta_1=0.4$, Caso 3: $\theta_1=0.8$, Caso 4: $\theta_1=1.2$, Caso 5: $\theta_1=1.6$ y Caso 6: $\theta_1<2$. 
+# Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.35$, Caso 3: $\theta_1=0.7$, Caso 4: $\theta_1=1.05$, Caso 5: $\theta_1=1.4$ y Caso 6: $\theta_1=1.75$. 
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
+#scalar theta2 = -0.75
+scalar theta2 = -0.99
+n = 0
+#loop for (r=0; r<=1-theta2; r+=.35)
+loop for (r=0; r<=1-theta2; r+=.39)
+    n += 1
+    scalar theta1 = r
+    nombre = sprintf("Zona4-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    sname = sprintf("Caso_%d", n)
+    series @sname = SimuladorMA( {1, -theta1,  -theta2} )
+    corrgm @sname 12 --plot=@nombre.png
+endloop
+#+END_SRC
+
+#+BEGIN_SRC bash :var dir="./P-L04-C-simulacion-procesos-MA/" :exports results :results raw
+# Inicia el bloque de exportación a LaTeX
+echo "#+BEGIN_EXPORT latex"
+echo "\\begin{figure}[H]"
+echo "\\centering"
+# Itera sobre los archivos .png encontrados y genera el código minipage
+find "$dir" -maxdepth 1 -type f -iname "Zona4-*.png" -print0 | sort -z | while IFS= read -r -d $'\0' file; do
+    echo "\\begin{minipage}{0.17\\textwidth}"
+    echo "  \\includegraphics[width=\\textwidth]{$file}"
+    echo "\\end{minipage}%" # El '%' es CRUCIAL para evitar un salto de línea entre minipages
+done
+# Finaliza el entorno de figura
+echo "\\end{figure}"
+echo "#+END_EXPORT"
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-1(0,0--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-2(0,4--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-3(0,8--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-4(1,2--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-5(1,6--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.17\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-6(2,0--1,0).png}
+\end{minipage}%
+\end{figure}
+#+END_EXPORT
+
+#+begin_src emacs-lisp :results raw :exports results
+(let ((imagenes (directory-files "P-L04-C-simulacion-procesos-MA/" t "^Zona4-.*\\.png$")))
+  (concat "#+BEGIN_EXPORT HTML\n"
+          "<div style=\"display: flex; justify-content: center; gap: 10px;\">\n"
+          (mapconcat (lambda (f)
+                       (format "<img src=\"%s\" style=\"max-width:16%%; height:auto;\"/>"
+                               (file-relative-name f)))
+                     imagenes
+                     "\n")
+          "\n</div>\n#+END_EXPORT"))
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT HTML
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-1(0,0--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-2(0,4--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-3(0,8--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-4(1,2--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-5(1,6--1,0).png" style="max-width:17%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-6(2,0--1,0).png" style="max-width:17%; height:auto;"/>
+</div>
+#+END_EXPORT
+
+
+** Eje vertical
+
+Correlogramas en zona 3
+- $\theta_1=0$
+- $\theta_2\approx-1,\quad-0.7,\quad-0.3,\quad0,\quad0.3,\quad0.7,\quad1$.
+
+# Correlogramas en zona 1 (En todos los casos $\theta_2=0.5$):
+
+# Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. 
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
+scalar theta1 = 0
+n = 0
+loop for (r=-.99; r<=1; r+=0.33)
+    n += 1
+    scalar theta2 = r
+    nombre = sprintf("EjeVertical-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    sname = sprintf("Caso_%d", n)
+    series @sname = SimuladorMA( {1, -theta1,  -theta2} )
+    corrgm @sname 12 --plot=@nombre.png
+endloop
+#+END_SRC
+
+#+BEGIN_SRC bash :var dir="./P-L04-C-simulacion-procesos-MA/" :exports results :results raw
+# Inicia el bloque de exportación a LaTeX
+echo "#+BEGIN_EXPORT latex"
+echo "\\begin{figure}[H]"
+echo "\\centering"
+# echo "\\captionsetup[figure]{labelformat=empty}" # Opcional: Oculta la etiqueta "Figure X"
+
+# Itera sobre los archivos .png encontrados y genera el código minipage
+find "$dir" -maxdepth 1 -type f -iname "EjeVertical-*.png" -print0 | sort -z | while IFS= read -r -d $'\0' file; do
+    echo "\\begin{minipage}{0.15\\textwidth}"
+    echo "  \\includegraphics[width=\\textwidth]{$file}"
+    echo "\\end{minipage}%" # El '%' es CRUCIAL para evitar un salto de línea entre minipages
+done
+
+# Finaliza el entorno de figura
+# echo "\\caption{Correlogramas en zona 1: Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. En todos los casos $\theta_2=0.5$.}"
+echo "\\end{figure}"
+echo "#+END_EXPORT"
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-1(0,0--1,0).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-2(0,0--0,7).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-3(0,0--0,3).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-4(0,0-0,0).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-5(0,0-0,3).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-6(0,0-0,7).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-7(0,0-1,0).png}
+\end{minipage}%
+\end{figure}
+#+END_EXPORT
+
+
+#+begin_src emacs-lisp :results raw :exports results
+(let ((imagenes (directory-files "P-L04-C-simulacion-procesos-MA/" t "^EjeVertical-.*\\.png$")))
+  (concat "#+BEGIN_EXPORT HTML\n"
+          "<div style=\"display: flex; justify-content: center; gap: 10px;\">\n"
+          (mapconcat (lambda (f)
+                       (format "<img src=\"%s\" style=\"max-width:13.5%%; height:auto;\"/>"
+                               (file-relative-name f)))
+                     imagenes
+                     "\n")
+          "\n</div>\n#+END_EXPORT"))
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT HTML
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-1(0,0--1,0).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-2(0,0--0,7).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-3(0,0--0,3).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-4(0,0-0,0).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-5(0,0-0,3).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-6(0,0-0,7).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-7(0,0-1,0).png" style="max-width:15%; height:auto;"/>
+</div>
+#+END_EXPORT
+
+
+
+** Parábola
+
+Correlogramas en zona 3
+- $\theta_1=-1.5,\quad-1,\quad-0.5,\quad0,\quad0.5,\quad1,\quad1.5$.
+- $\theta_2=\frac{\theta_1^2}{4}$
+
+# Correlogramas en zona 1 (En todos los casos $\theta_2=0.5$):
+
+# Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. 
+#+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
+n = 0
+loop for (r=-1.5; r<=1.52; r+=0.5)
+    n += 1
+    scalar theta1 = r
+    scalar theta2 = theta1*theta1/4
+    nombre = sprintf("Parabola-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    sname = sprintf("Caso_%d", n)
+    series @sname = SimuladorMA( {1, -theta1,  -theta2} )
+    corrgm @sname 12 --plot=@nombre.png
+endloop
+#+END_SRC
+
+#+BEGIN_SRC bash :var dir="./P-L04-C-simulacion-procesos-MA/" :exports results :results raw
+# Inicia el bloque de exportación a LaTeX
+echo "#+BEGIN_EXPORT latex"
+echo "\\begin{figure}[H]"
+echo "\\centering"
+# echo "\\captionsetup[figure]{labelformat=empty}" # Opcional: Oculta la etiqueta "Figure X"
+
+# Itera sobre los archivos .png encontrados y genera el código minipage
+find "$dir" -maxdepth 1 -type f -iname "Parabola-*.png" -print0 | sort -z | while IFS= read -r -d $'\0' file; do
+    echo "\\begin{minipage}{0.15\\textwidth}"
+    echo "  \\includegraphics[width=\\textwidth]{$file}"
+    echo "\\end{minipage}%" # El '%' es CRUCIAL para evitar un salto de línea entre minipages
+done
+
+# Finaliza el entorno de figura
+# echo "\\caption{Correlogramas en zona 1: Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. En todos los casos $\theta_2=0.5$.}"
+echo "\\end{figure}"
+echo "#+END_EXPORT"
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-1(-1,5-0,6).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-2(-1,0-0,3).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-3(-0,5-0,1).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-4(0,0-0,0).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-5(0,5-0,1).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-6(1,0-0,3).png}
+\end{minipage}%
+\begin{minipage}{0.15\textwidth}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-7(1,5-0,6).png}
+\end{minipage}%
+\end{figure}
+#+END_EXPORT
+
+
+#+begin_src emacs-lisp :results raw :exports results
+(let ((imagenes (directory-files "P-L04-C-simulacion-procesos-MA/" t "^Parabola-.*\\.png$")))
+  (concat "#+BEGIN_EXPORT HTML\n"
+          "<div style=\"display: flex; justify-content: center; gap: 10px;\">\n"
+          (mapconcat (lambda (f)
+                       (format "<img src=\"%s\" style=\"max-width:13.5%%; height:auto;\"/>"
+                               (file-relative-name f)))
+                     imagenes
+                     "\n")
+          "\n</div>\n#+END_EXPORT"))
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT HTML
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-1(-1,5-0,6).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-2(-1,0-0,3).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-3(-0,5-0,1).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-4(0,0-0,0).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-5(0,5-0,1).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-6(1,0-0,3).png" style="max-width:15%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-7(1,5-0,6).png" style="max-width:15%; height:auto;"/>
+</div>
+#+END_EXPORT
+
+
+
+#+latex: \clearpage
+
+#+BEGIN_EXPORT latex
+\textbf{Código completo de la práctica}
+
+%| Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L04-C-simulacion-procesos-MA.inp][P-L04-C-simulacion-procesos-MA.inp]] |
+
+\lstinputlisting{guiones/P-L04-C-simulacion-procesos-MA.inp}
+#+END_EXPORT
+

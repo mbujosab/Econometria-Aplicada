@@ -7,29 +7,13 @@
 # +OPTIONS: author:nil
 #+OPTIONS: date:nil
 
-#+OPTIONS: :eval yes
-#+PROPERTY: header-args :eval yes
+#+include: 00preambulo_practicas.txt
 
+#+INFOJS_OPT: view:overview
 # ###########
 # ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
 #+SETUPFILE: ../css/bigblow_inline.theme
 # ###########
-
-#+INFOJS_OPT: view:overview
-
-#+latex_class_options: [10pt]
-
-#+LATEX_HEADER: \usepackage[spanish]{babel}
-#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
-# +LaTeX_HEADER: \usepackage{framed}
-#+LaTeX_HEADER: \usepackage{listings}
-#+LaTeX_HEADER: \input{hansl.tex}
-#+LaTeX_HEADER: \lstnewenvironment{hansl-gretl}
-#+LaTeX_HEADER: {\lstset{language={hansl},basicstyle={\ttfamily\footnotesize},numbers,rame=single,breaklines=true}}
-#+LaTeX_HEADER: {}
-#+LaTeX_HEADER: \newcommand{\hansl}[1]{\lstset{language={hansl},basicstyle={\ttfamily\small}}\lstinline{#1}}
-
-#+LaTeX_HEADER: \lstset{backgroundcolor=\color{lightgray!20}, }
 
 #+name: setup-listings
 #+begin_src emacs-lisp :exports none :results silent :tangle no
@@ -58,7 +42,6 @@
        (format "\\%s{%s}" path desc)))))
 #+end_src
 
-
 #+NAME: if-no--guiones-makefir
 #+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
 (unless (file-directory-p "guiones")
@@ -69,6 +52,13 @@
 #+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
 (org-babel-tangle)
 #+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
 
 #+name: execute-gretl-practice
 #+PROPERTY: P-L07-A-EjercicioIdentificacionARIMA

@@ -55,6 +55,36 @@ all: calendario notebooksYslides practicas  publicacion-lecciones publicacion-pr
 
 calendario: directorios $(DOCS)/Calendario-Econometria-Aplicada.pdf
 
+REPO_URL = https://github.com/mbujosab/TimeSeriesData
+DATOS_DIR = ./datos/
+TEMP_DIR = ../TimeSeriesData_temp
+
+copia_datos: $(DATOS_DIR)
+	@echo "Clonando el repositorio $(REPO_URL) con profundidad 1..."
+	# 1. Clonar el repositorio en un directorio temporal SEGURO
+	@git clone --depth 1 $(REPO_URL) $(TEMP_DIR)
+	@echo "Copiando archivos y directorios sin la extensión .org, .git o .projectile a $(DATOS_DIR) (manteniendo estructura)..."
+	# 2. **CRÍTICO:** Bloque condicional de rsync con exclusiones mejoradas
+	@if [ -d "$(TEMP_DIR)" ]; then \
+		rsync -av \
+			--exclude '*/.git*' \
+			--exclude '*.org' \
+			--exclude '.*' \
+			--include '*/' \
+			--include '*' \
+			"$(TEMP_DIR)/" "$(DATOS_DIR)"; \
+	else \
+		echo "ERROR: Falló la clonación. Directorio fuente ($(TEMP_DIR)) no encontrado. NO se copió nada." 1>&2; \
+	fi
+	@echo "Limpiando directorio temporal..."
+	# 3. Eliminar el directorio temporal clonado
+	@rm -rf "$(TEMP_DIR)"
+	@echo "Copia de archivos y estructura completada."
+
+$(DATOS_DIR):
+	@mkdir -p $(DATOS_DIR)
+
+
 $(DOCS)/Calendario-Econometria-Aplicada.pdf:
 	emacs --batch Calendario/README.org -l org -f org-babel-tangle
 	cd Calendario && make Calendario-Econometria-Aplicada.pdf
@@ -235,6 +265,7 @@ directorios:
 	mkdir -v -p .github/workflows
 	mkdir -v -p $(LECCIONES_tmp)/src
 	mkdir -v -p $(LECCIONES_tmp)/img
+	mkdir -v -p $(PRACTICAS_tmp)
 	mkdir -v -p $(DOCS)/Lecciones-pdf
 	mkdir -v -p $(DOCS)/.binder
 	mkdir -v -p $(DOCS)/Lecciones-html/img
@@ -244,6 +275,7 @@ directorios:
 	cp -a ./css $(LECCIONES_tmp)/
 	cp -a ./datos $(LECCIONES_tmp)/
 	cp -a ./datos $(DOCS)/
+	cp -a ./org-practicas/00preambulo_practicas.txt $(PRACTICAS_tmp)/
 	touch directorios
 
 clean:

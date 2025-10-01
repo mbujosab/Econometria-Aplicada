@@ -304,24 +304,28 @@ descomposición de la varianza en sumas de oscilaciones con distintas frecuencia
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
 #+LATEX: \noindent
-($Periodo=\frac{1}{Frecuencia}$, donde la Frecuencia = Nº de ciclos por unidad de tiempo).
+($Periodo=\frac{1}{Frecuencia}$, donde la Frecuencia = Ciclos por unidad de tiempo).
 
 #+attr_ipynb: (slideshow . ((slide_type . slide)))
-La ACF, la PACF y la /densidad espectral/ son funciones que dependen
-únicamente de los dos primeros momentos de la distribución.
+- La ACF, la PACF y la /densidad espectral/ son funciones que dependen únicamente de los segundos momentos de la distribución.
 
-Su estimación y posterior análisis son la herramienta fundamental para
-elegir un modelo ARMA para una serie temporal /``estacionaria''/.
+- Su estimación y posterior análisis son la herramienta fundamental para elegir un modelo ARMA para una serie temporal /``estacionaria''/.
 
-Para entenderlo debemos ver cómo son estas funciones en algunos
-modelos lineales concretos.
+- Para entenderlo debemos ver cómo son estas funciones en algunos modelos lineales concretos.
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Comenzaremos por los /procesos lineales causales/ genéricos; de los cuales se derivan los modelos estacionarios que veremos en el curso. Hoy los procesos de ruido blanco y los procesos de medias móviles MA($q$).
+
+En la lección próxima: los procesos autorregresivos AR($p$) y los procesos ARMA($p,q$).
 
 * ACF, PACF y densidad espectral de algunos modelos lineales
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . skip)))
    :END:
 
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Comencemos con el caso general:
 
 ** Procesos lineales causales
    :PROPERTIES:
@@ -338,7 +342,7 @@ que $\;E(X_t)=0\;$ y que
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
   Es decir, 
   $$\gamma_k = \sigma^2\sum_{j=0}^\infty \psi_{j+|k|}\cdot\psi_j.$$ 
-  Por otra parte, $\;\gamma_k\to0\;$ cuando $\;k\to\infty$
+  Y como $\;\boldsymbol{\psi}\;$ es serie formal de cuadrado sumable, $\;\gamma_k\to0\;$ cuando $\;k\to\infty$
 #+BEGIN_EXPORT latex
 \medskip
 
@@ -356,7 +360,13 @@ que $\;E(X_t)=0\;$ y que
 y puesto que $\boldsymbol{\psi}$ es de cuadrado sumable, la cola 
 $\sum_{j=k}^\infty |\psi_{j}|^2$ 
 converje a cero cuando $k\to\infty$.
+\bigskip
+
+Fíjese que en particular, 
+$$\gamma_0 = Var(X_t) = \sigma^2\sum_{j=0}^\infty \psi_j^2;$$
+donde la suma es convergente dado que $\boldsymbol{\psi}$ es de cuadrado sumable.
 \medskip
+
 #+END_EXPORT
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
@@ -430,9 +440,10 @@ fig.savefig('./img/lecc04/SimulWhitenoise.png', dpi=300, bbox_inches='tight')
 [[./img/lecc04/colores.png]]
 
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
-En la luz blanca todos los colores (frecuencias) aparecen por igual (por eso se ve blanco).
-El ruido blanco es el pilar sobre el que construimos los demás procesos (débilmente) estacionarios.
+Los procesos de ruido blanco son los más simples. Carecen de correlación serial, lo que significa que el valor tomado en un momento determinado no aporta información útil para predecir valores futuros.
+Si los residuos de un modelo ajustado a una serie temporal no son /ruido blanco/, significa que queda correlación serial no captada por el modelo, por lo que dicho modelo es mejorable.
 
+El nombre de /ruido blanco/ se debe a que su función de densidad espectral es constante, indicando que, al descomponer la varianza en sumas de oscilaciones de diferentes frecuencias, todas las frecuencias tienen la misma relevancia o intensidad. Esta es una circunstancia análoga al fenómeno físico de la luz blanca, que contiene todos los colores (oscilaciones de la onda electromagnética en cada frecuencia) con idéntica intensidad. Al observar la luz /blanca/, percibimos todas esas oscilaciones simultáneamente, lo que nos da la percepción de color /blanco/. Sin embargo, al pasarla por un prisma, podemos descomponerla y ver los colores por separado (/la densidad espectral es como un prisma, pues nos deja ver la intensidad de las distintas oscilaciones por separado/).
 
 #+BEGIN_SRC jupyter-python :exports none :results silent
 from PIL import Image, ImageDraw
@@ -487,21 +498,27 @@ imagen.save("./img/lecc04/colores.png", dpi=(300, 300))
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
-Sea $\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}$, con $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y donde $\boldsymbol{\theta}$ es un polinomio de orden $q>0$, con $\theta_0=1$ y con todas sus raíces fuera del círculo unidad $(\boldsymbol{\theta}^{-\triangleright}\in\ell^1)$, es decir $$X_t=\sum_{j=1}^q\theta_j U_{t-j}+U_t.$$
+Sea $\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}$, con $\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$ y donde $\boldsymbol{\theta}$ es un polinomio de orden $q>0$, con $\theta_0=1$ y con todas sus raíces fuera del círculo unidad $(\boldsymbol{\theta}^{-\triangleright}\in\ell^1)$:
+$$X_t=\sum_{j=1}^q\theta_j U_{t-j}+U_t.$$
 
 #+BEGIN_EXPORT latex
 \begin{quotation}
 \em
-Este requisito no es necesario para que el proceso sea estacionario, pero por conveniencia se usan modelos MA que puedan tener una representación AR($\infty$) \emph{causal} (es decir, usando observaciones del pasado ``para construir'' el presente):
+El requisito sobre las raíces no es necesario para que el proceso sea estacionario, pero por conveniencia se usan modelos MA que tengan representación AR($\infty$) \emph{causal}:
 $$\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}
 \quad\rightarrow\quad
 \frac{1}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
 \quad\Rightarrow\quad
 U_t = \sum_{j=0}^\infty\psi_j X_{t-j}
 $$
-donde $\boldsymbol{\psi}=\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1$. Entonces se dice que el modelo MA es ``\emph{invertible}''. Cualquier modelo MA sin raíces en el círculo unidad se puede reparametrizar para obtener un modelo invertible con la misma función de autocovarianzas ``$\boldsymbol{\gamma}$'' (\emph{Véase Sección 2.6 de Fuller (1996)}) y, consecuentemente, las mismas ACF, PACF y densidad espectral que el modelo original. Para tener una asociación uno a uno entre ACFs y procesos estocásticos, siempre asumiremos que las raíces de los polinomios MA, $\boldsymbol{\theta}$, son mayores que uno en valor absoluto.
+donde $\boldsymbol{\psi}=\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1$. Entonces se dice que el modelo MA es ``\emph{invertible}''. 
+\medskip
+
+Cualquier modelo MA sin raíces en el círculo unitario puede reparametrizarse en un nuevo modelo con idéntica función de autocovarianzas $\boldsymbol{\gamma}$ (\emph{véase la Sección 2.6 de Fuller (1996)}). Por tanto, el nuevo modelo exhibirá las mismas ACF, PACF y densidad espectral que el modelo original.
+Para garantizarnos una correspondencia uno a uno entre ACFs y procesos estocásticos, siempre asumiremos que las raíces del polinomio $\boldsymbol{\theta}$ son mayores que uno en valor absoluto.
 \end{quotation}
 #+END_EXPORT
+
 Entonces $\;E(X_t)=0\;$ y
 
 $\boldsymbol{\gamma}=\; \sigma^2 \boldsymbol{\theta}(z)*\boldsymbol{\theta}(z^{-1}) \;=\; \sigma^2 \sum\limits_{j=0}^q \theta_{j+k}\theta_{j} z^{k}$ (grado $q$; cogrado $-q$) ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc02.pdf#subsection.9.3][Lecc. 02]])
@@ -521,10 +538,10 @@ Un proceso MA es _siempre estacionario._
 *Tipos de representación del proceso*
 
 #+latex: \noindent
-- Como suma ponderada finita :: (número finito de parámetros)
+- Como suma ponderada finita :: MA($q$) (número finito de parámetros)
   $$\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}
   \quad\Rightarrow\quad X_t=\boldsymbol{\theta}(\mathsf{B})U_t$$
-- Como suma ponderada infinita :: (_solo existe si es invertible_):
+- Como suma ponderada infinita :: AR($\infty$) (_solo existe si es invertible_):
   $$\frac{1}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
   \quad\Rightarrow\quad
   \frac{1}{\boldsymbol{\theta}}(\mathsf{B})X_t=U_t$$
@@ -535,7 +552,9 @@ Para ser invertible raíces $\boldsymbol{\theta}$ fuera del círculo
 unidad
 $(\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1)$
 
-Los procesos MA se caracterizan por su ``memoria muy corta''. Estos procesos dependen de un número finito, generalmente pequeño, de innovaciones pasadas. A diferencia de los modelos autorregresivos, los procesos MA solo presentan correlación con un número limitado de valores anteriores, lo que permite que su función de autocorrelación simple tenga solo unas pocas autocorrelaciones diferentes de cero..
+Los procesos MA se caracterizan por su ``memoria muy corta''. Estos procesos dependen de un número finito, generalmente pequeño, de innovaciones pasadas. 
+
+A diferencia de los modelos autorregresivos, los procesos MA solo presentan correlación con un número limitado de valores anteriores, lo que permite que su función de autocorrelación simple tenga solo unas pocas autocorrelaciones diferentes de cero.
 
 ** Proceso de media móvil MA($1$)
    :PROPERTIES:
@@ -703,7 +722,7 @@ es decir $X_t=U_t-\theta_1 U_{t-1}-\theta_2 U_{t-2}$.
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 
-#+CAPTION: El interior del triángulo es la región paramétrica donde un MA(2) es invertible. Por debajo de la parábola las raíces son complejas. El signo del parámetro $\theta_1$ determina el signo del primer retardo de la ACF y $\theta_2$ el signo del segundo. Las regiones 1, 2, 3, y 4 determinan cómo decae la PACF.
+#+CAPTION: El interior del triángulo es la región paramétrica donde un MA(2) es invertible. Por debajo de la parábola las raíces son complejas. El signo del parámetro $\theta_1$ determina el signo del primer retardo de la ACF y $\theta_2$ el signo del segundo. Las regiones 1, 2, 3, y 4 determinan cómo decae la PACF. Las cuatro subsecciones sobre modelos MA(2) muestran, por orden, ejemplos de estas 4 regiones.
 #+attr_org: :width 400
 #+attr_html: :width 600px
 #+attr_latex: :width 300px
@@ -1201,10 +1220,10 @@ $(\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1)$
 *Tipos de representación del proceso*
 
 #+latex: \noindent
-- Como suma ponderada finita :: (número finito de parámetros)
+- Como suma ponderada finita :: MA($q$) (número finito de parámetros)
   $$\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}
   \quad\Rightarrow\quad X_t=\boldsymbol{\theta}(\mathsf{B})U_t$$
-- Como suma ponderada infinita :: (_solo existe si es invertible_):
+- Como suma ponderada infinita :: AR($\infty$) (_solo existe si es invertible_):
   $$\frac{1}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
   \quad\Rightarrow\quad
   \frac{1}{\boldsymbol{\theta}}(\mathsf{B})X_t=U_t$$
@@ -1223,7 +1242,7 @@ $(\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1)$
 #+latex: \smallskip
 
 #+latex: \noindent
-*Densidad espectral* Suma de dos cosenos más una constante.
+*Densidad espectral* Suma de $q$ cosenos más una constante.
 # proporcional al inverso de la densidad espectral de $\;\boldsymbol{\theta}*\boldsymbol{X}=\boldsymbol{U}$
 
 
@@ -1238,11 +1257,11 @@ $(\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1)$
 (ox-ipynb-export-org-file-to-ipynb-file "Lecc04.org")
 #+END_SRC
 
-#+BEGIN_SRC sh :results silent :eval no
-#jupyter nbconvert --execute --inplace Lecc04.ipynb
+#+BEGIN_SRC sh :results silent :eval yes
+jupyter nbconvert --execute --inplace Lecc04.ipynb
 #+END_SRC
 
-#+BEGIN_SRC sh :results silent :eval no
-#jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc04.ipynb
+#+BEGIN_SRC sh :results silent :eval yes
+jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc04.ipynb
 #+END_SRC
 
