@@ -1,0 +1,303 @@
+#    -*- mode: org -*-
+
+#+Title: Lección 5.A --- Salarios y sueldos devengados en EEUU
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+#+INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: P-L05-A-salariosYsueldosDevengados
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L05-A-salariosYsueldosDevengados"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+#+begin_src gretl :tangle guiones/P-L05-A-salariosYsueldosDevengados.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+# string directory = $(pwd) ~ "/P-L05-A-salariosYsueldosDevengados" 
+
+
+#+LATEX: \maketitle
+
+
+* Objetivo de la práctica
+
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L05-A-salariosYsueldosDevengados.inp][P-L05-A-salariosYsueldosDevengados.inp]] |
+
+
+*Datos*
+
+La serie temporal /Compensation of Employees: Wages and Salary Accruals/ (WASCUR) mide el total de *salarios y sueldos devengados* por los empleados en la economía de Estados Unidos. Incluye: Remuneraciones en efectivo (salarios y sueldos antes de impuestos) y pagos en especie evaluados a precios de mercado (por ejemplo, parte de la compensación en forma de bienes o servicios). 
+- Periodicidad :: /Cuatrimestral/ (Primer dato corresponde a =1947Q1=). 
+- Fuente :: https://fred.stlouisfed.org/series/WASCUR
+
+*Objetivo*
+
+1. Identificar un modelo para los datos.
+
+Comencemos cargando los datos:
+
+*/~Archivo --> Abrir datos --> Archivo de usuario~/* y en la ventana emergente busque el fichero =WASCUR.csv= que previamente ha descargado desde aquí: https://fred.stlouisfed.org/series/WASCUR 
+
+# https://github.com/mbujosab/TimeSeriesData/blob/main/WASCUR.csv
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+NAME: Lectura del fichero de datos
+#+begin_src gretl :eval no
+open RutaAlDirectorioDelFichero/WASCUR.csv
+setobs 12 1947:1
+setinfo WASCUR --description="salarios y sueldos devengados en EEUU"
+#+end_src
+donde =RutaAlDirectorioDelFichero= es la ruta al directorio donde guardó el fichero =WASCUR.csv=
+#+latex: }
+
+#+NAME: Lectura del fichero de datos
+#+begin_src gretl :tangle ./guiones/P-L05-A-salariosYsueldosDevengados.inp :eval no :exports none
+open ../../datos/WASCUR.csv
+setobs 4 1947:1
+setinfo WASCUR --description="salarios y sueldos devengados en EEUU"
+#+end_src
+    
+* Actividad 2 - Gráfico de series temporales
+***** Scatter plot
+- Marque la variable =WASCUR= (pulsando ~ctrl~ y pinchando con el botón derecho del ratón sobre ella). Elija */~Gráfico de series temporales~/*
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+  /o bien teclee en linea de comandos/: =gnuplot WASCUR --time-series --with-lines=
+  #+latex: }
+
+***** Guardar gráfico como /icono/ para editarlo más tarde
+- ``Pinche'' con el botón derecho sobre la ventana del gráfico.
+- Seleccione */~Guardar a sesión como icono~/*
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+  /o bien teclee en linea de comandos/:
+    #+NAME: Guardamos scatterplot como icono
+    #+begin_src gretl :tangle ./guiones/P-L05-A-salariosYsueldosDevengados.inp :eval no 
+wascur <- gnuplot WASCUR --time-series --with-lines  --output="WASCUR.png"
+    #+end_src
+
+    (=wascur= /es el nombre con el que se guardará el icono/. El comando  ~--output=~  seguido de un nombre entre comillas es para que Gretl genere un fichero =.png= con el nombre indicado y que contenga la figura. Yo lo he añadido para poder insertar el gráfico en este documento; pero no es necesario para generar el gráfico ni el icono).
+  #+latex: }
+
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L05-A-salariosYsueldosDevengados/WASCUR.png]]
+
+Dada la muestra,
+- ¿podemos considerar que la serie temporal tiene el aspecto de realización de un proceso estocástico estacionario?
+- ¿Crece la variabilidad de los datos con su nivel medio? ¿Es viable la transformación logarítmica de los datos?
+
+** Gráfico rango media
+
+Los cambios de variabilidad de una serie pueden evidenciarse en su gráfico temporal pero en ocasiones se ven mucho mejor en un gráfico rango-media, donde se representa:
+- en el eje $x$ :: nivel de la serie (normalmente la media de submuestras no solapadas).
+- en el eje $y$ :: dispersión de la serie (normalmente el rango de dichas submuestras).
+Si los puntos se sitúan alrededor de una recta de pendiente positiva y la serie temporal siempre toma valores mayores que cero, entonces lo conveniente es tomar logaritmos.
+#+latex: \medskip
+
+Veamos cómo es el gráfico rango media de la serie WASCUR.
+Seleccione con el ratón la variable =WASCUR= y luego pulse en el menú desplegable */~Variable~/* que aparece arriba, en el centro de la ventana principal de [[https://gretl.sourceforge.net/es.html][Gretl]].
+  + En el menú desplegable seleccione */~Gráfico rango-media~/* y pulse */~Aceptar~/* en la ventana emergente.
+
+  #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+  /o bien teclee en linea de comandos/:
+    #+NAME: Guardamos scatterplot como icono
+    #+begin_src gretl :tangle ./guiones/P-L05-A-salariosYsueldosDevengados.inp :eval no 
+rmplot  WASCUR --output="rango-media.png"
+    #+end_src
+    (El comando  ~--output=~  seguido de un nombre entre comillas es para que Gretl genere un fichero =.png= con el nombre indicado y que contenga la figura. Yo lo he añadido para poder insertar el gráfico en este documento; pero no es necesario para generar el gráfico ni el icono).
+  #+latex: }
+
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.4\textwidth :center t
+[[./P-L05-A-salariosYsueldosDevengados/rango-media.png]] 
+#+END_CENTER
+
+Parece evidente que debemos tomar logaritmos además de una diferencia regular; es decir, debemos trabajar con la tasa logarítmica de crecimiento de los datos originales.
+
+* Actividad 3 - Tasa logarítmica de crecimiento de =WASCUR=
+
+Seleccione con el ratón la variable =WASCUR= y luego pulse en el menú desplegable */~Añadir~/* que aparece arriba, en el centro de la ventana principal de [[https://gretl.sourceforge.net/es.html][Gretl]].
+  + */~Añadir -> Diferencias de logaritmos de las variables seleccionadas~/*
+
+    #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+    /o bien teclee en linea de comandos/: 
+      #+begin_src gretl :tangle ./guiones/P-L05-A-salariosYsueldosDevengados.inp :eval no 
+ldiff WASCUR
+      #+end_src
+    #+latex: }
+
+Entre las variables se añadirá una nueva que tendrá el prefijo =ld_=; en este caso, la variable =ld_WASCUR=.
+
+Genere el gráfico de series temporales de la nueva serie y guárdelo como un icono.
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L05-A-salariosYsueldosDevengados.inp :eval no :results none
+Dif_wascur <- gnuplot ld_WASCUR --time-series --with-lines --output="Dif_WASCUR.png"
+#+end_src
+#+latex: }
+
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L05-A-salariosYsueldosDevengados/Dif_WASCUR.png]]
+
+- ¿podemos considerar que la serie temporal en primeras diferencias tiene el aspecto de realización de un proceso estocástico estacionario?
+- Observe que parece que pudiera haber habido un cambio en el modelo que genera los datos a partir de la crisis del 2008 (o, al menos, que los datos de la crisis del 2008 y, sobre todo, los del confinamiento de 2020 no parecen ser producto del mismo modelo generador de datos).
+
+* Actividad 4 - Estimar la función de autocorrelación (ACF) y la  función de autocorrelación parcial (PACF) hasta el año 2007
+
+Restrinja la muestra hasta el último trimestre de 2007 y calcule correlograma de los datos.
+
+Seleccione con el ratón la variable =ld_WASCUR= y luego pulse sobre la serie con el botón derecho de ratón. En el menú desplegable pulse en  */~Correlograma~/*; y en el la ventana emergente pulse en */~Aceptar~/*.
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/: 
+#+begin_src gretl :tangle ./guiones/P-L05-A-salariosYsueldosDevengados.inp :eval no 
+smpl 1947:1 2007:4
+corrgm ld_WASCUR 31 --plot="Dif_WASCUR-ACF-PACF.png"
+#+end_src
+La instrucción ~--plot="Dif_WASCUR-ACF-PACF.png"~ no es necesaria si no necesita crear un fichero =.png= con el correlograma (yo lo necesito para mostrar el gráfico a continuación). 
+#+latex: }
+
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L05-A-salariosYsueldosDevengados/Dif_WASCUR-ACF-PACF.png]]
+
+Observarmos que la ACF cae abruptamente tras el primer retardo y que la PACF decae exponencialmente.
+
+** Estimación de la densidad espectral
+
+También podemos calcular el periodograma, que es un estimador de la densidad espectral.
+
+Seleccione con el ratón la variable =ld_WASCUR= y luego pulse sobre la serie con el botón derecho de ratón. En el menú desplegable pulse en */~Periodograma~/*; y en el la ventana emergente pulse en */~Aceptar~/*.
+
+    #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+    /o bien teclee en linea de comandos/: 
+      #+begin_src gretl :tangle ./guiones/P-L05-A-salariosYsueldosDevengados.inp :eval no 
+pergm ld_WASCUR --plot="Dif_WASCUR-Periodograma.png"
+      #+end_src
+La instrucción ~--plot="Dif_WASCUR-ACF-PACF.png"~ no es necesaria si no necesita crear un fichero =.png= con el periodograma (yo lo necesito para mostrar el gráfico a continuación). 
+    #+latex: }
+
+
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L05-A-salariosYsueldosDevengados/Dif_WASCUR-Periodograma.png]]
+
+Al comparar el correlograma y el periodograma con las ACF, PACF y espectros vistos en clase, podemos deducir que la tasa logarítmica de crecimiento de los salarios se parece a la realización de un proceso AR(1) con parámetro positivo:
+$$(1-\phi \mathsf{B})X_t=U_t\qquad {\color{blue}{(\phi>0)}}$$
+
+#+attr_org: :width 800
+#+attr_html: :width 600px
+#+ATTR_LATEX: :width 0.8\textwidth :center t
+[[file:./img/ACF-AR1p.png]]
+
+
+* Actividad 5 - ¿Qué ocurre si usamos la muestra completa?
+
+Recupere la muestra completa y re-estime el correlograma y el periodograma.
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L05-A-salariosYsueldosDevengados.inp :eval no 
+smpl 1947:1 2025:2
+corrgm ld_WASCUR 31 --plot="Dif_WASCUR-ACF-PACF-2025.png"
+pergm  ld_WASCUR    --plot="Dif_WASCUR-Periodograma-2025.png"
+#+end_src
+#+latex: }
+
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L05-A-salariosYsueldosDevengados/Dif_WASCUR-ACF-PACF-2025.png]]
+
+
+#+attr_org: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L05-A-salariosYsueldosDevengados/Dif_WASCUR-Periodograma-2025.png]]
+
+Aparentemente el modelo ha cambiado al incorporar la última parte de la muestra. Pudiera ser que efectivamente el modelo ha cambiado desde la crisis de 2008; o quizás es solo la enorme influencia de unos pocos datos "atípicos" provocados por hechos extraordinarios que no son acordes con el proceso generado de datos habitual. Veremos cómo lidiar con atípicos algunas lecciones más allá.
+
+#+BEGIN_EXPORT latex
+\vspace{10pt}
+\noindent
+\textbf{Código completo de la práctica}
+\lstinputlisting{guiones/P-L05-A-salariosYsueldosDevengados.inp}
+#+END_EXPORT
+
+
+# # +LATEX: \clearpage
+# #+latex: {\vspace{10pt}
+# #+latex: \noindent
+# *Código completo de la práctica* ~P-L05-A-salariosYsueldosDevengados.inp~
+# #+latex: \vspace{10pt}
+# \lstinputlisting{guiones/P-L05-A-salariosYsueldosDevengados.inp}
+# #+LATEX: \clearpage }

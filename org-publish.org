@@ -206,7 +206,7 @@ PRACTICAS_SRC = $(wildcard org-practicas/*.org)
 PRACTICAS_DONE = $(patsubst org-practicas/%.org, $(PRACTICAS_tmp)/%.done, $(PRACTICAS_SRC))
 
 # Objetivo principal de las prácticas en Gretl
-practicas: $(PRACTICAS_DONE)
+practicas: figuras_de_lecciones $(PRACTICAS_DONE)
 	@echo "✅ Todas las prácticas actualizadas."
 
 $(PRACTICAS_tmp)/%.done: org-practicas/%.org
@@ -235,6 +235,10 @@ $(PRACTICAS_tmp)/%.done: org-practicas/%.org
 	echo "➡️ listado de ficheros en el subdirectorio guiones"
 	ls -lR $(PRACTICAS_tmp)/guiones  # Debug para Actions
 
+figuras_de_lecciones:
+	cp -a $(LECCIONES_tmp)/img/lecc04/MA2roots.png $(PRACTICAS_tmp)/img/
+	cp -a $(LECCIONES_tmp)/img/lecc04/ACF-MA1p.png $(PRACTICAS_tmp)/img/
+	cp -a $(LECCIONES_tmp)/img/lecc05/ACF-AR1p.png $(PRACTICAS_tmp)/img/
 
 ORG_FILES := $(wildcard $(LECCIONES_SRC)/src/*.org)
 TMP_FILES := $(patsubst $(LECCIONES_SRC)/src/%.org, $(LECCIONES_tmp)/src/%.org, $(ORG_FILES))
@@ -265,7 +269,7 @@ directorios:
 	mkdir -v -p .github/workflows
 	mkdir -v -p $(LECCIONES_tmp)/src
 	mkdir -v -p $(LECCIONES_tmp)/img
-	mkdir -v -p $(PRACTICAS_tmp)
+	mkdir -v -p $(PRACTICAS_tmp)/img
 	mkdir -v -p $(DOCS)/Lecciones-pdf
 	mkdir -v -p $(DOCS)/.binder
 	mkdir -v -p $(DOCS)/Lecciones-html/img

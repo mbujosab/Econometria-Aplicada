@@ -1,7 +1,7 @@
 
 #    -*- mode: org -*-
 
-#+Title: Lección 5.A - Simulación de procesos AR
+#+Title: Lección 5.B - Simulación de procesos AR
 #+author: Marcos Bujosa
 #+LANGUAGE: es
 #+OPTIONS: toc:nil
@@ -62,15 +62,15 @@
 
 
 #+name: execute-gretl-practice
-#+PROPERTY: P-L05-A-simulacion-procesos-AR
-#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L05-A-simulacion-procesos-AR"
+#+PROPERTY: P-L05-B-simulacion-procesos-AR
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L05-B-simulacion-procesos-AR"
 rm -fr $(pwd)/$practica
 mkdir -p $(pwd)/$practica 
 DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
 # zip $practica $practica.* $practica/*
 #+END_SRC
 
-#+begin_src gretl :tangle guiones/P-L05-A-simulacion-procesos-AR.inp :exports none :eval no
+#+begin_src gretl :tangle guiones/P-L05-B-simulacion-procesos-AR.inp :exports none :eval no
 # Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
 # al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
 #
@@ -90,7 +90,7 @@ set workdir "@directory"
 
 * Objetivo de la práctica
 
-   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-D-simulacion-procesos-AR.inp][P-L05-A-simulacion-procesos-AR.inp]] |
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-D-simulacion-procesos-AR.inp][P-L05-B-simulacion-procesos-AR.inp]] |
 
 En las prácticas anteriores hemos simulado procesos estacionarios MA. Ahora vamos a simular procesos AR (estacionarios) y otros casos de procesos NO estacionarios.
 
@@ -202,7 +202,7 @@ Cuando tenga su función, pruebe su funcionamiento con algún script o guión.
 
 ** Ejemplo de funcionamiento
 
-#+BEGIN_SRC gretl  :noweb tangle  :tangle ./guiones/P-L05-A-simulacion-procesos-AR.inp :eval no
+#+BEGIN_SRC gretl  :noweb tangle  :tangle ./guiones/P-L05-B-simulacion-procesos-AR.inp :eval no
 # establecemos la muestra
 nulldata 200
 setobs 12 1960:01 --time-series
@@ -223,7 +223,7 @@ gnuplot X Y --time-series --with-lines  --output="RandomWalks.png"
 #+CAPTION: Figura con la simulación de dos procesos AR
 #+attr_org: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
-[[file:P-L05-A-simulacion-procesos-AR/RandomWalks.png]]
+[[file:P-L05-B-simulacion-procesos-AR/RandomWalks.png]]
 #+END_CENTER
 
 
@@ -236,7 +236,7 @@ Por ejemplo con el polinomio $\boldsymbol{\phi}(\mathsf{B}) = 1-1.6\mathsf{B}+0.
  (1-1.6\mathsf{B}+.64\mathsf{B}^2)Y_t = U_t,\quad t>0.
 \]
 O expresándolo de otra forma: \(\;Y_t = 1.6Y_{t-1} - 0.64Y_{t-2} + U_t\).
-#+BEGIN_SRC gretl :tangle ./guiones/P-L05-A-simulacion-procesos-AR.inp :eval no
+#+BEGIN_SRC gretl :tangle ./guiones/P-L05-B-simulacion-procesos-AR.inp :eval no
 # Número de simulaciones
 scalar n = 300
 
@@ -261,7 +261,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR
 #+attr_org: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
 #+NAME: fig:MuchosAR2_I
-[[file:P-L05-A-simulacion-procesos-AR/MuchosAR2_I.png]]
+[[file:P-L05-B-simulacion-procesos-AR/MuchosAR2_I.png]]
 #+END_CENTER
 
 La figura [[fig:MuchosAR2_I]] presenta 300 realizaciones del proceso
@@ -269,7 +269,7 @@ La figura [[fig:MuchosAR2_I]] presenta 300 realizaciones del proceso
 con la función que hemos programado. 
 El proceso comienza siempre con el valor cero, pero la probabilidad de que tome valores alejados de cero crece rápidamente, pero se estabiliza inmediatamente. 
 
-#+BEGIN_SRC gretl :tangle ./guiones/P-L05-A-simulacion-procesos-AR.inp :eval no
+#+BEGIN_SRC gretl :tangle ./guiones/P-L05-B-simulacion-procesos-AR.inp :eval no
 # Extraemos las filas como vectores columna.
 # la comilla (') es la transposición
 matrix v1 = M[50,]'
@@ -295,8 +295,8 @@ y la desviación típica es aproximadamente $6$. Si calcula las raíces de este 
 \caption{Dispersión de los 300 paseos aleatorios en t=1, 70, 140 y 200}
 \centering
 \begin{tabular}{ll}
-\includegraphics[width=0.45\textwidth]{./P-L05-A-simulacion-procesos-AR/histograma_t50.png} & \includegraphics[width=0.45\textwidth]{./P-L05-A-simulacion-procesos-AR/histograma_t100.png}\\
-\includegraphics[width=0.45\textwidth]{./P-L05-A-simulacion-procesos-AR/histograma_t150.png} & \includegraphics[width=0.45\textwidth]{./P-L05-A-simulacion-procesos-AR/histograma_t200.png}\\
+\includegraphics[width=0.45\textwidth]{./P-L05-B-simulacion-procesos-AR/histograma_t50.png} & \includegraphics[width=0.45\textwidth]{./P-L05-B-simulacion-procesos-AR/histograma_t100.png}\\
+\includegraphics[width=0.45\textwidth]{./P-L05-B-simulacion-procesos-AR/histograma_t150.png} & \includegraphics[width=0.45\textwidth]{./P-L05-B-simulacion-procesos-AR/histograma_t200.png}\\
 \end{tabular}
 \end{table}
 \end{center}
@@ -305,12 +305,12 @@ y la desviación típica es aproximadamente $6$. Si calcula las raíces de este 
 #+BEGIN_EXPORT html
 <div class="row">
   <div class="column">
-    <img src="./P-L05-A-simulacion-procesos-AR/histograma_t50.png" alt="histograma_t50.png"">
-    <img src="./P-L05-A-simulacion-procesos-AR/histograma_t100.png" alt="histograma_t100.png"">
+    <img src="./P-L05-B-simulacion-procesos-AR/histograma_t50.png" alt="histograma_t50.png"">
+    <img src="./P-L05-B-simulacion-procesos-AR/histograma_t100.png" alt="histograma_t100.png"">
   </div>
   <div class="column">
-    <img src="./P-L05-A-simulacion-procesos-AR/histograma_t150.png" alt="histograma_t150.png"">
-    <img src="./P-L05-A-simulacion-procesos-AR/histograma_t200.png" alt="histograma_t200.png"">
+    <img src="./P-L05-B-simulacion-procesos-AR/histograma_t150.png" alt="histograma_t150.png"">
+    <img src="./P-L05-B-simulacion-procesos-AR/histograma_t200.png" alt="histograma_t200.png"">
   </div>
 </div>
 #+END_EXPORT
@@ -322,7 +322,7 @@ Por ejemplo con el polinomio $\boldsymbol{\phi}(\mathsf{B}) = 1+0.2\mathsf{B}-0.
  (1+0.1\mathsf{B}-0.9\mathsf{B}^2)Y_t = U_t,\quad t>0.
 \]
 O expresado de otra manera: \(\;Y_t = -0.2Y_{t-1} + 0.8Y_{t-2} + U_t\).
-#+BEGIN_SRC gretl :tangle ./guiones/P-L05-A-simulacion-procesos-AR.inp :eval no
+#+BEGIN_SRC gretl :tangle ./guiones/P-L05-B-simulacion-procesos-AR.inp :eval no
 # Número de simulaciones
 scalar n = 300
 
@@ -347,7 +347,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR
 #+attr_org: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
 #+NAME: fig:MuchosAR2_II
-[[file:P-L05-A-simulacion-procesos-AR/MuchosAR2_II.png]]
+[[file:P-L05-B-simulacion-procesos-AR/MuchosAR2_II.png]]
 #+END_CENTER
 
 La figura [[fig:MuchosAR2_II]] presenta 300 realizaciones del modelo no estacionario:
@@ -355,7 +355,7 @@ La figura [[fig:MuchosAR2_II]] presenta 300 realizaciones del modelo no estacion
 con la función que hemos programado. 
 Los primeros valores son cero, pero la probabilidad de que tome valores alejados de cero crece continuamente con $t$.
 
-#+BEGIN_SRC gretl :tangle ./guiones/P-L05-A-simulacion-procesos-AR.inp :eval no
+#+BEGIN_SRC gretl :tangle ./guiones/P-L05-B-simulacion-procesos-AR.inp :eval no
 # Extraemos las filas como vectores columna.
 # la comilla (') es la transposición
 matrix v1 = M[50,]'
@@ -381,8 +381,8 @@ Si calcula las raíces de $\boldsymbol{\phi}(z)=1+0.2\,z-0.8\,z^2$ comprobará q
 \caption{Dispersión de los 300 paseos aleatorios en t=1, 70, 140 y 200}
 \centering
 \begin{tabular}{ll}
-\includegraphics[width=0.45\textwidth]{./P-L05-A-simulacion-procesos-AR/histograma_II_t50.png} & \includegraphics[width=0.45\textwidth]{./P-L05-A-simulacion-procesos-AR/histograma_II_t100.png}\\
-\includegraphics[width=0.45\textwidth]{./P-L05-A-simulacion-procesos-AR/histograma_II_t150.png} & \includegraphics[width=0.45\textwidth]{./P-L05-A-simulacion-procesos-AR/histograma_II_t200.png}\\
+\includegraphics[width=0.45\textwidth]{./P-L05-B-simulacion-procesos-AR/histograma_II_t50.png} & \includegraphics[width=0.45\textwidth]{./P-L05-B-simulacion-procesos-AR/histograma_II_t100.png}\\
+\includegraphics[width=0.45\textwidth]{./P-L05-B-simulacion-procesos-AR/histograma_II_t150.png} & \includegraphics[width=0.45\textwidth]{./P-L05-B-simulacion-procesos-AR/histograma_II_t200.png}\\
 \end{tabular}
 \end{table}
 \end{center}
@@ -391,12 +391,12 @@ Si calcula las raíces de $\boldsymbol{\phi}(z)=1+0.2\,z-0.8\,z^2$ comprobará q
 #+BEGIN_EXPORT html
 <div class="row">
   <div class="column">
-    <img src="./P-L05-A-simulacion-procesos-AR/histograma_II_t50.png" alt="histograma_II_t50.png"">
-    <img src="./P-L05-A-simulacion-procesos-AR/histograma_II_t100.png" alt="histograma_II_t100.png"">
+    <img src="./P-L05-B-simulacion-procesos-AR/histograma_II_t50.png" alt="histograma_II_t50.png"">
+    <img src="./P-L05-B-simulacion-procesos-AR/histograma_II_t100.png" alt="histograma_II_t100.png"">
   </div>
   <div class="column">
-    <img src="./P-L05-A-simulacion-procesos-AR/histograma_II_t150.png" alt="histograma_II_t150.png"">
-    <img src="./P-L05-A-simulacion-procesos-AR/histograma_II_t200.png" alt="histograma_II_t200.png"">
+    <img src="./P-L05-B-simulacion-procesos-AR/histograma_II_t150.png" alt="histograma_II_t150.png"">
+    <img src="./P-L05-B-simulacion-procesos-AR/histograma_II_t200.png" alt="histograma_II_t200.png"">
   </div>
 </div>
 #+END_EXPORT
@@ -413,7 +413,7 @@ Si calcula las raíces de $\boldsymbol{\phi}(z)=1+0.2\,z-0.8\,z^2$ comprobará q
 #+attr_org: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
 #+NAME: fig:RW
-[[file:P-L05-A-simulacion-procesos-AR/RW.png]]
+[[file:P-L05-B-simulacion-procesos-AR/RW.png]]
 #+END_CENTER
 
 
@@ -431,14 +431,14 @@ Si se da cuenta, con esta práctica (y las anteriores) quizá ya tiene todas las
 #+attr_org: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
 #+NAME: fig:ARMA
-[[file:P-L05-A-simulacion-procesos-AR/ARMA.png]]
+[[file:P-L05-B-simulacion-procesos-AR/ARMA.png]]
 #+END_CENTER
 
 * Código completo de la práctica
 
-   | Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L05-A-simulacion-procesos-AR.inp][P-L05-A-simulacion-procesos-AR.inp]] |
+   | Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L05-B-simulacion-procesos-AR.inp][P-L05-B-simulacion-procesos-AR.inp]] |
 
-#+latex: \lstinputlisting{guiones/P-L05-A-simulacion-procesos-AR.inp}
+#+latex: \lstinputlisting{guiones/P-L05-B-simulacion-procesos-AR.inp}
 
 
 * Posibles resoluciones
@@ -536,12 +536,12 @@ end function
 
 ** Actividad 5
 
-#+BEGIN_SRC gretl :tangle ./guiones/P-L05-A-simulacion-procesos-AR.inp :eval no
+#+BEGIN_SRC gretl :tangle ./guiones/P-L05-B-simulacion-procesos-AR.inp :eval no
 series RW = SimuladorAR( {1, -1} )
 gnuplot RW --time-series --with-lines  { set nokey; } --output="RW.png"
 #+END_SRC
 
-#+BEGIN_SRC gretl :tangle ./guiones/P-L05-A-simulacion-procesos-AR.inp :eval no
+#+BEGIN_SRC gretl :tangle ./guiones/P-L05-B-simulacion-procesos-AR.inp :eval no
 # recuperamos nuesta función de la práctica anterior
 function series SimuladorMA(matrix theta)
     # SimuladorMA(theta) simula un proceso MA(q), 
