@@ -1,0 +1,115 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+function series SimuladorMA(matrix theta)
+    # SimuladorMA(theta) simula un proceso MA(q), 
+    # donde theta es el polinomio MA y q es su grado.
+    series WN = normal (0,1)
+    series X = 0
+
+    loop i=1..cols(theta)
+        X = X + theta[i]*WN(1-i)
+    endloop
+    
+    return X
+end function
+
+# establecemos la muestra
+nulldata 600
+setobs 12 1900:01 --time-series
+
+scalar theta = -0.9
+set seed 123409
+series X = SimuladorMA( {1, -theta} )
+gnuplot X --time-series --with-lines  --output="MA-0.9.png"
+corrgm X 20 --plot="MA-0.9-ACF-PACF.png"
+
+set seed 123409
+series XNI = SimuladorMA( {1, -1/theta} )
+gnuplot XNI --time-series --with-lines  --output="MA-1.111.png"
+corrgm XNI 20 --plot="MA-1.111-ACF-PACF.png"
+
+scalar theta = -0.8
+set seed 123408
+series Y = SimuladorMA( {1, -theta} )
+gnuplot Y --time-series --with-lines  --output="MA-0.8.png"
+corrgm Y 20 --plot="MA-0.8-ACF-PACF.png"
+
+set seed 123408
+series YNI = SimuladorMA( {1, -1/theta} )
+gnuplot YNI --time-series --with-lines  --output="MA-1.25.png"
+corrgm YNI 20 --plot="MA-1.25-ACF-PACF.png"
+
+scalar theta = -0.5
+set seed 123405
+series Z = SimuladorMA( {1, -theta} )
+gnuplot Z --time-series --with-lines  --output="MA-0.5.png"
+corrgm Z 20 --plot="MA-0.5-ACF-PACF.png"
+
+set seed 123405
+series ZNI = SimuladorMA( {1, -1/theta} )
+gnuplot ZNI --time-series --with-lines  --output="MA-2.png"
+corrgm ZNI 20 --plot="MA-2-ACF-PACF.png"
+
+scalar theta = -0.25
+set seed 123425
+series W = SimuladorMA( {1, -theta} )
+gnuplot W --time-series --with-lines  --output="MA-0.25.png"
+corrgm W 20 --plot="MA-0.25-ACF-PACF.png"
+
+set seed 123425
+series WNI = SimuladorMA( {1, -1/theta} )
+gnuplot WNI --time-series --with-lines  --output="MA-4.png"
+corrgm WNI 20 --plot="MA-4-ACF-PACF.png"
+
+scalar theta = 0.9
+set seed 123409
+series A = SimuladorMA( {1, -theta} )
+gnuplot A --time-series --with-lines  --output="MA+0.9.png"
+corrgm A 20 --plot="MA+0.9-ACF-PACF.png"
+
+set seed 123409
+series ANI = SimuladorMA( {1, -1/theta} )
+gnuplot ANI --time-series --with-lines  --output="MA+1.111.png"
+corrgm ANI 20 --plot="MA+1.111-ACF-PACF.png"
+
+scalar theta = 0.8
+set seed 123408
+series B = SimuladorMA( {1, -theta} )
+gnuplot B --time-series --with-lines  --output="MA+0.8.png"
+corrgm B 20 --plot="MA+0.8-ACF-PACF.png"
+
+set seed 123408
+series BNI = SimuladorMA( {1, -1/theta} )
+gnuplot BNI --time-series --with-lines  --output="MA+1.25.png"
+corrgm BNI 20 --plot="MA+1.25-ACF-PACF.png"
+
+scalar theta = 0.5
+set seed 123405
+series C = SimuladorMA( {1, -theta} )
+gnuplot C --time-series --with-lines  --output="MA+0.5.png"
+corrgm C 20 --plot="MA+0.5-ACF-PACF.png"
+
+set seed 123405
+series CNI = SimuladorMA( {1, -1/theta} )
+gnuplot CNI --time-series --with-lines  --output="MA+2.png"
+corrgm CNI 20 --plot="MA+2-ACF-PACF.png"
+
+set seed 123425
+scalar theta = 0.25
+series W = SimuladorMA( {1, -theta} )
+gnuplot W --time-series --with-lines  --output="MA+0.25.png"
+corrgm W 20 --plot="MA+0.25-ACF-PACF.png"
+
+set seed 123425
+series WNI = SimuladorMA( {1, -1/theta} )
+gnuplot WNI --time-series --with-lines  --output="MA+4.png"
+corrgm WNI 20 --plot="MA+4-ACF-PACF.png"

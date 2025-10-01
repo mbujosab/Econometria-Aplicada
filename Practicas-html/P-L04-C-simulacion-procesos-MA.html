@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
+<head>
+<!-- 2025-10-01 Wed 10:53 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lección 4.C - Simulación de procesos MA(2) en la región de invertibilidad</title>
+<meta name="generator" content="Org Mode" />
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Lección 4.C - Simulación de procesos MA(2) en la región de invertibilidad</h1>
+<div id="outline-container-org360c233" class="outline-2">
+<h2 id="org360c233">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-org360c233">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="org-left">Guión:</td>
+<td class="org-left"><a href="https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L04-C-simulacion-procesos-MA.inp">P-L04-C-simulacion-procesos-MA.inp</a></td>
+</tr>
+</tbody>
+</table>
+
+<p>
+<b>Objetivo</b>
+</p>
+
+<ol class="org-ol">
+<li>Observar la ACF y PACF de distintos modelos MA(\(2\)) en las distintas regiones del triángulo de invertibilidad.</li>
+</ol>
+
+<p>
+<b>Requerimientos previos</b>
+</p>
+
+<p>
+Programe o recupere de una práctica anterior una función que simule procesos MA(\(q\))
+</p>
+<div class="org-src-container">
+<pre class="src src-gretl" id="org22a0d5a"><code>function series SimuladorMA(matrix theta)
+    # SimuladorMA(theta) simula un proceso MA(q), 
+    # donde theta es el polinomio MA y q es su grado.
+    series WN = normal (0,1)
+    series X = 0
+
+    loop i=1..cols(theta)
+        X = X + theta[i]*WN(1-i)
+    endloop
+    
+    return X
+end function
+</code></pre>
+</div>
+
+<p>
+Para que se observe bien la estructura de las ACF y PACF estimadas, establezca un tamaño de muestra suficientemente grande.
+</p>
+<div class="org-src-container">
+<pre class="src src-gretl"><code># establecemos la muestra
+nulldata 3500
+setobs 12 1900:01 --time-series
+</code></pre>
+</div>
+
+<p>
+Recuerde cómo usar la función
+</p>
+<div class="org-src-container">
+<pre class="src src-gretl"><code>scalar theta1 = 0
+scalar theta2 = 0.8
+series X = SimuladorMA( {1, -theta1,  -theta2} )
+figura &lt;- corrgm X 12
+</code></pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org36848aa" class="outline-2">
+<h2 id="org36848aa">Actividad 1 - Probando pares de valores en distintas regiones de invertibilidad</h2>
+<div class="outline-text-2" id="text-org36848aa">
+<p>
+Asigne varios pares de valores \(\theta_1\) y \(\theta_2\) que pertenezcan a cada una de las regiones indicadas en la figura y explore cómo se comportan la AFC y PACF en cada caso.
+</p>
+
+<div class="org-center">
+
+<div id="orgb81add8" class="figure">
+<p><img src="file:///home/runner/SynologyDrive/ReposGH/Docencia/Econometria-Aplicada/Lecciones-tmp/img/lecc04/MA2roots.png" alt="MA2roots.png" width="600px" />
+</p>
+</div>
+</div>
+
+<p>
+\[
+\rho_1=\frac{-\theta_1(1-\theta_2)}{1+\theta_1^2++\theta_2^2}
+;\qquad
+\rho_2=\frac{-\theta_2}{1+\theta_1^2++\theta_2^2}
+;\qquad
+\pi_1=\rho_1
+;\qquad
+\pi_2=\frac{\rho_2-\rho_1^2}{1-\rho_1^2}
+;\qquad
+\pi_3=\frac{\rho_1^3-\rho_1\rho_2(2-\rho_2)}{1-\rho_1^2-2\rho_1^2(1-\rho_2)}
+;\quad\dots
+\]
+</p>
+</div>
+<div id="outline-container-org17539ce" class="outline-3">
+<h3 id="org17539ce">Zona 1</h3>
+<div class="outline-text-3" id="text-org17539ce">
+<p>
+Correlogramas en zona 3
+</p>
+<ul class="org-ul">
+<li>\(\theta_2=0.5\)</li>
+<li>\(\theta_1=0,\quad0.1,\quad0.2,\quad0.3,\quad0.4,\quad0.5\).</li>
+</ul>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-1(0.0-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-2(0.1-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-3(0.2-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-4(0.3-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-5(0.4-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-6(0.5-0.5).png" style="max-width:16%; height:auto;"/>
+</div>
+</div>
+</div>
+<div id="outline-container-org1496347" class="outline-3">
+<h3 id="org1496347">Zona 2</h3>
+<div class="outline-text-3" id="text-org1496347">
+<p>
+Correlogramas en zona 3
+</p>
+<ul class="org-ul">
+<li>\(\theta_2=-0.5\)</li>
+<li>\(\theta_1=-0.5,\quad-0.4,\quad-0.3,\quad-0.2,\quad-0.1,\quad0\).</li>
+</ul>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-1(-0.5-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-2(-0.4-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-3(-0.3-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-4(-0.2-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-5(-0.1-0.5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-6(-0.0-0.5).png" style="max-width:16%; height:auto;"/>
+</div>
+</div>
+</div>
+<div id="outline-container-orgeb7b388" class="outline-3">
+<h3 id="orgeb7b388">Zona 3</h3>
+<div class="outline-text-3" id="text-orgeb7b388">
+<p>
+Correlogramas en zona 3
+</p>
+<ul class="org-ul">
+<li>\(\theta_2=-0.99\)</li>
+<li>\(\theta_1=-1.99,\quad-1.6,\quad-1.2,\quad-0.8,\quad-0.4,\quad0\).</li>
+</ul>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-1(-2.0--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-2(-1.6--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-3(-1.2--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-4(-0.8--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-5(-0.4--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-6(-0.0--1.0).png" style="max-width:16%; height:auto;"/>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf5d3572" class="outline-3">
+<h3 id="orgf5d3572">Zona 4</h3>
+<div class="outline-text-3" id="text-orgf5d3572">
+<p>
+Correlogramas en zona 4
+</p>
+<ul class="org-ul">
+<li>\(\theta_2=-0.99\)</li>
+<li>\(\theta_1=0,\quad0.4,\quad0.8,\quad1.2,\quad1.6,\quad1.99\).</li>
+</ul>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-1(0.0--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-2(0.4--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-3(0.8--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-4(1.2--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-5(1.6--1.0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-6(2.0--1.0).png" style="max-width:16%; height:auto;"/>
+</div>
+</div>
+</div>
+<div id="outline-container-orga75855d" class="outline-3">
+<h3 id="orga75855d">Eje vertical</h3>
+<div class="outline-text-3" id="text-orga75855d">
+<p>
+Correlogramas en zona 3
+</p>
+<ul class="org-ul">
+<li>\(\theta_1=0\)</li>
+<li>\(\theta_2\approx-1,\quad-0.7,\quad-0.3,\quad0,\quad0.3,\quad0.7,\quad1\).</li>
+</ul>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-1(0.0--1.0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-2(0.0--0.7).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-3(0.0--0.3).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-4(0.0-0.0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-5(0.0-0.3).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-6(0.0-0.7).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-7(0.0-1.0).png" style="max-width:13.5%; height:auto;"/>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb42715f" class="outline-3">
+<h3 id="orgb42715f">Parábola</h3>
+<div class="outline-text-3" id="text-orgb42715f">
+<p>
+Correlogramas en zona 3
+</p>
+<ul class="org-ul">
+<li>\(\theta_1=-1.5,\quad-1,\quad-0.5,\quad0,\quad0.5,\quad1,\quad1.5\).</li>
+<li>\(\theta_2=\frac{\theta_1^2}{4}\)</li>
+</ul>
+
+<div style="display: flex; justify-content: center; gap: 10px;">
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-1(-1.5-0.6).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-2(-1.0-0.3).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-3(-0.5-0.1).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-4(0.0-0.0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-5(0.5-0.1).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-6(1.0-0.3).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-7(1.5-0.6).png" style="max-width:13.5%; height:auto;"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="date">Created: 2025-10-01 Wed 10:53</p>
+</div>
+</body>
+</html>

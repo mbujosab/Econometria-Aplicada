@@ -1,0 +1,24 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../datos/tempmundo.csv
+setobs 12 1881:01
+setinfo Temperature_Deviations --description="Temperaturas mensuales en desviaciones respecto a la media calculada entre los años 1951 y 1975"
+
+DesvTemp <- gnuplot Temperature_Deviations --time-series --with-lines  --output="Temperaturas.png"
+
+diff Temperature_Deviations
+
+Dif_DesvTemp <- gnuplot d_Temperature_Deviations --time-series --with-lines --output="Dif_Temperaturas.png"
+
+corrgm d_Temperature_Deviations 31 --plot="Dif_Temperature_Deviations-ACF-PACF.png"
+
+pergm d_Temperature_Deviations --plot="Dif_Temperature_Deviations-Periodograma.png"

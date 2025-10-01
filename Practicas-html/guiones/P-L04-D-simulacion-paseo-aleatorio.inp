@@ -1,0 +1,69 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+# establecemos la muestra
+nulldata 200
+setobs 12 1960:01 --time-series
+
+function series SimuladorRW(void)
+    # Simula un paseo aleatorio de longitud igual al tamaño de la muestra
+    # a partir de un proceso de ruido blanco gausiano.
+
+    series RW = normal(0,1)
+
+    loop i = 2..$nobs
+        RW[i] = RW[i] + RW[i-1]
+    endloop
+
+    setinfo RW --description="Paseo aleatorio"
+    
+    return RW
+    
+end function
+
+# Simulamos dos paseos aleatorios usando nuestra función
+series X = SimuladorRW()
+series Y = SimuladorRW()
+
+# Los graficamos juntos en un fichero 
+gnuplot X Y --time-series --with-lines  --output="RandomWalks.png"
+
+# Número de simulaciones
+scalar n = 300
+
+# Preasignamos una matriz para guardar cada simulación en una columna
+matrix M = zeros($nobs, n)
+
+# Bucle sobre las columnas
+loop j=1..n --quiet
+    # Simulamos un RW y Copiamos la serie en la columna j de la matriz
+    M[, j] = SimuladorRW()
+endloop
+
+gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosRandomWalks.png"
+
+# Extraemos las filas como vectores columna.
+# la comilla (') es la transposición
+matrix v1 = M[1,]'
+matrix v2 = M[70,]'
+matrix v3 = M[140,]'
+matrix v4 = M[200,]'
+
+# Dibujar histograma
+freq --matrix=v1 --nbins=15 --normal --plot="histograma_t1.png"
+freq --matrix=v2 --nbins=15 --normal --plot="histograma_t70.png"
+freq --matrix=v3 --nbins=15 --normal --plot="histograma_t140.png"
+freq --matrix=v4 --nbins=15 --normal --plot="histograma_t200.png"
+
+series Z = SimuladorRW()
+gnuplot Z --time-series --with-lines  --output="RandomWalk.png" # graficamos los datos simulados 
+corrgm Z 20 --plot="ACF-PACF-RW.png"                            # correlograma
+pergm Z --plot="Periodograma-RW.png"                            # periodograma
