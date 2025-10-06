@@ -18,7 +18,7 @@
 # https://quantecon.org/
 
 #+include: 00preambulo_lecciones.txt
-
+#+LaTeX_HEADER: \DeclareMathOperator*{\plim}{plim}
 
 #+begin_src emacs-lisp :results silent :exports none
   (org-babel-do-load-languages
@@ -115,7 +115,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 # +latex: \newpage
 
 
-* Identificación y diagnosis
+* Identificación
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
@@ -134,7 +134,7 @@ preguntas:
 4) ¿Es persistente la PACF? ¿sigue alguna pauta reconocible?
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
-- La identificación se apoya en estadísticos muestrales (media, autocorrelaciones, etc.) cuya representatividad respecto del proceso estocástico subyacente depende de la estacionariedad y la ergodicidad.
+- La identificación se apoya en estadísticos muestrales (media, autocorrelaciones, etc.) cuya representatividad respecto del proceso estocástico subyacente depende de la estacionariedad y la ergodicidad[fn::Véase la sección [[id:53eeba38-4fe7-432c-84f5-a5e9a0dc0808][Introducción intuitiva e informal al concepto de ergodicidad]].].
 - Tras inducir la estacionariedad, especificamos un modelo tentativo decidiendo cuál de las funciones ACF o PACF es finita y cuál es persistente
 #+latex: \medskip
 
@@ -150,7 +150,7 @@ La parametrización de mayor orden en modelos ARMA con series económicas suele 
 
 ** Instrumentos de identificación
    :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . slide)))
+   :metadata: (slideshow . ((slide_type . subslide)))
    :END:
 
 #+ATTR_HTML: :border 2 :rules all :frame border
@@ -164,10 +164,71 @@ La parametrización de mayor orden en modelos ARMA con series económicas suele 
 | $q$, orden MA.                                          | Si ACF cae abruptamente en el retardo $q$ y PACF  decae lentamente.                                                                 | En series económicas q suele ser $\leq1$.                                                                                            |
 #+latex: \medskip
 
+
+* Estimación por máxima verosimilitud
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+# +attr_ipynb: (slideshow . ((slide_type . slide)))
+Los parámetros de los modelos ARMA se estiman por máxima verosimilitud exacta (resolviendo un sistema de ecuaciones no lineales de forma iterativa).
+
+** Propiedades de los estimadores de máxima verosimilitud (MV)
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+- Invarianza :: Si $\hat{\beta}^{MV}$ es el estimador de máxima verosimilitud de $\beta$ y $g(\beta)$ es una función continua, entonces el estimador de máxima verosimilitud de $g(\beta)$ es $g(\hat{\beta}^{MV})$.
+  #+attr_ipynb: (slideshow . ((slide_type . skip)))
+  - Ejemplo. :: Si $\hat{\sigma}^2_{MV}$ es el estimador MV de $\sigma^2$, entonces el estimador MV de $\sigma$ es $\sqrt{\hat{\sigma}^2_{MV}}$.
+
+
+- Consistencia :: A medida que el tamaño muestral $n$ crece, el estimador $\hat{\beta}^{MV}$ se aproxima en probabilidad al valor verdadero $\beta$.
+  \[
+  \operatorname*{plim}\limits_{n \to \infty} \hat{\beta}^{MV} = \beta
+  %\mathop{\mathrm{plim}}
+  \]
+  #+attr_ipynb: (slideshow . ((slide_type . skip)))
+   Es decir, a medida que crece la muestra, la probabilidad de estimar valores alejados del verdadero valor tiende a cero; formalmente y de manera más explícita: 
+   $$\forall \epsilon > 0,\; \lim_{n\to\infty}P\Big(\lvert\hat{\beta}^{MV}​-\beta\rvert>\epsilon\Big)=0.$$
+
+- Insesgadez asintótica ::   El estimador puede ser sesgado en muestras pequeñas, pero su sesgo desaparece conforme $n \to \infty$. Es decir, el valor esperado converge al parámetro verdadero.
+  \[
+  \lim_{n \to \infty} E\Big(\hat{\beta}^{MV}_n\Big) = \beta
+  \]
+  #+attr_ipynb: (slideshow . ((slide_type . skip)))
+  - Diferencia con insesgadez :: Un estimador *insesgado* cumple $E[\hat{\beta}] = \beta$ para todo $n$, mientras que un estimador *asintóticamente insesgado* lo cumple solo en el límite.
+
+- Eficiencia asintótica :: El estimador se vuelve más preciso a medida que crece $n$. Su varianza tiende a cero, concentrándose alrededor del valor verdadero.
+  \[
+  \lim_{n \to \infty} Var\Big(\hat{\beta}^{MV}_n\Big) = 0
+  \]
+  #+attr_ipynb: (slideshow . ((slide_type . skip)))
+  - Nota :: Bajo condiciones regulares, el MLE es *asintóticamente eficiente*, es decir, alcanza la menor varianza posible entre los estimadores consistentes (cota de Cramér–Rao).
+
+#+LATEX: \renewcommand{\arraystretch}{1.4}
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+#+ATTR_LATEX: :environment longtable :align p{3.5cm}p{12cm}
+| Propiedades           | Significado                                                                                                                                                             |
+|-----------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Invarianza            | Si $\hat{\beta}^{MV}$ es el estimador de máxima verosimilitud de $\beta$, entonces el estimador de máxima verosimilitud de $g(\beta)$ es $g\big(\hat{\beta}^{MV}\big)$. |
+| Consistencia          | $\forall \epsilon > 0, \lim\limits_{n\to\infty}P\Big(\lvert\hat{\beta}^{MV}​-\beta\rvert>\epsilon\Big)=0$                                                               |
+| Insesgadez asintótica | $\lim\limits_{n \to \infty} E\Big(\hat{\beta}^{MV}_n\Big) = \beta$                                                                                                      |
+| Eficiencia asintótica | $\lim\limits_{n \to \infty} Var\Big(\hat{\beta}^{MV}_n\Big) = 0$                                                                                                        |
+#+LATEX: \renewcommand{\arraystretch}{1}
+
+
+* Diagnosis
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
 ** Instrumentos de diagnosis
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . slide)))
 
 #+ATTR_HTML: :border 2 :rules all :frame border
 #+ATTR_LATEX: :environment longtable :align p{2.3cm}p{5.5cm}p{7.2cm}
@@ -178,12 +239,85 @@ La parametrización de mayor orden en modelos ARMA con series económicas suele 
 | Constante                                               | Media de los residuos.                                     | Si es significativa: añadir una  constante.                                                                      |
 | Constante                                               | Constante estimada.                                        | Si NO es significativa: el modelo mejorará quitando el término constante.                                        |
 | $p$ y $q$,                                              | Contrastes de significación de los parámetros estimados.   | Pueden sugerir eliminar parámetros irrelevantes.                                                                 |
-| $p$ y $q$,                                              | ACF/PACF residuos. Test Q de Ljung-Box.                    | Indican posibles pautas de autocorrelación no modelizadas.                                                       |
+| $p$ y $q$,                                              | ACF/PACF residuos. Test Q de Ljung-Box para la ACF.        | Indican posibles pautas de autocorrelación no modelizadas.                                                       |
 | $p$ y $q$,                                              | Correlaciones elevadas entre los parámetros estimados.     | Puede ser síntoma de sobreparametrización.                                                                       |
 
-#+attr_ipynb: (slideshow . ((slide_type . subslide)))
-Una vez superadas las pruebas de diagnostico, aún se puede aplicar un análisis exploratorio; consistente en añadir parámetros AR y/o MA para comprobar si resultan significativos y mejoran el modelo.
+
+# *** Sobrediferenciación e infradiferenicación
+#    :PROPERTIES:
+#    :metadata: (slideshow . ((slide_type . subslide)))
+#    :END:
+# 
+# - si diferenciamos de más :: pérdida de eficiencia en la estimación. Aumento de la varianza
+# - ss diferenciamos de menos :: se cometen errores de predicción crecientes con el horizonte y se subestima la varianza de la predicción. Modelo poco robusto (grandes cambios en las estimaciones ante pequeños cambios muestrales).
+
+*** Reformulación
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+Siempre debemos analizar las características de los residuos.
+- Si los residuos presentan correlación serial debemos reformular el modelo.
+  - Ejemplo :: Supongamos que hemos estimado un modelo AR(1) y el correlograma de los residuos presenta estructura MA(1): 
+    debemos estimar un modelo ARMA(1,1) y analizar los nuevos residuos y la significatividad de los parámentos
+
+*** Componentes deterministas
+Un MA(1) con parámetro próximo a 1 puede indicar sobrediferenciación, pero también la presencia de una componente determinista.
+ - Ejemplo :: El modelo $(1-\mathsf{B})Y_t=\beta+(1-\theta\mathsf{B}) U_t$ es equivalente al modelo $Y_t = \beta t + U_t$ cuando $\theta=1$.
+
+   #+latex: \noindent
+  (fíjese que el primer modelo no es invertible; y el segundo no es estacionario).
+
  
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+Una vez superadas las pruebas de diagnostico, aún se puede aplicar un análisis exploratorio; consistente en añadir parámetros AR o MA para comprobar si resultan significativos y mejoran el modelo.
+- no aumentar los órdenes autorregresivos y de medias móviles simultáneamente.
+
+*** Otras herramientas estadísticas a usar, una vez comprobada la ausencia de correlación serial en los residuos
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+
+# *** Estadísticos descriptivos
+#    :PROPERTIES:
+#    :metadata: (slideshow . ((slide_type . slide)))
+#    :END:
+# 
+# - el nivel de la serie (media, mediana),
+# - valores extremos (máximo y mínimo). A veces son outliers o errores de registro
+# - dispersión de la variable (desviación típica, coeficiente de variación, rango, rango interpercentiles, rango intercuartílico)
+# - otros momentos (asimetría, exceso de curtosis)
+
+**** Término constante.
+Cuando el modelo ni tiene término constante:
+contrastar si la media de los residuos es significativa ( $H_0: \mu = 0$) para decidir si incorporarlo
+\[
+\frac{\widehat{\mu}}{\widehat{dt(\widehat{\mu})}}\underset{H_0}{\sim}t_{n-1};\qquad
+\widehat{dt(\widehat{\mu})}=\frac{\widehat{\sigma}}{\sqrt{n}}.
+\]
+
+**** Verificar visualmente que la varianza de los residuos es constante.
+
+**** Contrastar la normalidad de los residuos con el test Jarque-Bera.
+[[https://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test][Jarque-Bera test (Wikipedia)]]
+- La transformación logarítmica :: suele inducir normalidad si no hay datos negativos.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :exports code :results raw
+from scipy import stats
+rng = np.random.default_rng()
+x = rng.normal(0, 1, 100000)
+jarque_bera_test = stats.jarque_bera(x)
+jarque_bera_test
+# jarque_bera_test.statistic
+# jarque_bera_test.pvalue
+#+END_SRC
+
+#+RESULTS:
+: SignificanceResult(statistic=0.8177207377470701, pvalue=0.6644069977431221)
+
+# - Si hay valores atípicos :: el mejor tratamiento es /intervenirlos/.
+
 
 * Raíces unitarias
    :PROPERTIES:
@@ -218,7 +352,6 @@ es decir
 \[
  \boldsymbol{\phi}_p(\mathsf{B})\nabla^d Y_t = \boldsymbol{\theta}_q(\mathsf{B}) U_t; \quad t\in\mathbb{Z}.
 \]
-
 
 ** Raíces unitarias en los polinomios AR y MA
    :PROPERTIES:
@@ -284,6 +417,9 @@ fig.savefig('./img/lecc07/ACF-RW.png', dpi=300, bbox_inches='tight')
 [[./img/lecc07/ACF-RW.png]]
 
 
+# +latex: \newpage
+
+
 * Modelos ARIMA estacionales (SARIMA)
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
@@ -292,13 +428,10 @@ fig.savefig('./img/lecc07/ACF-RW.png', dpi=300, bbox_inches='tight')
 El período estacional $S$ es el número mínimo de observaciones necesarias para recorrer un ciclo estacional completo. 
 Por ejemplo, $S=12$ para datos mensuales, $S=4$ para datos trimestrales, $S=24$ para datos horarios, etc.
 
-Describiremos comportamientos estacionales con modelos ARIMA$(p,d,q)\times(P,D,Q)_S$ 
-\[
- \boldsymbol{\phi}_p(\mathsf{B})\boldsymbol{\Phi}_P(\mathsf{B}^S)\nabla^d\nabla_{_S}^D Y_t
- =
- \boldsymbol{\theta}_q(\mathsf{B})\boldsymbol{\Theta}_q(\mathsf{B}^S) U_t; 
- \quad t\in\mathbb{Z}
-\]
+Captamos la estacionalidad con modelos ARIMA$(p,d,q)\times(P,D,Q)_S$ 
+\[\boldsymbol{\phi}_p(\mathsf{B})\,\boldsymbol{\Phi}_P(\mathsf{B}^S)\,\nabla^d\,\nabla_{_S}^D\, Y_t
+ =\boldsymbol{\theta}_q(\mathsf{B})\,\boldsymbol{\Theta}_q(\mathsf{B}^S)\, U_t; 
+ \quad t\in\mathbb{Z}\]
 donde
 \begin{align*}
  \boldsymbol{\Phi}_P(\mathsf{B}^S)  = & 1-\Phi_1\mathsf{B}^{1\cdot S}-\Phi_2\mathsf{B}^{2\cdot S}-\cdots-\Phi_P\mathsf{B}^{P\cdot S}\\
@@ -360,7 +493,6 @@ fig.savefig('./img/lecc07/Sim-SMA1p.png', dpi=300, bbox_inches='tight')
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
 [[./img/lecc07/Sim-SMA1p.png]]
-
 
 ** AR(1) estacional con raíz positiva
    :PROPERTIES:
@@ -498,7 +630,6 @@ fig.savefig('./img/lecc07/Sim-AR1SMA1.png', dpi=300, bbox_inches='tight')
 #+attr_latex: :width 425px
 [[./img/lecc07/Sim-AR1SMA1.png]]
 
-
 ** ARIMA (1,0,0)x(1,0,0) 
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . notes)))
@@ -535,7 +666,6 @@ fig.savefig('./img/lecc07/Sim-AR1SAR1.png', dpi=300, bbox_inches='tight')
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
 [[./img/lecc07/Sim-AR1SAR1.png]]
-
 
 ** ARIMA (0,0,1)x(1,0,0) 
    :PROPERTIES:
@@ -631,6 +761,68 @@ Tres fases:
 Si la diagnosis no es satisfactoria, se vuelve a la primera fase.
 
 Si la diagnosis es satisfactoria... ¡hemos logrado un modelo aceptable!... que podremos usar para realizar pronósticos.
+
+
+* Introducción intuitiva e informal al concepto de ergodicidad
+:PROPERTIES:
+:metadata: (slideshow . ((slide_type . skip)))
+:ID:       53eeba38-4fe7-432c-84f5-a5e9a0dc0808
+:END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+La *ergodicidad* de un proceso estocástico es importante porque conecta el comportamiento en el tiempo de una sola realización del proceso con las propiedades estadísticas del conjunto de todas las posibles realizaciones. En otras palabras, nos dice cuándo “promediar en la muestra” puede arrojar un buen estimador de algún momento teórico. Es decir, si el proceso es *ergódico*:
+- estimadores como la media muestral, la varianza muestral o las autocorrelaciones son *consistentes y útiles*, porque en el límite nos dan el verdadero parámetro poblacional.
+  Por ejemplo, cuando el proceso es ergódico, el *promedio* de una sola realización (la media muestral de una serie larga) *converge* al valor esperado teórico (el promedio de la distribución incondicional del proceso).
+- En muchas aplicaciones, eso también se traduce en eficiencia asintótica (dependiendo del tipo de proceso y del estimador).
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+En cambio, si el proceso *no es ergódico* los promedios en el tiempo dependen de la trayectoria concreta observada, y pueden *no coincidir* con los momentos teóricos.
+- En tal caso, un estimador basado en una única realización puede estar *sesgado* o ser *inconsistente*: no converge al parámetro teórico, sino a algo dependiente de la trayectoria particular. 
+  Lo cual significa que los métodos estadísticos usuales de series temporales (media muestral, autocorrelaciones, regresiones dinámicas) dejan de ser fiables.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+En términos prácticos: la ergodicidad es lo que “salva” la inferencia empírica. Sin ergodicidad, trabajar con datos de una sola realización en el tiempo (que es lo que tenemos en economía, física o finanzas) no nos dice realmente cómo es la distribución del proceso estocástico.
+- Si un proceso es ergódico, entonces una única trayectoria suficientemente larga contiene información estadística suficiente para realizar inferencia estadística sobre el proceso estocástico.
+- Esto significa que podemos estimar valores esperados (media, varianza, correlaciones) observando un solo experimento durante mucho tiempo, sin necesidad de repetirlo muchas veces.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+- En la práctica, cuando medimos fenómenos físicos, económicos o sociales, solo observamos *una* trayectoria del proceso (ejemplo: una serie temporal de precios).
+- La ergodicidad garantiza que los cálculos hechos sobre esa única serie son representativos de la distribución subyacente.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+- La ergodicidad suele estudiarse en procesos estacionarios. No todos los procesos estacionarios son ergódicos, pero la ergodicidad asegura que la ``estabilidad en el tiempo'' realmente refleja la ``estabilidad en probabilidad''.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+- Implicaciones en teoría y aplicaciones:
+  - En estadística de series temporales: justifica el uso de una muestra temporal.
+  - En economía: permite usar datos históricos de una variable para inferir expectativas a largo plazo.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+En resumen: la ergodicidad es crucial porque es lo que hace posible inferir la estructura probabilística de un proceso observando solo una realización larga en el tiempo, algo que es lo habitual en el mundo real.
+
+** Ejemplo de un proceso no ergódico
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Consideremos un proceso de Bernoulli con un /parámetro aleatorio fijo/ $p$:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+1. Primero se elige al azar una probabilidad $p$ con distribución uniforme en el intervalo $[0,1]$.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+2 Luego se genera una secuencia infinita de lanzamientos de moneda con esa probabilidad $p$.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+En dicho experimento, como el valor esperado para el parámetro $p$ es $0.5$ (es el valor esperado de una distribución uniforme $[0,1]$), la esperanza de un lanzamiento es $E(X)=p=0.5$; 
+y si promediáramos los promedios de muchas realizaciones de esas secuencias infinitas, nos aproximaríamos al verdadero valor esperado $E(X)=0.5$. 
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Pero si tan solo tenemos una realización del proceso, a largo plazo el promedio temporal de la secuencia tenderá casi seguro al valor particular de $p$ que nos haya salido al principio, que no es necesariamente a $0.5$.
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Por tanto, este proceso no es ergódico: los promedios temporales dependen de la trayectoria inicial (dependen del valor de $p$ que nos ``tocó'' inicialmente).
 
 
 * COMMENT ipynb y slides                                           :noexport:

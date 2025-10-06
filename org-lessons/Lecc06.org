@@ -19,6 +19,8 @@
 
 #+include: 00preambulo_lecciones.txt
 
+# +LATEX_HEADER: \PassOptionsToPackage{table}{xcolor}
+# +LATEX_HEADER: \definecolor{lightgray}{gray}{0.9}
 
 #+begin_src emacs-lisp :results silent :exports none
   (org-babel-do-load-languages
@@ -112,6 +114,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 #+latex: \newpage
 
+
 * ACF, PACF y densidad espectral de algunos modelos lineales
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . skip)))
@@ -128,11 +131,11 @@ de la ecuación en diferencias:
 $$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}$$
 donde $\;\boldsymbol{U}\sim WN(0,\sigma^2);\;$ el polinomio
 /autorregresivo/ $\;\boldsymbol{\phi}\;$ tiene _grado_ $p$ con
-${{\phi_{0}=1}}$ (y raíces fuera del círculo unidad), y
+${{\phi_{0}=1}}$, y
 el polinomio /de media móvil/ $\;\boldsymbol{\theta}\;$ es de _grado_
 $q$ con ${{\theta_{0}=1}};\;$ y donde
-$\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ no tienen raíces comunes.
-#+latex:\medskip
+$\boldsymbol{\phi}$ y $\boldsymbol{\theta}$ tienen sus raíces fuera del círculo unidad (y ninguna es común; i.e., /no se pueden cancelar/).
+# +latex:\medskip
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
 Si $\;\;\boldsymbol{\phi}(z)=1-\phi_1z-\cdots-\phi_p z^p\;\;$ y
@@ -144,7 +147,6 @@ entonces
 \end{align*}
 y por tanto $$X_t= U_t + \sum_{j=1}^p\phi_j X_{t-j} +
 \sum_{j=1}^q-\theta_j U_{t-j}.$$
-
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
 Como las raíces de $\boldsymbol{\phi}$ están fuera del círculo unidad,
@@ -158,35 +160,37 @@ $$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}
 donde
 $\;\boldsymbol{\psi}=\boldsymbol{\phi}^{-1}*\boldsymbol{\theta}=({\color{blue}1},\
 -\psi_1,\ -\psi_2,\ -\psi_3,\ldots)\;$ tiene grado $\infty$.
-#+latex: \bigskip
+# +latex: \medskip
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
 Y como las raíces de $\boldsymbol{\theta}$ están fuera del círculo
 unidad, es decir, como /el polinomio MA es ``invertible''/
 $\;(\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1)\;$
 entonces $\boldsymbol{X}$ tiene una representación como AR($\infty$):
-$$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}
+\[
+\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}
 \quad\Rightarrow\quad
 \frac{\boldsymbol{\phi}}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
 \quad\Rightarrow\quad X_t = U_t + \sum_{j=1}^\infty\varphi_j
-X_{t-j};$$ donde
+X_{t-j};
+\]
+donde
 $\;\boldsymbol{\varphi}=\boldsymbol{\theta}^{-1}*\boldsymbol{\phi}=({\color{blue}1},\
 -\varphi_1,\ -\varphi_2,\ -\varphi_3,\ldots)\;$ tiene grado $\infty$.
-#+latex: \bigskip
+#+latex: \smallskip
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
-
-#+latex: \noindent
-En un ARMA($p,q$), por tener representación MA($\infty$):
-#+latex: \medskip
+# +latex: \noindent
+En un ARMA($p,q$) /estacionario/, por tener representación MA($\infty$):
+# +latex: \medskip
 
 $E(X_t)=0$ para todo $t\in\mathbb{Z}$ y
-#+latex: \medskip
+# +latex: \medskip
 
 $\boldsymbol{\gamma} \;=\; \sigma^2
 \frac{\boldsymbol{\theta}(z)}{\boldsymbol{\phi}(z)}*\frac{\boldsymbol{\theta}(z^{-1})}{\boldsymbol{\phi}(z^{-1})}
 = \sigma^2 \boldsymbol{\psi}(z)*\boldsymbol{\psi}(z^{-1})\;$ donde $\;\boldsymbol{\psi}=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}$;
-#+latex: \smallskip
+# +latex: \smallskip
 
 #+latex: \noindent
 es decir, $\;\gamma_k = \sigma^2 \sum\nolimits_{j=0}^\infty
@@ -203,26 +207,27 @@ $f(\omega) =
   \cos(h\omega);\quad$ donde $\omega\in[-\pi,\pi]$.
 
 (suma infinita de cosenos)
-#+latex: \bigskip
+#+latex: \medskip
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
 #+latex: \noindent
-En un ARMA($p,q$), por tener representación AR($\infty$):
+En un ARMA($p,q$) /invertible/, por tener representación AR($\infty$):
 #+latex: \medskip
 
-su PACF, $\;\boldsymbol{\pi},\;$ también es una secuencia con grado
+La PACF, $\;\boldsymbol{\pi},\;$ también es una secuencia con grado
 $\infty$ y cogrado $-\infty$.
-#+latex: \bigskip
+#+latex: \medskip
 
-#+attr_ipynb: (slideshow . ((slide_type . subslide)))
-En la sección [[id:315309b8-425e-48eb-a97d-083940275fe0][Función de autocovarianzas para un ARMA(p,q)]] se demuestra que para un proceso ARMA($p,q$)
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+latex: \noindent
+La sección [[id:315309b8-425e-48eb-a97d-083940275fe0][Función de autocovarianzas para un ARMA(p,q)]] muestra que en un proceso ARMA($p,q$):
 $$\boldsymbol{\phi}(\mathsf{B})\gamma_k = 
 \begin{cases}
   \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{para } k\leq q \\
   0 & \text{para } k > q \quad \text{(como en un AR)}
 \end{cases}$$
-#+attr_ipynb: (slideshow . ((slide_type . fragment)))
-Así, en cuanto a la ACF $\boldsymbol{\rho}$:
+# +attr_ipynb: (slideshow . ((slide_type . fragment)))
+Consecuentemente, en cuanto a la ACF $\boldsymbol{\rho}$:
  - De $\rho_1$ a $\rho_q$ dependen de los $q$ parámetros de
    $\boldsymbol{\theta}$ y los $p$ parámetros de $\boldsymbol{\phi}$
  - Los $p$ valores de $\rho_q$ a $\rho_{q-p+1}$ son los valores
@@ -233,11 +238,57 @@ Así, en cuanto a la ACF $\boldsymbol{\rho}$:
    valores iniciales $\rho_q$ a $\rho_{q-p+1}$
  - Si $q \geq p$ los primeros $q-p+1$ valores iniciales $\rho_0$ a
    $\rho_{q-p}$ siguen una pauta diferente
-
-En cuanto a la PACF $\boldsymbol{\pi}$:
+Y en cuanto a la PACF $\boldsymbol{\pi}$:
 - Tiene grado $\infty$ y cogrado $-\infty$
 - A partir de cierto retardo se comporta como la PACF de un MA($q$),
   es decir, decae exponencialmente o sinusoidalmente.
+
+*** Diferencias entre modelos AR(p), MA(q) y ARMA(p,q) a la hora de identificarlos
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :ID:       61d1ee85-d45b-4c23-8c56-d0c68773a4d0
+   :END:
+
+Se puede demostrar que
+- si un proceso tiene una ACF $\boldsymbol{\rho}$ con cogrado $-q$ y grado $q$, es un proceso MA($q$)
+- si un proceso tiene una PACF $\boldsymbol{\pi}$ con cogrado $-p$ y grado $p$, es un proceso AR($p$)
+
+Véase /Pourahmadi M. (2001)./
+#+latex: \medskip
+
+Consecuentemente, que la ACF o la PACF se corten ``bruscamente'' nos indica que el modelo es AR o MA (además de su grado).
+
+Desgraciadamente para los modelos ARMA tanto la ACF como la PACF tienen infinitos términos no nulos, por lo que su identificación no es tan sencilla.
+
+#+ATTR_HTML: :border 2 :rules all :frame border
+#+ATTR_LATEX: :environment longtable :align p{3.4cm}p{5.4cm}p{5.4cm}
+|                    | *ACF finita*                                             | *ACF persistente*                |
+|--------------------+----------------------------------------------------------+----------------------------------|
+| *PACF finita*      | _Ruido blanco_: retardos conjuntamente NO significativos | _AR_: orden indicado por la PACF |
+| *PACF persistente* | _MA_: orden indicado por la ACF                          | _ARMA_                           |
+
+
+# +LATEX: \rowcolors{2}{lightgray}{white} % Empieza en la segunda fila, alterna gris/blanco
+
+#+LATEX: \renewcommand{\arraystretch}{1.35}
+#+attr_ipynb: (slideshow . ((slide_type . slide)))
+#+CAPTION: Breve resumen sobre los modelos AR(p), MA(q) y ARMA(p,q)
+#+ATTR_LATEX: :placement [H]
+#+ATTR_LATEX: :environment tabularx :width \textwidth :align |p{3.2cm}|X|X|X|
+|                              | Modelo AR(p)                                                  | Modelo MA(q)                                                               | Modelo ARMA(p,q)                                                                                  |
+|------------------------------+---------------------------------------------------------------+----------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------|
+| Representación MA            | (solo si estacionario) \( \mbox{$Y_t = \phi^{-1}(B)U_t$} \)   | \( Y_t = \theta(B)U_t \)                                                   | (solo si estacionario) \( \mbox{$Y_t = \phi^{-1}(B)\theta(B)U_t$} \)                              |
+| Condición de estacionariedad | Raíces de \( \phi(z) \) fuera del círculo unitario            | Ninguna; siempre estacionario                                              | Raíces de \( \phi(z) \) fuera del círculo unitario                                                |
+| Representación AR            | \( \phi(B)Y_t = U_t \)                                        | (solo si invertible) \( \mbox{$\theta^{-1}(B)Y_t = U_t$} \)                | (solo si invertible) \(\mbox{ $\theta^{-1}(B)\phi(B)Y_t = U_t$} \)                                |
+| Condición de invertibilidad  | Ninguna; siempre invertible                                   | Raíces de \( \theta(z) \) fuera del círculo unitario                       | Raíces de \( \theta(z) \) fuera del círculo unitario                                              |
+| ACF teórica                  | Infinita: mezcla de exponenciales y oscilaciones amortiguadas | Finita: igual a 0 después de \( k=q \)                                     | Infinita: mezcla de exponenciales y oscilaciones amortiguadas después de \( k=q-p \)              |
+| PACF teórica                 | Finita: igual a 0 después de \( k=p \)                        | Infinita: dominada por mezcla de exponenciales y oscilaciones amortiguadas | Infinita: dominada por mezcla de exponenciales y oscilaciones amortiguadas después de \( k=p-q \) |
+#+LATEX: \renewcommand{\arraystretch}{1}
+# +LATEX: \rowcolors{0}{}{} % Para resetear después de la tabla
+
+# | Operador \( \pi(B) \)                            | \( \pi(B) = \phi(B)\) (finito)     | \( \pi(B) = \theta^{-1}(B)\) (infinito) | \( \pi(B) = \theta^{-1}(B)\phi(B)\) (infinito) |
+# | Operador \( \psi(B) \)                           | \( \psi(B) = \phi^{-1}(B)\) (infinito) | \( \psi(B) = \theta(B)\) (finito) | \( \psi(B) = \phi^{-1}(B)\theta(B)\) (infinito) |
+
 
 ** Proceso ARMA(1,1)
    :PROPERTIES:
@@ -308,7 +359,6 @@ fig.savefig('./img/lecc06/Sim-arma11R.png', dpi=300, bbox_inches='tight')
 #+attr_latex: :width 425px
 [[./img/lecc06/Sim-arma11R.png]]
 
-
 *** ARMA(1,1) (Ejemplo 2)
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . notes)))
@@ -348,7 +398,6 @@ fig.savefig('./img/lecc06/Sim-arma11A.png', dpi=300, bbox_inches='tight')
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
 [[./img/lecc06/Sim-arma11A.png]]
-
 
 *** ARMA(1,1) (Ejemplo 3)
    :PROPERTIES:
@@ -511,19 +560,15 @@ Veamos el gráfico de la serie de pasajeros de líneas aéreas junto a su gráfi
 df = pd.read_csv('../datos/airline-passengers.csv')
 df['Month'] = pd.to_datetime(df['Month'])
 df = df.set_index(['Month'])
-
 # Crear la figura y los subplots
 fig, axs = plt.subplots(1, 2, figsize=(15, 5))
-
 # Graficar la serie de tiempo
 axs[0].plot(df['Passengers'])
 axs[0].set_xlabel("Month", fontsize=16)
 axs[0].set_ylabel(r"Number of Air Passengers", fontsize=16)
 axs[0].tick_params(axis='both', labelsize=14)
-
 # Graficar el rango-mediana
 RangoMediana(df['Passengers'], ax=axs[1])
-
 plt.tight_layout()
 plt.savefig('./img/lecc06/rangoMedianaPasajeros.png', dpi=300, bbox_inches='tight')
 #+END_SRC
@@ -568,128 +613,42 @@ Las herramientas utilizadas para tomar la decisión son
 
 *** Análisis gráfico
    :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . subslide)))
+   :metadata: (slideshow . ((slide_type . skip)))
    :END:
 
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc06/ :file diferenciasPoblacion.png  :exports code :results silent
-# Leer los datos
-df1 = pd.read_csv('../datos/PoblacionAustralia.csv')
-
-# Calcular las diferencias
-df1['primera_diferencia'] = df1['pob'].diff()
-df1['segunda_diferencia'] = df1['primera_diferencia'].diff()
-
-# Crear la figura y los ejes, compartiendo el eje x
-fig, axs = plt.subplots(3, 1, figsize=(15, 9), sharex=True)  # 3 filas, 1 columna
-
-# Graficar la serie temporal
-axs[0].plot(df1['obs'], df1['pob'])
-axs[0].set_ylabel('Habitantes', fontsize=14)
-axs[0].set_title('Población australiana', fontsize=18)
-axs[0].grid()
-
-# Graficar la primera diferencia
-axs[1].plot(df1['obs'], df1['primera_diferencia'], color='green')
-axs[1].set_ylabel('Primera Diferencia', fontsize=14)
-axs[1].set_title('Primera diferencia', fontsize=18)
-axs[1].grid()
-
-# Graficar la segunda diferencia
-axs[2].plot(df1['obs'], df1['segunda_diferencia'])
-axs[2].set_xlabel('Años', fontsize=14)
-axs[2].set_ylabel('Segunda Diferencia', fontsize=14)
-axs[2].set_title('Segunda diferencia', fontsize=18)
-axs[2].grid()
-
-# Ajustar el layout
-plt.tight_layout()
-plt.savefig('./img/lecc06/diferenciasPoblacion.png', dpi=300, bbox_inches='tight')
-#+END_SRC
-
-
-#+attr_org: :width 800
-#+attr_html: :width 900px
-#+attr_latex: :width 425px
-[[./img/lecc06/diferenciasPoblacion.png]]
-
-
-
-#+attr_ipynb: (slideshow . ((slide_type . notes)))
-La serie de población $\boldsymbol{y}$ tiene una clara tendencia
-creciente (primer gráfico), que desaparece al tomar una diferencia
-ordinaria, $$\nabla\boldsymbol{y}=(1-\mathsf{B})*\boldsymbol{y}$$
-(segundo gráfico). Bastar con tomar una primera diferencia de la serie
-de población para obtener una nueva serie que se asemeja a la
-realización de un proceso estacionario.
-
-No obstante, ¿qué pasa si tomamos una segunda diferencia ordinaria?
-$$\nabla\nabla\boldsymbol{y}=\nabla^2\boldsymbol{y}=(1-\mathsf{B})^2*\boldsymbol{y}$$
-(segundo gráfico). Pues que la serie obtenida también es estacionaria,
-pero ojo, es un grave error tomar más diferencias de las necesarias al
-modelizar los datos. Se debe tomar el mínimo número de
-transformaciones que arrojen una serie ``estacionaria'' (recuerde que
-decir que una serie temporal es /estacionaria/ es un abuso del
-lenguaje).
-
-Si se toman más diferencias de las necesarias se obtiene un proceso
-/no invertible/ (raíces unitarias en la parte MA que imposibilitan que
-el proceso tenga una representación como AR($\infty$) causal), lo cual
-conduce a problemas de identificación y estimación.
-
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc06/ :file diferenciasPasajeros.png  :exports code :results silent
-# Leer los datos
-df = pd.read_csv('../datos/airline-passengers.csv')
-
-# Asegurarse de que la columna Month sea tipo datetime
-df['Month'] = pd.to_datetime(df['Month'])
-
-# Establecer la columna Month como índice
-df.set_index('Month', inplace=True)
-
-# Calcular el logaritmo de los pasajeros
-df['log_passengers'] = np.log(df['Passengers'])
-
-# Calcular la primera diferencia
-df['primera_diferencia'] = df['log_passengers'].diff()
-
-# Calcular la diferencia estacional (de orden 12)
-df['diferencia_estacional'] = df['log_passengers'] - df['log_passengers'].shift(12)
-
-# Calcular la primera diferencia de la diferencia estacional
-df['primera_diferencia_estacional'] = df['diferencia_estacional'].diff()
-
+df = pd.read_csv('../datos/airline-passengers.csv')    # Leer los datos
+df['Month'] = pd.to_datetime(df['Month'])              # Asegurarse de que la columna Month sea tipo datetime
+df.set_index('Month', inplace=True)                    # Establecer la columna Month como índice
+df['log_passengers'] = np.log(df['Passengers'])        # Calcular el logaritmo de los pasajeros
+df['primera_diferencia'] = df['log_passengers'].diff() # Calcular la primera diferencia
+df['diferencia_estacional'] = df['log_passengers'] - df['log_passengers'].shift(12) # Calcular diferencia estacional (orden 12)
+df['primera_diferencia_estacional'] = df['diferencia_estacional'].diff() # Calcular primera diferencia de diferencia estacional
 # Crear la figura y los ejes, compartiendo el eje x
 fig, axs = plt.subplots(4, 1, figsize=(15, 12), sharex=True)  # 4 filas, 1 columna
-
 # Graficar el logaritmo de la población
 axs[0].plot(df.index, df['log_passengers'])
 axs[0].set_ylabel(r'$\boldsymbol{y}=\log(\boldsymbol{z})$', fontsize=14)
 axs[0].set_title('Log de los Pasajeros', fontsize=18)
 axs[0].grid()
-
 # Graficar la primera diferencia
 axs[1].plot(df.index, df['primera_diferencia'], color='black')
 axs[1].set_ylabel(r'$\nabla\boldsymbol{y}$', fontsize=14)
 axs[1].set_title('Primera diferencia (Log)', fontsize=18)
 axs[1].grid()
-
 # Graficar la diferencia estacional
 axs[2].plot(df.index, df['diferencia_estacional'], color='red')
 axs[2].set_ylabel(r'$\nabla_{12}(\boldsymbol{y})=(1-\mathsf{B^{12}})*\boldsymbol{y}$', fontsize=14)
 axs[2].set_title('Diferencia estacional (Log)', fontsize=18)
 axs[2].grid()
-
 # Graficar la primera diferencia de la diferencia estacional
 axs[3].plot(df.index, df['primera_diferencia_estacional'], color='green')
 axs[3].set_xlabel('Fecha', fontsize=14)
 axs[3].set_ylabel(r'$\nabla\nabla_{12}(\boldsymbol{y})=(1-\mathsf{B})*(1-\mathsf{B^{12}})*\boldsymbol{y}$', fontsize=14)
 axs[3].set_title('Primera diferencia de la diferencia estacional (Log)', fontsize=18)
 axs[3].grid()
-
 # Ajustar el layout
 plt.tight_layout()
 plt.savefig('./img/lecc06/diferenciasPasajeros.png', dpi=300, bbox_inches='tight')
@@ -697,7 +656,7 @@ plt.savefig('./img/lecc06/diferenciasPasajeros.png', dpi=300, bbox_inches='tight
 #+END_SRC
 
 
-#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+attr_ipynb: (slideshow . ((slide_type . slide)))
 #+attr_org: :width 800
 #+attr_html: :width 900px
 #+attr_latex: :width 425px
@@ -706,13 +665,12 @@ plt.savefig('./img/lecc06/diferenciasPasajeros.png', dpi=300, bbox_inches='tight
 
 
 #+attr_ipynb: (slideshow . ((slide_type . notes)))
-Como ya vimos, la serie pasajeros en logaritmos tiene tendencia y estacionalidad muy evidentes. No basta con tomar solo una diferencia ordinaria 
+Como ya vimos, la serie pasajeros en logaritmos tiene tendencia y estacionalidad muy evidentes. No basta con tomar solo una diferencia ordinaria:
 $$\nabla\boldsymbol{y}=(1-\mathsf{B})*\boldsymbol{y};$$ 
-pues el resultado muestra una pauta estacional. Ni tampoco basta con tomar solo una diferencia estacional
+pues el resultado muestra una pauta estacional. Tampoco basta tomar solo una diferencia estacional:
 $$\nabla_{12}(\boldsymbol{y})=(1-\mathsf{B^{12}})*\boldsymbol{y};$$
 pues resulta una serie que ``deambula'', i.e., que no es /``estacionaria''/ en media.
-
-Tomar una diferencia ordinaria y otra estacional
+Tomar ambas diferencias (una ordinaria y otra estacional):
 $$\nabla\nabla_{12}(\boldsymbol{y})=(1-\mathsf{B})*(1-\mathsf{B^{12}})*\boldsymbol{y}$$
 arroja una serie que sí parece ser /``estacionaria''/.
 
@@ -722,28 +680,22 @@ arroja una serie que sí parece ser /``estacionaria''/.
 df3 = pd.read_csv('../datos/Retiro.txt')
 # Generar una columna de fechas desde enero de 1985
 df3['Fecha'] = pd.date_range(start='1985-01', periods=len(df3), freq='M') # cambiar por 'ME' en el futuro
-
 # Configurar la columna de fechas como índice
 df3.set_index('Fecha', inplace=True)
-
 # Calcular la diferencia estacional (de orden 12)
 df3['diferencia_estacional'] = df3['TemperaturaMedia'] - df3['TemperaturaMedia'].shift(12)
- 
 # Crear la figura y los ejes, compartiendo el eje x
 fig, axs = plt.subplots(2, 1, figsize=(15, 8), sharex=True)  # 4 filas, 1 columna
-
 # Graficar el logaritmo de la población
 axs[0].plot(df3.index, df3['TemperaturaMedia'])
 axs[0].set_ylabel(r'Grados centígrados', fontsize=14)
 axs[0].set_title('Temperatura media en el Parque del Retiro', fontsize=18)
 axs[0].grid()
-
 # Graficar la primera diferencia
 axs[1].plot(df3.index, df3['diferencia_estacional'], color='green')
 axs[1].set_ylabel(r'$\nabla_{12}\boldsymbol{z}$', fontsize=14)
 axs[1].set_title('Diferencia estacional', fontsize=18)
 axs[1].grid()
-
 # Ajustar el layout
 plt.tight_layout()
 plt.savefig('./img/lecc06/diferenciasTemperaturasRetiro', dpi=300, bbox_inches='tight')
@@ -761,6 +713,61 @@ plt.savefig('./img/lecc06/diferenciasTemperaturasRetiro', dpi=300, bbox_inches='
 En el caso de la serie de temperaturas en el Parque del Retiro, parece
 que es suficiente con tomar solo una diferencia estacional.
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results file :output-dir ./img/lecc06/ :file diferenciasPoblacion.png  :exports code :results silent
+df1 = pd.read_csv('../datos/PoblacionAustralia.csv') # Leer los datos
+# Calcular las diferencias
+df1['primera_diferencia'] = df1['pob'].diff()
+df1['segunda_diferencia'] = df1['primera_diferencia'].diff()
+# Crear la figura y los ejes, compartiendo el eje x
+fig, axs = plt.subplots(3, 1, figsize=(15, 9), sharex=True)  # 3 filas, 1 columna
+# Graficar la serie temporal
+axs[0].plot(df1['obs'], df1['pob'])
+axs[0].set_ylabel('Habitantes', fontsize=14)
+axs[0].set_title('Población australiana', fontsize=18)
+axs[0].grid()
+# Graficar la primera diferencia
+axs[1].plot(df1['obs'], df1['primera_diferencia'], color='green')
+axs[1].set_ylabel('Primera Diferencia', fontsize=14)
+axs[1].set_title('Primera diferencia', fontsize=18)
+axs[1].grid()
+# Graficar la segunda diferencia
+axs[2].plot(df1['obs'], df1['segunda_diferencia'])
+axs[2].set_xlabel('Años', fontsize=14)
+axs[2].set_ylabel('Segunda Diferencia', fontsize=14)
+axs[2].set_title('Segunda diferencia', fontsize=18)
+axs[2].grid()
+# Ajustar el layout
+plt.tight_layout()
+plt.savefig('./img/lecc06/diferenciasPoblacion.png', dpi=300, bbox_inches='tight')
+
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+#+attr_org: :width 800
+#+attr_html: :width 900px
+#+attr_latex: :width 425px
+[[./img/lecc06/diferenciasPoblacion.png]]
+
+
+
+#+attr_ipynb: (slideshow . ((slide_type . notes)))
+La serie de población $\boldsymbol{y}$ tiene una clara tendencia creciente (primer gráfico), que desaparece al tomar una diferencia ordinaria, $$\nabla\boldsymbol{y}=(1-\mathsf{B})*\boldsymbol{y}$$ (segundo gráfico). 
+Bastar con tomar una primera diferencia de la serie de población para obtener una nueva serie que se asemeja a la realización de un proceso estacionario.
+
+No obstante, ¿qué pasa si tomamos una segunda diferencia ordinaria? (tercer gráfico):
+$$\nabla\nabla\boldsymbol{y}=\nabla^2\boldsymbol{y}=(1-\mathsf{B})^2*\boldsymbol{y}.$$
+Pues que la serie obtenida también es estacionaria, pero ojo, es un grave error tomar más diferencias de las necesarias al modelizar los datos. 
+Se debe tomar el mínimo número de transformaciones que arrojen una serie ``estacionaria'' 
+(recuerde que decir que una serie temporal es /estacionaria/ es un abuso del lenguaje).
+
+Si se toman más diferencias de las necesarias se obtiene un proceso /no invertible/ (raíces unitarias en la parte MA que imposibilitan que el proceso tenga una representación como AR($\infty$) causal), lo cual conduce a problemas de identificación y estimación.
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Es importante tomar el número necesario de diferencias y ni una más. 
+Por ello es conveniente realizar contrastes de hipótesis que nos ayuden a tomar la decisión correcta.
+
 *** Contrastes formales sobre el orden de integración: DF, ADF y KPSS
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
@@ -768,187 +775,122 @@ que es suficiente con tomar solo una diferencia estacional.
 
 **** Test de Dickey-Fuller (DF)
 
-- $H_0$ :: la serie es $I(1)$
-- $H_1$ :: la serie es $I(0)$.
+- $H_0$ : la serie es $I(1)$
+- $H_1$ : la serie es $I(0)$.
 
-Sea el siguiente modelo donde $\phi$ es un parámetro autorregresivo y
-$U_{t}$ es ruido blanco $$Y_{t}=\phi Y_{t-1}+U_{t},$$
+Sea el siguiente modelo donde $\phi$ es un parámetro autorregresivo y $U_{t}$ es ruido blanco $$Y_{t}=\phi Y_{t-1}+U_{t},$$
 
-Habrá una raíz unitaria (será no-estacionario) si $\phi =1.\;$ Restando
-$Y_{t-1}$ a ambos lados
-
+Habrá una raíz unitaria (será no-estacionario) si $\phi =1.\;$ 
+Restando $Y_{t-1}$ a ambos lados
 $$\nabla Y_{t}\;=\;(\phi -1)Y_{t-1}+U_{t}\;=\;\delta Y_{t-1}+U_{t}$$
-
 donde $\delta=\phi -1$ y, por tanto, la $H_0$ se reduce a $\delta=0$.
 
 Pasos del contraste:
 - se estima el último modelo por MCO
 - se calcula el ratio $t$ de significación de $\delta$
-- se compara dicho ratio con la distribución específica del contraste
-  $DF$ (pues bajo la nula, el ratio $t$ no se distribuye de la forma
-  habitual).
+- se compara dicho ratio con la distribución específica del contraste $DF$ (pues bajo la nula, el ratio $t$ no se distribuye de la forma habitual).
 
 **** Test de Dickey-Fuller aumentado (ADF)
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . subslide)))
    :END:
 
-Una variante habitual del test DF es el test de Dickey-Fuller
-aumentado (ADF), que consiste en estimar por MCO el modelo: $$\nabla
-Y_t = c + \delta Y_{t-1} + \pi_1 \nabla Y_{t-1} + \pi_2 \nabla
-Y_{t-2} + \cdots + \pi_p \nabla Y_{t-p} + U_t$$ que añade $p$ retardos
-del regresando como regresores para permitir autocorrelación. Por lo
-demás, el test se calcula de la forma habitual (comparando de ratio
-$t$ de $\widehat{\delta}$ con las tablas del test ADF).
+Una variante habitual del test DF es el test de Dickey-Fuller aumentado (ADF), que consiste en estimar por MCO el modelo: 
+\[
+\nabla Y_t = c + \delta Y_{t-1} + \pi_1 \nabla Y_{t-1} + \pi_2 \nabla Y_{t-2} + \cdots + \pi_p \nabla Y_{t-p} + U_t
+\] 
+que añade $p$ retardos del regresando como regresores para permitir autocorrelación. 
+Por lo demás, el test se calcula de la forma habitual 
+(comparando de ratio $t$ de $\widehat{\delta}$ con las tablas a la correspondiente variante del test ADF).
 
 Otra variante consiste en incluir una tendencia temporal determinista:
-$$\nabla Y_t = \underbrace{c + \beta t} + \delta Y_{t-1} + \pi_1 \nabla Y_{t-1} + \pi_2 \nabla Y_{t-2} + \cdots + \pi_p \nabla Y_{t-p} + U_t$$
+\[
+\nabla Y_t = \underbrace{c + \beta t} + \delta Y_{t-1} + \pi_1 \nabla Y_{t-1} + \pi_2 \nabla Y_{t-2} + \cdots + \pi_p \nabla Y_{t-p} + U_t.
+\]
 
 **** Test Kwiatkowski–Phillips–Schmidt–Shin (KPSS)
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . subslide)))
    :END:
 
-El contraste KPSS es un contraste alternativo (y complementario) al test DF/ADF
+El contraste KPSS es un contraste alternativo (y complementario) al test DF/ADF.
 
-Las hipótesis del test KPSS están invertidas respecto a las del Test DF
-- $H_0$ :: la serie es $I(0)$.
-- $H_1$ :: la serie es $I(1)$ o estacionaria en torno a una tendencia determinista
+Las hipótesis del test KPSS están invertidas respecto a las del Test DF:
+- $H_0$ : la serie es $I(0)$.
+- $H_1$ : la serie es $I(1)$ o estacionaria en torno a una tendencia determinista
 
-*DF/ADF y KPSS se complementan.* Si la serie es:
+*DF/ADF y KPSS se complementan.* 
+Si la serie es:
 - /estacionaria/: el test DF/ADF debería rechazar su $H_0:$ la serie es $I(1)$
 - /NO estacionaria/: el test KPSS debería rechazar su $H_0:$ la serie es $I(0)$
 
-Estos test son poco potentes y son frágiles ante incumplimientos
-(heterocedasticidad o no-normalidad); por ello debemos complementarlos
-con el análisis gráfico.
+Estos test son poco potentes y son frágiles ante incumplimientos (heterocedasticidad o no-normalidad); 
+por ello debemos complementarlos con el análisis gráfico.
 
+*** Más indicios sobre la necesidad de diferenciar la serie
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
+- Si la función de autocorrelación (ACF) decae muy lentamente (y de manera aparentemente lineal) es un indicio de que la serie necesita una diferencia regular.
+  [[file:img/lecc07/ACF-RW.png]]
+- Si al estimar los parámetros AR del modelo, alguna raíz autorregresiva tiene un valor absoluto muy próximo a uno, también es un indicio de que la serie necesita una diferencia regular.
+
+*** Indicios de haber diferenciado en exceso
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
+- Por el contrario, si al estimar los parámetros MA del modelo, alguna raíz del polinomio de media móvil tiene un valor absoluto muy próximo a uno, es un indicio de que la serie se ha sobre-diferenciado (hay que usar los datos tal como estaban antes de tomar la última diferencia regular).
 
 ** ACF muestral
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
-La /k/-ésima autocorrelación muestral simple ($\widehat{\rho_k}$) se
-define como:
-$$\widehat{\rho_k}=\frac{\widehat{\gamma_k}}{\widehat{\gamma_0}};\qquad
+La /k/-ésima autocorrelación muestral simple ($\widehat{\rho_k}$) se define como:
+\[
+\widehat{\rho_k}=\frac{\widehat{\gamma_k}}{\widehat{\gamma_0}};\qquad
 \widehat{\gamma_k}=\frac{1}{n}\sum_{t=k+1}^n
-\widetilde{X_t}\widetilde{X_{t-k}},\quad\text{para }\;k=1,2,\ldots$$
+\widetilde{X_t}\widetilde{X_{t-k}},\quad\text{para }\;k=1,2,\ldots
+\]
 donde $\widetilde{X_t}=X_t-\bar{X}$.
 
-Para valorar la significatividad individual de estas autocorrelaciones
-puede usarse el error estándar asintótico:
+Para valorar la significatividad individual de estas autocorrelaciones puede usarse el error estándar asintótico:
 $s.e.(\widehat{\rho_k})=1/\sqrt{n}$.
 
-Para contrastar la $H_0:$ /los $k$ primeros retardos son conjuntamente 
-no significativos/ (es decir, para contrastar si el proceso es /ruido
-blanco/) se emplea el test de Ljung-Box $$Q =
-n\left(n+2\right)\sum_{k=1}^h\frac{\hat{\rho}^2_k}{n-k}$$
-(usaremos el test de Ljung-Box para evaluar los modelos).
+Para contrastar la $H_0:$ */los $k$ primeros retardos son conjuntamente no significativos/* se emplea el test de Ljung-Box 
+\[Q(h) = n\left(n+2\right)\sum_{k=1}^h\frac{\hat{\rho}^2_k}{n-k}\sim \chi^2(h-p-q)\]
+Usaremos el test de Ljung-Box, para evaluar la bondad de un modelo, contrastando si sus residuos son un proceso de /ruido blanco/ (si sus $h$ primeras autocorrelaciones son conjuntamente nulas).
 
 ** PACF muestral
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
-La /k/-ésima autocorrelación muestral $\widehat{\pi_k}$ se puede
-estimar mediante el algoritmo Levinson-Durbin sustituyendo las
-autocorrelaciones teóricas por las muestrales.
+La /k/-ésima autocorrelación muestral $\widehat{\pi_k}$ se puede estimar mediante el algoritmo Levinson-Durbin sustituyendo las autocorrelaciones teóricas por las muestrales.
 
-O bien, calculando el /k/-ésimo coeficiente MCO de una autorregresión
-de orden $k$ $$\widetilde{X}_t =
+O bien, calculando el /k/-ésimo coeficiente MCO de una autorregresión de orden $k$ 
+\[
+\widetilde{X}_t =
 \widehat{\phi_{k1}}\widetilde{X}_{t-1} +
 \widehat{\phi_{k2}}\widetilde{X}_{t-2} + \cdots +
-\widehat{\phi_{kk}}\widetilde{X}_{t-k} + U_t;\qquad k = 1, 2,\ldots$$
-donde $\widetilde{X}_t=X_t-\bar{X}\;$ y donde
-$\;\widehat{\pi_k}=\widehat{\phi_{kk}}$
+\widehat{\phi_{kk}}\widetilde{X}_{t-k} + U_t;\qquad k = 1, 2,\ldots
+\]
+donde $\widetilde{X}_t=X_t-\bar{X}\;$ y donde $\;\widehat{\pi_k}=\widehat{\phi_{kk}}$.
 
-** Otras herramientas estadísticas
-   :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . skip)))
-   :END:
-
-*** Estadísticos descriptivos
-   :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . slide)))
-   :END:
-
-- el nivel de la serie (media, mediana),
-- valores extremos (máximo y mínimo). A veces son outliers o errores de registro
-- dispersión de la variable (desviación típica, coeficiente de variación, rango, rango interpercentiles, rango intercuartílico)
-- otros momentos (asimetría, exceso de curtosis)
-
-También es frecuente contrastar si la media es significativa ( $H_0: \mu = 0$)
-$$\frac{\widehat{\mu}}{\widehat{dt(\widehat{\mu})}}\underset{H_0}{\sim}t_{n-1};\qquad
-\widehat{dt(\widehat{\mu})}=\frac{\widehat{\sigma}}{\sqrt{n}}.$$
-
-# value table pp
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python  :exports code :results  raw
-df3['TemperaturaMedia'].describe()
-#+END_SRC
-
-#+RESULTS:
-: count    333.000000
-: mean      15.211712
-: std        6.957194
-: min        3.600000
-: 25%        9.000000
-: 50%       14.300000
-: 75%       21.900000
-: max       27.800000
-: Name: TemperaturaMedia, dtype: float64
-
-*** Contraste de normalidad Jarque-Bera
+*** Nota práctica sobre la interpretación de la ACF y PACF muestrales
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . subslide)))
    :END:
+- Un valor grande en la ACF o en la PACF muestrales en un retardo $k$ dado, puede no ser relevante si se encuentra aislado y $k$ es grande.
 
-[[https://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test][Jarque-Bera test (Wikipedia)]]
-
-- Si los datos son mayores que cero :: a menudo la transformación
-  logarítmica ayuda a conseguir normalidad
-
-- Si hay valores atípicos :: el mejor tratamiento es /intervenirlos/.
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python :exports code :results raw
-from scipy import stats
-rng = np.random.default_rng()
-x = rng.normal(0, 1, 100000)
-jarque_bera_test = stats.jarque_bera(x)
-jarque_bera_test
-#jarque_bera_test.statistic
-#jarque_bera_test.pvalue
-#+END_SRC
-
-#+RESULTS:
-: SignificanceResult(statistic=1.6174184291673626, pvalue=0.4454326532816735)
+- Una conﬁguración reconocible de valores estadísticamente no significativos en la ACF o en la PACF muestrales, sí puede ser relevante.
 
 
-* Nota final
-   :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . subslide)))
-   :END:
-
-Se puede demostrar que
-- si un proceso tiene una ACF $\boldsymbol{\rho}$ con cogrado $-q$ y grado $q$, es un proceso MA($q$)
-- si un proceso tiene una PACF $\boldsymbol{\pi}$ con cogrado $-p$ y grado $p$, es un proceso AR($p$)
-
-Véase /Pourahmadi M. (2001)./
-#+latex: \medskip
-
-Consecuentemente, que la ACF o la PACF se corten ``bruscamente'' nos indica que el modelo es AR o MA (además de su grado).
-
-Desgraciadamente para los modelos ARMA tanto la ACF como la PACF tienen infinitos términos no nulos, por lo que su identificación no es tan sencilla.
-
-#+ATTR_HTML: :border 2 :rules all :frame border
-#+ATTR_LATEX: :environment longtable :align p{3.4cm}p{5.4cm}p{5.4cm}
-|                    | *ACF finita*                                             | *ACF persistente*                |
-|--------------------+----------------------------------------------------------+----------------------------------|
-| *PACF finita*      | _Ruido blanco_: retardos conjuntamente NO significativos | _AR_: orden indicado por la PACF |
-| *PACF persistente* | _MA_: orden indicado por la ACF                          | _ARMA_                           |
-
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+A la hora de identificar un modelo para los datos:
+- Buscaremos modelos simples que expliquen los rasgos más obvios de la ACF o la PACF.
+- Evitaremos la identificación inicial de modelos ARMA. Es mejor comenzar con un AR o un MA de orden bajo, y analizar qué estructura queda en los residuos del modelo. Dicha estructura nos ayudara a ir completando el modelo. En la práctica, los órdenes  AR y MA suelen ser bajos.
 
 * Función de autocovarianzas para un ARMA(p,q)
    :PROPERTIES:
@@ -972,15 +914,14 @@ E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot X_{t-k}\Big]
 \;=\;
 \underbrace{E\Big[\Big(\boldsymbol{\theta}(\mathsf{B})U_t\Big)\cdot
 \Big(\boldsymbol{\psi}(\mathsf{B})U_{t-k}\Big)\Big]}_{\boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)}$$
-Donde hemos usando $\eqref{eqnLadoIzquierdoYW}$ y renombrando
+Donde hemos usando $\eqref{eqnLadoIzquierdoYW}$ y hemos renombrado
 $\;\boldsymbol{\theta}(\mathsf{B})U_t=\boldsymbol{W}\;$ y
 $\;\boldsymbol{\psi}(\mathsf{B})U_t=\boldsymbol{Y}.\;$ Así:
 \begin{align*}
   \boldsymbol{\phi}(\mathsf{B})\gamma_k & = \boldsymbol{\gamma_{_{\boldsymbol{W},\boldsymbol{Y}}}}(k)\\
-  & =  \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{por } (5-Lecc 3)
+  & =  \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{por } (5-Lecc 3),
 \end{align*}
-Por 
-Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogrado $-\infty$
+donde $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogrado $-\infty$. Por tanto
 \begin{equation}
   \boldsymbol{\phi}(\mathsf{B})\gamma_k = 
   \begin{cases}
@@ -991,29 +932,11 @@ Y como $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogr
 \end{equation}
 (Donde (5-Lecc 3) se refiere a la [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf#subsection.5.2][última ecuación de la Lección 3]])
 
-
-
-* COMMENT ipynb y slides                                           :noexport:
-
-#+BEGIN_SRC emacs-lisp :results silent :eval yes
-(require 'ox-ipynb)
-(ox-ipynb-export-org-file-to-ipynb-file "Lecc06.org")
-#+END_SRC
-
-#+BEGIN_SRC sh :results silent :eval yes
-#jupyter nbconvert --execute --inplace Lecc06.ipynb
-#+END_SRC
-
-#+BEGIN_SRC sh :results silent :eval yes
-#jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc06.ipynb
-#+END_SRC
-
-* COMMENT Las Ecuaciones de Yule-Walker para un AR(p) estacionario
+* Recordatorio de las Ecuaciones de Yule-Walker para un AR(p) estacionario
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
-# +attr_ipynb: (slideshow . ((slide_type . skip)))
 Sea un AR($p$) estacionario:
 $\;\;\boldsymbol{\phi}(\mathsf{B})X_t=U_t\;\;$ donde $\;\;\boldsymbol{\phi}(z)=1-\phi_1z^1-\cdots-\phi_pz^p.\;$
 Multiplicando por $X_{t-k}$ y tomando esperanzas:
@@ -1084,13 +1007,14 @@ $$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_0=\sigma^2\)}
 \quad\Rightarrow\quad
 \gamma_0-\phi_1\gamma_1-\cdots-\phi_p\gamma_p=\sigma^2
 \quad\Rightarrow\quad \sigma^2=\gamma_0-\sum\nolimits_{j=1}^p\phi_j\gamma_j.$$
-Dividiendo por $\gamma_0$ (y recordando que $\rho_0=1$):
+Dividiendo por $\gamma_0$ (y recordando que $\rho_0=1$ en la secuencia $\boldsymbol{\rho}$):
 $$\boldsymbol{\phi}(\mathsf{B})\rho_0=\frac{\sigma^2}{\gamma_0}
 \quad\Rightarrow\quad
 \fbox{\(\gamma_0=\frac{\sigma^2}{\boldsymbol{\phi}(\mathsf{B})\rho_0}\)}
 \quad\Rightarrow\quad
 \gamma_0=\frac{\sigma^2}{1-\sum\nolimits_{j=1}^p\phi_j\rho_j}.$$ 
   
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
 *para $k>0$:* $\quad$ (por $\ref{eqnLadoIzquierdoYW}$ y $\ref{eqnLadoDerechoYW}$)
 $$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\gamma_k=0\)}
 \quad\Rightarrow\quad
@@ -1106,4 +1030,21 @@ $$\fbox{\(\boldsymbol{\phi}(\mathsf{B})\rho_k=0\)}
 En resumen, la estructura autorregresiva del proceso impone que las
 autocovarianzas (y las autocorrelaciones) verifiquen las ecuaciones de
 Yule-Walker.
+
+
+
+* COMMENT ipynb y slides                                           :noexport:
+
+#+BEGIN_SRC emacs-lisp :results silent :eval yes
+(require 'ox-ipynb)
+(ox-ipynb-export-org-file-to-ipynb-file "Lecc06.org")
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+#jupyter nbconvert --execute --inplace Lecc06.ipynb
+#+END_SRC
+
+#+BEGIN_SRC sh :results silent :eval yes
+#jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc06.ipynb
+#+END_SRC
 
