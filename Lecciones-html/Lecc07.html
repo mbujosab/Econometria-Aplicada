@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-10-06 Mon 12:24 -->
+<!-- 2025-10-08 Wed 21:11 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 7. Modelos ARIMA y SARIMA. Identificación y diagnosis</title>
@@ -66,63 +66,63 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgcc232c8">Identificación</a>
+<li><a href="#org4593296">Identificación</a>
 <ul>
-<li><a href="#org8d0b4cc">Instrumentos de identificación</a></li>
+<li><a href="#org0b4077c">Instrumentos de identificación</a></li>
 </ul>
 </li>
-<li><a href="#orgc96a53f">Estimación por máxima verosimilitud</a>
+<li><a href="#orgafc8feb">Estimación por máxima verosimilitud</a>
 <ul>
-<li><a href="#org3aea666">Propiedades de los estimadores de máxima verosimilitud (MV)</a></li>
+<li><a href="#org79c7c90">Propiedades de los estimadores de máxima verosimilitud (MV)</a></li>
 </ul>
 </li>
-<li><a href="#orgb411e97">Diagnosis</a>
+<li><a href="#orgfd8feac">Diagnosis</a>
 <ul>
-<li><a href="#org37230ca">Instrumentos de diagnosis</a>
+<li><a href="#org0f61003">Instrumentos de diagnosis</a>
 <ul>
-<li><a href="#org934f5c7">Reformulación</a></li>
-<li><a href="#org97e78c6">Componentes deterministas</a></li>
-<li><a href="#orgd2483b7">Otras herramientas estadísticas a usar, una vez comprobada la ausencia de correlación serial en los residuos</a></li>
+<li><a href="#org94eb6e5">Reformulación</a></li>
+<li><a href="#org7774f7b">Componentes deterministas</a></li>
+<li><a href="#org5506fe8">Otras herramientas estadísticas a usar, una vez comprobada la ausencia de correlación serial en los residuos</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org6712c4c">Raíces unitarias</a>
+<li><a href="#org75989bd">Raíces unitarias</a>
 <ul>
-<li><a href="#org71e5cdf">Notación: operadores retardo y diferencia y modelos ARIMA</a>
+<li><a href="#orga80786d">Notación: operadores retardo y diferencia y modelos ARIMA</a>
 <ul>
-<li><a href="#org7f9a2e9">Notación: ARIMA</a></li>
+<li><a href="#org99b8c13">Notación: ARIMA</a></li>
 </ul>
 </li>
-<li><a href="#org399ffa7">Raíces unitarias en los polinomios AR y MA</a></li>
-<li><a href="#orgfc6bf5c">Paseos aleatorios</a></li>
+<li><a href="#org59b7a2a">Raíces unitarias en los polinomios AR y MA</a></li>
+<li><a href="#org852d607">Paseos aleatorios</a></li>
 </ul>
 </li>
-<li><a href="#org0824daa">Modelos ARIMA estacionales (SARIMA)</a>
+<li><a href="#orgd61aaa4">Modelos ARIMA estacionales (SARIMA)</a>
 <ul>
-<li><a href="#orgc80e336">MA(1) estacional con raíz positiva</a></li>
-<li><a href="#org981c724">AR(1) estacional con raíz positiva</a></li>
-<li><a href="#orgfd3efa4">ARIMA (0,0,1)x(0,0,1)</a></li>
-<li><a href="#orgce032ee">ARIMA (1,0,0)x(0,0,1)</a></li>
-<li><a href="#org200fb9c">ARIMA (1,0,0)x(1,0,0)</a></li>
-<li><a href="#org3686384">ARIMA (0,0,1)x(1,0,0)</a></li>
+<li><a href="#orgaaca568">MA(1) estacional con raíz positiva</a></li>
+<li><a href="#orgd1a8e50">AR(1) estacional con raíz positiva</a></li>
+<li><a href="#orgd95cacf">ARIMA (0,0,1)x(0,0,1)</a></li>
+<li><a href="#org258a75b">ARIMA (1,0,0)x(0,0,1)</a></li>
+<li><a href="#org1588207">ARIMA (1,0,0)x(1,0,0)</a></li>
+<li><a href="#org74cdc4b">ARIMA (0,0,1)x(1,0,0)</a></li>
 </ul>
 </li>
-<li><a href="#org317e4b5">Resumen del análisis univariante de series temporales</a>
+<li><a href="#org3f5dc2f">Resumen del análisis univariante de series temporales</a>
 <ul>
-<li><a href="#orgb5e6b7c">Ideas principales respecto a la modelización univariante</a></li>
-<li><a href="#orgc2a8517">Metodología</a></li>
+<li><a href="#org0d660ba">Ideas principales respecto a la modelización univariante</a></li>
+<li><a href="#orga42052e">Metodología</a></li>
 </ul>
 </li>
-<li><a href="#org5dd9166">Introducción intuitiva e informal al concepto de ergodicidad</a>
+<li><a href="#org8b079d3">Introducción intuitiva e informal al concepto de ergodicidad</a>
 <ul>
-<li><a href="#org677aae9">Ejemplo de un proceso no ergódico</a></li>
+<li><a href="#org2604e26">Ejemplo de un proceso no ergódico</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div class="abstract" id="orgcbba756">
+<div class="abstract" id="orge313a5b">
 <p>
 Repasaremos los instrumentos de identificación y diagnosis del análisis univariante.
 Extenderemos la notación para incorporar modelos con raíces unitarias y modelos estacionales.
@@ -134,9 +134,9 @@ Finalmente resumiremos las ideas principales del análisis univariante.
 <ul class="org-ul">
 <li>(<a href="https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc07.slides.html">slides</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc07.html">html</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc07.pdf">pdf</a>) &mdash; (<a href="https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc07.ipynb">mybinder</a>)</li>
 </ul>
-<div id="outline-container-org54dd23d" class="outline-4">
-<h4 id="org54dd23d">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-org54dd23d">
+<div id="outline-container-orgd077423" class="outline-4">
+<h4 id="orgd077423">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-orgd077423">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python
 </span><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra
@@ -150,8 +150,8 @@ Finalmente resumiremos las ideas principales del análisis univariante.
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org9123e31"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
-<div class="outline-text-5" id="text-org9123e31">
+<li><a id="org558daf6"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
+<div class="outline-text-5" id="text-org558daf6">
 <p>
 para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
@@ -165,9 +165,9 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 </li>
 </ul>
 </div>
-<div id="outline-container-org452eec5" class="outline-4">
-<h4 id="org452eec5">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
-<div class="outline-text-4" id="text-org452eec5">
+<div id="outline-container-org78e9094" class="outline-4">
+<h4 id="org78e9094">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
+<div class="outline-text-4" id="text-org78e9094">
 <p>
 Cargamos las funciones auxiliares (véase la carpeta <code>src/</code>)
 </p>
@@ -180,9 +180,9 @@ warnings.filterwarnings(<span style="font-style: italic;">"ignore"</span>, categ
 </div>
 </div>
 </div>
-<div id="outline-container-orgcc232c8" class="outline-2">
-<h2 id="orgcc232c8">Identificación</h2>
-<div class="outline-text-2" id="text-orgcc232c8">
+<div id="outline-container-org4593296" class="outline-2">
+<h2 id="org4593296">Identificación</h2>
+<div class="outline-text-2" id="text-org4593296">
 <ul class="org-ul">
 <li>Combinando herramientas gráficas y estadísticas, se puede inferir un modelo para los datos.</li>
 <li>Este proceso de especificación empírica de un modelo es conocido como "<i>identificación</i>".</li>
@@ -239,9 +239,9 @@ preguntas:
 La parametrización de mayor orden en modelos ARMA con series económicas suele ser ARMA(\(2,1\))
 </p>
 </div>
-<div id="outline-container-org8d0b4cc" class="outline-3">
-<h3 id="org8d0b4cc">Instrumentos de identificación</h3>
-<div class="outline-text-3" id="text-org8d0b4cc">
+<div id="outline-container-org0b4077c" class="outline-3">
+<h3 id="org0b4077c">Instrumentos de identificación</h3>
+<div class="outline-text-3" id="text-org0b4077c">
 <table border="2" cellspacing="0" cellpadding="6" rules="all" frame="border">
 
 
@@ -294,16 +294,16 @@ La parametrización de mayor orden en modelos ARMA con series económicas suele 
 </div>
 </div>
 </div>
-<div id="outline-container-orgc96a53f" class="outline-2">
-<h2 id="orgc96a53f">Estimación por máxima verosimilitud</h2>
-<div class="outline-text-2" id="text-orgc96a53f">
+<div id="outline-container-orgafc8feb" class="outline-2">
+<h2 id="orgafc8feb">Estimación por máxima verosimilitud</h2>
+<div class="outline-text-2" id="text-orgafc8feb">
 <p>
 Los parámetros de los modelos ARMA se estiman por máxima verosimilitud exacta (resolviendo un sistema de ecuaciones no lineales de forma iterativa).
 </p>
 </div>
-<div id="outline-container-org3aea666" class="outline-3">
-<h3 id="org3aea666">Propiedades de los estimadores de máxima verosimilitud (MV)</h3>
-<div class="outline-text-3" id="text-org3aea666">
+<div id="outline-container-org79c7c90" class="outline-3">
+<h3 id="org79c7c90">Propiedades de los estimadores de máxima verosimilitud (MV)</h3>
+<div class="outline-text-3" id="text-org79c7c90">
 <dl class="org-dl">
 <dt>Invarianza</dt><dd>Si \(\hat{\beta}^{MV}\) es el estimador de máxima verosimilitud de \(\beta\) y \(g(\beta)\) es una función continua, entonces el estimador de máxima verosimilitud de \(g(\beta)\) es \(g(\hat{\beta}^{MV})\).
 <dl class="org-dl">
@@ -330,7 +330,7 @@ Es decir, a medida que crece la muestra, la probabilidad de estimar valores alej
   \lim_{n \to \infty} E\Big(\hat{\beta}^{MV}_n\Big) = \beta
   \]
 <dl class="org-dl">
-<dt>Diferencia con insesgadez</dt><dd>Un estimador <b>insesgado</b> cumple \(E[\hat{\beta}] = \beta\) para todo \(n\), mientras que un estimador <b>asintóticamente insesgado</b> lo cumple solo en el límite.</dd>
+<dt>Diferencia con insesgadez</dt><dd>Un estimador <b>insesgado</b> cumple \(E(\hat{\beta}) = \beta\) para todo \(n\), mientras que un estimador <b>asintóticamente insesgado</b> lo cumple solo en el límite.</dd>
 </dl></dd>
 
 <dt>Eficiencia asintótica</dt><dd>El estimador se vuelve más preciso a medida que crece \(n\). Su varianza tiende a cero, concentrándose alrededor del valor verdadero.
@@ -381,13 +381,13 @@ Es decir, a medida que crece la muestra, la probabilidad de estimar valores alej
 </div>
 </div>
 </div>
-<div id="outline-container-orgb411e97" class="outline-2">
-<h2 id="orgb411e97">Diagnosis</h2>
-<div class="outline-text-2" id="text-orgb411e97">
+<div id="outline-container-orgfd8feac" class="outline-2">
+<h2 id="orgfd8feac">Diagnosis</h2>
+<div class="outline-text-2" id="text-orgfd8feac">
 </div>
-<div id="outline-container-org37230ca" class="outline-3">
-<h3 id="org37230ca">Instrumentos de diagnosis</h3>
-<div class="outline-text-3" id="text-org37230ca">
+<div id="outline-container-org0f61003" class="outline-3">
+<h3 id="org0f61003">Instrumentos de diagnosis</h3>
+<div class="outline-text-3" id="text-org0f61003">
 <table border="2" cellspacing="0" cellpadding="6" rules="all" frame="border">
 
 
@@ -450,9 +450,9 @@ Es decir, a medida que crece la muestra, la probabilidad de estimar valores alej
 </tbody>
 </table>
 </div>
-<div id="outline-container-org934f5c7" class="outline-4">
-<h4 id="org934f5c7">Reformulación</h4>
-<div class="outline-text-4" id="text-org934f5c7">
+<div id="outline-container-org94eb6e5" class="outline-4">
+<h4 id="org94eb6e5">Reformulación</h4>
+<div class="outline-text-4" id="text-org94eb6e5">
 <p>
 Siempre debemos analizar las características de los residuos.
 </p>
@@ -465,9 +465,9 @@ debemos estimar un modelo ARMA(1,1) y analizar los nuevos residuos y la signific
 </ul>
 </div>
 </div>
-<div id="outline-container-org97e78c6" class="outline-4">
-<h4 id="org97e78c6">Componentes deterministas</h4>
-<div class="outline-text-4" id="text-org97e78c6">
+<div id="outline-container-org7774f7b" class="outline-4">
+<h4 id="org7774f7b">Componentes deterministas</h4>
+<div class="outline-text-4" id="text-org7774f7b">
 <p>
 Un MA(1) con parámetro próximo a 1 puede indicar sobrediferenciación, pero también la presencia de una componente determinista.
 </p>
@@ -491,13 +491,13 @@ Una vez superadas las pruebas de diagnostico, aún se puede aplicar un análisis
 </ul>
 </div>
 </div>
-<div id="outline-container-orgd2483b7" class="outline-4">
-<h4 id="orgd2483b7">Otras herramientas estadísticas a usar, una vez comprobada la ausencia de correlación serial en los residuos</h4>
-<div class="outline-text-4" id="text-orgd2483b7">
+<div id="outline-container-org5506fe8" class="outline-4">
+<h4 id="org5506fe8">Otras herramientas estadísticas a usar, una vez comprobada la ausencia de correlación serial en los residuos</h4>
+<div class="outline-text-4" id="text-org5506fe8">
 </div>
 <ul class="org-ul">
-<li><a id="orge5cc5ff"></a>Término constante.<br />
-<div class="outline-text-5" id="text-orge5cc5ff">
+<li><a id="orga0e6c33"></a>Término constante.<br />
+<div class="outline-text-5" id="text-orga0e6c33">
 <p>
 Cuando el modelo ni tiene término constante:
 contrastar si la media de los residuos es significativa ( \(H_0: \mu = 0\)) para decidir si incorporarlo
@@ -508,10 +508,10 @@ contrastar si la media de los residuos es significativa ( \(H_0: \mu = 0\)) para
 </p>
 </div>
 </li>
-<li><a id="org8350369"></a>Verificar visualmente que la varianza de los residuos es constante.<br /></li>
+<li><a id="org32eae0e"></a>Verificar visualmente que la varianza de los residuos es constante.<br /></li>
 
-<li><a id="orgd390fb5"></a>Contrastar la normalidad de los residuos con el test Jarque-Bera.<br />
-<div class="outline-text-5" id="text-orgd390fb5">
+<li><a id="org28c485a"></a>Contrastar la normalidad de los residuos con el test Jarque-Bera.<br />
+<div class="outline-text-5" id="text-org28c485a">
 <p>
 <a href="https://en.wikipedia.org/wiki/Jarque%E2%80%93Bera_test">Jarque-Bera test (Wikipedia)</a>
 </p>
@@ -535,13 +535,13 @@ jarque_bera_test
 </div>
 </div>
 </div>
-<div id="outline-container-org6712c4c" class="outline-2">
-<h2 id="org6712c4c">Raíces unitarias</h2>
-<div class="outline-text-2" id="text-org6712c4c">
+<div id="outline-container-org75989bd" class="outline-2">
+<h2 id="org75989bd">Raíces unitarias</h2>
+<div class="outline-text-2" id="text-org75989bd">
 </div>
-<div id="outline-container-org71e5cdf" class="outline-3">
-<h3 id="org71e5cdf">Notación: operadores retardo y diferencia y modelos ARIMA</h3>
-<div class="outline-text-3" id="text-org71e5cdf">
+<div id="outline-container-orga80786d" class="outline-3">
+<h3 id="orga80786d">Notación: operadores retardo y diferencia y modelos ARIMA</h3>
+<div class="outline-text-3" id="text-orga80786d">
 <p>
 El operador diferencia \(\nabla\) se define a partir del operador retardo como \(\nabla=(1 - \mathsf{B})\):
 \[
@@ -553,9 +553,9 @@ El operador diferencia estacional es \({\nabla}_{_S} = (1 - \mathsf{B}^S)\):
 \]
 </p>
 </div>
-<div id="outline-container-org7f9a2e9" class="outline-4">
-<h4 id="org7f9a2e9">Notación: ARIMA</h4>
-<div class="outline-text-4" id="text-org7f9a2e9">
+<div id="outline-container-org99b8c13" class="outline-4">
+<h4 id="org99b8c13">Notación: ARIMA</h4>
+<div class="outline-text-4" id="text-org99b8c13">
 <p>
 Extendemos la notación a procesos con raíces autorregresivas unitarias con ``ARIMA(\(p,d,q\))''; 
 donde \(d\) indica el número de diferencias que la serie necesita para ser \(I(0)\),
@@ -570,9 +570,9 @@ es decir
 </div>
 </div>
 </div>
-<div id="outline-container-org399ffa7" class="outline-3">
-<h3 id="org399ffa7">Raíces unitarias en los polinomios AR y MA</h3>
-<div class="outline-text-3" id="text-org399ffa7">
+<div id="outline-container-org59b7a2a" class="outline-3">
+<h3 id="org59b7a2a">Raíces unitarias en los polinomios AR y MA</h3>
+<div class="outline-text-3" id="text-org59b7a2a">
 <p>
 Cuando un polinomio tiene alguna raíz igual a uno se dice que tiene ``raíces unitarias''.
 </p>
@@ -622,9 +622,9 @@ Ejemplos:
 </table>
 </div>
 </div>
-<div id="outline-container-orgfc6bf5c" class="outline-3">
-<h3 id="orgfc6bf5c">Paseos aleatorios</h3>
-<div class="outline-text-3" id="text-orgfc6bf5c">
+<div id="outline-container-org852d607" class="outline-3">
+<h3 id="org852d607">Paseos aleatorios</h3>
+<div class="outline-text-3" id="text-org852d607">
 <p>
 Un paseo aleatorio representa una variable cuyos incrementos son ruido blanco:
 \[Y_t = \mu + Y_{t-1} + U_t.\]
@@ -641,7 +641,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/ACF-RWcd.png'</span>
 </div>
 
 
-<div id="orgd7ef564" class="figure">
+<div id="org360b9ce" class="figure">
 <p><img src="./img/lecc07/ACF-RWcd.png" alt="ACF-RWcd.png" width="900px" />
 </p>
 </div>
@@ -662,16 +662,16 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/ACF-RW.png'</span>, 
 </div>
 
 
-<div id="org57ae4cb" class="figure">
+<div id="orge16882d" class="figure">
 <p><img src="./img/lecc07/ACF-RW.png" alt="ACF-RW.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org0824daa" class="outline-2">
-<h2 id="org0824daa">Modelos ARIMA estacionales (SARIMA)</h2>
-<div class="outline-text-2" id="text-org0824daa">
+<div id="outline-container-orgd61aaa4" class="outline-2">
+<h2 id="orgd61aaa4">Modelos ARIMA estacionales (SARIMA)</h2>
+<div class="outline-text-2" id="text-orgd61aaa4">
 <p>
 El período estacional \(S\) es el número mínimo de observaciones necesarias para recorrer un ciclo estacional completo. 
 Por ejemplo, \(S=12\) para datos mensuales, \(S=4\) para datos trimestrales, \(S=24\) para datos horarios, etc.
@@ -696,9 +696,9 @@ Es decir, el modelo consta de polinomios autorregresivos y de media móvil tanto
 Veamos un ejemplo de un modelo MA(\(1\)) estacional y otro de un modelo AR(\(1\)) estacional&hellip;
 </p>
 </div>
-<div id="outline-container-orgc80e336" class="outline-3">
-<h3 id="orgc80e336">MA(1) estacional con raíz positiva</h3>
-<div class="outline-text-3" id="text-orgc80e336">
+<div id="outline-container-orgaaca568" class="outline-3">
+<h3 id="orgaaca568">MA(1) estacional con raíz positiva</h3>
+<div class="outline-text-3" id="text-orgaaca568">
 <p>
 MA(\(1\)) estacional:
 \(\quad\boldsymbol{\Theta}=1-0.9z^{12}\quad\Rightarrow\quad X_t= (1-0.9 \mathsf{B}^{12})U_t\)
@@ -712,13 +712,13 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/ACF-SMA1p.png'</span
 </div>
 
 
-<div id="org734bfaa" class="figure">
+<div id="orgfc6d3cf" class="figure">
 <p><img src="./img/lecc07/ACF-SMA1p.png" alt="ACF-SMA1p.png" width="900px" />
 </p>
 </div>
 
 
-<div id="org48b56e8" class="figure">
+<div id="org23253c1" class="figure">
 <p><img src="img/lecc07/Roots-SMA1p.png" alt="Roots-SMA1p.png" width="500px" />
 </p>
 </div>
@@ -733,15 +733,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/Sim-SMA1p.png'</span
 
 
 
-<div id="orgbd13537" class="figure">
+<div id="orgda6a593" class="figure">
 <p><img src="./img/lecc07/Sim-SMA1p.png" alt="Sim-SMA1p.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org981c724" class="outline-3">
-<h3 id="org981c724">AR(1) estacional con raíz positiva</h3>
-<div class="outline-text-3" id="text-org981c724">
+<div id="outline-container-orgd1a8e50" class="outline-3">
+<h3 id="orgd1a8e50">AR(1) estacional con raíz positiva</h3>
+<div class="outline-text-3" id="text-orgd1a8e50">
 <p>
 AR(\(1\)) estacional:
 \(\quad\boldsymbol{\Phi}=1-0.9z^{12}\quad\Rightarrow\quad (1-0.9 \mathsf{B}^{12})X_t= U_t\)
@@ -755,13 +755,13 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/ACF-SAR1p.png'</span
 </div>
 
 
-<div id="org7de8e45" class="figure">
+<div id="org85c277b" class="figure">
 <p><img src="./img/lecc07/ACF-SAR1p.png" alt="ACF-SAR1p.png" width="900px" />
 </p>
 </div>
 
 
-<div id="orgbff1ad1" class="figure">
+<div id="org7255009" class="figure">
 <p><img src="img/lecc07/Roots-SAR1p.png" alt="Roots-SAR1p.png" width="500px" />
 </p>
 </div>
@@ -779,7 +779,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/Sim-SAR1p.png'</span
 
 
 
-<div id="org743a6a5" class="figure">
+<div id="orgb1e8cb4" class="figure">
 <p><img src="./img/lecc07/Sim-SAR1p.png" alt="Sim-SAR1p.png" width="900px" />
 </p>
 </div>
@@ -800,9 +800,9 @@ Veamos ahora un par de ejemplos de modelos estacionales multiplicativos (i.e., c
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd3efa4" class="outline-3">
-<h3 id="orgfd3efa4">ARIMA (0,0,1)x(0,0,1)</h3>
-<div class="outline-text-3" id="text-orgfd3efa4">
+<div id="outline-container-orgd95cacf" class="outline-3">
+<h3 id="orgd95cacf">ARIMA (0,0,1)x(0,0,1)</h3>
+<div class="outline-text-3" id="text-orgd95cacf">
 <p>
 ARIMA\((0,0,1)\times(0,0,1)_{12}\): \(\quad X_t= (1-0.9 \mathsf{B})(1-0.9 \mathsf{B}^{12})U_t\)
 </p>
@@ -816,7 +816,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/ACF-MA1SMA1.png'</sp
 </div>
 
 
-<div id="org25c9dd2" class="figure">
+<div id="orgba2bc77" class="figure">
 <p><img src="./img/lecc07/ACF-MA1SMA1.png" alt="ACF-MA1SMA1.png" width="900px" />
 </p>
 </div>
@@ -831,15 +831,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/Sim-MA1SMA1.png'</sp
 
 
 
-<div id="org23f6d19" class="figure">
+<div id="orgff0b8c9" class="figure">
 <p><img src="./img/lecc07/Sim-MA1SMA1.png" alt="Sim-MA1SMA1.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgce032ee" class="outline-3">
-<h3 id="orgce032ee">ARIMA (1,0,0)x(0,0,1)</h3>
-<div class="outline-text-3" id="text-orgce032ee">
+<div id="outline-container-org258a75b" class="outline-3">
+<h3 id="org258a75b">ARIMA (1,0,0)x(0,0,1)</h3>
+<div class="outline-text-3" id="text-org258a75b">
 <p>
 ARIMA\((1,0,0)\times(0,0,1)_{12}\): \(\quad (1-0.9 \mathsf{B})X_t= (1-0.9 \mathsf{B}^{12})U_t\)
 </p>
@@ -853,7 +853,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/ACF-AR1SMA1.png'</sp
 </div>
 
 
-<div id="orgdcd3a3f" class="figure">
+<div id="org61f20b3" class="figure">
 <p><img src="./img/lecc07/ACF-AR1SMA1.png" alt="ACF-AR1SMA1.png" width="900px" />
 </p>
 </div>
@@ -868,15 +868,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/Sim-AR1SMA1.png'</sp
 
 
 
-<div id="orgf6f86d7" class="figure">
+<div id="org6e9c880" class="figure">
 <p><img src="./img/lecc07/Sim-AR1SMA1.png" alt="Sim-AR1SMA1.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org200fb9c" class="outline-3">
-<h3 id="org200fb9c">ARIMA (1,0,0)x(1,0,0)</h3>
-<div class="outline-text-3" id="text-org200fb9c">
+<div id="outline-container-org1588207" class="outline-3">
+<h3 id="org1588207">ARIMA (1,0,0)x(1,0,0)</h3>
+<div class="outline-text-3" id="text-org1588207">
 <p>
 ARIMA\((1,0,0)\times(1,0,0)_{12}\): \(\quad (1-0.9 \mathsf{B})(1-0.9 \mathsf{B}^{12})X_t= U_t\)
 </p>
@@ -890,7 +890,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/ACF-AR1SAR1.png'</sp
 </div>
 
 
-<div id="org6f57670" class="figure">
+<div id="orgd1ba5c0" class="figure">
 <p><img src="./img/lecc07/ACF-AR1SAR1.png" alt="ACF-AR1SAR1.png" width="900px" />
 </p>
 </div>
@@ -905,15 +905,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/Sim-AR1SAR1.png'</sp
 
 
 
-<div id="org782cb69" class="figure">
+<div id="org017442f" class="figure">
 <p><img src="./img/lecc07/Sim-AR1SAR1.png" alt="Sim-AR1SAR1.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org3686384" class="outline-3">
-<h3 id="org3686384">ARIMA (0,0,1)x(1,0,0)</h3>
-<div class="outline-text-3" id="text-org3686384">
+<div id="outline-container-org74cdc4b" class="outline-3">
+<h3 id="org74cdc4b">ARIMA (0,0,1)x(1,0,0)</h3>
+<div class="outline-text-3" id="text-org74cdc4b">
 <p>
 ARIMA\((0,0,1)\times(1,0,0)_{12}\): \(\quad (1-0.9 \mathsf{B}^{12})X_t= (1-0.9 \mathsf{B})U_t\)
 </p>
@@ -927,7 +927,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/ACF-MA1SAR1.png'</sp
 </div>
 
 
-<div id="org3faeb3c" class="figure">
+<div id="org5719a91" class="figure">
 <p><img src="./img/lecc07/ACF-MA1SAR1.png" alt="ACF-MA1SAR1.png" width="900px" />
 </p>
 </div>
@@ -942,7 +942,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc07/Sim-MA1SAR1.png'</sp
 
 
 
-<div id="org3ea33e6" class="figure">
+<div id="orge608a67" class="figure">
 <p><img src="./img/lecc07/Sim-MA1SAR1.png" alt="Sim-MA1SAR1.png" width="900px" />
 </p>
 </div>
@@ -958,13 +958,13 @@ En estos cuatro ejemplos hemos podido apreciar que
 </div>
 </div>
 </div>
-<div id="outline-container-org317e4b5" class="outline-2">
-<h2 id="org317e4b5">Resumen del análisis univariante de series temporales</h2>
-<div class="outline-text-2" id="text-org317e4b5">
+<div id="outline-container-org3f5dc2f" class="outline-2">
+<h2 id="org3f5dc2f">Resumen del análisis univariante de series temporales</h2>
+<div class="outline-text-2" id="text-org3f5dc2f">
 </div>
-<div id="outline-container-orgb5e6b7c" class="outline-3">
-<h3 id="orgb5e6b7c">Ideas principales respecto a la modelización univariante</h3>
-<div class="outline-text-3" id="text-orgb5e6b7c">
+<div id="outline-container-org0d660ba" class="outline-3">
+<h3 id="org0d660ba">Ideas principales respecto a la modelización univariante</h3>
+<div class="outline-text-3" id="text-org0d660ba">
 <ul class="org-ul">
 <li>Es una modelización sin variables exógenas</li>
 <li>Modelizan la interdependencia temporal con polinomios de órdenes reducidos.</li>
@@ -1014,9 +1014,9 @@ En estos cuatro ejemplos hemos podido apreciar que
 </table>
 </div>
 </div>
-<div id="outline-container-orgc2a8517" class="outline-3">
-<h3 id="orgc2a8517">Metodología</h3>
-<div class="outline-text-3" id="text-orgc2a8517">
+<div id="outline-container-orga42052e" class="outline-3">
+<h3 id="orga42052e">Metodología</h3>
+<div class="outline-text-3" id="text-orga42052e">
 <p>
 Tres fases:
 </p>
@@ -1042,9 +1042,9 @@ Si la diagnosis es satisfactoria&hellip; ¡hemos logrado un modelo aceptable!&he
 </div>
 </div>
 </div>
-<div id="outline-container-org5dd9166" class="outline-2">
-<h2 id="org5dd9166">Introducción intuitiva e informal al concepto de ergodicidad</h2>
-<div class="outline-text-2" id="text-org5dd9166">
+<div id="outline-container-org8b079d3" class="outline-2">
+<h2 id="org8b079d3">Introducción intuitiva e informal al concepto de ergodicidad</h2>
+<div class="outline-text-2" id="text-org8b079d3">
 <p>
 La <b>ergodicidad</b> de un proceso estocástico es importante porque conecta el comportamiento en el tiempo de una sola realización del proceso con las propiedades estadísticas del conjunto de todas las posibles realizaciones. En otras palabras, nos dice cuándo “promediar en la muestra” puede arrojar un buen estimador de algún momento teórico. Es decir, si el proceso es <b>ergódico</b>:
 </p>
@@ -1091,9 +1091,9 @@ En términos prácticos: la ergodicidad es lo que “salva” la inferencia emp�
 En resumen: la ergodicidad es crucial porque es lo que hace posible inferir la estructura probabilística de un proceso observando solo una realización larga en el tiempo, algo que es lo habitual en el mundo real.
 </p>
 </div>
-<div id="outline-container-org677aae9" class="outline-3">
-<h3 id="org677aae9">Ejemplo de un proceso no ergódico</h3>
-<div class="outline-text-3" id="text-org677aae9">
+<div id="outline-container-org2604e26" class="outline-3">
+<h3 id="org2604e26">Ejemplo de un proceso no ergódico</h3>
+<div class="outline-text-3" id="text-org2604e26">
 <p>
 Consideremos un proceso de Bernoulli con un <i>parámetro aleatorio fijo</i> \(p\):
 </p>
@@ -1125,13 +1125,13 @@ Por tanto, este proceso no es ergódico: los promedios temporales dependen de la
 <h2 class="footnotes">Notas al pie de p&aacute;gina: </h2>
 <div id="text-footnotes">
 
-<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Véase la sección <a href="#org5dd9166">Introducción intuitiva e informal al concepto de ergodicidad</a>.</p></div></div>
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">Véase la sección <a href="#org8b079d3">Introducción intuitiva e informal al concepto de ergodicidad</a>.</p></div></div>
 
 
 </div>
 </div></div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-10-06 Mon 12:24</p>
+<p class="date">Created: 2025-10-08 Wed 21:11</p>
 </div>
 </body>
 </html>
