@@ -14,11 +14,9 @@ function series SimuladorMA(matrix theta)
     # donde theta es el polinomio MA y q es su grado.
     series WN = normal (0,1)
     series X = 0
-
     loop i=1..cols(theta)
         X = X + theta[i]*WN(1-i)
     endloop
-    
     return X
 end function
 
@@ -31,71 +29,67 @@ scalar theta2 = 0.8
 series X = SimuladorMA( {1, -theta1,  -theta2} )
 figura <- corrgm X 12
 
-scalar theta2 = 0.5
-n = 0
-loop for (r=0; r<=1-theta2; r+=.1)
+scalar theta2 = 0.45
+scalar n = 0
+loop for (r=0; r<=1-theta2-0.04; r+=.09)
     n += 1
     scalar theta1 = r
-    nombre = sprintf("Zona1-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Zona1-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
 endloop
 
-scalar theta2 = 0.5
-n = 0
-loop for (r=theta2-1; r<=0; r+=.1)
+scalar theta2 = 0.45
+scalar n = 0
+loop for (r=-theta2; r<=0.03; r+=.09)
     n += 1
     scalar theta1 = r
-    nombre = sprintf("Zona2-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Zona2-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
 endloop
 
-#scalar theta2 = -0.75
-scalar theta2 = -0.99
-n = 0
-#loop for (r=theta2-1; r<=0.01; r+=.35)
+scalar theta2 = -0.95
+scalar n = 0
 loop for (r=theta2-1; r<=0.01; r+=.39)
     n += 1
     scalar theta1 = r
-    nombre = sprintf("Zona3-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Zona3-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
 endloop
 
-#scalar theta2 = -0.75
-scalar theta2 = -0.99
-n = 0
-#loop for (r=0; r<=1-theta2; r+=.35)
-loop for (r=0; r<=1-theta2; r+=.39)
+scalar theta2 = -0.95
+scalar n = 0
+loop for (r=0; r<=1-theta2+0.01; r+=.39)
     n += 1
     scalar theta1 = r
-    nombre = sprintf("Zona4-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Zona4-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
 endloop
 
 scalar theta1 = 0
-n = 0
-loop for (r=-.99; r<=1; r+=0.33)
+scalar n = 0
+loop for (r=-.96; r<=1; r+=0.32)
     n += 1
     scalar theta2 = r
-    nombre = sprintf("EjeVertical-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("EjeVertical-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
 endloop
 
-n = 0
-loop for (r=-.99; r<=1; r+=0.33)
+scalar n = 0
+loop for (r=-1.91; r<=2; r+=0.636)
     n += 1
     scalar theta1 = r
     scalar theta2 = -theta1*theta1/4
-    nombre = sprintf("Parabola-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Parabola-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
