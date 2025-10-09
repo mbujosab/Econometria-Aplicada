@@ -17,16 +17,15 @@ function series SimuladorAR(matrix phi)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
 
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)                                 
     series U = normal(0,1)                    
     series Y = 0                              
     setinfo Y --description="Serie simulada"
 
     loop i = (p+1)..$nobs                     
     
-        comb_pasado_Yt = 0                         
-        perturbacion = U[i]
+        scalar comb_pasado_Yt = 0                         
+        scalar perturbacion = U[i]
     
         loop j = 2..p                         
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
@@ -116,14 +115,9 @@ function series SimuladorMA(matrix theta)
     # donde theta es el polinomio MA y q es su grado.
     series WN = normal (0,1)
     series X = 0
-
     loop i=1..cols(theta)
-        # print i        # (descomente estos prints si no entiende el funcionamiento)
-        # print theta[i]
-        # print 1-i
         X = X + theta[i]*WN(1-i)
     endloop
-    
     return X
 end function
 
@@ -131,16 +125,15 @@ function series SimuladorARMA(matrix phi, matrix theta)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
 
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)                                 
     series procesoMA = SimuladorMA(theta)
     series Y = 0                              
     setinfo Y --description="Serie simulada"
 
     loop i = (p+1)..$nobs                     
     
-        comb_pasado_Yt = 0                         
-        perturbacion = procesoMA[i]
+        scalar comb_pasado_Yt = 0                         
+        scalar perturbacion   = procesoMA[i]
     
         loop j = 2..p                         
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada

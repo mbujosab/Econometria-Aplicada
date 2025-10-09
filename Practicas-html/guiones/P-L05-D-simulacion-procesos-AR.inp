@@ -12,28 +12,19 @@ set workdir "@directory"
 function series SimuladorAR(matrix phi)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
-
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)
     series U = normal(0,1)                    
     series Y = 0                              
     setinfo Y --description="Serie simulada"
-
     loop i = (p+1)..$nobs                     
-    
-        comb_pasado_Yt = 0                         
-        perturbacion = U[i]
-    
-        loop j = 2..p                         
+        scalar comb_pasado_Yt = 0
+        scalar perturbacion = U[i]
+        loop j = 2..p
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
         endloop
-    
-        Y[i] = comb_pasado_Yt + perturbacion       
-    
+        Y[i] = comb_pasado_Yt + perturbacion
     endloop
-
     return Y
-
 end function
 
 # establecemos la muestra
@@ -42,11 +33,11 @@ setobs 12 1900:01 --time-series
 
 scalar phi1 = 0
 scalar phi2 = 0.8
-series X = SimuladorAR( {1, -phi1,  -phi2} )
+series X = SimuladorAR( {1, -phi1, -phi2} )
 figura <- corrgm X 12
 
 scalar phi2 = 0.5
-n = 0
+scalar n = 0
 loop for (r=0; r<=1-phi2; r+=.1)
     n += 1
     scalar phi1 = r
@@ -57,7 +48,7 @@ loop for (r=0; r<=1-phi2; r+=.1)
 endloop
 
 scalar phi2 = 0.5
-n = 0
+scalar n = 0
 loop for (r=phi2-1; r<=0; r+=.1)
     n += 1
     scalar phi1 = r
@@ -67,11 +58,9 @@ loop for (r=phi2-1; r<=0; r+=.1)
     corrgm @sname 12 --plot=@nombre.png
 endloop
 
-#scalar phi2 = -0.75
 scalar phi2 = -0.99
-n = 0
-#loop for (r=phi2-1; r<=0.01; r+=.35)
-loop for (r=phi2-1; r<=0.01; r+=.39)
+scalar n = 0
+loop for (r=phi2-1+0.01; r<=0.01; r+=.39)
     n += 1
     scalar phi1 = r
     nombre = sprintf("Zona3-%d(%1.1f-%1.1f)", n, phi1, phi2)
@@ -80,10 +69,8 @@ loop for (r=phi2-1; r<=0.01; r+=.39)
     corrgm @sname 12 --plot=@nombre.png
 endloop
 
-#scalar phi2 = -0.75
 scalar phi2 = -0.99
-n = 0
-#loop for (r=0; r<=1-phi2; r+=.35)
+scalar n = 0
 loop for (r=0; r<=1-phi2; r+=.39)
     n += 1
     scalar phi1 = r
@@ -94,8 +81,8 @@ loop for (r=0; r<=1-phi2; r+=.39)
 endloop
 
 scalar phi1 = 0
-n = 0
-loop for (r=-.99; r<=1; r+=0.33)
+scalar n = 0
+loop for (r=-.98; r<=1; r+=0.32)
     n += 1
     scalar phi2 = r
     nombre = sprintf("EjeVertical-%d(%1.1f-%1.1f)", n, phi1, phi2)
@@ -104,8 +91,8 @@ loop for (r=-.99; r<=1; r+=0.33)
     corrgm @sname 12 --plot=@nombre.png
 endloop
 
-n = 0
-loop for (r=-.99; r<=1; r+=0.33)
+scalar n = 0
+loop for (r=-1.91; r<=2; r+=0.63)
     n += 1
     scalar phi1 = r
     scalar phi2 = -phi1*phi1/4

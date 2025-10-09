@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-10-08 Wed 21:11 -->
+<!-- 2025-10-09 Thu 17:35 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 5.C - Simulación de procesos AR(1) y exploración de sus correlogramas</title>
@@ -68,16 +68,16 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0ef3ac8">Objetivo de la práctica</a></li>
-<li><a href="#orgbfe579c">Actividad 2 - Modelos AR(\(1\)) parámetro positivo</a></li>
-<li><a href="#org336c440">Actividad 1 - Modelos AR(\(1\)) parámetro negativo</a></li>
-<li><a href="#orgc98ee3f">Código completo de la práctica</a></li>
+<li><a href="#org449cfb8">Objetivo de la práctica</a></li>
+<li><a href="#org991a9ba">Actividad 2 - Modelos AR(\(1\)) parámetro positivo</a></li>
+<li><a href="#orgd08e0c4">Actividad 1 - Modelos AR(\(1\)) parámetro negativo</a></li>
+<li><a href="#org3100184">Código completo de la práctica</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org0ef3ac8" class="outline-2">
-<h2 id="org0ef3ac8">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-org0ef3ac8">
+<div id="outline-container-org449cfb8" class="outline-2">
+<h2 id="org449cfb8">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-org449cfb8">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -114,31 +114,22 @@ org_html_manager.setup();  // activate after the parameters are set
 Programe o recupere de una práctica anterior una función que simule procesos AR(\(q\))
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org1b0bfc5"><code>function series SimuladorAR(matrix phi)
+<pre class="src src-gretl" id="orga547c04"><code>function series SimuladorAR(matrix phi)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
-
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)                             
     series U = normal(0,1)                    
     series Y = 0                              
     setinfo Y --description="Serie simulada"
-
-    loop i = (p+1)..$nobs                     
-    
-        comb_pasado_Yt = 0                         
-        perturbacion = U[i]
-    
+    loop i = (p+1)..$nobs                         
+        scalar comb_pasado_Yt = 0                         
+        scalar perturbacion = U[i]    
         loop j = 2..p                         
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
-        endloop
-    
-        Y[i] = comb_pasado_Yt + perturbacion       
-    
+        endloop    
+        Y[i] = comb_pasado_Yt + perturbacion    
     endloop
-
     return Y
-
 end function
 </code></pre>
 </div>
@@ -154,9 +145,9 @@ setobs 12 1900:01 --time-series
 </div>
 </div>
 </div>
-<div id="outline-container-orgbfe579c" class="outline-2">
-<h2 id="orgbfe579c">Actividad 2 - Modelos AR(\(1\)) parámetro positivo</h2>
-<div class="outline-text-2" id="text-orgbfe579c">
+<div id="outline-container-org991a9ba" class="outline-2">
+<h2 id="org991a9ba">Actividad 2 - Modelos AR(\(1\)) parámetro positivo</h2>
+<div class="outline-text-2" id="text-org991a9ba">
 <p>
 Pruebe a simular modelos AR(\(1\)) 
 \[
@@ -179,9 +170,9 @@ donde \(\boldsymbol{U}\sim WN(0,1)\), con valores paramétricos: entre \(0\) y \
 </div>
 </div>
 </div>
-<div id="outline-container-org336c440" class="outline-2">
-<h2 id="org336c440">Actividad 1 - Modelos AR(\(1\)) parámetro negativo</h2>
-<div class="outline-text-2" id="text-org336c440">
+<div id="outline-container-orgd08e0c4" class="outline-2">
+<h2 id="orgd08e0c4">Actividad 1 - Modelos AR(\(1\)) parámetro negativo</h2>
+<div class="outline-text-2" id="text-orgd08e0c4">
 <p>
 Pruebe a simular modelos AR(\(1\)) 
 \[
@@ -204,9 +195,9 @@ donde \(\boldsymbol{U}\sim WN(0,1)\), con valores paramétricos: entre \(-1\) y 
 </div>
 </div>
 </div>
-<div id="outline-container-orgc98ee3f" class="outline-2">
-<h2 id="orgc98ee3f">Código completo de la práctica</h2>
-<div class="outline-text-2" id="text-orgc98ee3f">
+<div id="outline-container-org3100184" class="outline-2">
+<h2 id="org3100184">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-org3100184">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -226,7 +217,7 @@ donde \(\boldsymbol{U}\sim WN(0,1)\), con valores paramétricos: entre \(-1\) y 
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-10-08 Wed 21:11</p>
+<p class="date">Created: 2025-10-09 Thu 17:35</p>
 </div>
 </body>
 </html>

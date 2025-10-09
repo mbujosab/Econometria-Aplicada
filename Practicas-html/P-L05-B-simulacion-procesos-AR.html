@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-10-08 Wed 21:11 -->
+<!-- 2025-10-09 Thu 17:35 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 5.B - Simulación de procesos AR</title>
@@ -101,40 +101,42 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org91245d6">Objetivo de la práctica</a></li>
-<li><a href="#org1558928">Actividad 1 - Procesos auto-regresivos</a></li>
-<li><a href="#org2a99ff1">Actividad 2 - Simular un proceso AR(p)</a>
+<li><a href="#org2be5bc7">Objetivo de la práctica</a></li>
+<li><a href="#orgd5b7c4d">Actividad 1 - Procesos auto-regresivos</a></li>
+<li><a href="#orgce8b9a3">Actividad 2 - Simular un proceso AR(p)</a>
 <ul>
-<li><a href="#org037fcf6">Muestra y argumentos necesarios</a></li>
-<li><a href="#org9a07943">Valores iniciales</a></li>
-<li><a href="#orgc78679b">Estructura del programa que necesita</a></li>
+<li><a href="#org1e0b173">Muestra y argumentos necesarios</a></li>
+<li><a href="#org52527d3">Valores iniciales</a></li>
+<li><a href="#org27b31fc">Estructura del programa que necesita</a></li>
 </ul>
 </li>
-<li><a href="#orga3e799c">Actividad 3 - Genere una función que simule un paseo aleatorio</a>
+<li><a href="#org9c6062f">Actividad 3 - Genere una función que simule un paseo aleatorio</a>
 <ul>
-<li><a href="#org634ec56">Ejemplo de funcionamiento</a></li>
+<li><a href="#org4b7f0a2">Ejemplo de funcionamiento</a></li>
 </ul>
 </li>
-<li><a href="#org5592719">Actividad 4 - Use su función en un bucle para generar muchas realizaciones de un mismo proceso AR(p)</a>
+<li><a href="#orgb2618d9">Actividad 4 - Use su función en un bucle para generar muchas realizaciones de un mismo proceso AR(p)</a>
 <ul>
-<li><a href="#orgf737f22">Pruebe con un primer polinomio</a></li>
-<li><a href="#org32c6985">Y ahora pruebe con otro polinomio</a></li>
+<li><a href="#org34ad7ab">Pruebe con un primer polinomio</a></li>
+<li><a href="#org8bf7e4e">Y ahora pruebe con otro polinomio</a></li>
 </ul>
 </li>
-<li><a href="#orgbecb867">Actividad 5 - Extensiones</a>
+<li><a href="#org324607c">Actividad 5 - Extensiones</a>
 <ul>
-<li><a href="#orgc75d1f2">Piense cómo usar su nueva función para simular un paseo aleatorio</a></li>
-<li><a href="#org9151c90">Piense cómo generalizar su función para simular un proceso ARMA(p,q)</a></li>
+<li><a href="#org6aeabfb">Piense cómo usar su nueva función para simular un paseo aleatorio</a></li>
+<li><a href="#org91ec96c">Piense cómo generalizar su función para simular un proceso ARMA(p,q)</a></li>
 </ul>
 </li>
-<li><a href="#org6351b21">Código completo de la práctica</a></li>
-<li><a href="#org964f692">Posibles resoluciones</a>
+<li><a href="#org58e5afa">Código completo de la práctica</a></li>
+<li><a href="#org4e2cc91">Posibles resoluciones</a>
 <ul>
-<li><a href="#orgd602931">Actividad 2</a></li>
-<li><a href="#org4fa5bef">Actividad 3</a></li>
-<li><a href="#org368c09f">Actividad 5</a>
+<li><a href="#orgc7b61b9">Actividad 2</a></li>
+<li><a href="#org1cc5766">Actividad 3</a></li>
+<li><a href="#orgc219602">Actividad 5</a>
 <ul>
-<li><a href="#org92ff4b3">Generalización descartando el ``transitorio''</a></li>
+<li><a href="#orgd97b2ce">Paseo aleatorio</a></li>
+<li><a href="#org454d34b">Simulación ARMA</a></li>
+<li><a href="#orgd6071eb">Generalización descartando el ``transitorio''</a></li>
 </ul>
 </li>
 </ul>
@@ -142,9 +144,9 @@ org_html_manager.setup();  // activate after the parameters are set
 </ul>
 </div>
 </div>
-<div id="outline-container-org91245d6" class="outline-2">
-<h2 id="org91245d6">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-org91245d6">
+<div id="outline-container-org2be5bc7" class="outline-2">
+<h2 id="org2be5bc7">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-org2be5bc7">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -177,9 +179,9 @@ En las prácticas anteriores hemos simulado procesos estacionarios MA. Ahora vam
 </ol>
 </div>
 </div>
-<div id="outline-container-org1558928" class="outline-2">
-<h2 id="org1558928">Actividad 1 - Procesos auto-regresivos</h2>
-<div class="outline-text-2" id="text-org1558928">
+<div id="outline-container-orgd5b7c4d" class="outline-2">
+<h2 id="orgd5b7c4d">Actividad 1 - Procesos auto-regresivos</h2>
+<div class="outline-text-2" id="text-orgd5b7c4d">
 <p>
 Consideremos un proceso estocástico \(\boldsymbol{Y}\) solución de la siguiente ecuación en diferencias:
 \[
@@ -214,13 +216,13 @@ Como en los casos anteriores, para poder simularlo necesitamos cambiar el escena
 </p>
 </div>
 </div>
-<div id="outline-container-org2a99ff1" class="outline-2">
-<h2 id="org2a99ff1">Actividad 2 - Simular un proceso AR(p)</h2>
-<div class="outline-text-2" id="text-org2a99ff1">
+<div id="outline-container-orgce8b9a3" class="outline-2">
+<h2 id="orgce8b9a3">Actividad 2 - Simular un proceso AR(p)</h2>
+<div class="outline-text-2" id="text-orgce8b9a3">
 </div>
-<div id="outline-container-org037fcf6" class="outline-3">
-<h3 id="org037fcf6">Muestra y argumentos necesarios</h3>
-<div class="outline-text-3" id="text-org037fcf6">
+<div id="outline-container-org1e0b173" class="outline-3">
+<h3 id="org1e0b173">Muestra y argumentos necesarios</h3>
+<div class="outline-text-3" id="text-org1e0b173">
 <p>
 Como en casos anteriores, debemos fijar un tamaño muestral y unas fechas; por tratarse de un ejemplo de series temporales. Ya sabemos que lo podemos lograr ejecutando por ejemplo:
 </p>
@@ -260,9 +262,9 @@ Para generalizar nuestro código necesitaremos invocar a alguna de estas dos fun
 </p>
 </div>
 </div>
-<div id="outline-container-org9a07943" class="outline-3">
-<h3 id="org9a07943">Valores iniciales</h3>
-<div class="outline-text-3" id="text-org9a07943">
+<div id="outline-container-org52527d3" class="outline-3">
+<h3 id="org52527d3">Valores iniciales</h3>
+<div class="outline-text-3" id="text-org52527d3">
 <p>
 Si el polinomio AR es de grado \(p\), para calcular \(y_t\) necesito conocer los \(p\) valores previos a \(y_t\). 
 </p>
@@ -286,9 +288,9 @@ para cada instante \(t\), cada una de las partes en la suma es distinta, pues de
 </p>
 </div>
 </div>
-<div id="outline-container-orgc78679b" class="outline-3">
-<h3 id="orgc78679b">Estructura del programa que necesita</h3>
-<div class="outline-text-3" id="text-orgc78679b">
+<div id="outline-container-org27b31fc" class="outline-3">
+<h3 id="org27b31fc">Estructura del programa que necesita</h3>
+<div class="outline-text-3" id="text-org27b31fc">
 <ol class="org-ol">
 <li>Piense cuantos bucles necesita.</li>
 <li>Diseñe en un papel la estructura del programa que necesita.</li>
@@ -298,9 +300,9 @@ Si no funciona piense cuál puede ser el error y corríjalo.</li>
 </div>
 </div>
 </div>
-<div id="outline-container-orga3e799c" class="outline-2">
-<h2 id="orga3e799c">Actividad 3 - Genere una función que simule un paseo aleatorio</h2>
-<div class="outline-text-2" id="text-orga3e799c">
+<div id="outline-container-org9c6062f" class="outline-2">
+<h2 id="org9c6062f">Actividad 3 - Genere una función que simule un paseo aleatorio</h2>
+<div class="outline-text-2" id="text-org9c6062f">
 <p>
 Generalice lo anterior escribiendo una función que devuelva realizaciones de procesos AR(p) a partir de polinomios AR.
 </p>
@@ -314,9 +316,9 @@ Generalice lo anterior escribiendo una función que devuelva realizaciones de pr
 Cuando tenga su función, pruebe su funcionamiento con algún script o guión.
 </p>
 </div>
-<div id="outline-container-org634ec56" class="outline-3">
-<h3 id="org634ec56">Ejemplo de funcionamiento</h3>
-<div class="outline-text-3" id="text-org634ec56">
+<div id="outline-container-org4b7f0a2" class="outline-3">
+<h3 id="org4b7f0a2">Ejemplo de funcionamiento</h3>
+<div class="outline-text-3" id="text-org4b7f0a2">
 <div class="org-src-container">
 <pre class="src src-gretl"><code># establecemos la muestra
 nulldata 200
@@ -337,7 +339,7 @@ gnuplot X Y --time-series --with-lines  --output="RandomWalks.png"
 
 <div class="org-center">
 
-<div id="org1e22b65" class="figure">
+<div id="org3cd77dc" class="figure">
 <p><img src="P-L05-B-simulacion-procesos-AR/RandomWalks.png" alt="RandomWalks.png" />
 </p>
 <p><span class="figure-number">Figura 1: </span>Figura con la simulación de dos procesos AR</p>
@@ -346,13 +348,13 @@ gnuplot X Y --time-series --with-lines  --output="RandomWalks.png"
 </div>
 </div>
 </div>
-<div id="outline-container-org5592719" class="outline-2">
-<h2 id="org5592719">Actividad 4 - Use su función en un bucle para generar muchas realizaciones de un mismo proceso AR(p)</h2>
-<div class="outline-text-2" id="text-org5592719">
+<div id="outline-container-orgb2618d9" class="outline-2">
+<h2 id="orgb2618d9">Actividad 4 - Use su función en un bucle para generar muchas realizaciones de un mismo proceso AR(p)</h2>
+<div class="outline-text-2" id="text-orgb2618d9">
 </div>
-<div id="outline-container-orgf737f22" class="outline-3">
-<h3 id="orgf737f22">Pruebe con un primer polinomio</h3>
-<div class="outline-text-3" id="text-orgf737f22">
+<div id="outline-container-org34ad7ab" class="outline-3">
+<h3 id="org34ad7ab">Pruebe con un primer polinomio</h3>
+<div class="outline-text-3" id="text-org34ad7ab">
 <p>
 Por ejemplo con el polinomio \(\boldsymbol{\phi}(\mathsf{B}) = 1-1.6\mathsf{B}+0.64\mathsf{B}^2 = (1-0.8\mathsf{B})(1-0.8\mathsf{B})\); es decir, simule el modelo
 \[
@@ -383,7 +385,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR
 
 <div class="org-center">
 
-<div id="orgfbdb8dc" class="figure">
+<div id="org200e49c" class="figure">
 <p><img src="P-L05-B-simulacion-procesos-AR/MuchosAR2_I.png" alt="MuchosAR2_I.png" />
 </p>
 <p><span class="figure-number">Figura 2: </span>Figura con la simulación de 300 procesos AR(2)</p>
@@ -391,7 +393,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR
 </div>
 
 <p>
-La figura <a href="#orgfbdb8dc">2</a> presenta 300 realizaciones del proceso
+La figura <a href="#org200e49c">2</a> presenta 300 realizaciones del proceso
 \((1-1.6\mathsf{B}+0.64\mathsf{B}^2)Y_t = U_t\); 
 con la función que hemos programado. 
 El proceso comienza siempre con el valor cero, pero la probabilidad de que tome valores alejados de cero crece rápidamente, pero se estabiliza inmediatamente. 
@@ -432,9 +434,9 @@ y la desviación típica es aproximadamente \(6\). Si calcula las raíces de est
 </div>
 </div>
 </div>
-<div id="outline-container-org32c6985" class="outline-3">
-<h3 id="org32c6985">Y ahora pruebe con otro polinomio</h3>
-<div class="outline-text-3" id="text-org32c6985">
+<div id="outline-container-org8bf7e4e" class="outline-3">
+<h3 id="org8bf7e4e">Y ahora pruebe con otro polinomio</h3>
+<div class="outline-text-3" id="text-org8bf7e4e">
 <p>
 Por ejemplo con el polinomio \(\boldsymbol{\phi}(\mathsf{B}) = 1+0.2\mathsf{B}-0.8\mathsf{B}^2  = (1+\mathsf{B})(1-0.8\mathsf{B})\); es decir, simule el modelo
 \[
@@ -465,7 +467,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR
 
 <div class="org-center">
 
-<div id="orgfa603d0" class="figure">
+<div id="orgd8a949f" class="figure">
 <p><img src="P-L05-B-simulacion-procesos-AR/MuchosAR2_II.png" alt="MuchosAR2_II.png" />
 </p>
 <p><span class="figure-number">Figura 3: </span>Figura con 300 simulaciones del modelo \(Y_t = -0.2Y_{t-1} + 0.8Y_{t-2} + U_t\).</p>
@@ -473,7 +475,7 @@ gnuplot --matrix=M --time-series --with-lines  { set nokey; } --output="MuchosAR
 </div>
 
 <p>
-La figura <a href="#orgfa603d0">3</a> presenta 300 realizaciones del modelo no estacionario:
+La figura <a href="#orgd8a949f">3</a> presenta 300 realizaciones del modelo no estacionario:
 \(Y_t = -0.1Y_{t-1} + 0.9Y_{t-2} + U_t\); 
 con la función que hemos programado. 
 Los primeros valores son cero, pero la probabilidad de que tome valores alejados de cero crece continuamente con \(t\).
@@ -515,20 +517,20 @@ Si calcula las raíces de \(\boldsymbol{\phi}(z)=1+0.2\,z-0.8\,z^2\) comprobará
 </div>
 </div>
 </div>
-<div id="outline-container-orgbecb867" class="outline-2">
-<h2 id="orgbecb867">Actividad 5 - Extensiones</h2>
-<div class="outline-text-2" id="text-orgbecb867">
+<div id="outline-container-org324607c" class="outline-2">
+<h2 id="org324607c">Actividad 5 - Extensiones</h2>
+<div class="outline-text-2" id="text-org324607c">
 </div>
-<div id="outline-container-orgc75d1f2" class="outline-3">
-<h3 id="orgc75d1f2">Piense cómo usar su nueva función para simular un paseo aleatorio</h3>
-<div class="outline-text-3" id="text-orgc75d1f2">
+<div id="outline-container-org6aeabfb" class="outline-3">
+<h3 id="org6aeabfb">Piense cómo usar su nueva función para simular un paseo aleatorio</h3>
+<div class="outline-text-3" id="text-org6aeabfb">
 <p>
 <b>Pista</b>: Piense cuál es el polinomio AR asociado a un paseo aleatorio.
 </p>
 
 <div class="org-center">
 
-<div id="orgca69b88" class="figure">
+<div id="org21ae768" class="figure">
 <p><img src="P-L05-B-simulacion-procesos-AR/RW.png" alt="RW.png" />
 </p>
 <p><span class="figure-number">Figura 4: </span>Figura con la simulación de un paseo aleatorio con la función que simula ARs.</p>
@@ -536,9 +538,9 @@ Si calcula las raíces de \(\boldsymbol{\phi}(z)=1+0.2\,z-0.8\,z^2\) comprobará
 </div>
 </div>
 </div>
-<div id="outline-container-org9151c90" class="outline-3">
-<h3 id="org9151c90">Piense cómo generalizar su función para simular un proceso ARMA(p,q)</h3>
-<div class="outline-text-3" id="text-org9151c90">
+<div id="outline-container-org91ec96c" class="outline-3">
+<h3 id="org91ec96c">Piense cómo generalizar su función para simular un proceso ARMA(p,q)</h3>
+<div class="outline-text-3" id="text-org91ec96c">
 <p>
 <b>Pista</b>: Escriba el modelo de un proceso ARMA \(\boldsymbol(Y)\), despeje \(Y_t\). 
 Analice la composición del lado de la derecha de la ecuación. 
@@ -552,7 +554,7 @@ Si se da cuenta, con esta práctica (y las anteriores) quizá ya tiene todas las
 
 <div class="org-center">
 
-<div id="org09cc61b" class="figure">
+<div id="orga46dedd" class="figure">
 <p><img src="P-L05-B-simulacion-procesos-AR/ARMA.png" alt="ARMA.png" />
 </p>
 <p><span class="figure-number">Figura 5: </span>Figura con la simulación de un proceso ARMA.</p>
@@ -561,9 +563,9 @@ Si se da cuenta, con esta práctica (y las anteriores) quizá ya tiene todas las
 </div>
 </div>
 </div>
-<div id="outline-container-org6351b21" class="outline-2">
-<h2 id="org6351b21">Código completo de la práctica</h2>
-<div class="outline-text-2" id="text-org6351b21">
+<div id="outline-container-org58e5afa" class="outline-2">
+<h2 id="org58e5afa">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-org58e5afa">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -581,19 +583,19 @@ Si se da cuenta, con esta práctica (y las anteriores) quizá ya tiene todas las
 </table>
 </div>
 </div>
-<div id="outline-container-org964f692" class="outline-2">
-<h2 id="org964f692">Posibles resoluciones</h2>
-<div class="outline-text-2" id="text-org964f692">
+<div id="outline-container-org4e2cc91" class="outline-2">
+<h2 id="org4e2cc91">Posibles resoluciones</h2>
+<div class="outline-text-2" id="text-org4e2cc91">
 </div>
-<div id="outline-container-orgd602931" class="outline-3">
-<h3 id="orgd602931">Actividad 2</h3>
-<div class="outline-text-3" id="text-orgd602931">
+<div id="outline-container-orgc7b61b9" class="outline-3">
+<h3 id="orgc7b61b9">Actividad 2</h3>
+<div class="outline-text-3" id="text-orgc7b61b9">
 <div class="org-src-container">
-<pre class="src src-gretl" id="orgbb8e53f"><code>nulldata 300
+<pre class="src src-gretl" id="org47aa378"><code>nulldata 300
 setobs 4 1960:01 --time-series
 
-matrix phi   = {1, -.8}                   # polinomio AR
-p = cols(phi)                             # grado del polinomio
+matrix phi = {1, -.8}                     # polinomio AR
+scalar p   = cols(phi)                    # grado del polinomio
 
 series U = normal(0,1)                    # proceso de ruido blanco
 series Y = 0                              # iniciamos la serie con ceros
@@ -601,12 +603,12 @@ series Y = 0                              # iniciamos la serie con ceros
 ## bucle para generar los valores del proceso
 loop i = (p+1)..$nobs                     # los p primeros datos los dejamos como están
 
-    comb_pasado_Yt = 0                    # inicializamos el cálculo en cada iteración
-    perturbacion = U[i]
+    scalar comb_pasado_Yt = 0             # inicializamos el cálculo en cada iteración
+    scalar perturbacion = U[i]
 
-    loop j = 2..p                         # recorremos los parámetros
-
-        comb_pasado_Yt = comb_pasado_Yt - phi[1,j] * Y[i-j+1]    # calculo parámetro a parámetro
+    loop j = 2..p                         # calculo parámetro phi a parámetro phi
+        
+        comb_pasado_Yt = comb_pasado_Yt - phi[1,j] * Y[i-j+1]    
 
     endloop
 
@@ -618,52 +620,45 @@ endloop
 
 <p>
 La siguiente variante en lugar de calcular la suma con
-<code>comb_pasado_Yt = comb_pasado_Yt + phi[1,j] * Y[i-j]</code>, usa <code>+=</code>, que evita escribir <code>comb_pasado_Yt</code> dos veces. Con <code>+=</code> indicamos que aumente en cantidad expresada a la derecha el valor de la variable a la izquierda (logramos expresiones más compactas).
+<code>comb_pasado_Yt = comb_pasado_Yt + phi[1,j] * Y[i-j]</code>, usa <code>+=</code>, que evita escribir <code>comb_pasado_Yt</code> dos veces. Con <code>+=</code> indicamos que aumente en cantidad expresada a la derecha el valor de la variable a la izquierda (logrando expresiones más compactas).
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org9ab94fd"><code>nulldata 300
+<pre class="src src-gretl" id="org000bdcd"><code>nulldata 300
 setobs 4 1960:01 --time-series
-
 matrix phi   = {1, -.8}                   
-p = cols(phi)                             
-
+scalar p = cols(phi)                             
 series U = normal(0,1)                    
 series Y = 0                              
 
 loop i = (p+1)..$nobs                     
-
-    comb_pasado_Yt = 0                         
-    perturbacion = U[i]
-
+    scalar comb_pasado_Yt = 0                         
+    scalar perturbacion = U[i]
     loop j = 2..p                         
         comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
     endloop
-
     Y[i] = comb_pasado_Yt + perturbacion       
-
 endloop
 </code></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org4fa5bef" class="outline-3">
-<h3 id="org4fa5bef">Actividad 3</h3>
-<div class="outline-text-3" id="text-org4fa5bef">
+<div id="outline-container-org1cc5766" class="outline-3">
+<h3 id="org1cc5766">Actividad 3</h3>
+<div class="outline-text-3" id="text-org1cc5766">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org973eac9"><code>function series SimuladorAR(matrix phi)
+<pre class="src src-gretl" id="org637f7cf"><code>function series SimuladorAR(matrix phi)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
 
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)                                 
     series U = normal(0,1)                    
     series Y = 0                              
     setinfo Y --description="Serie simulada"
 
     loop i = (p+1)..$nobs                     
     
-        comb_pasado_Yt = 0                         
-        perturbacion = U[i]
+        scalar comb_pasado_Yt = 0                         
+        scalar perturbacion = U[i]
     
         loop j = 2..p                         
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
@@ -680,15 +675,23 @@ end function
 </div>
 </div>
 </div>
-<div id="outline-container-org368c09f" class="outline-3">
-<h3 id="org368c09f">Actividad 5</h3>
-<div class="outline-text-3" id="text-org368c09f">
+<div id="outline-container-orgc219602" class="outline-3">
+<h3 id="orgc219602">Actividad 5</h3>
+<div class="outline-text-3" id="text-orgc219602">
+</div>
+<div id="outline-container-orgd97b2ce" class="outline-4">
+<h4 id="orgd97b2ce">Paseo aleatorio</h4>
+<div class="outline-text-4" id="text-orgd97b2ce">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>series RW = SimuladorAR( {1, -1} )
 gnuplot RW --time-series --with-lines  { set nokey; } --output="RW.png"
 </code></pre>
 </div>
-
+</div>
+</div>
+<div id="outline-container-org454d34b" class="outline-4">
+<h4 id="org454d34b">Simulación ARMA</h4>
+<div class="outline-text-4" id="text-org454d34b">
 <div class="org-src-container">
 <pre class="src src-gretl"><code># recuperamos nuesta función de la práctica anterior
 function series SimuladorMA(matrix theta)
@@ -696,14 +699,9 @@ function series SimuladorMA(matrix theta)
     # donde theta es el polinomio MA y q es su grado.
     series WN = normal (0,1)
     series X = 0
-
     loop i=1..cols(theta)
-        # print i        # (descomente estos prints si no entiende el funcionamiento)
-        # print theta[i]
-        # print 1-i
         X = X + theta[i]*WN(1-i)
     endloop
-    
     return X
 end function
 
@@ -711,16 +709,15 @@ function series SimuladorARMA(matrix phi, matrix theta)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
 
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)                                 
     series procesoMA = SimuladorMA(theta)
     series Y = 0                              
     setinfo Y --description="Serie simulada"
 
     loop i = (p+1)..$nobs                     
     
-        comb_pasado_Yt = 0                         
-        perturbacion = procesoMA[i]
+        scalar comb_pasado_Yt = 0                         
+        scalar perturbacion   = procesoMA[i]
     
         loop j = 2..p                         
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
@@ -739,9 +736,10 @@ gnuplot Z --time-series --with-lines  { set nokey; } --output="ARMA.png"
 </code></pre>
 </div>
 </div>
-<div id="outline-container-org92ff4b3" class="outline-4">
-<h4 id="org92ff4b3">Generalización descartando el ``transitorio''</h4>
-<div class="outline-text-4" id="text-org92ff4b3">
+</div>
+<div id="outline-container-orgd6071eb" class="outline-4">
+<h4 id="orgd6071eb">Generalización descartando el ``transitorio''</h4>
+<div class="outline-text-4" id="text-orgd6071eb">
 <p>
 y con algún refinamiento más; además de no depender de funciones externas como <code>SimuladorMA</code>.
 </p>
@@ -750,8 +748,8 @@ y con algún refinamiento más; además de no depender de funciones externas com
     # SimuladorAR(phi, theta) simula un proceso ARMA(p,q), 
     # donde p es el grado del AR y q el grado del polinomio MA.
 
-    p = xmax(cols(phi), rows(phi))     # por si es matriz fila o bien matriz columna
-    q = xmax(cols(theta), rows(theta)) # por si es matriz fila o bien matriz columna
+    scalar p = xmax(cols(phi), rows(phi))     # por si es matriz fila o bien matriz columna
+    scalar q = xmax(cols(theta), rows(theta)) # por si es matriz fila o bien matriz columna
 
     scalar Transit = 10*p + q          # unas 10 veces el grado AR debería ser suficiente
     scalar N           = $nobs         # tamaño muestral final
@@ -768,7 +766,7 @@ y con algún refinamiento más; además de no depender de funciones externas com
     # Simulación ARMA
     matrix Y = U * 0
     loop i = (p+1)..N+Transit
-        comb_pasado_Yt = 0                     
+        scalar comb_pasado_Yt = 0                     
         loop j = 2..p                   
             comb_pasado_Yt += -phi[1,j] * Y[1,i-j+1]  # expresión abreviada
         endloop
@@ -786,7 +784,6 @@ series MA             = simARMA( {1}, {1, -0.6})
 series ARMA           = simARMA( {1, -0.6}, {1, 0.9} )
 series RuidoBlanco    = simARMA( {1,}, {1,} )
 series PaseoAleatorio = simARMA( {1, -1}, {1} )
-
 </code></pre>
 </div>
 </div>
@@ -805,7 +802,7 @@ series PaseoAleatorio = simARMA( {1, -1}, {1} )
 </div>
 </div></div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-10-08 Wed 21:11</p>
+<p class="date">Created: 2025-10-09 Thu 17:35</p>
 </div>
 </body>
 </html>

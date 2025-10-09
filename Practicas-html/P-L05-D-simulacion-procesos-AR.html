@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-10-08 Wed 21:11 -->
+<!-- 2025-10-09 Thu 17:35 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 5.D - Simulación de procesos AR(2) en la región de estacionariedad</title>
@@ -44,9 +44,9 @@
 <body>
 <div id="content" class="content">
 <h1 class="title">Lección 5.D - Simulación de procesos AR(2) en la región de estacionariedad</h1>
-<div id="outline-container-org7a40487" class="outline-2">
-<h2 id="org7a40487">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-org7a40487">
+<div id="outline-container-orga08e83f" class="outline-2">
+<h2 id="orga08e83f">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-orga08e83f">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -79,31 +79,22 @@
 Programe o recupere de una práctica anterior una función que simule procesos AR(\(q\))
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="orge489ee2"><code>function series SimuladorAR(matrix phi)
+<pre class="src src-gretl" id="orgc0614c7"><code>function series SimuladorAR(matrix phi)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
-
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)
     series U = normal(0,1)                    
     series Y = 0                              
     setinfo Y --description="Serie simulada"
-
     loop i = (p+1)..$nobs                     
-    
-        comb_pasado_Yt = 0                         
-        perturbacion = U[i]
-    
-        loop j = 2..p                         
+        scalar comb_pasado_Yt = 0
+        scalar perturbacion = U[i]
+        loop j = 2..p
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
         endloop
-    
-        Y[i] = comb_pasado_Yt + perturbacion       
-    
+        Y[i] = comb_pasado_Yt + perturbacion
     endloop
-
     return Y
-
 end function
 </code></pre>
 </div>
@@ -124,22 +115,22 @@ Recuerde cómo usar la función
 <div class="org-src-container">
 <pre class="src src-gretl"><code>scalar phi1 = 0
 scalar phi2 = 0.8
-series X = SimuladorAR( {1, -phi1,  -phi2} )
+series X = SimuladorAR( {1, -phi1, -phi2} )
 figura &lt;- corrgm X 12
 </code></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org44ebeea" class="outline-2">
-<h2 id="org44ebeea">Actividad 1 - Probando pares de valores en distintas regiones de invertibilidad</h2>
-<div class="outline-text-2" id="text-org44ebeea">
+<div id="outline-container-org4ed43ef" class="outline-2">
+<h2 id="org4ed43ef">Actividad 1 - Probando pares de valores en distintas regiones de invertibilidad</h2>
+<div class="outline-text-2" id="text-org4ed43ef">
 <p>
 Asigne varios pares de valores \(\phi_1\) y \(\phi_2\) que pertenezcan a cada una de las regiones indicadas en la figura y explore cómo se comportan la AFC y PACF en cada caso.
 </p>
 
 <div class="org-center">
 
-<div id="orgdb8b8ea" class="figure">
+<div id="org6317d40" class="figure">
 <p><img src="./img/AR2roots.png" alt="AR2roots.png" width="600px" />
 </p>
 </div>
@@ -161,9 +152,9 @@ Asigne varios pares de valores \(\phi_1\) y \(\phi_2\) que pertenezcan a cada un
 \]
 </p>
 </div>
-<div id="outline-container-orgb6ad40c" class="outline-3">
-<h3 id="orgb6ad40c">Zona 1</h3>
-<div class="outline-text-3" id="text-orgb6ad40c">
+<div id="outline-container-org6260331" class="outline-3">
+<h3 id="org6260331">Zona 1</h3>
+<div class="outline-text-3" id="text-org6260331">
 <p>
 Correlogramas en zona 3
 </p>
@@ -182,9 +173,9 @@ Correlogramas en zona 3
 </div>
 </div>
 </div>
-<div id="outline-container-org2a822d7" class="outline-3">
-<h3 id="org2a822d7">Zona 2</h3>
-<div class="outline-text-3" id="text-org2a822d7">
+<div id="outline-container-org8e2a007" class="outline-3">
+<h3 id="org8e2a007">Zona 2</h3>
+<div class="outline-text-3" id="text-org8e2a007">
 <p>
 Correlogramas en zona 3
 </p>
@@ -203,15 +194,16 @@ Correlogramas en zona 3
 </div>
 </div>
 </div>
-<div id="outline-container-org551fa3e" class="outline-3">
-<h3 id="org551fa3e">Zona 3</h3>
-<div class="outline-text-3" id="text-org551fa3e">
+<div id="outline-container-orge9cd539" class="outline-3">
+<h3 id="orge9cd539">Zona 3</h3>
+<div class="outline-text-3" id="text-orge9cd539">
 <p>
 Correlogramas en zona 3
 </p>
+
 <ul class="org-ul">
-<li>\(\phi_2=-0.99\)</li>
-<li>\(\phi_1=-1.99,\quad-1.6,\quad-1.2,\quad-0.8,\quad-0.4,\quad0\).</li>
+<li>\(\phi_2=-0.9\)</li>
+<li>\(\phi_1\approx-1.9,\quad-1.5,\quad-1.2,\quad-0.8,\quad-0.4,\quad0\).</li>
 </ul>
 
 <div style="display: flex; justify-content: center; gap: 10px;">
@@ -224,9 +216,9 @@ Correlogramas en zona 3
 </div>
 </div>
 </div>
-<div id="outline-container-org8f5040a" class="outline-3">
-<h3 id="org8f5040a">Zona 4</h3>
-<div class="outline-text-3" id="text-org8f5040a">
+<div id="outline-container-org34b75e7" class="outline-3">
+<h3 id="org34b75e7">Zona 4</h3>
+<div class="outline-text-3" id="text-org34b75e7">
 <p>
 Correlogramas en zona 4
 </p>
@@ -245,9 +237,9 @@ Correlogramas en zona 4
 </div>
 </div>
 </div>
-<div id="outline-container-org949cfef" class="outline-3">
-<h3 id="org949cfef">Eje vertical</h3>
-<div class="outline-text-3" id="text-org949cfef">
+<div id="outline-container-orga71dc6b" class="outline-3">
+<h3 id="orga71dc6b">Eje vertical</h3>
+<div class="outline-text-3" id="text-orga71dc6b">
 <p>
 Correlogramas en zona 3
 </p>
@@ -260,39 +252,39 @@ Correlogramas en zona 3
 <img src="P-L05-D-simulacion-procesos-AR/EjeVertical-1(0.0--1.0).png" style="max-width:13.5%; height:auto;"/>
 <img src="P-L05-D-simulacion-procesos-AR/EjeVertical-2(0.0--0.7).png" style="max-width:13.5%; height:auto;"/>
 <img src="P-L05-D-simulacion-procesos-AR/EjeVertical-3(0.0--0.3).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-4(0.0-0.0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-4(0.0--0.0).png" style="max-width:13.5%; height:auto;"/>
 <img src="P-L05-D-simulacion-procesos-AR/EjeVertical-5(0.0-0.3).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-6(0.0-0.7).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-7(0.0-1.0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-6(0.0-0.6).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-7(0.0-0.9).png" style="max-width:13.5%; height:auto;"/>
 </div>
 </div>
 </div>
-<div id="outline-container-orgdc9a4cd" class="outline-3">
-<h3 id="orgdc9a4cd">Parábola</h3>
-<div class="outline-text-3" id="text-orgdc9a4cd">
+<div id="outline-container-orgd16d05d" class="outline-3">
+<h3 id="orgd16d05d">Parábola</h3>
+<div class="outline-text-3" id="text-orgd16d05d">
 <p>
 Correlogramas en zona 3
 </p>
 <ul class="org-ul">
-<li>\(\phi_1\approx-1,\quad-0.7,\quad-0.3,\quad0,\quad0.3,\quad0.7,\quad1\).</li>
+<li>\(\phi_1\approx-1.9,\quad-1.3,\quad-0.6,\quad0,\quad0.6,\quad1.3,\quad1.9\).</li>
 <li>\(\phi_2=\frac{-\phi_1^2}{4}\)</li>
 </ul>
 
 <div style="display: flex; justify-content: center; gap: 10px;">
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-1(-1.0--0.2).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-2(-0.7--0.1).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-3(-0.3--0.0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-4(0.0--0.0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-5(0.3--0.0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-6(0.7--0.1).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-7(1.0--0.2).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-1(-1.9--0.9).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-2(-1.3--0.4).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-3(-0.6--0.1).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-4(-0.0--0.0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-5(0.6--0.1).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-6(1.2--0.4).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-7(1.9--0.9).png" style="max-width:13.5%; height:auto;"/>
 </div>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-10-08 Wed 21:11</p>
+<p class="date">Created: 2025-10-09 Thu 17:35</p>
 </div>
 </body>
 </html>
