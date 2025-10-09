@@ -107,11 +107,9 @@ function series SimuladorMA(matrix theta)
     # donde theta es el polinomio MA y q es su grado.
     series WN = normal (0,1)
     series X = 0
-
     loop i=1..cols(theta)
         X = X + theta[i]*WN(1-i)
     endloop
-    
     return X
 end function
 #+END_SRC
@@ -160,18 +158,18 @@ Asigne varios pares de valores $\theta_1$ y $\theta_2$ que pertenezcan a cada un
 
 Correlogramas en zona 3
 - $\theta_2=0.5$
-- $\theta_1=0,\quad0.1,\quad0.2,\quad0.3,\quad0.4,\quad0.5$.
+- $\theta_1\approx0,\quad0.1,\quad0.2,\quad0.3,\quad0.4,\quad0.45$.
 
 # Correlogramas en zona 1 (En todos los casos $\theta_2=0.5$):
 
 # Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
-scalar theta2 = 0.5
-n = 0
-loop for (r=0; r<=1-theta2; r+=.1)
+scalar theta2 = 0.45
+scalar n = 0
+loop for (r=0; r<=1-theta2-0.04; r+=.09)
     n += 1
     scalar theta1 = r
-    nombre = sprintf("Zona1-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Zona1-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
@@ -203,22 +201,22 @@ echo "#+END_EXPORT"
 \begin{figure}[H]
 \centering
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-1(0,0-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-1(0,00-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-2(0,1-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-2(0,09-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-3(0,2-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-3(0,18-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-4(0,3-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-4(0,27-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-5(0,4-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-5(0,36-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-6(0,5-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona1-6(0,45-0,45).png}
 \end{minipage}%
 \end{figure}
 #+END_EXPORT
@@ -239,12 +237,12 @@ echo "#+END_EXPORT"
 #+RESULTS:
 #+BEGIN_EXPORT HTML
 <div style="display: flex; justify-content: center; gap: 10px;">
-<img src="P-L04-C-simulacion-procesos-MA/Zona1-1(0,0-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona1-2(0,1-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona1-3(0,2-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona1-4(0,3-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona1-5(0,4-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona1-6(0,5-0,5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-1(0,00-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-2(0,09-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-3(0,18-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-4(0,27-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-5(0,36-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona1-6(0,45-0,45).png" style="max-width:16%; height:auto;"/>
 </div>
 #+END_EXPORT
 
@@ -254,19 +252,19 @@ echo "#+END_EXPORT"
 ** Zona 2
 
 Correlogramas en zona 3
-- $\theta_2=-0.5$
-- $\theta_1=-0.5,\quad-0.4,\quad-0.3,\quad-0.2,\quad-0.1,\quad0$.
+- $\theta_2=-0.45$
+- $\theta_1=\approx-0.45,\quad-0.4,\quad-0.3,\quad-0.2,\quad-0.1,\quad0$.
 
 # Correlogramas en zona 2 (En todos los casos $\theta_2=0.5$):
 
 # Caso 1: $\theta_1=-0.5$, Caso 2: $\theta_1=-0.4$, Caso 3: $\theta_1=-0.3$, Caso 4: $\theta_1=-0.2$, Caso 5: $\theta_1=-0.1$ y Caso 6: $\theta_1=0.0$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
-scalar theta2 = 0.5
-n = 0
-loop for (r=theta2-1; r<=0; r+=.1)
+scalar theta2 = 0.45
+scalar n = 0
+loop for (r=-theta2; r<=0.03; r+=.09)
     n += 1
     scalar theta1 = r
-    nombre = sprintf("Zona2-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Zona2-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
@@ -294,22 +292,22 @@ echo "#+END_EXPORT"
 \begin{figure}[H]
 \centering
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-1(-0,5-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-1(-0,45-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-2(-0,4-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-2(-0,36-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-3(-0,3-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-3(-0,27-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-4(-0,2-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-4(-0,18-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-5(-0,1-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-5(-0,09-0,45).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-6(-0,0-0,5).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona2-6(-0,00-0,45).png}
 \end{minipage}%
 \end{figure}
 #+END_EXPORT
@@ -330,12 +328,12 @@ echo "#+END_EXPORT"
 #+RESULTS:
 #+BEGIN_EXPORT HTML
 <div style="display: flex; justify-content: center; gap: 10px;">
-<img src="P-L04-C-simulacion-procesos-MA/Zona2-1(-0,5-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona2-2(-0,4-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona2-3(-0,3-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona2-4(-0,2-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona2-5(-0,1-0,5).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona2-6(-0,0-0,5).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-1(-0,45-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-2(-0,36-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-3(-0,27-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-4(-0,18-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-5(-0,09-0,45).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona2-6(-0,00-0,45).png" style="max-width:16%; height:auto;"/>
 </div>
 #+END_EXPORT
 
@@ -346,8 +344,8 @@ echo "#+END_EXPORT"
 ** Zona 3
 
 Correlogramas en zona 3
-- $\theta_2=-0.99$
-- $\theta_1=-1.99,\quad-1.6,\quad-1.2,\quad-0.8,\quad-0.4,\quad0$.
+- $\theta_2=-0.95$
+- $\theta_1-1.95,\quad-1.6,\quad-1.2,\quad-0.8,\quad-0.4,\quad0$.
 
 # +latex: \noindent
 # Correlogramas en zona 3 (En todos los casos $\theta_3=-0.75$):
@@ -355,14 +353,12 @@ Correlogramas en zona 3
 # +latex: \noindent
 # Caso 1: $\theta_1=-1.75$, Caso 2: $\theta_1\quad=-1.4$, Caso 3: $\theta_1=-1.05$, Caso 4: $\theta_1=-0.7$, Caso 5: $\theta_1=-0.35$ y Caso 6: $\theta_1=0.0$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
-#scalar theta2 = -0.75
-scalar theta2 = -0.99
-n = 0
-#loop for (r=theta2-1; r<=0.01; r+=.35)
+scalar theta2 = -0.95
+scalar n = 0
 loop for (r=theta2-1; r<=0.01; r+=.39)
     n += 1
     scalar theta1 = r
-    nombre = sprintf("Zona3-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Zona3-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
@@ -390,22 +386,22 @@ echo "#+END_EXPORT"
 \begin{figure}[H]
 \centering
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-1(-2,0--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-1(-1,95--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-2(-1,6--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-2(-1,56--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-3(-1,2--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-3(-1,17--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-4(-0,8--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-4(-0,78--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-5(-0,4--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-5(-0,39--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-6(-0,0--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona3-6(0,00--0,95).png}
 \end{minipage}%
 \end{figure}
 #+END_EXPORT
@@ -425,12 +421,12 @@ echo "#+END_EXPORT"
 #+RESULTS:
 #+BEGIN_EXPORT HTML
 <div style="display: flex; justify-content: center; gap: 10px;">
-<img src="P-L04-C-simulacion-procesos-MA/Zona3-1(-2,0--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona3-2(-1,6--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona3-3(-1,2--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona3-4(-0,8--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona3-5(-0,4--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona3-6(-0,0--1,0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-1(-1,95--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-2(-1,56--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-3(-1,17--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-4(-0,78--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-5(-0,39--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona3-6(0,00--0,95).png" style="max-width:16%; height:auto;"/>
 </div>
 #+END_EXPORT
 
@@ -440,20 +436,18 @@ echo "#+END_EXPORT"
 ** Zona 4
 
 Correlogramas en zona 4
-- $\theta_2=-0.99$
-- $\theta_1=0,\quad0.4,\quad0.8,\quad1.2,\quad1.6,\quad1.99$.
+- $\theta_2=-0.95$
+- $\theta_1\approx0,\quad0.4,\quad0.8,\quad1.2,\quad1.6,\quad1.95$.
 
 # Caso 1: $0$, Caso 2: $\theta_1=0.4$, Caso 3: $\theta_1=0.8$, Caso 4: $\theta_1=1.2$, Caso 5: $\theta_1=1.6$ y Caso 6: $\theta_1<2$. 
 # Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.35$, Caso 3: $\theta_1=0.7$, Caso 4: $\theta_1=1.05$, Caso 5: $\theta_1=1.4$ y Caso 6: $\theta_1=1.75$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
-#scalar theta2 = -0.75
-scalar theta2 = -0.99
-n = 0
-#loop for (r=0; r<=1-theta2; r+=.35)
-loop for (r=0; r<=1-theta2; r+=.39)
+scalar theta2 = -0.95
+scalar n = 0
+loop for (r=0; r<=1-theta2+0.01; r+=.39)
     n += 1
     scalar theta1 = r
-    nombre = sprintf("Zona4-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Zona4-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
@@ -481,22 +475,22 @@ echo "#+END_EXPORT"
 \begin{figure}[H]
 \centering
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-1(0,0--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-1(0,00--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-2(0,4--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-2(0,39--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-3(0,8--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-3(0,78--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-4(1,2--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-4(1,17--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-5(1,6--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-5(1,56--0,95).png}
 \end{minipage}%
 \begin{minipage}{0.17\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-6(2,0--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Zona4-6(1,95--0,95).png}
 \end{minipage}%
 \end{figure}
 #+END_EXPORT
@@ -516,32 +510,32 @@ echo "#+END_EXPORT"
 #+RESULTS:
 #+BEGIN_EXPORT HTML
 <div style="display: flex; justify-content: center; gap: 10px;">
-<img src="P-L04-C-simulacion-procesos-MA/Zona4-1(0,0--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona4-2(0,4--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona4-3(0,8--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona4-4(1,2--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona4-5(1,6--1,0).png" style="max-width:16%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Zona4-6(2,0--1,0).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-1(0,00--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-2(0,39--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-3(0,78--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-4(1,17--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-5(1,56--0,95).png" style="max-width:16%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Zona4-6(1,95--0,95).png" style="max-width:16%; height:auto;"/>
 </div>
 #+END_EXPORT
 
 
 ** Eje vertical
 
-Correlogramas en zona 3
+Correlogramas correspondientes a puntos sobre el eje vertical
 - $\theta_1=0$
-- $\theta_2\approx-1,\quad-0.7,\quad-0.3,\quad0,\quad0.3,\quad0.7,\quad1$.
+- $\theta_2\approx-0.9,\quad-0.6,\quad-0.3,\quad0,\quad0.3,\quad0.6,\quad0.9$.
 
 # Correlogramas en zona 1 (En todos los casos $\theta_2=0.5$):
 
 # Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
 scalar theta1 = 0
-n = 0
-loop for (r=-.99; r<=1; r+=0.33)
+scalar n = 0
+loop for (r=-.96; r<=1; r+=0.32)
     n += 1
     scalar theta2 = r
-    nombre = sprintf("EjeVertical-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("EjeVertical-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
@@ -573,25 +567,25 @@ echo "#+END_EXPORT"
 \begin{figure}[H]
 \centering
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-1(0,0--1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-1(0,00--0,96).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-2(0,0--0,7).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-2(0,00--0,64).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-3(0,0--0,3).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-3(0,00--0,32).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-4(0,0-0,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-4(0,00-0,00).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-5(0,0-0,3).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-5(0,00-0,32).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-6(0,0-0,7).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-6(0,00-0,64).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-7(0,0-1,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/EjeVertical-7(0,00-0,96).png}
 \end{minipage}%
 \end{figure}
 #+END_EXPORT
@@ -612,13 +606,13 @@ echo "#+END_EXPORT"
 #+RESULTS:
 #+BEGIN_EXPORT HTML
 <div style="display: flex; justify-content: center; gap: 10px;">
-<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-1(0,0--1,0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-2(0,0--0,7).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-3(0,0--0,3).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-4(0,0-0,0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-5(0,0-0,3).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-6(0,0-0,7).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-7(0,0-1,0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-1(0,00--0,96).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-2(0,00--0,64).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-3(0,00--0,32).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-4(0,00-0,00).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-5(0,00-0,32).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-6(0,00-0,64).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/EjeVertical-7(0,00-0,96).png" style="max-width:13.5%; height:auto;"/>
 </div>
 #+END_EXPORT
 
@@ -626,20 +620,20 @@ echo "#+END_EXPORT"
 
 ** Parábola
 
-Correlogramas en zona 3
-- $\theta_1\approx-1,\quad-0.7,\quad-0.3,\quad0,\quad0.3,\quad0.7,\quad1$.
-- $\theta_2=\frac{-\theta_1^2}{4}$
+Correlogramas correspondientes a puntos sobre la parábola
+- $\theta_1\approx-1.9,\quad-1.3,\quad-0.6,\quad0,\quad0.6,\quad1.3,\quad1.9$.
+- $\theta_2=\frac{-\phi_1^2}{4}$
 
 # Correlogramas en zona 1 (En todos los casos $\theta_2=0.5$):
 
 # Caso 1: $\theta_1=0$, Caso 2: $\theta_1=0.1$, Caso 3: $\theta_1=0.2$, Caso 4: $\theta_1=0.3$, Caso 5: $\theta_1=0.4$ y Caso 6: $\theta_1=0.5$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L04-C-simulacion-procesos-MA.inp :eval no  :exports results
-n = 0
-loop for (r=-.99; r<=1; r+=0.33)
+scalar n = 0
+loop for (r=-1.91; r<=2; r+=0.636)
     n += 1
     scalar theta1 = r
     scalar theta2 = -theta1*theta1/4
-    nombre = sprintf("Parabola-%d(%1.1f-%1.1f)", n, theta1, theta2)
+    nombre = sprintf("Parabola-%d(%1.2f-%1.2f)", n, theta1, theta2)
     sname = sprintf("Caso_%d", n)
     series @sname = SimuladorMA( {1, -theta1,  -theta2} )
     corrgm @sname 12 --plot=@nombre.png
@@ -671,25 +665,25 @@ echo "#+END_EXPORT"
 \begin{figure}[H]
 \centering
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-1(-1,0--0,2).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-1(-1,91--0,91).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-2(-0,7--0,1).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-2(-1,27--0,41).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-3(-0,3--0,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-3(-0,64--0,10).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-4(0,0--0,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-4(-0,00--0,00).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-5(0,3--0,0).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-5(0,63--0,10).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-6(0,7--0,1).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-6(1,27--0,40).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-7(1,0--0,2).png}
+  \includegraphics[width=\textwidth]{./P-L04-C-simulacion-procesos-MA/Parabola-7(1,91--0,91).png}
 \end{minipage}%
 \end{figure}
 #+END_EXPORT
@@ -710,13 +704,13 @@ echo "#+END_EXPORT"
 #+RESULTS:
 #+BEGIN_EXPORT HTML
 <div style="display: flex; justify-content: center; gap: 10px;">
-<img src="P-L04-C-simulacion-procesos-MA/Parabola-1(-1,0--0,2).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Parabola-2(-0,7--0,1).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Parabola-3(-0,3--0,0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Parabola-4(0,0--0,0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Parabola-5(0,3--0,0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Parabola-6(0,7--0,1).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L04-C-simulacion-procesos-MA/Parabola-7(1,0--0,2).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-1(-1,91--0,91).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-2(-1,27--0,41).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-3(-0,64--0,10).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-4(-0,00--0,00).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-5(0,63--0,10).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-6(1,27--0,40).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L04-C-simulacion-procesos-MA/Parabola-7(1,91--0,91).png" style="max-width:13.5%; height:auto;"/>
 </div>
 #+END_EXPORT
 
