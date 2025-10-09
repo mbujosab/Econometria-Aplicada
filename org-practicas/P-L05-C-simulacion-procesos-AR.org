@@ -105,28 +105,19 @@ Programe o recupere de una práctica anterior una función que simule procesos A
 function series SimuladorAR(matrix phi)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
-
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)                             
     series U = normal(0,1)                    
     series Y = 0                              
     setinfo Y --description="Serie simulada"
-
-    loop i = (p+1)..$nobs                     
-    
-        comb_pasado_Yt = 0                         
-        perturbacion = U[i]
-    
+    loop i = (p+1)..$nobs                         
+        scalar comb_pasado_Yt = 0                         
+        scalar perturbacion = U[i]    
         loop j = 2..p                         
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
-        endloop
-    
-        Y[i] = comb_pasado_Yt + perturbacion       
-    
+        endloop    
+        Y[i] = comb_pasado_Yt + perturbacion    
     endloop
-
     return Y
-
 end function
 #+END_SRC
 
@@ -149,7 +140,7 @@ donde $\boldsymbol{U}\sim WN(0,1)$, con valores paramétricos: entre $0$ y $1$; 
 - Para $\theta_1\approx0,\quad0.2,\quad0.4,\quad0.6,\quad0.8,\quad1$.
 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L05-C-simulacion-procesos-AR.inp :eval no  :exports results
-n = 0
+scalar n = 0
 loop for (r=0; r<=1.1; r+=0.2)
     n += 1
     scalar theta1 = r
@@ -243,7 +234,7 @@ donde $\boldsymbol{U}\sim WN(0,1)$, con valores paramétricos: entre $-1$ y $0$;
 - Para $\theta_1\approx-1,\quad-0.8,\quad-0.6,\quad-0.4,\quad-0.2,\quad0$.
 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L05-C-simulacion-procesos-AR.inp :eval no  :exports results
-n = 0
+scalar n = 0
 loop for (r=-1; r<=0.1; r+=0.2)
     n += 1
     scalar theta1 = r

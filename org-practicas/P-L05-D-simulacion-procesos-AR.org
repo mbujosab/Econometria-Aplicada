@@ -105,28 +105,19 @@ Programe o recupere de una práctica anterior una función que simule procesos A
 function series SimuladorAR(matrix phi)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
-
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)
     series U = normal(0,1)                    
     series Y = 0                              
     setinfo Y --description="Serie simulada"
-
     loop i = (p+1)..$nobs                     
-    
-        comb_pasado_Yt = 0                         
-        perturbacion = U[i]
-    
-        loop j = 2..p                         
+        scalar comb_pasado_Yt = 0
+        scalar perturbacion = U[i]
+        loop j = 2..p
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
         endloop
-    
-        Y[i] = comb_pasado_Yt + perturbacion       
-    
+        Y[i] = comb_pasado_Yt + perturbacion
     endloop
-
     return Y
-
 end function
 #+END_SRC
 
@@ -141,7 +132,7 @@ Recuerde cómo usar la función
 #+BEGIN_SRC gretl :tangle ./guiones/P-L05-D-simulacion-procesos-AR.inp :eval no
 scalar phi1 = 0
 scalar phi2 = 0.8
-series X = SimuladorAR( {1, -phi1,  -phi2} )
+series X = SimuladorAR( {1, -phi1, -phi2} )
 figura <- corrgm X 12
 #+END_SRC
 
@@ -182,7 +173,7 @@ Correlogramas en zona 3
 # Caso 1: $\phi_1=0$, Caso 2: $\phi_1=0.1$, Caso 3: $\phi_1=0.2$, Caso 4: $\phi_1=0.3$, Caso 5: $\phi_1=0.4$ y Caso 6: $\phi_1=0.5$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L05-D-simulacion-procesos-AR.inp :eval no  :exports results
 scalar phi2 = 0.5
-n = 0
+scalar n = 0
 loop for (r=0; r<=1-phi2; r+=.1)
     n += 1
     scalar phi1 = r
@@ -277,7 +268,7 @@ Correlogramas en zona 3
 # Caso 1: $\phi_1=-0.5$, Caso 2: $\phi_1=-0.4$, Caso 3: $\phi_1=-0.3$, Caso 4: $\phi_1=-0.2$, Caso 5: $\phi_1=-0.1$ y Caso 6: $\phi_1=0.0$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L05-D-simulacion-procesos-AR.inp :eval no  :exports results
 scalar phi2 = 0.5
-n = 0
+scalar n = 0
 loop for (r=phi2-1; r<=0; r+=.1)
     n += 1
     scalar phi1 = r
@@ -361,8 +352,10 @@ echo "#+END_EXPORT"
 ** Zona 3
 
 Correlogramas en zona 3
-- $\phi_2=-0.99$
-- $\phi_1=-1.99,\quad-1.6,\quad-1.2,\quad-0.8,\quad-0.4,\quad0$.
+# - $\phi_2=-0.99$
+# - $\phi_1=-1.99,\quad-1.6,\quad-1.2,\quad-0.8,\quad-0.4,\quad0$.
+- $\phi_2=-0.9$
+- $\phi_1\approx-1.9,\quad-1.5,\quad-1.2,\quad-0.8,\quad-0.4,\quad0$.
 
 # +latex: \noindent
 # Correlogramas en zona 3 (En todos los casos $\phi_3=-0.75$):
@@ -370,11 +363,9 @@ Correlogramas en zona 3
 # +latex: \noindent
 # Caso 1: $\phi_1=-1.75$, Caso 2: $\phi_1\quad=-1.4$, Caso 3: $\phi_1=-1.05$, Caso 4: $\phi_1=-0.7$, Caso 5: $\phi_1=-0.35$ y Caso 6: $\phi_1=0.0$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L05-D-simulacion-procesos-AR.inp :eval no  :exports results
-#scalar phi2 = -0.75
 scalar phi2 = -0.99
-n = 0
-#loop for (r=phi2-1; r<=0.01; r+=.35)
-loop for (r=phi2-1; r<=0.01; r+=.39)
+scalar n = 0
+loop for (r=phi2-1+0.01; r<=0.01; r+=.39)
     n += 1
     scalar phi1 = r
     nombre = sprintf("Zona3-%d(%1.1f-%1.1f)", n, phi1, phi2)
@@ -461,10 +452,8 @@ Correlogramas en zona 4
 # Caso 1: $0$, Caso 2: $\phi_1=0.4$, Caso 3: $\phi_1=0.8$, Caso 4: $\phi_1=1.2$, Caso 5: $\phi_1=1.6$ y Caso 6: $\phi_1<2$. 
 # Caso 1: $\phi_1=0$, Caso 2: $\phi_1=0.35$, Caso 3: $\phi_1=0.7$, Caso 4: $\phi_1=1.05$, Caso 5: $\phi_1=1.4$ y Caso 6: $\phi_1=1.75$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L05-D-simulacion-procesos-AR.inp :eval no  :exports results
-#scalar phi2 = -0.75
 scalar phi2 = -0.99
-n = 0
-#loop for (r=0; r<=1-phi2; r+=.35)
+scalar n = 0
 loop for (r=0; r<=1-phi2; r+=.39)
     n += 1
     scalar phi1 = r
@@ -552,8 +541,8 @@ Correlogramas en zona 3
 # Caso 1: $\phi_1=0$, Caso 2: $\phi_1=0.1$, Caso 3: $\phi_1=0.2$, Caso 4: $\phi_1=0.3$, Caso 5: $\phi_1=0.4$ y Caso 6: $\phi_1=0.5$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L05-D-simulacion-procesos-AR.inp :eval no  :exports results
 scalar phi1 = 0
-n = 0
-loop for (r=-.99; r<=1; r+=0.33)
+scalar n = 0
+loop for (r=-.98; r<=1; r+=0.32)
     n += 1
     scalar phi2 = r
     nombre = sprintf("EjeVertical-%d(%1.1f-%1.1f)", n, phi1, phi2)
@@ -597,16 +586,16 @@ echo "#+END_EXPORT"
   \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/EjeVertical-3(0,0--0,3).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/EjeVertical-4(0,0-0,0).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/EjeVertical-4(0,0--0,0).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
   \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/EjeVertical-5(0,0-0,3).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/EjeVertical-6(0,0-0,7).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/EjeVertical-6(0,0-0,6).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/EjeVertical-7(0,0-1,0).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/EjeVertical-7(0,0-0,9).png}
 \end{minipage}%
 \end{figure}
 #+END_EXPORT
@@ -630,10 +619,10 @@ echo "#+END_EXPORT"
 <img src="P-L05-D-simulacion-procesos-AR/EjeVertical-1(0,0--1,0).png" style="max-width:13.5%; height:auto;"/>
 <img src="P-L05-D-simulacion-procesos-AR/EjeVertical-2(0,0--0,7).png" style="max-width:13.5%; height:auto;"/>
 <img src="P-L05-D-simulacion-procesos-AR/EjeVertical-3(0,0--0,3).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-4(0,0-0,0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-4(0,0--0,0).png" style="max-width:13.5%; height:auto;"/>
 <img src="P-L05-D-simulacion-procesos-AR/EjeVertical-5(0,0-0,3).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-6(0,0-0,7).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-7(0,0-1,0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-6(0,0-0,6).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/EjeVertical-7(0,0-0,9).png" style="max-width:13.5%; height:auto;"/>
 </div>
 #+END_EXPORT
 
@@ -642,15 +631,15 @@ echo "#+END_EXPORT"
 ** Parábola
 
 Correlogramas en zona 3
-- $\phi_1\approx-1,\quad-0.7,\quad-0.3,\quad0,\quad0.3,\quad0.7,\quad1$.
+- $\phi_1\approx-1.9,\quad-1.3,\quad-0.6,\quad0,\quad0.6,\quad1.3,\quad1.9$.
 - $\phi_2=\frac{-\phi_1^2}{4}$
 
 # Correlogramas en zona 1 (En todos los casos $\phi_2=0.5$):
 
 # Caso 1: $\phi_1=0$, Caso 2: $\phi_1=0.1$, Caso 3: $\phi_1=0.2$, Caso 4: $\phi_1=0.3$, Caso 5: $\phi_1=0.4$ y Caso 6: $\phi_1=0.5$. 
 #+BEGIN_SRC gretl  :tangle ./guiones/P-L05-D-simulacion-procesos-AR.inp :eval no  :exports results
-n = 0
-loop for (r=-.99; r<=1; r+=0.33)
+scalar n = 0
+loop for (r=-1.91; r<=2; r+=0.63)
     n += 1
     scalar phi1 = r
     scalar phi2 = -phi1*phi1/4
@@ -686,25 +675,25 @@ echo "#+END_EXPORT"
 \begin{figure}[H]
 \centering
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-1(-1,0--0,2).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-1(-1,9--0,9).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-2(-0,7--0,1).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-2(-1,3--0,4).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-3(-0,3--0,0).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-3(-0,6--0,1).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-4(0,0--0,0).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-4(-0,0--0,0).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-5(0,3--0,0).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-5(0,6--0,1).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-6(0,7--0,1).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-6(1,2--0,4).png}
 \end{minipage}%
 \begin{minipage}{0.15\textwidth}
-  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-7(1,0--0,2).png}
+  \includegraphics[width=\textwidth]{./P-L05-D-simulacion-procesos-AR/Parabola-7(1,9--0,9).png}
 \end{minipage}%
 \end{figure}
 #+END_EXPORT
@@ -725,13 +714,13 @@ echo "#+END_EXPORT"
 #+RESULTS:
 #+BEGIN_EXPORT HTML
 <div style="display: flex; justify-content: center; gap: 10px;">
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-1(-1,0--0,2).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-2(-0,7--0,1).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-3(-0,3--0,0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-4(0,0--0,0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-5(0,3--0,0).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-6(0,7--0,1).png" style="max-width:13.5%; height:auto;"/>
-<img src="P-L05-D-simulacion-procesos-AR/Parabola-7(1,0--0,2).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-1(-1,9--0,9).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-2(-1,3--0,4).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-3(-0,6--0,1).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-4(-0,0--0,0).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-5(0,6--0,1).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-6(1,2--0,4).png" style="max-width:13.5%; height:auto;"/>
+<img src="P-L05-D-simulacion-procesos-AR/Parabola-7(1,9--0,9).png" style="max-width:13.5%; height:auto;"/>
 </div>
 #+END_EXPORT
 

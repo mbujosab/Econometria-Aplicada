@@ -450,8 +450,8 @@ Si se da cuenta, con esta práctica (y las anteriores) quizá ya tiene todas las
 nulldata 300
 setobs 4 1960:01 --time-series
 
-matrix phi   = {1, -.8}                   # polinomio AR
-p = cols(phi)                             # grado del polinomio
+matrix phi = {1, -.8}                     # polinomio AR
+scalar p   = cols(phi)                    # grado del polinomio
 
 series U = normal(0,1)                    # proceso de ruido blanco
 series Y = 0                              # iniciamos la serie con ceros
@@ -459,12 +459,12 @@ series Y = 0                              # iniciamos la serie con ceros
 ## bucle para generar los valores del proceso
 loop i = (p+1)..$nobs                     # los p primeros datos los dejamos como están
 
-    comb_pasado_Yt = 0                    # inicializamos el cálculo en cada iteración
-    perturbacion = U[i]
+    scalar comb_pasado_Yt = 0             # inicializamos el cálculo en cada iteración
+    scalar perturbacion = U[i]
 
-    loop j = 2..p                         # recorremos los parámetros
-
-        comb_pasado_Yt = comb_pasado_Yt - phi[1,j] * Y[i-j+1]    # calculo parámetro a parámetro
+    loop j = 2..p                         # calculo parámetro phi a parámetro phi
+        
+        comb_pasado_Yt = comb_pasado_Yt - phi[1,j] * Y[i-j+1]    
 
     endloop
 
@@ -474,29 +474,23 @@ endloop
 #+END_SRC
 
 La siguiente variante en lugar de calcular la suma con
-=comb_pasado_Yt = comb_pasado_Yt + phi[1,j] * Y[i-j]=, usa ~+=~, que evita escribir =comb_pasado_Yt= dos veces. Con ~+=~ indicamos que aumente en cantidad expresada a la derecha el valor de la variable a la izquierda (logramos expresiones más compactas).
+=comb_pasado_Yt = comb_pasado_Yt + phi[1,j] * Y[i-j]=, usa ~+=~, que evita escribir =comb_pasado_Yt= dos veces. Con ~+=~ indicamos que aumente en cantidad expresada a la derecha el valor de la variable a la izquierda (logrando expresiones más compactas).
 #+name: guion para simular un proceso AR
 #+BEGIN_SRC gretl :eval no
 nulldata 300
 setobs 4 1960:01 --time-series
-
 matrix phi   = {1, -.8}                   
-p = cols(phi)                             
-
+scalar p = cols(phi)                             
 series U = normal(0,1)                    
 series Y = 0                              
 
 loop i = (p+1)..$nobs                     
-
-    comb_pasado_Yt = 0                         
-    perturbacion = U[i]
-
+    scalar comb_pasado_Yt = 0                         
+    scalar perturbacion = U[i]
     loop j = 2..p                         
         comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
     endloop
-
     Y[i] = comb_pasado_Yt + perturbacion       
-
 endloop
 #+END_SRC
 
@@ -509,16 +503,15 @@ function series SimuladorAR(matrix phi)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
 
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)                                 
     series U = normal(0,1)                    
     series Y = 0                              
     setinfo Y --description="Serie simulada"
 
     loop i = (p+1)..$nobs                     
     
-        comb_pasado_Yt = 0                         
-        perturbacion = U[i]
+        scalar comb_pasado_Yt = 0                         
+        scalar perturbacion = U[i]
     
         loop j = 2..p                         
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
@@ -536,11 +529,13 @@ end function
 
 ** Actividad 5
 
+*** Paseo aleatorio
 #+BEGIN_SRC gretl :tangle ./guiones/P-L05-B-simulacion-procesos-AR.inp :eval no
 series RW = SimuladorAR( {1, -1} )
 gnuplot RW --time-series --with-lines  { set nokey; } --output="RW.png"
 #+END_SRC
 
+*** Simulación ARMA
 #+BEGIN_SRC gretl :tangle ./guiones/P-L05-B-simulacion-procesos-AR.inp :eval no
 # recuperamos nuesta función de la práctica anterior
 function series SimuladorMA(matrix theta)
@@ -548,14 +543,9 @@ function series SimuladorMA(matrix theta)
     # donde theta es el polinomio MA y q es su grado.
     series WN = normal (0,1)
     series X = 0
-
     loop i=1..cols(theta)
-        # print i        # (descomente estos prints si no entiende el funcionamiento)
-        # print theta[i]
-        # print 1-i
         X = X + theta[i]*WN(1-i)
     endloop
-    
     return X
 end function
 
@@ -563,16 +553,15 @@ function series SimuladorARMA(matrix phi, matrix theta)
     # SimuladorAR(phi) simula un proceso AR(p), 
     # donde phi es el polinomio AR y p es su grado.
 
-    p = cols(phi)                             
-    
+    scalar p = cols(phi)                                 
     series procesoMA = SimuladorMA(theta)
     series Y = 0                              
     setinfo Y --description="Serie simulada"
 
     loop i = (p+1)..$nobs                     
     
-        comb_pasado_Yt = 0                         
-        perturbacion = procesoMA[i]
+        scalar comb_pasado_Yt = 0                         
+        scalar perturbacion   = procesoMA[i]
     
         loop j = 2..p                         
             comb_pasado_Yt += -phi[1,j] * Y[i-j+1]  # expresión abreviada
@@ -597,8 +586,8 @@ function series simARMA(matrix phi "Polinomio AR", matrix theta "Polinomio MA")
     # SimuladorAR(phi, theta) simula un proceso ARMA(p,q), 
     # donde p es el grado del AR y q el grado del polinomio MA.
 
-    p = xmax(cols(phi), rows(phi))     # por si es matriz fila o bien matriz columna
-    q = xmax(cols(theta), rows(theta)) # por si es matriz fila o bien matriz columna
+    scalar p = xmax(cols(phi), rows(phi))     # por si es matriz fila o bien matriz columna
+    scalar q = xmax(cols(theta), rows(theta)) # por si es matriz fila o bien matriz columna
 
     scalar Transit = 10*p + q          # unas 10 veces el grado AR debería ser suficiente
     scalar N           = $nobs         # tamaño muestral final
@@ -615,7 +604,7 @@ function series simARMA(matrix phi "Polinomio AR", matrix theta "Polinomio MA")
     # Simulación ARMA
     matrix Y = U * 0
     loop i = (p+1)..N+Transit
-        comb_pasado_Yt = 0                     
+        scalar comb_pasado_Yt = 0                     
         loop j = 2..p                   
             comb_pasado_Yt += -phi[1,j] * Y[1,i-j+1]  # expresión abreviada
         endloop
@@ -633,7 +622,6 @@ series MA             = simARMA( {1}, {1, -0.6})
 series ARMA           = simARMA( {1, -0.6}, {1, 0.9} )
 series RuidoBlanco    = simARMA( {1,}, {1,} )
 series PaseoAleatorio = simARMA( {1, -1}, {1} )
-
 #+END_SRC
 
 
