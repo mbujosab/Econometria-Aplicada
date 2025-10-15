@@ -289,7 +289,6 @@ Desgraciadamente para los modelos ARMA tanto la ACF como la PACF tienen infinito
 # | Operador \( \pi(B) \)                            | \( \pi(B) = \phi(B)\) (finito)     | \( \pi(B) = \theta^{-1}(B)\) (infinito) | \( \pi(B) = \theta^{-1}(B)\phi(B)\) (infinito) |
 # | Operador \( \psi(B) \)                           | \( \psi(B) = \phi^{-1}(B)\) (infinito) | \( \psi(B) = \theta(B)\) (finito) | \( \psi(B) = \phi^{-1}(B)\theta(B)\) (infinito) |
 
-
 ** Proceso ARMA(1,1)
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
@@ -583,14 +582,15 @@ plt.savefig('./img/lecc06/rangoMedianaPasajeros.png', dpi=300, bbox_inches='tigh
 El gráfico de rango media a veces se acompaña de una regresión de la
 dispersión sobre los niveles para medir la relación nivel-dispersión.
 
-
 ** Determinación del orden de integración
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
-Un proceso estocástico sin componentes deterministas es $I(0)$ si
-tiene una representación ARMA estacionaria e _invertible_
+# El operador diferencia, $\nabla$, se define como $\nabla = 1 - \mathsf{B}$, donde $\mathsf{B}$ es el operador de retardo.
+
+
+Un proceso estocástico sin componentes deterministas es $I(0)$ si tiene representación ARMA _estacionaria e invertible_.
 
 #+BEGIN_EXPORT latex
 \medskip
@@ -600,16 +600,22 @@ Más formalmente, un proceso estocástico $\boldsymbol{Y}$ que satisface $Y_t-E(
 
 #+END_EXPORT
 
-El /orden de integración/ de un proceso estocástico $\boldsymbol{Y}$
-es el número de diferencias necesarias para transformarlo en un
-proceso $I(0)$.
+El /orden de integración/ de un proceso estocástico es el número de diferencias necesarias para transformarlo en un proceso $I(0)$.
 
-Decidir adecuadamente el orden de integración es crucial en el
-análisis de series temporales.
+Un proceso estocástico $\boldsymbol{X}$ /es integrado de orden $d$/, decimos que _es $I(d)$_, si $\;(1-\mathsf{B})^d*\boldsymbol{X}\;$ es $I(0)$.
 
-Las herramientas utilizadas para tomar la decisión son 
+Identificar el orden de integración es crucial en el análisis de series temporales.
+
+Las herramientas utilizadas para identificar el orden de integración son:
  - el análisis gráfico
  - los contrastes formales
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Recuerde que el operador diferencia $\nabla$ se define a partir del operador retardo como $\nabla=(1 - \mathsf{B})$:
+\[
+ \nabla Y_t = (1 - \mathsf{B})Y_t = Y_t - Y_{t-1}.
+\]
+
 
 *** Análisis gráfico
    :PROPERTIES:
@@ -832,7 +838,8 @@ por ello debemos complementarlos con el análisis gráfico.
    :metadata: (slideshow . ((slide_type . slide)))
    :END:
 
-- Si la función de autocorrelación (ACF) decae muy lentamente (y de manera aparentemente lineal) es un indicio de que la serie necesita una diferencia regular.
+- Si la función de autocorrelación (ACF) decae muy lentamente (y de manera aparentemente lineal) es un indicio de que la serie necesita una diferencia regular (salvo si hay una tendencia determinista).
+
   [[file:img/lecc07/ACF-RW.png]]
 - Si al estimar los parámetros AR del modelo, alguna raíz autorregresiva tiene un valor absoluto muy próximo a uno, también es un indicio de que la serie necesita una diferencia regular.
 
@@ -892,6 +899,7 @@ A la hora de identificar un modelo para los datos:
 - Buscaremos modelos simples que expliquen los rasgos más obvios de la ACF o la PACF.
 - Evitaremos la identificación inicial de modelos ARMA. Es mejor comenzar con un AR o un MA de orden bajo, y analizar qué estructura queda en los residuos del modelo. Dicha estructura nos ayudara a ir completando el modelo. En la práctica, los órdenes  AR y MA suelen ser bajos.
 
+
 * Función de autocovarianzas para un ARMA(p,q)
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . slide)))
@@ -931,6 +939,7 @@ donde $\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})$ tiene grado $q$ y cogra
   \end{cases}
 \end{equation}
 (Donde (5-Lecc 3) se refiere a la [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf#subsection.5.2][última ecuación de la Lección 3]])
+
 
 * Recordatorio de las Ecuaciones de Yule-Walker para un AR(p) estacionario
    :PROPERTIES:
