@@ -43,98 +43,131 @@ Esta lección se centra en la predicción de modelos de series temporales univar
 
 
 * Introducción
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
 
 Supongamos que disponemos de una serie temporal $\boldsymbol{y}_1^T=(y_1,\ldots,y_T)$. Hay tres aspectos a tener en cuenta respecto a la previsión de valores futuros de esta serie:
-- Necesitamos un método para prever valores futuros basados en las observaciones disponibles.
+- Necesitamos un método para prever valores futuros basados en algún modelo ajustado a las observaciones disponibles.
 - Necesitamos evaluar la incertidumbre asociada a dichas predicciones. 
   Sin dicha información, los pronósticos pierden su utilidad, ya que no podemos evaluar su precisión. 
 
-  Una forma común de expresar esta incertidumbre es mediante el cálculo de un intervalo de confianza para la predicción, es decir, un rango que, con alta probabilidad (como .95 o .99) incluya el valor futuro que estamos intentando prever. 
+  Una forma común de expresar esta incertidumbre es mediante el cálculo de un intervalo de confianza para la predicción, es decir, un rango que, con alta probabilidad (como .95 o .99) incluya el valor futuro que estamos pronosticando.
 - Además, la previsión es un proceso dinámico: al recibir nuevos datos, es necesario actualizar los pronósticos para que exploten la nueva información.
-Los modelos lineales de series temporales ofrecen un modo directo de calcular estos tres aspectos.
+*Los modelos lineales permiten un cálculo directo de estos tres aspectos.*
 
 
-* Propiedades de la predicción de error cuadrático medio mínimo
+* Predicciones de error cuadrático medio mínimo
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
 
-# $\boldsymbol{Y}_{|:t} = = \boldsymbol{Y}_1^T $
-Consideremos un proceso estocástico estacionario con media cero, $\boldsymbol{Y}$, y que nuestro objetivo es pronosticar el valor de $Y_{t+\ell}$ con alguna función $g$ de las variables aleatorias $\boldsymbol{Y}_{|:t}=\{Y_n\mid n\leq t\}$; es decir, condicionado al ``pasado del proceso'' que llega hasta el instante correspondiente al índice $t$.
-Para comparar diferentes funciones de predicción es necesario establecer un criterio de optimalidad. 
+El objetivo es pronosticar el valor de \(Y_{t+\ell}\) utilizando una función \(g\) de las variables aleatorias pasadas \(\boldsymbol{Y}_{|:t}=\{Y_n\mid n\leq t\}\). 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Es decir, en función del ``pasado del proceso'' que llega hasta el instante correspondiente al índice $t$.
 
-Un criterio natural es minimizar los errores de predicción seleccionando el método de predicción que minimiza la esperanza del cuadrado de los errores. Dicho criterio se denomina minimizar el error cuadrático medio $(MSE)$ de la previsión de $Y_{t+\ell}$ obtenida con una función $g_t(\ell)$:
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Para evaluar diferentes funciones de predicción, estableceremos como criterio /minimizar el error cuadrático medio/ (MSE):
 \[
-MSE(Y_{t+\ell},\,g_t(\ell)) = E\Big(Y_{t+\ell}-g_t(\ell)\Big)^2; %  = E\big(Y_{t+\ell}-g(\boldsymbol{Y}_{|:t})_{t+\ell}\big)^2;
+MSE\big(Y_{t+\ell},\,g_t(\ell)\big) = E\Big(Y_{t+\ell}-g_t(\ell)\Big)^2.
 \]
-donde \(g_t(\ell)\) es una función de predicción de \({Y}_{t+\ell}\), donde \(t\) corresponde al índice de la última variable aleatoria del tramo del pasado de $\boldsymbol{Y}$ que estamos considerando para realizar la previsión y \(\ell\) indica el horizonte de predicción.
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Lo ideal es emplear aquel método $g_t(\ell)$ que minimiza la esperanza del cuadrado de los errores cometidos en la predicción $Y_{t+\ell}-g_t(\ell)$; donde \(g_t(\ell)\) es una función de predicción de \({Y}_{t+\ell}\), donde \(t\) corresponde al índice de la última variable aleatoria del tramo del pasado de $\boldsymbol{Y}$ que estamos considerando para realizar la previsión y \(\ell\) indica el horizonte de predicción.
 
-La función de las variables aleatorias $\boldsymbol{Y}_{|:t}=\{Y_t,Y_{t-1},\ldots\}$ que logra minimizar el error cuadrático medio $(MSE)$ se conoce con el nombre de /esperanza condicional/[fn::Dicha función es la proyección ortogonal sobre el espacio euclídeo (específicamente espacio de Hilbert) generado por el conjunto de todas las funciones (medibles) de $\boldsymbol{Y}_{|:t}$. El conjunto de funciones medibles contiene a las funciones /lineales/, pero es infinitamente más grande.] de $Y_{t+\ell}$:
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+La función que minimiza dicho criterio MSE es la *esperanza condicional* de $Y_{t+\ell}$:
 \[
 E\big(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}\big).
 \]
-Es decir, cuando la función de predicción escogida es $g_t(\ell)=E\big(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}\big)$, el error cuadrático medio $MSE(Y_{t+\ell},\,g_t(\ell))$ es mínimo. 
-Las predicciones basadas en minimizar el MSE se conocen como predicciones de error cuadrático medio mínimo. 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+Es decir, cuando la función de predicción es $g_t(\ell)=E\big(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}\big)$, el error cuadrático medio 
+$$MSE\big(Y_{t+\ell},\,g_t(\ell)\big)= E\Big(Y_{t+\ell}-E\big(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}\big)\Big)^2$$ 
+es mínimo.[fn::Dicha función es la proyección ortogonal sobre el espacio euclídeo (específicamente espacio de Hilbert) generado por el conjunto de todas las funciones (medibles) de $\boldsymbol{Y}_{|:t}$. El conjunto de funciones medibles es enorme y entre otras muchas, también contiene al conjunto de funciones /lineales/.] 
+
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Las predicciones resultantes se conocen como predicciones de error cuadrático medio mínimo.
 #+latex: \medskip
 
 # =g(\boldsymbol{Y}_{|1:t})_{t+\ell}
 # (MMSEF). 
 
-El problema de la esperanza condicional radica en que, dependiendo del contexto, su cálculo puede ser complicado o inviable. 
-Sin embargo, si nos limitamos a aquellas funciones que son /lineales/, 
-en lugar de buscar el predictor entre cualquiera de las funciones[fn::funciones medibles.] del pasado del proceso, $\boldsymbol{Y}_{|:t}$, 
-encontraremos el /predictor _lineal_/ que minimiza el error cuadrático medio (MSEL).[fn::Pero al seguir esta estrategia aceptamos el coste de que pueda ocurrir que  $MSEL \geq MSE$ ya que, al excluir de la búsqueda las funciones no lineales, podríamos estar descartado aquella función que arroja las mejores predicciones de entre todas las posibles.] 
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
+El problema de la esperanza condicional radica en que, dependiendo del contexto, su cálculo puede ser muy difícil\dots o sencillamente inviable. 
+
+
+Como solución alternativa podemos:
+- limitarnos a buscar predictores entre aquellas funciones de $\boldsymbol{Y}_{|:t}$ (i.e., funciones ``del pasado'') que son /lineales/; 
+- y seleccionar aquel /predictor _lineal_/ que minimiza el error cuadrático medio de entre las funciones que son lineales en $\boldsymbol{Y}_{|:t}$ (MSEL).
+
+Al seguir esta estrategia asumimos poder cometer errores de predicción más grandes, $MSEL \geq MSE$; ya que al excluir las funciones no lineales, podríamos estar descartando la función que arroja las predicciones con los errores más pequeños.
 
 
 ** Predicciones lineales
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
+
 *** Breve recordatorio sobre las proyecciones ortogonales
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
 
 #+latex: \noindent
 Aquí solo voy a recordar que como
-#+BEGIN_QUOTE
-_la proyección ortogonal de $X$ sobre $\mathcal{H}$ es el elemento de $\mathcal{H}$ más ``próximo'' a $X$_.
-#+END_QUOTE
-si $X\in\mathcal{H}$, la proyección de $X$ sobre $\mathcal{H}$ es el propio $X$. 
-Por otra parte, si $Y$ es ortogonal a todo $X\in\mathcal{H}$, es decir, si $Y\perp\mathcal{H}$, la proyección de $Y$ sobre $\mathcal{H}$ es cero. 
+#+begin_center
+_la proyección ortogonal de $X$ sobre $\mathcal{H}$ es el elemento de $\mathcal{H}$ más /próximo/ a $X$_
+#+end_center
+- si $X\in\mathcal{H}$, la proyección de $X$ sobre $\mathcal{H}$ es el propio $X$. 
+- si $Y$ es ortogonal a todo $X\in\mathcal{H}$, es decir, si $Y\perp\mathcal{H}$, la proyección de $Y$ sobre $\mathcal{H}$ es cero. 
 
-La proyección ortogonal de $X$ sobre $\mathcal{H}$ queda caracterizada porque la diferencia entre $X$ y su proyección, $\widehat{X}$, es perpendicular al subespacio vectorial $\mathcal{H}$. 
-En lo que sigue, dicha diferencia $X-\widehat{X}$ recibirá el nombre de error de predicción (lineal).[fn::/Puede consultar algunos resultados sobre las proyecciones ortogonales [[https://mbujosab.github.io/CursoDeAlgebraLineal/libro.pdf#appendix.13][aquí]]./]
+La proyección ortogonal de $X$ sobre el espacio euclídeo $\mathcal{H}$ queda caracterizada porque la diferencia entre $X$ y su proyección, $\widehat{X}$, es perpendicular a $\mathcal{H}$. 
+En lo que sigue, dicha diferencia $X-\widehat{X}$ recibirá el nombre de error de predicción (lineal).
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+/Puede consultar algunos resultados sobre las proyecciones ortogonales en este [[https://mbujosab.github.io/CursoDeAlgebraLineal/libro.pdf#appendix.13][enlace]]./
 
 *** Las predicciones lineales son proyecciones ortogonales
-
-#  Tenga presente que la igualdad solo se produce si, de entre todas las funciones (ya sean lineales o no lineales), la mejor predicción se logra mediante una función lineal.
-# \hat{Y}_T(k) 
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
 
 La forma general de un predictor /lineal/ es
 \[
-%\widehat{Y_{t+\ell|t}} 
 g_t(\ell)
 \;=\; 
 {b_\ell}_0 Y_t + {b_\ell}_1 Y_{t-1} + {b_\ell}_2 Y_{t-2} + \cdots
 \;=\; 
-\boldsymbol{b_\ell}*\boldsymbol{Y}_{|:t}
+\boldsymbol{b_\ell}*(\boldsymbol{Y}_{|:t})
 \;=\; \boldsymbol{b_\ell}(B)Y_t,
 \]
 donde $\boldsymbol{b_\ell}$ es una serie formal de cuadrado sumable. 
 
-El error cuadrático medio de dicho predictor lineal (MSEL) es
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+El error cuadrático medio del predictor lineal (MSEL) es mínimo cuando el error de predicción \(\big(Y_{t+\ell}-g_t(\ell)\big)\) es ortogonal a cada una de las variables aleatorias del pasado del proceso;[fn::Si el proceso $\boldsymbol{Y}$ tiene media cero, esta condición es equivalente a que el error de previsión esté incorrelado con el pasado del proceso.] es decir, cuando
 \[
-MSEL\big(Y_{t+\ell},\,g_t(\ell)\big) = E\big(Y_{t+\ell}-g_t(\ell)\big)^2; 
-% = E\Big(Y_{t+\ell}-(\boldsymbol{b_\ell}*\boldsymbol{Y}_{|:t})\Big)^2;
+E\Big((Y_{t+\ell}-\boldsymbol{b_\ell}*\boldsymbol{Y}_{|:t})\cdot{Y}_{n}\Big) = \boldsymbol{0}, \;\text{para cualquier } n\leq t.
 \]
-que es mínimo cuando cuando la variable aleatoria $\big(Y_{t+\ell}-g_t(\ell)\big)$ es ortogonal a las variables aleatorias del pasado del proceso ($\boldsymbol{Y}_{|:t}$); 
-es decir, cuando 
-\[E\Big((Y_{t+\ell}-\boldsymbol{b_\ell}*\boldsymbol{Y}_{|:t})\cdot{Y}_{n}\Big) =\boldsymbol{0},\;\text{para cualquier } n\leq t.\]
-Consecuentemente, el mejor predictor lineal (que denotaremos con $\widehat{Y_{t+\ell|t}}$) es aquel cuyos errores de predicción
-\(Y_{t+\ell}-\widehat{Y_{t+\ell|t}}\) son ortogonales[fn::Si el proceso $\boldsymbol{Y}$ tiene media cero, esta condición es equivalente a que el error de previsión esté incorrelado con el pasado del proceso.] a toda combinación lineal de las variables aleatorias del pasado del proceso $\boldsymbol{Y}_{|:t}$.
-Es decir, $\widehat{Y_{t+\ell|t}}$ es la proyección ortogonal de $Y_{t+\ell}$ sobre el subespacio cerrado formado por las combinaciones lineales de las variables aleatorias $Y_t,Y_{t-1},Y_{t-2},\ldots$. 
+#+attr_ipynb: (slideshow . ((slide_type . fragment)))
+Consecuentemente, el mejor predictor lineal (que denotaremos con $\widehat{Y_{t+\ell|t}}$) es la proyección ortogonal de $Y_{t+\ell}$ sobre el subespacio cerrado formado por las combinaciones lineales de las variables aleatorias $Y_t,Y_{t-1},Y_{t-2},\ldots$. 
 
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
 Denotando con $\mathcal{H}_{Y_t}$ a la clausura en la norma de \(L^2\) del subespacio engendrado por la constante $1$ y el ``pasado'' de $\boldsymbol{Y}$ 
 (es decir, si $\mathcal{H}_{Y_t}=\overline{\operatorname{sp}}\{1,Y_t,Y_{t-1},\ldots\}$), 
-podremos decir que el predictor lineal $\widehat{Y_{t+\ell|t}}$ que minimiza $MSEL$ es la proyección ortogonal de $Y_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$.
+podemos decir que el predictor lineal que minimiza los errores de previsión, $\widehat{Y_{t+\ell|t}}$, es la proyección ortogonal de $Y_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$.
 
-Es importante tener en cuenta que cuando $\boldsymbol{Y}=\boldsymbol{\varphi}*\boldsymbol{U}$ es un modelo lineal causal, estacionario e invertible, se cumple que $\mathcal{H}_{Y_t} = \mathcal{H}_{U_t}$ (véase la sección [[id:e8c024c1-d9d1-41e8-b1fa-e0deb73bbf79][Nota sobre subespacio sobre el que proyectamos al prever]]).[fn::donde $\mathcal{H}_{U_t}$ denota la clausura en la norma de \(L^2\) del subespacio generado por la constante $1$ y el pasado del proceso de ruido blanco $\boldsymbol{U}$]
+Es importante tener en cuenta que cuando $\boldsymbol{Y}=\boldsymbol{\varphi}*\boldsymbol{U}$ es un proceso estocástico lineal causal, estacionario e invertible, se cumple que $\mathcal{H}_{Y_t} = \mathcal{H}_{U_t}$ 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+(véase la sección [[id:e8c024c1-d9d1-41e8-b1fa-e0deb73bbf79][Nota sobre subespacio sobre el que proyectamos al prever]]).[fn::donde $\mathcal{H}_{U_t}$ denota la clausura en la norma de \(L^2\) del subespacio generado por la constante $1$ y el pasado del proceso de ruido blanco $\boldsymbol{U}$]
 Es habitual referirse a las variables aleatorias que pertenecen a $\mathcal{H}_{Y_t}$ como /variables observadas/, y a todo es espacio $\mathcal{H}_{Y_t}$ como el /conjunto de información/ empleado en la previsión.
-#+latex:\medskip
 
-Restringir la búsqueda a funciones lineales implica que, si la esperanza condicional no es lineal respecto al pasado del proceso, 
+# +attr_ipynb: (slideshow . ((slide_type . fragment)))
+# El mejor predictor lineal \(\widehat{Y_{t+\ell|t}}\) minimiza el error \(Y_{t+\ell}-\widehat{Y_{t+\ell|t}}\) siendo ortogonal a todas las combinaciones lineales de las variables del pasado \(\boldsymbol{Y}_{|:t}\). Esto establece que \(\widehat{Y_{t+\ell|t}}\) es la proyección ortogonal de \(Y_{t+\ell}\) sobre el subespacio cerrado \(\mathcal{H}_{Y_t}\), formado por constantes y el pasado de \(\boldsymbol{Y}\).
+
+# Si \(\boldsymbol{Y}=\boldsymbol{\varphi}*\boldsymbol{U}\) es un modelo lineal causal y estacionario, se cumple que \(\mathcal{H}_{Y_t} = \mathcal{H}_{U_t}\). Las variables en \(\mathcal{H}_{Y_t}\) son denominadas /variables observadas/ y el espacio \(\mathcal{H}_{Y_t}\) es el /conjunto de información/ para la previsión.
+
+
+#+latex:\medskip
+Recuerde que restringir la búsqueda a funciones lineales implica que, si la esperanza condicional no es lineal respecto al pasado del proceso, 
 el mejor predictor lineal será peor que la esperanza condicional. Dicho de otro modo
 \[
 MSEL(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t})\geq MSE(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}).
@@ -145,24 +178,22 @@ De hecho, es lo que ocurre cuando el proceso estocástico tiene distribución no
 # También ocurre cuando el proceso estocástico corresponde a un modelo lineal causal /estacionario e invertible/. Es decir, donde cada $Y_t$ es de la forma $\sum_{k=0}^\infty \psi_{k} U_{t-k}$ y cada $U_t$ es de la forma  $\sum_{k=0}^\infty \varphi_{k} Y_{t-k}$.  
 
 Aunque los resultados anteriores se han establecido para procesos estacionarios infinitos, también son válidos para procesos no estacionarios si solo consideramos un tramo finito del pasado de $\boldsymbol{Y}$, es decir, si nuestra predicción es función de $\boldsymbol{Y}_{|1:T}=(Y_1,\ldots,Y_T)$. en este caso, la discusión anterior se limita a condicionar la esperanza[fn::entonces estaremos proyectado ortogonalmente sobre funciones de un conjunto finito de variables aleatorias: $Y_1,\ldots,Y_T$.] sobre un conjunto finito de variables aleatorias: $(Y_1,\ldots,Y_T)$.
-Consecuentemente, la esperanza condicional (al conjunto finito $\boldsymbol{Y}_{|1:T}$) así como la varianza condicional (al conjunto finito $\boldsymbol{Y}_{|1:T}$) serán finitas;[fn::aunque ni la esperanza ni la varianza sean constantes.] por lo que todo estará bien definido.
+Consecuentemente, la esperanza condicional (al conjunto finito $\boldsymbol{Y}_{|1:T}$) así como la varianza condicional (al conjunto finito $\boldsymbol{Y}_{|1:T}$) serán finitas;[fn::aunque no sean constantes.] por lo que todo estará bien definido.
 
 *** Proyección sobre el pasado de un proceso lineal causal, estacionario e invertible
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
 
-Sea $\boldsymbol{Y}$ tal que
-\(
-Y_t = \sum_{k=0}^{\infty} \psi_k\,U_{t-k}, \; \text{ con }\; \sum_{k=0}^\infty \psi_k^2 < \infty,
-\)
-es invertible, y donde $\boldsymbol{U}\sim WN$.
+Sea $\boldsymbol{Y}=\boldsymbol{\varphi}*\boldsymbol{U}$ es un proceso estocástico lineal causal, estacionario e invertible.
 
-Si $\ell > 0$, denominamos /``previsión de $Y_{t+\ell}$ basada en la historia del proceso hasta $Y_t$''/ a la proyección ortogonal de $Y_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$; y la denotamos con $\widehat{Y_{t+\ell|t}}$.
+Para $\ell > 0$, denominamos /_previsión de $Y_{t+\ell}$ basada en la historia del proceso hasta $Y_t$_/ a la proyección ortogonal de $Y_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$; y la denotamos con $\widehat{Y_{t+\ell|t}}$.
 
-Análogamente, la /``previsión de $U_{t+\ell}$ basada en la historia del proceso $\boldsymbol{Y}$ hasta $Y_t$''/ es la proyección ortogonal de $U_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$. 
-Esta previsión, que podemos denotar con $\widehat{U_{t+\ell|t}}$, _siempre es cero_; 
-pues cada $U_t$ es ortogonal a $U_n$ cuando $n<t$ (por ser $\boldsymbol{U}$ incorrelado y con esperanza nula). 
+Análogamente, la /``previsión, $\widehat{U_{t+\ell|t}}$, de $U_{t+\ell}$ basada en la historia del proceso $\boldsymbol{Y}$ hasta $Y_t$''/ es la proyección ortogonal de $U_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$. 
+Esta previsión _siempre es nula_, pues $U_n$ es ortogonal a su pasado (por ser el ruido blanco incorrelado y con esperanza nula). 
 Es decir, la proyección es cero porque $U_{t+\ell}\perp\mathcal{H}_{U_t}\;$ (donde $\mathcal{H}_{Y_t}=\mathcal{H}_{U_t}$ por ser $\boldsymbol{Y}$ invertible).
 
-Sin embargo, cuando $k \geq 0$, la proyecciones de $Y_{t-k}$ y de $U_{t-k}$ sobre $\mathcal{H}_{Y_t}$ son ellas mismas, ya que ambas variables aleatorias pertenecen al espacio $\mathcal{H}_{U_t}=\mathcal{H}_{Y_t}$ sobre el que se proyectan.
+Sin embargo, para $k \geq 0$, la proyecciones de $Y_{t-k}$ y de $U_{t-k}$ sobre $\mathcal{H}_{Y_t}$ son ellas mismas, ya que ambas variables aleatorias pertenecen al espacio $\mathcal{H}_{U_t}=\mathcal{H}_{Y_t}$ sobre el que se proyectan.
 
 Además, para las secuencias constantes $c_t=c$ para todo $t$, tenemos $\widehat{c_{t|j}}=c$ dado que $1\cdot c\in\mathcal{H}_{Y_t}$.
 
@@ -172,6 +203,9 @@ Tras este repaso de las proyecciones ortogonales, ya podemos ver cómo calcular 
 
 
 * Cálculo de predicciones de procesos ARIMA
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . slide)))
+   :END:
  
 Sea \( \boldsymbol{Y} \) un proceso ARIMA$(p,d,q)\times(P,D,Q)_S$ 
 \[
