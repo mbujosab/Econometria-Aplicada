@@ -395,13 +395,39 @@ jobs:
     - name: Disable tlmgr (prevent accidental calls)
       run: sudo mv /usr/bin/tlmgr /usr/bin/tlmgr.disabled || true
 
-    - name: Clone Scimax
+    - name: Clone Scimax (pin to scimax 3.0 tag)
       run: |
+        mkdir -p ~/Software
         git clone https://github.com/jkitchin/scimax.git ~/Software/scimax
+        cd ~/Software/scimax
+        # Checkout the v3.0 tag explicitly (creates a branch scimax-3.0)
+        git fetch --tags
+        git checkout -b scimax-3.0 tags/3.0
 
-    - name: Download ox-ipynb.el
+    - name: Download ox-ipynb.el (match pinned scimax)
       run: |
         wget https://raw.githubusercontent.com/jkitchin/ox-ipynb/master/ox-ipynb.el -O ~/Software/scimax/ox-ipynb.el
+
+    - name: Install Emacs packages required by scimax and org-babel (s, dash, jupyter, org-ref, org-db)
+      run: |
+        emacs --batch \
+          --eval "(require 'package)" \
+          --eval "(add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\"))" \
+          --eval "(package-refresh-contents)" \
+          --eval "(package-install 's)" \
+          --eval "(package-install 'dash)" \
+          --eval "(package-install 'jupyter)" \
+          --eval "(package-install 'org-ref)" \
+          --eval "(package-install 'org-db)" \
+          --eval "(package-install 'ox-ipynb)" || true
+
+#    - name: Clone Scimax
+#       run: |
+#         git clone https://github.com/jkitchin/scimax.git ~/Software/scimax
+# 
+#     - name: Download ox-ipynb.el
+#       run: |
+#         wget https://raw.githubusercontent.com/jkitchin/ox-ipynb/master/ox-ipynb.el -O ~/Software/scimax/ox-ipynb.el
 
     - name: Install s.el and dash.el
       run: |

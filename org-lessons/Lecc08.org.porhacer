@@ -1,0 +1,542 @@
+#    -*- mode: org -*-
+
+#+TITLE: Lección 8. Predicción de modelos ARIMA
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+# +OPTIONS: toc:nil
+
+# https://machinelearningmastery.com/arima-for-time-series-forecasting-with-python/
+# https://www.machinelearningplus.com/time-series/arima-model-time-series-forecasting-python/
+# https://medium.com/datainc/time-series-analysis-and-forecasting-with-arima-in-python-aa22694b3aaa
+
+# https://www.tigerdata.com/blog/how-to-work-with-time-series-in-python
+# https://pyspectrum.readthedocs.io/en/latest/ref_param.html
+
+# https://github.com/QuantEcon/quantecon-notebooks-python/blob/master/arma.ipynb
+# https://github.com/QuantEcon/lecture-python-intro
+# https://quantecon.org/quantecon-py/
+# https://quantecon.org/
+
+#+include: 00preambulo_lecciones.txt
+#+LaTeX_HEADER: \DeclareMathOperator*{\plim}{plim}
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+BEGIN_SRC emacs-lisp :exports none :results silent
+(use-package ox-ipynb
+  :load-path (lambda () (expand-file-name "ox-ipynb" scimax-dir)))
+(use-package htmlize)
+#+END_SRC
+
+#+LATEX: \maketitle
+
+#+begin_abstract
+Esta lección se centra en la predicción de modelos de series temporales univariantes.  
+#+end_abstract
+
+- ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc08.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc08.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc08.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc08.ipynb][mybinder]])
+
+
+* Introducción
+
+Supongamos que disponemos de una serie temporal $\boldsymbol{y}_1^T=(y_1,\ldots,y_T)$. Hay tres aspectos a tener en cuenta respecto a la previsión de valores futuros de esta serie:
+- Necesitamos un método para prever valores futuros basados en las observaciones disponibles.
+- Necesitamos evaluar la incertidumbre asociada a dichas predicciones. 
+  Sin dicha información, los pronósticos pierden su utilidad, ya que no podemos evaluar su precisión. 
+
+  Una forma común de expresar esta incertidumbre es mediante el cálculo de un intervalo de confianza para la predicción, es decir, un rango que, con alta probabilidad (como .95 o .99) incluya el valor futuro que estamos intentando prever. 
+- Además, la previsión es un proceso dinámico: al recibir nuevos datos, es necesario actualizar los pronósticos para que exploten la nueva información.
+Los modelos lineales de series temporales ofrecen un modo directo de calcular estos tres aspectos.
+
+
+* Propiedades de la predicción de error cuadrático medio mínimo
+
+# $\boldsymbol{Y}_{|:t} = = \boldsymbol{Y}_1^T $
+Consideremos un proceso estocástico estacionario con media cero, $\boldsymbol{Y}$, y que nuestro objetivo es pronosticar el valor de $Y_{t+\ell}$ con alguna función $g$ de las variables aleatorias $\boldsymbol{Y}_{|:t}=\{Y_n\mid n\leq t\}$; es decir, condicionado al ``pasado del proceso'' que llega hasta el instante correspondiente al índice $t$.
+Para comparar diferentes funciones de predicción es necesario establecer un criterio de optimalidad. 
+
+Un criterio natural es minimizar los errores de predicción seleccionando el método de predicción que minimiza la esperanza del cuadrado de los errores. Dicho criterio se denomina minimizar el error cuadrático medio $(MSE)$ de la previsión de $Y_{t+\ell}$ obtenida con una función $g_t(\ell)$:
+\[
+MSE(Y_{t+\ell},\,g_t(\ell)) = E\Big(Y_{t+\ell}-g_t(\ell)\Big)^2; %  = E\big(Y_{t+\ell}-g(\boldsymbol{Y}_{|:t})_{t+\ell}\big)^2;
+\]
+donde \(g_t(\ell)\) es una función de predicción de \({Y}_{t+\ell}\), donde \(t\) corresponde al índice de la última variable aleatoria del tramo del pasado de $\boldsymbol{Y}$ que estamos considerando para realizar la previsión y \(\ell\) indica el horizonte de predicción.
+
+La función de las variables aleatorias $\boldsymbol{Y}_{|:t}=\{Y_t,Y_{t-1},\ldots\}$ que logra minimizar el error cuadrático medio $(MSE)$ se conoce con el nombre de /esperanza condicional/[fn::Dicha función es la proyección ortogonal sobre el espacio euclídeo (específicamente espacio de Hilbert) generado por el conjunto de todas las funciones (medibles) de $\boldsymbol{Y}_{|:t}$. El conjunto de funciones medibles contiene a las funciones /lineales/, pero es infinitamente más grande.] de $Y_{t+\ell}$:
+\[
+E\big(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}\big).
+\]
+Es decir, cuando la función de predicción escogida es $g_t(\ell)=E\big(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}\big)$, el error cuadrático medio $MSE(Y_{t+\ell},\,g_t(\ell))$ es mínimo. 
+Las predicciones basadas en minimizar el MSE se conocen como predicciones de error cuadrático medio mínimo. 
+#+latex: \medskip
+
+# =g(\boldsymbol{Y}_{|1:t})_{t+\ell}
+# (MMSEF). 
+
+El problema de la esperanza condicional radica en que, dependiendo del contexto, su cálculo puede ser complicado o inviable. 
+Sin embargo, si nos limitamos a aquellas funciones que son /lineales/, 
+en lugar de buscar el predictor entre cualquiera de las funciones[fn::funciones medibles.] del pasado del proceso, $\boldsymbol{Y}_{|:t}$, 
+encontraremos el /predictor _lineal_/ que minimiza el error cuadrático medio (MSEL).[fn::Pero al seguir esta estrategia aceptamos el coste de que pueda ocurrir que  $MSEL \geq MSE$ ya que, al excluir de la búsqueda las funciones no lineales, podríamos estar descartado aquella función que arroja las mejores predicciones de entre todas las posibles.] 
+
+
+** Predicciones lineales
+*** Breve recordatorio sobre las proyecciones ortogonales
+
+#+latex: \noindent
+Aquí solo voy a recordar que como
+#+BEGIN_QUOTE
+_la proyección ortogonal de $X$ sobre $\mathcal{H}$ es el elemento de $\mathcal{H}$ más ``próximo'' a $X$_.
+#+END_QUOTE
+si $X\in\mathcal{H}$, la proyección de $X$ sobre $\mathcal{H}$ es el propio $X$. 
+Por otra parte, si $Y$ es ortogonal a todo $X\in\mathcal{H}$, es decir, si $Y\perp\mathcal{H}$, la proyección de $Y$ sobre $\mathcal{H}$ es cero. 
+
+La proyección ortogonal de $X$ sobre $\mathcal{H}$ queda caracterizada porque la diferencia entre $X$ y su proyección, $\widehat{X}$, es perpendicular al subespacio vectorial $\mathcal{H}$. 
+En lo que sigue, dicha diferencia $X-\widehat{X}$ recibirá el nombre de error de predicción (lineal).[fn::/Puede consultar algunos resultados sobre las proyecciones ortogonales [[https://mbujosab.github.io/CursoDeAlgebraLineal/libro.pdf#appendix.13][aquí]]./]
+
+*** Las predicciones lineales son proyecciones ortogonales
+
+#  Tenga presente que la igualdad solo se produce si, de entre todas las funciones (ya sean lineales o no lineales), la mejor predicción se logra mediante una función lineal.
+# \hat{Y}_T(k) 
+
+La forma general de un predictor /lineal/ es
+\[
+%\widehat{Y_{t+\ell|t}} 
+g_t(\ell)
+\;=\; 
+{b_\ell}_0 Y_t + {b_\ell}_1 Y_{t-1} + {b_\ell}_2 Y_{t-2} + \cdots
+\;=\; 
+\boldsymbol{b_\ell}*\boldsymbol{Y}_{|:t}
+\;=\; \boldsymbol{b_\ell}(B)Y_t,
+\]
+donde $\boldsymbol{b_\ell}$ es una serie formal de cuadrado sumable. 
+
+El error cuadrático medio de dicho predictor lineal (MSEL) es
+\[
+MSEL\big(Y_{t+\ell},\,g_t(\ell)\big) = E\big(Y_{t+\ell}-g_t(\ell)\big)^2; 
+% = E\Big(Y_{t+\ell}-(\boldsymbol{b_\ell}*\boldsymbol{Y}_{|:t})\Big)^2;
+\]
+que es mínimo cuando cuando la variable aleatoria $\big(Y_{t+\ell}-g_t(\ell)\big)$ es ortogonal a las variables aleatorias del pasado del proceso ($\boldsymbol{Y}_{|:t}$); 
+es decir, cuando 
+\[E\Big((Y_{t+\ell}-\boldsymbol{b_\ell}*\boldsymbol{Y}_{|:t})\cdot{Y}_{n}\Big) =\boldsymbol{0},\;\text{para cualquier } n\leq t.\]
+Consecuentemente, el mejor predictor lineal (que denotaremos con $\widehat{Y_{t+\ell|t}}$) es aquel cuyos errores de predicción
+\(Y_{t+\ell}-\widehat{Y_{t+\ell|t}}\) son ortogonales[fn::Si el proceso $\boldsymbol{Y}$ tiene media cero, esta condición es equivalente a que el error de previsión esté incorrelado con el pasado del proceso.] a toda combinación lineal de las variables aleatorias del pasado del proceso $\boldsymbol{Y}_{|:t}$.
+Es decir, $\widehat{Y_{t+\ell|t}}$ es la proyección ortogonal de $Y_{t+\ell}$ sobre el subespacio cerrado formado por las combinaciones lineales de las variables aleatorias $Y_t,Y_{t-1},Y_{t-2},\ldots$. 
+
+Denotando con $\mathcal{H}_{Y_t}$ a la clausura en la norma de \(L^2\) del subespacio engendrado por la constante $1$ y el ``pasado'' de $\boldsymbol{Y}$ 
+(es decir, si $\mathcal{H}_{Y_t}=\overline{\operatorname{sp}}\{1,Y_t,Y_{t-1},\ldots\}$), 
+podremos decir que el predictor lineal $\widehat{Y_{t+\ell|t}}$ que minimiza $MSEL$ es la proyección ortogonal de $Y_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$.
+
+Es importante tener en cuenta que cuando $\boldsymbol{Y}=\boldsymbol{\varphi}*\boldsymbol{U}$ es un modelo lineal causal, estacionario e invertible, se cumple que $\mathcal{H}_{Y_t} = \mathcal{H}_{U_t}$ (véase la sección [[id:e8c024c1-d9d1-41e8-b1fa-e0deb73bbf79][Nota sobre subespacio sobre el que proyectamos al prever]]).[fn::donde $\mathcal{H}_{U_t}$ denota la clausura en la norma de \(L^2\) del subespacio generado por la constante $1$ y el pasado del proceso de ruido blanco $\boldsymbol{U}$]
+Es habitual referirse a las variables aleatorias que pertenecen a $\mathcal{H}_{Y_t}$ como /variables observadas/, y a todo es espacio $\mathcal{H}_{Y_t}$ como el /conjunto de información/ empleado en la previsión.
+#+latex:\medskip
+
+Restringir la búsqueda a funciones lineales implica que, si la esperanza condicional no es lineal respecto al pasado del proceso, 
+el mejor predictor lineal será peor que la esperanza condicional. Dicho de otro modo
+\[
+MSEL(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t})\geq MSE(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}).
+\]
+La igualdad solo se dará si la función que minimiza el error cuadrático medio es lineal y, por ende, no ha sido excluida por la restricción. En resumen, $MSEL = MSE$ solo si la esperanza condicional $E\big(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}\big)$ es lineal en $\boldsymbol{Y}_{|:t}$ (es decir, si es la proyección ortogonal de $Y_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$).
+De hecho, es lo que ocurre cuando el proceso estocástico tiene distribución normal.
+
+# También ocurre cuando el proceso estocástico corresponde a un modelo lineal causal /estacionario e invertible/. Es decir, donde cada $Y_t$ es de la forma $\sum_{k=0}^\infty \psi_{k} U_{t-k}$ y cada $U_t$ es de la forma  $\sum_{k=0}^\infty \varphi_{k} Y_{t-k}$.  
+
+Aunque los resultados anteriores se han establecido para procesos estacionarios infinitos, también son válidos para procesos no estacionarios si solo consideramos un tramo finito del pasado de $\boldsymbol{Y}$, es decir, si nuestra predicción es función de $\boldsymbol{Y}_{|1:T}=(Y_1,\ldots,Y_T)$. en este caso, la discusión anterior se limita a condicionar la esperanza[fn::entonces estaremos proyectado ortogonalmente sobre funciones de un conjunto finito de variables aleatorias: $Y_1,\ldots,Y_T$.] sobre un conjunto finito de variables aleatorias: $(Y_1,\ldots,Y_T)$.
+Consecuentemente, la esperanza condicional (al conjunto finito $\boldsymbol{Y}_{|1:T}$) así como la varianza condicional (al conjunto finito $\boldsymbol{Y}_{|1:T}$) serán finitas;[fn::aunque ni la esperanza ni la varianza sean constantes.] por lo que todo estará bien definido.
+
+*** Proyección sobre el pasado de un proceso lineal causal, estacionario e invertible
+
+Sea $\boldsymbol{Y}$ tal que
+\(
+Y_t = \sum_{k=0}^{\infty} \psi_k\,U_{t-k}, \; \text{ con }\; \sum_{k=0}^\infty \psi_k^2 < \infty,
+\)
+es invertible, y donde $\boldsymbol{U}\sim WN$.
+
+Si $\ell > 0$, denominamos /``previsión de $Y_{t+\ell}$ basada en la historia del proceso hasta $Y_t$''/ a la proyección ortogonal de $Y_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$; y la denotamos con $\widehat{Y_{t+\ell|t}}$.
+
+Análogamente, la /``previsión de $U_{t+\ell}$ basada en la historia del proceso $\boldsymbol{Y}$ hasta $Y_t$''/ es la proyección ortogonal de $U_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$. 
+Esta previsión, que podemos denotar con $\widehat{U_{t+\ell|t}}$, _siempre es cero_; 
+pues cada $U_t$ es ortogonal a $U_n$ cuando $n<t$ (por ser $\boldsymbol{U}$ incorrelado y con esperanza nula). 
+Es decir, la proyección es cero porque $U_{t+\ell}\perp\mathcal{H}_{U_t}\;$ (donde $\mathcal{H}_{Y_t}=\mathcal{H}_{U_t}$ por ser $\boldsymbol{Y}$ invertible).
+
+Sin embargo, cuando $k \geq 0$, la proyecciones de $Y_{t-k}$ y de $U_{t-k}$ sobre $\mathcal{H}_{Y_t}$ son ellas mismas, ya que ambas variables aleatorias pertenecen al espacio $\mathcal{H}_{U_t}=\mathcal{H}_{Y_t}$ sobre el que se proyectan.
+
+Además, para las secuencias constantes $c_t=c$ para todo $t$, tenemos $\widehat{c_{t|j}}=c$ dado que $1\cdot c\in\mathcal{H}_{Y_t}$.
+
+# Sin embargo, cuando $k \geq 0$, tanto la proyección de $Y_{t-k}$ como la $U_{t-k}$ de sobre $\mathcal{H}_{Y_t}$ es la propia variable $Y_{t-k}$ (ó $U_{t-k}$), pues ambas son elementos de $\mathcal{H}_{Y_t}=\mathcal{H}_{U_t}$. 
+
+Tras este repaso de las proyecciones ortogonales, ya podemos ver cómo calcular predicciones para los modelos ARIMA causales.
+
+
+* Cálculo de predicciones de procesos ARIMA
+ 
+Sea \( \boldsymbol{Y} \) un proceso ARIMA$(p,d,q)\times(P,D,Q)_S$ 
+\[
+\boldsymbol{\phi}_p(\mathsf{B})\,\boldsymbol{\Phi}_P(\mathsf{B}^S)\,\nabla^d\,\nabla_{_S}^D\, Y_t
+= c +\boldsymbol{\theta}_q(\mathsf{B})\,\boldsymbol{\Theta}_q(\mathsf{B}^S)\, U_t; 
+\quad t\in\mathbb{N}.
+\]
+donde $c$ puede ser distinto de cero para permitir procesos con esperanza no nula.
+
+Denotemos con $\boldsymbol{\varphi}$ al polinomio de grado $p+P+d+D$ resultante del producto convolución de los polinomios de la parte AR:
+\[
+\boldsymbol{\varphi}(z)=\boldsymbol{\phi}_p(z)*\boldsymbol{\Phi}_P(z^S)*\nabla^d*\nabla_{_S}^D.
+\] 
+Y denotemos con $\boldsymbol{\vartheta}$ al polinomio de grado $q+Q$ resultante del producto convolución de los polinomios de la parte MA:
+\[\boldsymbol{\vartheta}(z)=\boldsymbol{\theta}_q(z)*\boldsymbol{\Theta}_q(z^S).\]
+Entonces podemos reescribir el modelo ARIMA de manera mucho más compacta:
+\[
+\boldsymbol{\varphi}(\mathsf{B})\, Y_t = c + \boldsymbol{\vartheta}(\mathsf{B})\, U_t.
+\]
+Debido a la simple estructura de los modelos ARIMA, tenemos que
+\begin{equation}
+Y_{t} = c + \sum_{k=1}^{p} \varphi_k Y_{t-k} + U_{t} + \sum_{k=1}^{q} -\vartheta_k U_{t-k}.
+\label{eqn:ARMA-en-t}
+\end{equation}
+De \eqref{eqn:ARMA-en-t}, para \( \ell = 0, \pm 1, \pm 2, \dots \) y \( t \) arbitrario, tenemos que
+\begin{equation}
+Y_{t+\ell} = c + \sum_{k=1}^{p} \varphi_k Y_{t+\ell-k} + U_{t+\ell} + \sum_{k=1}^{q} -\vartheta_k U_{t+\ell-k},
+\label{eqn:ARMA-en-t+l}
+\end{equation}
+
+Dividiendo los sumatorios de $\eqref{eqn:ARMA-en-t+l}$ en partes: por un lado la suma desde $k=1$ hasta $\ell-1$, y por otro la suma del resto (de $\ell$ en adelante); tenemos[fn::Recuerde que en la notación con sumatorios se asume que si el limite inferior del índice (el que aparece abajo del sumatorio) es mayor que el valor que aparece arriba, el sumatorio es cero: si $m>n$ entonces $\sum_{i=m}^n a_i =0$.]
+\begin{equation}
+Y_{t+\ell} = 
+c + 
+\sum_{k=1}^{\ell-1} \varphi_k Y_{t+\ell-k} + 
+\sum_{k=\ell}^{p} \varphi_k Y_{t+\ell-k} + 
+U_{t+\ell} + 
+\sum_{k=1}^{\ell-1} -\vartheta_k U_{t+\ell-k} + 
+\sum_{k=\ell}^{q} -\vartheta_k U_{t+\ell-k},
+\label{eqn:ARMA-en-t+l-bis}
+\end{equation}
+Indicar la relación de cada elemento con el subespacio $\mathcal{H}_{Y_t}$ nos ayudará a calcular las previsiones:
+\begin{equation}
+Y_{t+\ell} = 
+\overbrace{c\Bigg.}^{\in\mathcal{H}_{Y_t}} + 
+\sum_{k=1}^{\ell-1} \varphi_k Y_{t+\ell-k} + 
+\overbrace{\sum_{k=\ell}^{p} \varphi_k Y_{t+\ell-k}}^{\in\mathcal{H}_{Y_t} \text{ pues } k\geq\ell} + 
+\underbrace{U_{t+\ell}\Bigg.}_{\perp\mathcal{H}_{Y_t}} + 
+\underbrace{\sum_{k=1}^{\ell-1} -\vartheta_k U_{t+\ell-k}}_{\perp\mathcal{H}_{Y_t} \text{ pues } k<\ell} + 
+\overbrace{\sum_{k=\ell}^{q} -\vartheta_k U_{t+\ell-k}}^{\in\mathcal{H}_{Y_t} \text{ pues } k\geq\ell};
+\;\text{ con } \ell\geq1.
+\label{eqn:ARMA-en-t+l-bis-notas}
+\end{equation}
+Por linealidad de la proyección ortogonal, y teniendo en cuenta la relación de cada sumando con $\mathcal{H}_{Y_t}$, el predictor \( \ell \)-pasos adelante de \( Y_t \) es,
+\begin{equation}
+\widehat{Y_{t+\ell|t}} = c + \sum_{k=1}^{\ell-1} \varphi_k \widehat{Y_{t+\ell-k|t}} + \sum_{k=\ell}^{p} -\varphi_k Y_{t+\ell-k} + \sum_{k=\ell}^{q} -\vartheta_k U_{t+\ell-k}:
+\label{eqn:predicion-recursiva-ARMA}
+\end{equation}
+es decir, todo lo que era ortogonal a $\mathcal{H}_{Y_t}$ se anula, y solo quedan las proyecciones no nulas (algunas de ellas son los mismos sumandos, pues pertenecen a $\mathcal{H}_{Y_t}$ y coinciden con su propia proyección).
+
+A partir de esta expresión podemos obtener fórmulas recursivas tanto para los predictores como para sus actualizaciones cuando se disponen de nuevas observaciones.
+
+*AÑADIR ECUACIÓN DE PREDICCIÓN 8.6 DEL LIBRO DE PEÑA*
+
+** Ejemplos
+
+# \overbrace{  }^{\in\mathcal{H}_{Y_t}}
+
+# \underbrace{ }_{\perp\mathcal{H}_{Y_t}}
+
+*** ARMA(1,1)
+\[
+Y_{t+\ell} = c + \phi_1 Y_{t+\ell-1} + U_{t+\ell} - \theta_1 U_{t+\ell-1},
+\]
+la ecuación \eqref{eqn:predicion-recursiva-ARMA} da lugar a dos casos en función de $\ell$ 
+\begin{equation}
+  \begin{cases}
+    \widehat{Y_{t+1|t}} & = c + \phi_1 Y_{t} - \theta_1 U_t. \\\\
+    \widehat{Y_{t+\ell|t}} & = c + \phi_1 \widehat{Y_{t+\ell-1|t}}  \qquad \text{cuando } \ell\geq2. 
+  \end{cases}
+  \label{eqn:predicion-recursiva-ARMA11}
+\end{equation}
+donde la segunda ecuación es recursiva (y la primera nos indica el paso inicial). Así
+- Para $\ell=1$: :: $\quad\widehat{Y_{t+1|t}} = c + \phi_1 Y_{t} - \theta_1 U_t$.
+- Para $\ell=2$: :: 
+  \begin{align*}
+  Y_{t+2} = & c + \phi_1 \widehat{Y_{t+2-1|t}} \\
+  = & c + \phi_1 \big(c + \phi_1 Y_{t} - \theta_1 U_t\big) \\
+  = & c(1+\phi_1) +  \phi_1^2{Y}_{t} - \phi_1 \theta_1 U_{t} 
+  \end{align*}
+- Para $\ell=3$: :: 
+  \begin{align*}
+  Y_{t+3} = & c + \phi_1 \widehat{Y_{t+3-1|t}} \\
+  = & c + \phi_1 \big(c(1+\phi_1) +  \phi_1^2{Y}_{t} - \phi_1 \theta_1 U_{t}\big) \\
+  = & c(1+\phi_1+\phi_1^2) + \phi_1^3{Y}_{t} - \phi_1^2 \theta_1 U_{t}.
+  \end{align*}
+- Para $l=k$: ::  Repitiendo el procedimiento llegamos a que: 
+  $$\;\widehat{Y_{t+\ell|t}} = c(1+\phi_1+\cdots+\phi_1^\ell) + \phi_1^\ell{Y}_{t} - \phi_1^{\ell-1} \theta_1 U_{t}.$$
+#+latex: \medskip
+
+Así, como $|\phi_1|<1$ y $|\theta|<1$, la predicción cuando $\ell\to\infty$ tiende al valor esperado del proceso
+$$\widehat{Y_{t+\ell|t}}=\frac{c}{1-\phi_1}=\mu\quad\text{cuando } \ell\to\infty.$$
+#+latex: \bigskip
+
+*** AR(1)
+Basta sustituir $\theta=0$ en \eqref{eqn:predicion-recursiva-ARMA11} para particularizar el resultado un modelo AR(1), 
+\[
+\widehat{Y_{t+\ell|t}} = \frac{c}{1-\phi_1} + \phi_1^\ell{Y}_{t}, \quad \ell = 1, 2, \dots,
+\]
+
+*DESCRIBIR COMPORTAMIENTO*
+
+*** MA(1)
+De igual manera, sustituyendo $\phi=0$ en \eqref{eqn:predicion-recursiva-ARMA11} particularizamos para un modelo MA(1), 
+$$\begin{cases}
+    \widehat{Y_{t+1|t}} & = \frac{c}{1-\phi_1} - \theta U_t, \\\\
+    \widehat{Y_{t+\ell|t}} &  = \frac{c}{1-\phi_1}, \quad \text{para } \ell \ge 2.
+  \end{cases}$$
+Nótese que en ambos casos, \( \widehat{Y_{t+\ell|t}} \) converge a \( 0 = E(Y_{t+\ell}) \) a medida que \( \ell \to \infty \).
+De hecho, se puede demostrar que este fenómeno se verifica para todos los modelos ARMA estacionarios, causales e invertibles de media cero.
+
+*DESCRIBIR COMPORTAMIENTO*
+
+*** Paseo aleatorio sin deriva
+Para un paseo aleatorio $\theta=0$ y $\phi=1$ en \eqref{eqn:predicion-recursiva-ARMA11}:
+\[
+\widehat{Y_{t+\ell|t}} = Y_t, \quad \ell = 1, 2, \dots,
+\]
+
+*DESCRIBIR COMPORTAMIENTO*
+
+*** Paseo aleatorio con deriva
+Si el paseo aleatorio tiene deriva, el modelo es $\theta=0$ y $\phi=1$ en \eqref{eqn:predicion-recursiva-ARMA11}:
+\[
+\widehat{Y_{t+\ell|t}} = c\cdot\ell + Y_t, \quad \ell = 1, 2, \dots,
+\]
+
+
+*** IMA(1)
+
+*CORREGIR. ESTÁ MAL*
+
+Basta sustituir $\phi_1=1$ en \eqref{eqn:predicion-recursiva-ARMA11} para particularizar el resultado un modelo IMA(1), 
+$$\begin{cases}
+    \widehat{Y_{t+1|t}} & = c + Y_{t} - \theta_1 U_t. \\\\
+    \widehat{Y_{t+\ell|t}} & = c\cdot \ell + Y_{t}\cdot(\ell-1) - \theta_1 U_t  \qquad \text{cuando } \ell\geq2. 
+  \end{cases}$$
+
+
+*** COMMENT IMA(1) estacional  Falta
+
+*DESCRIBIR COMPORTAMIENTO*
+
+
+* Varianza de las predicciones lineales
+
+Consideremos un proceso MA(q)
+\[
+Y_{t+\ell} = U_{t+\ell} - \theta_1 U_{t+\ell-1} - \cdots - \theta_q U_{t+\ell-q}.
+\]
+Como la proyección de $U_n$ para $n>t$ es cero por ser $U_n\perp\mathcal{H}_{Y_t}$, tenemos que 
+\[
+\widehat{Y_{t+\ell|t}} = -\theta_\ell U_t - \theta_{\ell+1} U_{t-1} - \cdots - \theta_q U_{t+\ell-q}.
+\]
+(suponiendo que \(q > \ell\)) .Restando estas dos últimas ecuaciones, se obtiene el error de predicción:
+\[
+e_t(\ell) \; = \;
+Y_{t+\ell} - \widehat{Y_{t+\ell|t}} 
+\; = \;
+U_{t+\ell} - \theta_1 U_{t+\ell-1} - \cdots - \theta_{\ell-1} U_{t+1},
+\]
+cuya esperanza es cero.
+Elevando al cuadrado y tomando esperanzas se obtiene el valor esperado del error cuadrático de predicción de \(Y_{t+\ell}\)
+\[
+ECML(Y_{t+\ell} \mid \boldsymbol{Y}_{|:t}) = 
+% ECMP(e_t(\ell)) =
+E\Bigg[\Big(Y_{t+\ell} - \widehat{Y_{t+\ell|t}}\Big)^2 \;\Big|\; \boldsymbol{Y}_{|:t} \Bigg]
+= \sigma^2 (1 + \theta_1^2 + \cdots + \theta_{\ell-1}^2). 
+%\tag{8.19}
+\]
+Asumiendo que \boldsymbol{Y} tiene distribución gaussiana, la esperanza condicional y el mejor predictor lineal son la misma función. Por tanto tenemos que
+\[
+E\Bigg[\Big(Y_{t+\ell} - E(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t})\Big)^2 \;\Big|\; \boldsymbol{Y}_{|:t} \Bigg]
+\;=\;
+ \sigma^2 (1 + \theta_1^2 + \cdots + \theta_{\ell-1}^2)
+\;=\;
+Var\big(e_t(\ell)\big)
+\]
+es la varianza del error de previsión.
+
+Este cálculo puede extenderse a cualquier proceso ARMA invertible:[fn::Para los proceso ARIMA véase el manual de W.W.S. Wei [[cite:&wei2006time]].]
+
+#+latex: \noindent
+Sea \(Y_t = \psi(B)U_t\) la representación MA(\(\infty\)) del proceso, es decir, donde $\boldsymbol{\psi}=\boldsymbol{\phi}^{-1}*\boldsymbol{\theta}$. Entonces:
+\[
+Y_{t+\ell} = \sum_{i=0}^{\infty} \psi_i U_{t+\ell-i}.
+\]
+La predicción lineal óptima será su proyección ortogonal sobre $\mathcal{H}_{Y_t}$
+\begin{equation}
+\widehat{Y_{t+\ell|t}} = \sum_{j=0}^{\infty} \psi_{\ell+j} U_{t-j}.
+\label{eqn:predicion-MA-infinito}
+\end{equation}
+Restando $\widehat{Y_{t+\ell|t}}$ de $Y_{t+\ell}$ obtenemos el error de predicción:
+\[
+e_t(\ell) \;=\; Y_{t+\ell} - \widehat{Y_{t+\ell|t}} \;=\; U_{t+\ell} + \psi_1 U_{t+\ell-1} + \cdots + \psi_{\ell-1} U_{t+1},
+\]
+cuyo valor esperado es cero, y cuya varianza (asumiendo que \(\boldsymbol{Y}\) tiene distribución gaussiana) es:
+\[
+Var(e_t(\ell)) = \sigma^2 (1 + \psi_1^2 + \cdots + \psi_{\ell-1}^2),
+\]
+donde \(1 + \psi_1^2 + \cdots + \psi_{\ell-1}^2\) es la suma del cuadrado de los $\ell$ primeros coeficientes de la secuencia $\boldsymbol{\psi}=\boldsymbol{\phi}^{-1}*\boldsymbol{\theta}$, que es una secuencia de cuadrado sumable.
+
+Lo curioso es que si el proceso es ARIMA (véase el manual de W.W.S. Wei [[cite:&wei2006time]]) la varianza tiene la misma expresión, pero donde la secuencia $\boldsymbol{\psi}$ es ahora $\boldsymbol{\phi}^{-\triangleright}*\boldsymbol{\theta}$, que es una secuencia que no es de cuadrado sumable cuando $\boldsymbol{\phi}$ tiene raíces en el círculo unidad.
+
+Este resultado muestra que la incertidumbre en las predicciones varía considerablemente entre modelos estacionarios y no estacionarios. En un modelo estacionario, \(\psi_k \to 0\) cuando \(k \to \infty\), lo que hace que la varianza de la predicción a largo plazo se estabilice en un valor constante, que es la varianza marginal del proceso.
+
+Por ejemplo, en un modelo AR(1), donde \(\psi_k = \phi^k\), cuando \(\ell\) tiende a infinito   
+\[
+Var(e_T(\ell)) = \sigma^2 / (1 - \phi^2).
+\]
+
+Si \(\phi\) está próximo uno, la varianza marginal será muchísimo más grande que la varianza condicionada, \(\sigma^2\). 
+No obstante, la incertidumbre es finita ya que la varianza marginal es finita.
+
+Sin embargo, para los modelos no estacionarios, la serie \(\sum \psi_i^2\) no converge, lo que provoca que la incertidumbre de la predicción a largo plazo aumente indefinidamente. Por lo tanto, no es posible anticipar el comportamiento de un proceso no estacionario a largo plazo.
+
+** Intervalos de confianza para las previsiones
+
+Si asumimos que la distribución de las innovaciones es gaussiana, podremos calcular intervalos de confianza para los distintos horizontes de predicción. Como \(Y_{T+\ell}\) se comportará como una variable normal con media \(\widehat{Y_{T+\ell|T}}\) y varianza definida \(Var(e_t(\ell)) = \sigma^2 (1 + \psi_1^2 + \cdots + \psi_{\ell-1}^2),\) tendremos que 
+\[
+Y_{T+\ell} \in \left( \widehat{Y_{T+\ell|T}} \pm z_{1-\alpha} \sqrt{Var(e_T(\ell))} \right)
+\]
+donde \(z_{1-\alpha}\) son los valores críticos de la distribución normal estándar.
+
+
+**** COMMENT Ejemplo 8.9
+
+Dado el modelo \(\nabla z_t = (1 - \theta B)a_t\), calcular la varianza de las predicciones a distintos periodos.
+
+Para obtener los coeficientes de la representación MA(\(\infty\)), escribiendo \(z_t = \psi(B)a_t\), como en este modelo \(a_t = (1 - \theta B)^{-1}\nabla z_t\), tenemos que:
+
+\[
+z_t = \psi(B)(1 - \theta B)^{-1}\nabla z_t
+\]
+
+es decir,
+
+\[
+(1 - \theta B) = \psi(B)\nabla = 1 + (\psi_1 - 1)B + (\psi_2 - \psi_1)B^2 + \ldots
+\]
+
+de donde obtenemos \(\psi_1 = 1 - \theta\), \(\psi_2 =  \psi_1, \ldots, \psi_k =  \psi_{k-1}\). Por tanto
+\[
+\]
+y la varianza de la predicción crece linealmente con el horizonte.
+
+
+* Adaptación de las predicciones a las nuevas observaciones
+
+Considere que generamos predicciones con información hasta el instante \(t\) para periodos futuros, desde \(t+1\) hasta \(t+j\); y queremos adaptar las previsiones con nueva información hasta el instante \(t+1\).
+
+Según \eqref{eqn:predicion-MA-infinito}, la predicción de \(Y_{t+k}\) con información hasta \(t\) (es decir proyectando ortogonalmente sobre $\mathcal{H}_{Y_t}$) es:
+\[
+\widehat{Y_{t+k|t}} = \psi_k U_t + \psi_{k+1} U_{t-1} + \ldots;
+\]
+al comparar la predicción $\widehat{Y_{t+1|t}}$ con \(Y_{t+1}\) obtenemos el error de predicción  
+\(U_{t+1} = Y_{t+1} - \widehat{Y_{t+1|t}}\). 
+
+La nueva predicción para \(Y_{t+k}\), proyectando ahora sobre $\mathcal{H}_{Y_{t+1}}$ (es decir, incorporando $Y_{t+1}$ como nueva información), será:
+\[
+\widehat{Y_{t+k-1|t+1}} = \psi_{k-1} U_t + \psi_k U_{t-1} + \ldots
+\]
+Restando las dos previsiones, tenemos que:
+\[
+\widehat{Y_{t+k-1|t+1}} - \widehat{Y_{t+k|t}} = \psi_{k-1} U_{t+1}.
+\]
+Es decir, cuando observamos \(Y_{t+1}\) y calculamos el error de previsión cometido \(U_{t+1}\), podremos adaptar todas las predicciones mediante:
+\[
+\widehat{Y_{t+k-1|t+1}} = \widehat{Y_{t+k|t}} + \psi_{k-1} U_{t+1}
+%, \tag{8.23}
+\]
+que indica que las predicciones se adaptan añadiendo a las predicciones anteriores una fracción del último error de predicción obtenido.  
+Si no hubo error de previsión un periodo hacia delante \((U_{t+1} = 0)\), las predicciones realizadas a un horizonte mayor no serán modificadas
+
+# La ecuación (8.23) tiene una interpretación interesante.  
+# Las dos variables \(Y_{t+1}\) y \(Y_{t+k}\) tienen, dada la información hasta \(t\), una distribución conjuntamente normal con esperanzas \(\widehat{Y_{t+1|t}}\) y \(\widehat{Y_{t+k|t}}\), varianzas \(\sigma^2\) y \(\sigma^2(1 + \psi_1^2 + \ldots + \psi_{k-1}^2)\) y covarianza:
+# $$\begin{aligned}
+# \mathrm{cov}(Y_{t+1}, Y_{t+k})
+# &= E\big[(Y_{t+1} - \widehat{Y_{t+1|t}})(Y_{t+k} - \widehat{Y_{t+k|t}})\big] \\
+# &= E\big[U_{t+1}(U_{t+k} + \psi_1 U_{t+k-1} + \ldots)\big] = \sigma^2 \psi_{k-1}.
+# \end{aligned}$$
+# 
+# La mejor predicción de \(Y_{t+k}\) dada \(Y_{t+1}\) y la información hasta \(t\) puede calcularse por regresión, según la expresión:
+# \[
+# E(Y_{t+k} \mid Y_{t+1}) = E(Y_{t+k}) + \mathrm{cov}(Y_{t+1}, Y_{t+k}) \mathrm{var}^{-1}(Y_{t+1}) (Y_{t+1} - E(Y_{t+1})).
+# \]
+
+
+* Interpretación 
+
+
+* Nota sobre subespacio sobre el que proyectamos al prever
+:PROPERTIES:
+:ID:       e8c024c1-d9d1-41e8-b1fa-e0deb73bbf79
+:END:
+
+Sea un proceso estocástico lineal causal y estacionario de segundo orden definido por
+\[
+Y_t = \sum_{k=0}^{\infty} \psi_k\, U_{t-k},
+\]
+donde:
+- \(\sum_{k=0}^{\infty} \psi_k^2 < \infty\),
+- \(\boldsymbol{U}\) es un proceso de ruido blanco con \(E[U_t]=0\) y \(E[U_t^2]=\sigma^2 < \infty\),
+- el proceso es *invertible*, es decir, existe una secuencia \(\{\pi_j\}_{j\ge 0}\) con
+  \(\sum_{j=0}^{\infty} \pi_j^2 < \infty\) tal que
+  \[
+  U_t = \sum_{j=0}^{\infty} \pi_j\, Y_{t-j}.
+  \]
+
+Bajo las hipótesis anteriores se cumple que los subespacios cerrados de \(L^2\) generados por el pasado de \(Y_t\) y por el pasado de las innovaciones \(U_t\) son iguales:
+\[
+\mathcal{H}_{Y_t} 
+\;=\;
+\mathcal{H}_{U_t} 
+\]
+donde $\mathcal{H}_{Z_n} = \overline{\operatorname{sp}}\{1,Z_n,Z_{n-1},\ldots\}$ denota la clausura en la norma de \(L^2\) del subespacio engendrado por las variables aleatorias $\{1,Z_n,Z_{n-1},Z_{n-2},\ldots\}$. He incluido la constante $1$ para poder considerar procesos con esperanza no nula. 
+La ``H'' de la notación $\mathcal{H}_{Z_n}$ tiene como objetivo recordar que se trata de un espacio de _Hilbert_ y que dicho espacio está engendrado por las variables aleatorias que constituyen la _``Historia''_ del proceso desde $Z_n$ hacia atrás.
+
+
+*Demostración:*
+
+1. *Primera inclusión* \(\subseteq\):
+
+   Cada \(Y_{t}\) se puede expresar como combinación lineal de las innovaciones pasadas:
+   \[
+   Y_{t} = \sum_{k=0}^{\infty} \psi_k\, U_{t-k}.
+   \]
+   Por tanto, todo \(Y_{t}\) pertenece al subespacio cerrado generado por
+   \(\{1,U_t,U_{t-1}, U_{t-2}, \dots\}\), y al incluir la clausura en \(L^2\) obtenemos
+   \[
+   \mathcal{H}_{Y_t}  % \overline{\operatorname{sp}}\{\boldsymbol{Y}_{|:(t-1)}\}
+   \subseteq
+   \mathcal{H}_{U_t} % \overline{\operatorname{sp}}\{\boldsymbol{U}_{|:(t-1)}\}
+   \]
+
+2. *Segunda inclusión* \(\supseteq\):
+
+   Por invertibilidad, cada \(U_{t}\) se puede escribir como combinación de las \(Y\) pasadas:
+   \[
+   U_{t} = \sum_{m=0}^{\infty} \pi_m\, Y_{t-m}.
+   \]
+   Así, cada \(U_{t}\) pertenece al subespacio cerrado generado por
+   \(\{1,Y_t,Y_{t-1},Y_{t-2},\dots\}\), y al incluir la clausura en \(L^2\) obtenemos la inclusión opuesta.
+   \[
+   \mathcal{H}_{Y_t} % \overline{\operatorname{sp}}\{\boldsymbol{Y}_{|:(t-1)}\}
+   \supseteq
+   \mathcal{H}_{U_t} % \overline{\operatorname{sp}}\{\boldsymbol{U}_{|:(t-1)}\}
+   \]
+# Combinando ambas inclusiones, se tiene la igualdad buscada: $\;\mathcal{H}_{Y_t}=\mathcal{H}_{U_t}$.
+
+
+
+bibliographystyle:plainnat
+bibliography:bibliografia.bib
+
+
+
+
