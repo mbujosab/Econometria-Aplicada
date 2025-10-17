@@ -7435,7 +7435,7 @@ main {
 <main>
 <div class="reveal">
 <div class="slides"><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dc637ce4-2a0d-49ca-8b24-a559a3a7c5c1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0f5ea560-7105-414f-9332-06ac38002045">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7446,13 +7446,13 @@ main {
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a20e134f-4e73-4f47-92a0-3d16447a90c2">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e976f3ab-d0b4-4b1c-a8e7-6de7f15fca72">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
-<div class="abstract" id="orgafeff6d">
+<div class="abstract" id="org05f49b7">
 <p>
 En esta lección analizaremos la ACF, la PACF y la densidad espectral de los procesos autorregresivos (AR). 
 Estos procesos se caracterizan por tener infinitos coeficientes de autocorrelación no nulos (i.e, una ACF de grado infinito), pero una PACF de grado finito. 
@@ -7470,8 +7470,127 @@ También veremos que los coeficientes de autocorrelación satisfacen las ecuacio
 </div>
 </div>
 </div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6ed8b2d3-b5fc-4bca-9b0f-fbbbc5fbf3a8">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b407ae0f-1a1d-4bdd-8399-fc0a0e8d8cff">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Carga-de-algunos-m%C3%B3dulos-de-python-y-creaci%C3%B3n-de-directorios-auxiliares">Carga de algunos módulos de python y creación de directorios auxiliares<a class="anchor-link" href="#Carga-de-algunos-m%C3%B3dulos-de-python-y-creaci%C3%B3n-de-directorios-auxiliares">¶</a></h4>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e39aa4be-4776-433f-a2c6-4ca74b3e6833">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [1]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Para trabajar con los datos y dibujarlos necesitamos cargar algunos módulos de python</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span> <span class="c1"># linear algebra</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span> <span class="c1"># data processing, CSV file I/O (e.g. pd.read_csv)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mpl</span>
+<span class="c1"># definimos parámetros para mejorar los gráficos</span>
+<span class="n">mpl</span><span class="o">.</span><span class="n">rc</span><span class="p">(</span><span class="s1">'text'</span><span class="p">,</span> <span class="n">usetex</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>   <span class="c1"># data visualization</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dataframe_image</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dfi</span>   <span class="c1"># export tables as .png</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e1471e34-84ae-41c1-b4a3-4afb3dedd464">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h5 id="Directorio-auxiliar-para-albergar-las-figuras-de-la-lecci%C3%B3n:">Directorio auxiliar para albergar las figuras de la lección:<a class="anchor-link" href="#Directorio-auxiliar-para-albergar-las-figuras-de-la-lecci%C3%B3n:">¶</a></h5>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b061bf20-feac-4e67-956a-52baf4089e1f">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=2b35b2e5-07bf-4606-95d1-bce6773fb9bb">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [2]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">imagenes_leccion</span> <span class="o">=</span> <span class="s2">"./img/lecc05"</span> <span class="c1"># directorio para las imágenes de la lección</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">imagenes_leccion</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># crea el directorio si no existe</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=abfffa8c-b182-4f58-be16-e7a649923ba9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Gr%C3%A1ficos-para-las-ACF,-PACF-y-densidades-espectrales-te%C3%B3ricas">Gráficos para las ACF, PACF y densidades espectrales teóricas<a class="anchor-link" href="#Gr%C3%A1ficos-para-las-ACF,-PACF-y-densidades-espectrales-te%C3%B3ricas">¶</a></h4>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=76366c47-27b4-4fc6-bcda-d4dc6c15f425">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<p>Cargamos las funciones auxiliares (véase la carpeta <code>src/</code>)</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=c5c8e6cc-61af-4093-a722-96e14fbf66e0">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">"ignore"</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="ne">UserWarning</span><span class="p">)</span>
+<span class="o">%</span><span class="k">run</span> -i ./src/analisis_armas.py
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4feef8ba-d6ac-4699-a700-316d4fd9a470">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h2 id="ACF,-PACF-y-densidad-espectral-de-m%C3%A1s-modelos-lineales-(AR)">ACF, PACF y densidad espectral de más modelos lineales (AR)<a class="anchor-link" href="#ACF,-PACF-y-densidad-espectral-de-m%C3%A1s-modelos-lineales-(AR)">¶</a></h2>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f312dcd2-2768-4989-bf1f-25ec703ede58">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7482,7 +7601,7 @@ También veremos que los coeficientes de autocorrelación satisfacen las ecuacio
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b95341dd-9bdc-4a9d-80f4-5ca1d6104d15">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=303de5df-931e-49c1-b109-d9af88b64bec">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7497,32 +7616,11 @@ Sabemos que $\;E(X_t)=0;\;$ y por la <a href="https://mbujosab.github.io/Econome
 <li>$\boldsymbol{\gamma} \;=\; \sigma^2 \boldsymbol{\psi}(z)*\boldsymbol{\psi}(z^{-1})\quad$
 con grado igual al grado de $\boldsymbol{\psi}$.</li>
 </ul>
-</div>
-</div>
-</div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8069e462-7983-4df1-a1e9-0e24715ab50f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Es decir,
 $$
    \gamma_k = \sigma^2\sum_{j=0}^\infty \psi_{j+|k|}\cdot\psi_j.
   $$
 Además, $\;\gamma_k\to0\;$ cuando $\;k\to\infty$</p>
-</div>
-</div>
-</div>
-</div>
-</aside><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dac751b1-ec76-47e7-a28d-1ec875394b9a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>A partir de $\boldsymbol{\gamma}$ obtenemos las otras tres funciones:</p>
 <p><strong>ACF</strong>: $\;\boldsymbol{\rho} \;=\; \frac{1}{\gamma_0}\boldsymbol{\gamma}$</p>
 <p><strong>Dens. espectral</strong>:  $\;f(\omega)=\frac{1}{2\pi}\sum_{k\geq0}\gamma_k\cos(k\omega)$</p>
@@ -7530,8 +7628,8 @@ Además, $\;\gamma_k\to0\;$ cuando $\;k\to\infty$</p>
 </div>
 </div>
 </div>
-</div></div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cd0058ba-21bc-4e50-aa1a-8cff317d6a65">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7f13099d-085a-4f02-9bb4-a15c6a7ffeb3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7542,7 +7640,7 @@ Además, $\;\gamma_k\to0\;$ cuando $\;k\to\infty$</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7513831d-8dd8-498d-82c9-462030f1c0fa">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=906a76a1-6210-49a2-9b18-4f2c0cf9b378">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7566,16 +7664,6 @@ $$
 $$
 Y por tanto
 $$X_t= U_t-\sum_{j=1}^p\phi_j X_{t-j}.$$</p>
-</div>
-</div>
-</div>
-</div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=18a493bd-1758-4cca-a4fa-5313a6d73b65">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Si todas las raíces del polinomio $\boldsymbol{\phi}$ (de grado $p$) están fuera del círculo unidad, es decir, si <em>el polinomio AR es ``invertible''</em> $\;(\boldsymbol{\phi}^{-\triangleright}=\boldsymbol{\phi}^{-1}\in\ell^1)\;$ entonces $\boldsymbol{X}$ tiene una representación como <strong>proceso lineal causal MA($\infty$)</strong>:
 $$
  \boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U}
@@ -7584,16 +7672,6 @@ $$
  \quad\Rightarrow\quad X_t = U_t + \sum_{j=1}^\infty\psi_j U_{t-j};
 $$
 donde $\;\boldsymbol{\phi}^{-1}=\boldsymbol{\psi}=({\color{blue}1},\ \psi_1,\ \psi_2,\ \psi_3,\ldots)\;$ tiene grado $\infty$.</p>
-</div>
-</div>
-</div>
-</div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4646f811-f4c3-4b8c-aec1-ad938087a5e0">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Por tanto $E(X_t)=0$ para todo $t\in\mathbb{Z}$ y</p>
 <p>$\boldsymbol{\gamma} \;=\; \sigma^2 \frac{1}{\boldsymbol{\phi}(z)}*\frac{1}{\boldsymbol{\phi}(z^{-1})} \;=\; \sigma^2 \sum\limits_{j,k=0}^\infty (\psi_{j+k}\psi_j) z^{j}\quad$ (grado $\infty$)$\quad$ (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#section.5">Ec. de Yule-Walker</a>)</p>
 <p>$\boldsymbol{\rho} \;=\; \frac{1}{\gamma_0}\boldsymbol{\gamma}$</p>
@@ -7602,27 +7680,7 @@ donde $\;\boldsymbol{\phi}^{-1}=\boldsymbol{\psi}=({\color{blue}1},\ \psi_1,\ \p
   \;=\; \frac{1}{2\pi}\sum\limits_{h=0}^\infty \gamma_h
   \cos(h\omega);\quad$ donde $\omega\in[-\pi,\pi]$.</p>
 <p>(suma infinita de cosenos)</p>
-</div>
-</div>
-</div>
-</div></div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a57abd49-e56d-4161-9acb-a0a5363dae33">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Pero la PACF, $\;\boldsymbol{\pi},\;$ es una secuencia con grado $p$ y cogrado $-p$ (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#subsubsection.1.2.1">demo en los apuntes</a>).</p>
-</div>
-</div>
-</div>
-</div></div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d1dd55e6-a81c-4452-8401-01975debb85c">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <ul>
 <li>Los procesos AR tienen infinitos coeficientes <em>no nulos</em> de autocorrelación.</li>
 <li>Presentan una <strong>memoria relativamente larga</strong>.<ul>
@@ -7638,8 +7696,19 @@ donde $\;\boldsymbol{\phi}^{-1}=\boldsymbol{\psi}=({\color{blue}1},\ \psi_1,\ \p
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d9fdc547-a6b2-495e-af0b-0a12a75dc069">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=05af93e3-3e21-4970-950a-76a4da0852d0">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h4 id="Demostraci%C3%B3n-de-que-la-PACF-tiene-cogrado-$-p$-y-grado-$p$">Demostración de que la PACF tiene cogrado $-p$ y grado $p$<a class="anchor-link" href="#Demostraci%C3%B3n-de-que-la-PACF-tiene-cogrado-$-p$-y-grado-$p$">¶</a></h4>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=084ebf97-b255-442d-b554-093e7040dfa2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7650,14 +7719,14 @@ donde $\;\boldsymbol{\phi}^{-1}=\boldsymbol{\psi}=({\color{blue}1},\ \psi_1,\ \p
 </li>
 <li><p>La proyección de $X_{k+1}$ sobre el espacio $\bar{sp}(X_{2}:X_k)$ generado por $X_2,\ldots X_k$ (con $k&gt;p$) es:
 $$
-    \widehat{X_{k+1}}=P_{\bar{sp}(X_{2}:X_k)}(X_{k+1})=\sum_{j=1}^p\phi_j X_{k+1-j}
-  $$</p>
+      \widehat{X_{k+1}}=P_{\bar{sp}(X_{2}:X_k)}(X_{k+1})=\sum_{j=1}^p\phi_j X_{k+1-j}
+    $$</p>
 </li>
 <li><p>De su representación MA($\infty$): $\;Y\in\bar{sp}(X_{2}:X_k)
-  \;\Rightarrow\; Y\in\bar{sp}(U_j\mid{j\leq k})$, pues
+    \;\Rightarrow\; Y\in\bar{sp}(U_j\mid{j\leq k})$, pues
 $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
-  \quad\Rightarrow\quad
-  \bar{sp}(X_{2}:X_k)\subset\bar{sp}(U_j\mid{j\leq k}) \; \perp \; U_{k+1}$$</p>
+    \quad\Rightarrow\quad
+    \bar{sp}(X_{2}:X_k)\subset\bar{sp}(U_j\mid{j\leq k}) \; \perp \; U_{k+1}$$</p>
 </li>
 <li><p>Si $Y\in\bar{sp}(X_{2}:X_k)$ entonces $Cov\Big((X_{k+1}-\widehat{X_{k+1}}), Y\Big)=Cov(U_{k+1}, Y)=0$</p>
 </li>
@@ -7676,8 +7745,7 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
-</aside></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=19950d6f-7fe2-4289-9af4-1195851eb44e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=53daa5fe-ed38-48bf-b09c-8a6b6ecc8760">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7688,34 +7756,14 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=510d6048-fa5b-4af2-afd7-ae8dadb37f1e">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e143e1fb-4418-4bf3-a047-d9e16619958b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Sea $\;(1-\phi z)*\boldsymbol{X}=\boldsymbol{U},\quad$ con $\;|\phi|&lt;1\;$ y con $\;\;\boldsymbol{U}\sim WN(0,\sigma^2)\;$, es decir $$X_t=\phi X_{t-1} + U_t.$$</p>
-</div>
-</div>
-</div>
-</div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0b31a0e7-ee4f-4835-975d-0fe3000ccf4f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>como $\;|\phi|&lt;1\;$ tenemos que $\;\boldsymbol{X}=(1-\phi z)^{-1}*\boldsymbol{U}.\quad$ Por tanto:</p>
-</div>
-</div>
-</div>
-</div></div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=fbfdae18-4c60-4822-be44-6b862e9cf962">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>$\boldsymbol{\gamma} \;=\; \sigma^2 (1-\phi z)^{-1}*(1-\phi
   z^{-1})^{-1} \;=\; \frac{\sigma^2}{1-\phi^2}
   \sum\limits_{k=-\infty}^\infty \phi^{|k|} z^k\quad$ (grado $\infty$).</p>
@@ -7729,8 +7777,8 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9aa08980-db2c-4806-9e68-8e3f85796cec">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=65312ae8-fc81-4140-9bd2-fcbe1bd509f2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7741,8 +7789,7 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
-</aside></div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4a73bd82-d7e7-40a6-8a51-33dc96cb7d28">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4554299f-65d7-4624-996e-1e71046550b2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7752,19 +7799,52 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6310e77e-aa85-4a8f-a102-fd8ec84cea72">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c46b90b9-dc4f-4fcc-a7a6-45fd094ab3e7">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [4]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.9</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-AR1p.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=857c00ce-807d-4dac-91a1-63634b79c7fc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-AR1p.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR1p.png"/></p>
 </div>
 </div>
 </div>
-</div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f5594f11-bf37-4ff3-9e79-58a4fef86d76">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=8f82e5a7-9d93-4157-979e-56d5d469394c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-AR1p.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7ae44232-d66d-4893-bdd6-b246b1232e72">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7774,8 +7854,8 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0d0be10a-b8f0-4992-b118-3661071479b0">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6fc2790e-f8cf-4460-8cef-de84d25aab57">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7786,8 +7866,7 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
-</aside></div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=0e8ae206-09da-4018-945f-ebd14dbcd370">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=50c2da93-7a5a-43fb-a3fc-425c6da7d270">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7797,19 +7876,52 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=93c40fdf-7489-4fb5-9369-e83ec91212c0">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=89b18d7a-e1b4-491b-bde3-e8cde57e3001">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-AR1n.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=50622710-d0fe-49c3-9ea6-68b6a57a580f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-AR1n.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR1n.png"/></p>
 </div>
 </div>
 </div>
-</div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cba09868-9ac7-41e7-8e53-4c18b5f4ccae">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=93e9c969-52f6-4e7c-bfb4-e540badb1bdf">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-AR1n.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=96c2a4e9-1324-4471-b81d-2a699b1bd379">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7819,8 +7931,8 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
-</div></div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e76149af-9aa7-4a5d-83de-24b7086ef334">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c70301f1-32df-40bb-a877-0ccf8190802c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7831,7 +7943,7 @@ $$X_t\;=\;\sum\limits_{j=0}^{\infty} \psi_j U_{t-j}
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c1b445d0-f3c1-4801-b844-0c2936906b26">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a90735a0-c962-433e-aa7c-7edf53464acc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7846,22 +7958,26 @@ X_{t-2} + U_t.$$ Entonces</p>
 <p>$\boldsymbol{\rho} \;=\; \frac{1}{\gamma_0}\boldsymbol{\gamma}\qquad$ (Verifica <a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#section.5">Ec. Yule-Walker</a>: $\;\rho_k=\phi_1\rho_{k-1}+\phi_2\rho_{k-2})$</p>
 <p>$f(\omega) \;=\;  \frac{\sigma^2}{2\pi}\frac{1}{1+\phi_1^2+\phi_2^2-2\phi_1(1+\phi_2)\cos(\omega)-2\phi_2\cos(2\omega)}$</p>
 <p>$\boldsymbol{\pi} \;=\; (\ldots,\; 0,\; \phi_2,\; \frac{\phi_1}{1-\phi_2},\; {\color{blue}1},\; \frac{\phi_1}{1-\phi_2},\; \phi_2,\; 0,\;\ldots)$</p>
-</div>
-</div>
-</div>
-</div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=60da3fa3-f08a-402d-ac3b-b5e3a158d1f7">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="img/lecc05/AR2roots.png" title="El interior del triángulo es la región paramétrica donde un AR(2) es estacionario. Por debajo de la parábola las raíces son complejas. El signo del parámetro $\phi_1$ determina el signo del primer retardo de la PACF y $\phi_2$ el signo del segundo. Las regiones 1, 2, 3, y 4 determinan cómo decae la ACF."/></p>
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c74bd618-b73d-4aa0-a3bb-d9c0bea864d6">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6a0a9963-09fb-4e19-a13f-08ef79cfde74">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">RegionParametrica</span><span class="p">(</span><span class="s1">'AR'</span><span class="p">)</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/AR2roots.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e26688b6-982f-466f-aceb-5c5767351ea2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7872,8 +7988,7 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</aside></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c2c9a62d-b069-4900-99db-4690e8184852">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4f66e410-3add-4718-9732-7679fae70329">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7885,19 +8000,52 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0ba38517-9b9b-4066-a24c-791393f0821c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8ad6f123-6400-4cdf-8269-7d3a5ab202b5">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-AR2pp.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8aaf8f0b-6008-4d10-8482-90396ddd1b14">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-AR2pp.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR2pp.png"/></p>
 </div>
 </div>
 </div>
-</div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7d51becf-621d-4c35-b379-4135ba0d8b14">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=afe4e534-5c17-45fd-9674-8e292c93af86">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2025</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-AR2pp.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8badfc61-07c9-41d2-b3ad-1a29ba9aa243">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7907,8 +8055,8 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4771a716-dfdd-418a-9feb-16321c362728">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a38de75d-20e7-4df2-959c-54b2c3b60ecc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7919,8 +8067,7 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</aside></div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4acc7df6-5e97-4102-bc2c-b623af7e0e9c">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8ce40263-efda-4c2f-b7e5-7efd0e77bacd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7932,19 +8079,52 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=305a3485-15ec-403c-8467-c66a5814a277">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=deb26743-c8d2-489f-bf1a-301d5e84fb93">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.3</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-AR2np.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f2c4751a-8e19-477b-9630-cda007158ee0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-AR2np.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR2np.png"/></p>
 </div>
 </div>
 </div>
-</div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=50d06cdd-6ef8-4de0-b48a-d6e449ab3e83">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e3ba0039-a50b-4556-ae9b-eaa7cb06c03d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2025</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-AR2np.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3e93beba-f0b5-4c71-a4d2-a201352d9168">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7954,8 +8134,8 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b66367d3-d59a-4300-8c0e-fb4f8615a826">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d60babb1-04b0-4d2b-b483-525ca18b64e3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7966,8 +8146,7 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</aside></div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=af074a54-79a6-4be3-8738-7730e24e31ee">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3430cce3-1343-454a-9a72-32ea5e5002df">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -7979,19 +8158,52 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a736f51c-7e40-472b-bc67-896a7b32e9fb">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=97397e9e-7ce4-48be-b26c-a7bef7c56a52">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.9</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.9</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-AR2nn.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=392c4ac7-7f95-4bea-be85-2a6df0a52b56">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-AR2nn.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR2nn.png"/></p>
 </div>
 </div>
 </div>
-</div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ac4574b5-85bf-4192-ae66-0d4812b412b4">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5524ba14-fcbb-46da-b135-2b6e3c20f19c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-AR2nn.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=46b0bf7a-5ced-4c87-9a64-3cda2e92df2e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8001,8 +8213,8 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=601d1bf1-5ed1-4fb2-8bdc-da81aa52defd">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7df2ba57-ecc7-4313-8223-58aaf8df16cf">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8013,8 +8225,7 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</aside></div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=092ff4be-c8e9-420e-b7cf-744295caf9ea">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2c6802c4-93b9-4952-94e2-3931d371ec66">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8026,19 +8237,52 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0df77694-2598-4da8-b571-c82bad1174de">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=044db2f2-5268-47e1-b1c4-34243260d9f3">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.1</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.9</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-AR2pn.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=956f2d27-c99e-44fd-8ff4-3a33c6e7df8d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-AR2pn.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR2pn.png"/></p>
 </div>
 </div>
 </div>
-</div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=cf0177da-9b90-4d49-b19e-8216eb3b228a">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ede44d53-3cf6-4c9a-9bb3-06d2603aa223">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-AR2pn.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ba0a4073-a950-491e-b3ac-6269b0233a2d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8048,8 +8292,8 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=87cb237c-331f-479a-bab4-9825684a0576">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6366d04d-eb96-4cbb-b377-d16eadbc6afd">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8060,8 +8304,7 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</aside></div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2024a8eb-6569-451f-b39c-443a9d7eba50">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3a6a41a5-88e3-44b8-9443-57fd2912cd4f">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8073,19 +8316,52 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0e517dc2-f268-43cc-8487-0e25a1dbb5ec">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=09b3d805-342d-4673-b492-7a13277fffdc">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.8</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-AR2RojoVioleta.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e75e7fb2-1ac2-48af-bd74-b7fc7121f1a7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-AR2RojoVioleta.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR2RojoVioleta.png"/></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=5b9871ee-dc29-47ec-a343-87434ca109cd">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-AR2RojoVioleta.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=9bfae895-f6df-462b-8126-e7ed01f1b5df">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=742990d4-d6b0-4c4a-b272-f407953c16c8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8095,8 +8371,8 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=00a56360-1a7c-4e13-9882-d377ae10f2c7">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6c197e83-f17b-48d6-95ad-6311f426ec04">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8107,8 +8383,7 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</aside></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b777c203-c555-46a6-8107-e1a2bfed60d9">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5dc1b8ad-3be4-493f-9c94-d05df294c804">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8120,19 +8395,52 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=63371182-3b83-467d-9bd0-debd78b139a7">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2d7d46fd-596f-426e-b412-6fae03618c05">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.8</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-ARverde.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1de8cdda-25f8-4141-863a-1f0e2fb652b3">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-ARverde.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR2verde.png"/></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=984f8dd7-b379-44e8-b0e9-eedf6e543b0d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-ARverde.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e0e70110-3b78-4346-9927-ddfff71b052a">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d362ff1e-5355-4919-8150-391c24f606dc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8142,8 +8450,8 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=946dcdd7-265c-4bac-a208-f09c7a77a31e">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=96529055-445c-42ad-b1ee-c8bee0303d64">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8154,8 +8462,7 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</aside></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=517f4d88-cc38-4240-8712-f195210d1c04">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=5b666776-a5fe-4ffc-9713-9fd67fea0806">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8167,19 +8474,52 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=aa5c0999-3659-4767-9a88-9b25ce9f2f54">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ebd56dbd-8169-4f3d-905d-4c407d158cb7">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.64</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-AR2violeta.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f1adb771-309d-421b-9b12-7ba628f9ee21">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-AR2violeta.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR2violeta.png"/></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=85bb8ad7-a98d-496e-b0e2-b986f4ba2530">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-AR2violeta.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=b186e31a-327d-4ab1-8df1-d4fe05a9edac">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=53c378e5-c4c1-4a60-a3e4-66b315b9bcf5">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8189,8 +8529,8 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f1db880a-f634-48c2-82e9-ebac611d719a">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=dc0e58d6-94c0-490b-9321-d240205bf4d2">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8201,8 +8541,7 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</aside></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=980299e3-e81b-4711-8a71-694d37bc2637">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=2b98c22a-ec30-403a-96ee-00e8a2d88e85">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8214,19 +8553,52 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=9e442736-7930-4b11-8aef-d7bb6c9c39d4">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4191d20f-835a-4b66-a406-4f01dbcfd021">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">ar_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.6</span><span class="p">,</span> <span class="o">+</span><span class="mf">0.64</span><span class="p">]</span>
+<span class="n">ma_params</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,]</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_parametric_diagnostics</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">sigma2</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/ACF-AR2rojo.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3ba0df75-3674-4b08-9ddb-e33dc753c5e8">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><img alt="img" src="./img/lecc05/ACF-AR2rojo.png"/></p>
+<p><img alt="img" src="img/lecc05/Roots-AR2rojo.png"/></p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=10165f7c-2735-4789-bcd9-48043316bc4b">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [24]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_arma_analysis</span><span class="p">(</span><span class="n">ar_params</span><span class="p">,</span> <span class="n">ma_params</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">)</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">'./img/lecc05/Sim-AR2rojo.png'</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">'tight'</span><span class="p">)</span>
+</pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6587c48d-403a-4be2-9404-f5738d46c1c0">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=8aeeda98-80af-4593-b518-f7b813e6a070">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8236,8 +8608,8 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=e18b900e-ce85-454b-a49a-078554281690">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=6d568245-23da-4431-8654-c15e826b2330">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8248,7 +8620,7 @@ X_{t-2} + U_t.$$ Entonces</p>
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=bf162452-fa4f-4b1b-b232-7cce568b36ca">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1cbb6de3-c123-4dd3-88a4-09063e1509ea">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8260,11 +8632,11 @@ X_{t-2} + U_t.$$ Entonces</p>
 <ul>
 <li><strong>Como suma ponderada finita:</strong> (número finito de parámetros)
 $$\boldsymbol{\phi}*\boldsymbol{X}=\boldsymbol{U}
-  \quad\Rightarrow\quad \boldsymbol{\phi}(\mathsf{B})X_t=U_t$$</li>
+       \quad\Rightarrow\quad \boldsymbol{\phi}(\mathsf{B})X_t=U_t$$</li>
 <li><strong>Como suma ponderada infinita:</strong> (<u>solo si es estacionario</u>)
 $$\boldsymbol{X}=\frac{1}{\boldsymbol{\phi}}*\boldsymbol{U}
-  \quad\Rightarrow\quad
-  X_t=\frac{1}{\boldsymbol{\phi}}(\mathsf{B})U_t$$</li>
+       \quad\Rightarrow\quad
+       X_t=\frac{1}{\boldsymbol{\phi}}(\mathsf{B})U_t$$</li>
 </ul>
 <p><strong>ACF ($\boldsymbol{\rho}$):</strong> Grado ($\infty$) y cogrado ($-\infty$); exponenciales y/o sinusoidales amortiguadas.</p>
 <p><strong>PACF ($\boldsymbol{\pi}$):</strong> Grado ($p$) y cogrado ($-p$)</p>
@@ -8272,8 +8644,8 @@ $$\boldsymbol{X}=\frac{1}{\boldsymbol{\phi}}*\boldsymbol{U}
 </div>
 </div>
 </div>
-</div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d88d01d7-7172-4103-a72b-d45a3051582e">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=266fc88e-c316-46a7-add3-2c779312cb6b">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8284,7 +8656,7 @@ $$\boldsymbol{X}=\frac{1}{\boldsymbol{\phi}}*\boldsymbol{U}
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=f4625651-557d-4526-92ad-9c78ca66a8b1">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3ef928c6-0158-42cb-9fb4-b1b9e6566712">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8297,11 +8669,11 @@ $(\boldsymbol{\theta}^{-\triangleright}=\boldsymbol{\theta}^{-1}\in\ell^1)$</p>
 <ul>
 <li><strong>Como suma ponderada finita:</strong> (número finito de parámetros)
 $$\boldsymbol{X}=\boldsymbol{\theta}*\boldsymbol{U}
-  \quad\Rightarrow\quad X_t=\boldsymbol{\theta}(\mathsf{B})U_t$$</li>
+       \quad\Rightarrow\quad X_t=\boldsymbol{\theta}(\mathsf{B})U_t$$</li>
 <li><strong>Como suma ponderada infinita:</strong> (<u>solo existe si es invertible</u>):
 $$\frac{1}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
-  \quad\Rightarrow\quad
-  \frac{1}{\boldsymbol{\theta}}(\mathsf{B})X_t=U_t$$</li>
+       \quad\Rightarrow\quad
+       \frac{1}{\boldsymbol{\theta}}(\mathsf{B})X_t=U_t$$</li>
 </ul>
 <p><strong>ACF ($\boldsymbol{\rho}$):</strong> Grado ($q$) y cogrado ($-q$)</p>
 <p><strong>PACF ($\boldsymbol{\pi}$):</strong> Grado ($\infty$) y cogrado ($-\infty$); exponenciales y/o sinusoidales amortiguadas.</p>
@@ -8309,8 +8681,8 @@ $$\frac{1}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
 </div>
 </div>
 </div>
-</div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d9e5d41e-f65c-43e5-9c7d-be99a300d1dc">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=af993059-dd7d-4104-9c74-1561d4dcc008">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8321,7 +8693,7 @@ $$\frac{1}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ca824722-2aa7-41a1-910c-687cdfb923fd">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=3e7d4eb8-6366-45fb-b629-a6265aa4d330">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8359,8 +8731,8 @@ $$\frac{1}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
 </div>
 </div>
 </div>
-</div></section></section><section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=1edb9305-3a9c-4ecb-a8f3-72683647ba34">
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=a1153349-23b9-48a8-bcbe-236d325a2c92">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8371,7 +8743,7 @@ $$\frac{1}{\boldsymbol{\theta}}*\boldsymbol{X}=\boldsymbol{U}
 </div>
 </div>
 </div>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=d2bb4710-5652-4058-bc92-a0a09d1f4a9a">
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=7531d126-5068-4fd3-bd66-01eab6726a6c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -8385,16 +8757,6 @@ $$
  E[U_t\cdot X_{t-k}]
 $$</p>
 <p>Estas ecuaciones se denominan <em>Ecuaciones de Yule-Walker</em> y permiten calcular las autocovarianzas y autocorrelaciones de manera iterativa.</p>
-</div>
-</div>
-</div>
-</div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4aa2cd3c-c05b-4ed8-b84f-359ee8a17766">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><em>Por una parte</em> (lado izquierdo):</p>
 <p>Si $\boldsymbol{X}$ es un proceso (débilmente) estacionario con
 $E(\boldsymbol{X})=\boldsymbol{0}\;$ y $\;\boldsymbol{\phi}$ es una serie
@@ -8409,16 +8771,6 @@ formal absolutamente sumable; entonces para $t,k\in\mathbb{Z}$</p>
 \end{equation}</p>
 <p>que no depende de $t$, por ser $\boldsymbol{X}$ es un proceso
 (débilmente) estacionario.</p>
-</div>
-</div>
-</div>
-</div><div class="fragment">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=26bcf2cd-f7b0-470b-847c-2528d13fb81a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p><em>Por otra parte</em> (lado derecho):</p>
 <p>Si $\boldsymbol{X}$ tiene representación
 $\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U}$ donde
@@ -8435,16 +8787,6 @@ entonces para $t,k\in\mathbb{Z}$</p>
   \label{eqnLadoDerechoYW}
 \end{equation}</p>
 <p>Usemos las ecuaciones $\eqref{eqnLadoIzquierdoYW}$ y $\eqref{eqnLadoDerechoYW}$ para calcular autocovarianzas y autocorrelaciones de manera iterativa:</p>
-</div>
-</div>
-</div>
-</div></div></section><section>
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=10c4411a-5a75-470f-a061-b2fc56ede33a">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>Sea un AR($p$) estacionario:
 $\;\;\boldsymbol{\phi}(\mathsf{B})X_t=U_t\;\;$ donde
 $\;\;\boldsymbol{\phi}(z)=1-\phi_1z^1-\cdots-\phi_pz^p.\;$
@@ -8472,24 +8814,13 @@ $$\fbox{$\boldsymbol{\phi}(\mathsf{B})\rho_k=0$}
 \;\Rightarrow\;
 \rho_k-\phi_1\rho_{k-1}-\cdots-\phi_p\rho_{k-p}=0
 \quad\Rightarrow\quad \rho_k=\sum\nolimits_{j=1}^p\phi_j\rho_{k-j}.$$</p>
-</div>
-</div>
-</div>
-</div><aside class="notes">
-<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=c4249b68-c89c-4c2b-8ce8-23e5aab8fc0f">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
-</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <p>En resumen, la estructura autorregresiva del proceso impone que las
 autocovarianzas (y las autocorrelaciones) verifiquen las ecuaciones de
 Yule-Walker.</p>
 </div>
 </div>
 </div>
-</div>
-</aside></section></section>
+</div></section></section>
 </div>
 </div>
 </main>
