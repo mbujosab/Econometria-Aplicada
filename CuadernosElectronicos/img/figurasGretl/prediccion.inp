@@ -1,0 +1,112 @@
+function series simARMA(matrix phi "Polinomio AR", matrix theta "Polinomio MA")
+    # SimuladorAR(phi, theta) simula un proceso ARMA(p,q), 
+    # donde p es el grado del AR y q el grado del polinomio MA.
+
+    scalar p = xmax(cols(phi), rows(phi))     # por si es matriz fila o bien matriz columna
+    scalar q = xmax(cols(theta), rows(theta)) # por si es matriz fila o bien matriz columna
+
+    scalar Transit = 10*p + q          # unas 10 veces el grado AR debería ser suficiente
+    scalar N           = $nobs         # tamaño muestral final
+
+    # Parte MA
+    matrix U1 = mrandgen(n, 0, 1, 1, Transit)     # Matriz fila
+    matrix U2 = mrandgen(n, 0, 1, 1, N)           # Matriz fila
+    matrix U = U1 ~ U2                            # Concatenación
+    matrix MA = U
+    loop i=2..cols(theta)
+        MA[1,i:N+Transit] = MA[1,i:N+Transit] + theta[i]*U[1,1:N+Transit-i+1]
+    endloop
+    
+    # Simulación ARMA
+    matrix Y = U * 0
+    loop i = (p+1)..N+Transit
+        scalar comb_pasado_Yt = 0                     
+        loop j = 2..p                   
+            comb_pasado_Yt += -phi[1,j] * Y[1,i-j+1]  # expresión abreviada
+        endloop
+        Y[i] = comb_pasado_Yt + MA[i]
+    endloop
+
+    series Z = Y[1,Transit+1:]                        # descartamos el transitorio
+    setinfo Z --description="Serie simulada"
+    return Z
+
+end function
+
+function series SimuladorRWconDeriva(scalar valor_inicial[0], scalar deriva[0])
+    # Simula un paseo aleatorio con deriva de longitud igual al tamaño de la muestra 
+    # y con un valor_inicial; a partir de un proceso de ruido blanco gausiano.
+
+    series RW = normal(0,1) + deriva
+
+    RW[1] = RW[1] + valor_inicial
+
+    loop i = 2..$nobs
+        RW[i] = RW[i] + RW[i-1]
+    endloop
+
+    setinfo RW --description="Paseo aleatorio"
+    
+    return RW
+    
+end function
+
+
+# establecemos la muestra
+nulldata 240
+setobs 12 1960:01 --time-series
+
+#3
+# 26122004
+# 19061934
+
+# 1011931 
+set seed 25031960
+
+# AR
+series Z = simARMA( {1, -0.6}, {} )
+series X = Z + 10
+
+# MA
+series W = simARMA( {}, {1, -0.6})
+series Y = W + 10
+
+# RW
+series P = simARMA( {1, -1}, {} )
+
+# RW
+series PD = SimuladorRWconDeriva( 10, 0.1 )
+
+# IMA
+series A = simARMA( {1, -1}, {1, -0.6})
+series B = A + 10
+
+# IMA estacional
+series C = simARMA( {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1}, {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.8}) + 100
+
+
+smpl 1960:01 1977:12
+
+ModeloAR <- arima 1 0 0 ; X
+ARprediccionS <- fcast 1978:01 1979:12   --static   --plot=ARprediccionS.png
+ARprediccionD <- fcast 1978:01 1979:12   --dynamic  --plot=ARprediccionD.png
+						                   
+ModeloMA <- arima 0 0 1 ; Y			                   
+MAprediccionS <- fcast 1978:01 1979:12   --static   --plot=MAprediccionS.png
+MAprediccionD <- fcast 1978:01 1979:12   --dynamic  --plot=MAprediccionD.png
+						                   
+ModeloRW <- arima 0 1 0 ; P --nc		                   
+RWprediccionS <- fcast 1978:01 1979:12   --static   --plot=RWprediccionS.png
+RWprediccionD <- fcast 1978:01 1979:12   --dynamic  --plot=RWprediccionD.png
+						                   
+ModeloRWCD <- arima 0 1 0 ; PD 			                   
+RWCDprediccionS <- fcast 1978:01 1979:12 --static   --plot=RWCDprediccionS.png
+RWCDprediccionD <- fcast 1978:01 1979:12 --dynamic  --plot=RWCDprediccionD.png
+						                   
+ModeloIMA <- arima 0 1 1 ; B 			                   
+IMAprediccionS <- fcast 1978:01 1979:12  --static   --plot=IMAprediccionS.png
+IMAprediccionD <- fcast 1978:01 1979:12  --dynamic  --plot=IMAprediccionD.png
+						                   
+ModeloSIMA <- arima 0 0 0 ; 0 1 1; C 		                   
+SIMAprediccionS <- fcast 1978:01 1979:12 --static   --plot=SIMAprediccionS.png
+SIMAprediccionD <- fcast 1978:01 1979:12 --dynamic  --plot=SIMAprediccionD.png
