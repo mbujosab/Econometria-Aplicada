@@ -531,14 +531,14 @@ Por ejemplo, en un modelo AR(1), donde \(\psi_k = \phi^k\), cuando \(\ell\) tien
 \]
 Si \(|\phi|\) está próximo uno, la varianza marginal será mucho más grande que la varianza condicionada, \(\sigma^2\). Pero la incertidumbre es finita pues la varianza marginal también lo es.
 
-- En modelos no estacionarios, como la serie \(\sum \psi_i^2\) no converge, la incertidumbre en la predicción a largo plazo que crece indefinidamente: *no se puede anticipar el comportamiento de un proceso no estacionario a largo plazo*.
+- En modelos no estacionarios, como la serie \(\sum \psi_i^2\) no converge, la incertidumbre en la predicción a largo plazo crece indefinidamente: *no se puede anticipar el comportamiento de un proceso no estacionario a largo plazo*.
 
 # Sin embargo, para los modelos no estacionarios, la serie \(\sum \psi_i^2\) no converge, lo que provoca que la incertidumbre de la predicción a largo plazo aumente indefinidamente. Por lo tanto, *no es posible anticipar el comportamiento de un proceso no estacionario a largo plazo*.
 
 
 ** Intervalos de confianza para las previsiones
    :PROPERTIES:
-   :metadata: (slideshow . ((slide_type . slide)))
+   :metadata: (slideshow . ((slide_type . subslide)))
    :END:
 
 Si asumimos que la distribución de las innovaciones es gaussiana, podemos calcular intervalos de confianza para diferentes horizontes de predicción. 
@@ -560,41 +560,41 @@ En modelos MA($q$) la varianza deja de crecer si $\ell>q$, pues $\psi_{k}=0$ par
    :END:
 
 
-Imagine que tenemos las predicciones para los periodos, desde \(t+1\) hasta \(t+j\) con el conjunto de información $\mathcal{H}_{Y_t}$. Queremos adaptar las previsiones al conjunto $\mathcal{H}_{Y_{t+1}}$.
-
-Según \eqref{eqn:predicion-MA-infinito}, la predicción de \(Y_{t+k}\) con información hasta \(t\) es:
+Contamos con predicciones para \(t+1\) hasta \(t+j\) basadas en $\mathcal{H}_{Y_t}$. Queremos actualizarlas con $\mathcal{H}_{Y_{t+1}}$.
+Según \eqref{eqn:predicion-MA-infinito}, la predicción de \(Y_{t+\ell}\) con información hasta \(t\) es:
 \[
-\widehat{Y_{t+k|t}} = \psi_k U_t + \psi_{k+1} U_{t-1} + \ldots.
+\widehat{Y_{t+\ell|t}} = \psi_\ell U_t + \psi_{\ell+1} U_{t-1} + \ldots.
 \]
-Al comparar $\widehat{Y_{t+1|t}}$ con \(Y_{t+1}\) obtenemos el error de predicción \(U_{t+1} = Y_{t+1} - \widehat{Y_{t+1|t}}\). 
+Comparando $\widehat{Y_{t+1|t}}$ con \(Y_{t+1}\) obtenemos el error de predicción \(U_{t+1} = Y_{t+1} - \widehat{Y_{t+1|t}}\). 
 
-La nueva predicción para \(Y_{t+k}\), proyectando ahora sobre $\mathcal{H}_{Y_{t+1}}$ (es decir, incorporando $Y_{t+1}$ como nueva información), será:
+La nueva predicción para \(Y_{t+\ell}\), incorporando $Y_{t+1}$ como información adicional, será:
 \[
-\widehat{Y_{t+k-1|t+1}} = \psi_{k-1} U_t + \psi_k U_{t-1} + \ldots
+\widehat{Y_{t+\ell-1|t+1}} = \psi_{\ell-1} U_t + \psi_\ell U_{t-1} + \ldots
 \]
 Restando las dos previsiones, tenemos que:
 \[
-\widehat{Y_{t+k-1|t+1}} - \widehat{Y_{t+k|t}} = \psi_{k-1} U_{t+1}.
+\widehat{Y_{t+\ell-1|t+1}} - \widehat{Y_{t+\ell|t}} = \psi_{\ell-1} U_{t+1}.
 \]
-Es decir, cuando observamos \(Y_{t+1}\) y calculamos el error de previsión cometido \(U_{t+1}\), podremos adaptar todas las predicciones mediante:
+Al observar \(Y_{t+1}\) y obtener el error de previsión \(U_{t+1}\), podremos revisar las previsiones:
 \[
-\widehat{Y_{t+k-1|t+1}} = \widehat{Y_{t+k|t}} + \psi_{k-1} U_{t+1}
+\widehat{Y_{t+\ell-1|t+1}} = \widehat{Y_{t+\ell|t}} + \psi_{\ell-1} U_{t+1}
 %, \tag{8.23}
 \]
-que indica que las predicciones se adaptan añadiendo a las predicciones anteriores una fracción del último error de predicción obtenido.  
-Si no hubo error de previsión un periodo hacia delante \((U_{t+1} = 0)\), las predicciones realizadas a un horizonte mayor no serán modificadas
+(las predicciones se revisan sumando un múltiplo del último error de predicción).
+
+Si no hay error de previsión un periodo adelante \((U_{t+1} = 0)\), no hay revisión del resto.
 
 # La ecuación (8.23) tiene una interpretación interesante.  
-# Las dos variables \(Y_{t+1}\) y \(Y_{t+k}\) tienen, dada la información hasta \(t\), una distribución conjuntamente normal con esperanzas \(\widehat{Y_{t+1|t}}\) y \(\widehat{Y_{t+k|t}}\), varianzas \(\sigma^2\) y \(\sigma^2(1 + \psi_1^2 + \ldots + \psi_{k-1}^2)\) y covarianza:
+# Las dos variables \(Y_{t+1}\) y \(Y_{t+\ell}\) tienen, dada la información hasta \(t\), una distribución conjuntamente normal con esperanzas \(\widehat{Y_{t+1|t}}\) y \(\widehat{Y_{t+\ell|t}}\), varianzas \(\sigma^2\) y \(\sigma^2(1 + \psi_1^2 + \ldots + \psi_{\ell-1}^2)\) y covarianza:
 # $$\begin{aligned}
-# \mathrm{cov}(Y_{t+1}, Y_{t+k})
-# &= E\big[(Y_{t+1} - \widehat{Y_{t+1|t}})(Y_{t+k} - \widehat{Y_{t+k|t}})\big] \\
-# &= E\big[U_{t+1}(U_{t+k} + \psi_1 U_{t+k-1} + \ldots)\big] = \sigma^2 \psi_{k-1}.
+# \mathrm{cov}(Y_{t+1}, Y_{t+\ell})
+# &= E\big[(Y_{t+1} - \widehat{Y_{t+1|t}})(Y_{t+\ell} - \widehat{Y_{t+\ell|t}})\big] \\
+# &= E\big[U_{t+1}(U_{t+\ell} + \psi_1 U_{t+\ell-1} + \ldots)\big] = \sigma^2 \psi_{\ell-1}.
 # \end{aligned}$$
 # 
-# La mejor predicción de \(Y_{t+k}\) dada \(Y_{t+1}\) y la información hasta \(t\) puede calcularse por regresión, según la expresión:
+# La mejor predicción de \(Y_{t+\ell}\) dada \(Y_{t+1}\) y la información hasta \(t\) puede calcularse por regresión, según la expresión:
 # \[
-# E(Y_{t+k} \mid Y_{t+1}) = E(Y_{t+k}) + \mathrm{cov}(Y_{t+1}, Y_{t+k}) \mathrm{var}^{-1}(Y_{t+1}) (Y_{t+1} - E(Y_{t+1})).
+# E(Y_{t+\ell} \mid Y_{t+1}) = E(Y_{t+\ell}) + \mathrm{cov}(Y_{t+1}, Y_{t+\ell}) \mathrm{var}^{-1}(Y_{t+1}) (Y_{t+1} - E(Y_{t+1})).
 # \]
 
 
@@ -604,6 +604,7 @@ Si no hubo error de previsión un periodo hacia delante \((U_{t+1} = 0)\), las p
    :END:
 
 Si se tomaron logaritmos para estabilizar la varianza, es necesario recuperar las previsiones de la serie original a partir de las de la serie transformada.
+Si
 \[
 Y_{t+\ell} = \ln(X_{t+\ell})
 \]
@@ -621,8 +622,6 @@ a = & \exp\left( \widehat{Y_{t+\ell|t}} - \big(z_{1-\frac{\alpha}{2}}\big) \sqrt
 b = & \exp\left( \widehat{Y_{t+\ell|t}} + \big(z_{1-\frac{\alpha}{2}}\big) \sqrt{Var\big(e_t(\ell)\big)} \right)
 \end{align*}
 que es no simétrico alrededor de la previsión.
-
-
 
 
 * Nota sobre subespacio sobre el que proyectamos al prever
@@ -707,6 +706,7 @@ jupyter nbconvert --execute --inplace Lecc08.ipynb
 #+BEGIN_SRC sh :results silent :eval yes
 jupyter nbconvert --config ../mycfg-GitHubPages.py --to slides --reveal-prefix "https://unpkg.com/reveal.js@5.2.1" --execute Lecc08.ipynb
 #+END_SRC
+
 
 * COMMENT Prueba
    :PROPERTIES:
