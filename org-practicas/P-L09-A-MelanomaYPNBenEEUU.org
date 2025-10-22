@@ -1,0 +1,322 @@
+#    -*- mode: org -*-
+
+#+Title: Lección 9.A --- Correlación entre la incidencia de melanoma en Connecticut y el PNB de EEUU
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+#+INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: P-L09-A-MelanomaYPNBenEEUU
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L09-A-MelanomaYPNBenEEUU"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+#+begin_src gretl :tangle guiones/P-L09-A-MelanomaYPNBenEEUU.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+# string directory = $(pwd) ~ "/P-L09-A-MelanomaYPNBenEEUU" 
+
+
+#+LATEX: \maketitle
+
+
+* Objetivo de la práctica
+
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L09-A-MelanomaYPNBenEEUU.inp][P-L09-A-MelanomaYPNBenEEUU.inp]] |
+
+
+*Datos*
+
+Datos anuales (1936–1972). PNB de EEUU en miles de millones de dólares corrientes e
+incidencia de melanoma en la población masculina de Connecticut.
+
+(/Estos datos me los pasó el Profesor Miguel Jerez hace tiempo. Desconozco la fuente original/)
+
+- Descarga de datos :: [[https://github.com/mbujosab/TimeSeriesData/blob/main/GNPvsMelanoma.csv]]
+
+*Objetivo*
+
+1. Comprobar cómo la aparente relación entre ambas series temporales se desvanece al tomar primeras diferencias
+
+Comencemos cargando los datos:
+
+*/~Archivo --> Abrir datos --> Archivo de usuario~/* y en la ventana emergente busque el fichero =GNPvsMelanoma.csv= que previamente ha descargado desde [[https://github.com/mbujosab/TimeSeriesData/blob/main/GNPvsMelanoma.csv][aquí]].
+
+# https://github.com/mbujosab/TimeSeriesData/blob/main/GNPvsMelanoma.csv
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+NAME: Lectura del fichero de datos
+#+begin_src gretl :eval no
+open RutaAlDirectorioDelFichero/GNPvsMelanoma.csv
+setobs 1 1936
+setinfo GNP --description="US GNP"
+setinfo Melanoma --description="Incidencia de melanoma en la población masculina de Connecticut"
+#+end_src
+donde =RutaAlDirectorioDelFichero= es la ruta al directorio donde guardó el fichero =GNPvsMelanoma.csv=
+#+latex: }
+
+#+NAME: Lectura del fichero de datos
+#+begin_src gretl :tangle ./guiones/P-L09-A-MelanomaYPNBenEEUU.inp :eval no :exports none
+open ../../datos/GNPvsMelanoma.csv
+setobs 1 1936
+setinfo GNP --description="US GNP"
+setinfo Melanoma --description="Incidencia de melanoma en la población masculina de Connecticut"
+#+end_src
+    
+* Actividad 1 - Dibujar ambas series en un mismo gráfico
+
+Marque las series =GNP= y =Melanoma=. 
+Pulse sobre ellas con el botón derecho del ratón. 
+En el menú desplegable seleccione */~Gráfico de Series Temporales~/* 
+(indique representar en un único gráfico).
+
+Guarde el gráfico en la sesión como un icono.
+#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+ /o bien teclee en linea de comandos/:
+ #+NAME: Guardamos scatterplot como icono
+ #+begin_src gretl :tangle ./guiones/P-L09-A-MelanomaYPNBenEEUU.inp :eval no 
+ GraficoSeriesEnNiveles <- gnuplot GNP Melanoma --time-series --with-lines   --output="GNPyMelanoma.png"
+ #+end_src
+#+latex: }
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+attr_hmlt: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L09-A-MelanomaYPNBenEEUU/GNPyMelanoma.png]]
+#+END_CENTER
+
+1) ¿Tienen tendencia estas series temporales?
+2) ¿Hay una tendencia común a ambas series?
+3) ¿lo podemos saber con seguridad solo mirando el gráfico?
+
+* Actividad 2 - Dibujar el diagrama de dispersión y calcular la correlación
+
+Marque las series =GNP= y =Melanoma=. 
+Pulse sobre ellas con el botón derecho del ratón. 
+En el menú desplegable seleccione */~Gráfico de dispersión XY~/* 
+(elija como variable del eje X =Melanoma= y marque suprimir la recta estimada).
+
+Guarde el gráfico en la sesión como un icono.
+
+#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+    #+begin_src gretl :tangle ./guiones/P-L09-A-MelanomaYPNBenEEUU.inp :eval no 
+DiagramDispersion <- gnuplot GNP Melanoma --fit=none --output="ScatterPlotGNPyMelanoma.png"
+    #+end_src
+      #+latex: }
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+attr_hmlt: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L09-A-MelanomaYPNBenEEUU/ScatterPlotGNPyMelanoma.png]]
+#+END_CENTER
+      
+
+** Calcular la correlación entre ambas series
+
+Marque las series =GNP= y =Melanoma=. 
+Pulse sobre ellas con el botón derecho del ratón. 
+En el menú desplegable seleccione */~Matriz de correlación~/*
+
+#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+    #+begin_src gretl :tangle ./guiones/P-L09-A-MelanomaYPNBenEEUU.inp :eval no 
+corr GNP Melanoma
+    #+end_src
+      #+latex: }
+
+- ¿Qué correlación hay? ¿Es elevada?
+- ¿Significa que una de las variables influye en la otra?
+- ¿Significa que hay una causa común que influyen en ambas?
+- ¿Significa que quizá hay alguna relación de causalidad entre ambas (por remota que sea)? 
+
+
+* Actividad 3 - Regresar =GNP= sobre =Melanoma= y constatar que el ajuste es bueno
+
+Estime el modelo mediante los menús desplegables: */~Modelo -> Mínimos
+  Cuadrados Ordinarios~/*; 
+indique a [[https://gretl.sourceforge.net/es.html][Gretl]] el regresando y regresor y pulse */~Aceptar~/*.
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+begin_src gretl :tangle ./guiones/P-L09-A-MelanomaYPNBenEEUU.inp :eval no 
+AjusteEnNiveles <- ols GNP 0 Melanoma
+#+end_src
+#+latex: }
+
+#+BEGIN_SRC R :tangle ./guiones/P-L09-A-MelanomaYPNBenEEUU.inp :results none :exports none
+outfile --quiet RegresionNiveles.txt
+    AjusteEnNiveles <- ols GNP 0 Melanoma
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./P-L09-A-MelanomaYPNBenEEUU/RegresionNiveles.txt example
+#+latex: }
+
+
+Aunque el coeficiente de determinación es muy elevado y los parámetros muy significativos, el modelo "/no tiene ningún sentido/". 
+Una forma de constatarlo es darse cuenta de que si fuera cierto que
+
+$$\boldsymbol{y}=\beta_1 \boldsymbol{1} + \beta_2 \boldsymbol{x} +
+\boldsymbol{u}$$
+
+Entonces también sería cierto que (y nótese que
+$\nabla\boldsymbol{1}=\boldsymbol{0}$)
+
+$$\nabla\boldsymbol{y}=\beta_2 \nabla\boldsymbol{x} +
+\nabla\boldsymbol{u}$$
+
+Consecuentemente, si $\boldsymbol{y}$ corresponde al =GNP= y $\boldsymbol{x}$ a =Melanoma=, al regresar la primera diferencia de =GNP= sobre la primera diferencia de =Melanoma= el ajuste debería indicar que el parámetro de la constante ($\beta_1$) no es significativo, pero la pendiente ($\beta_2$) debería ser significativa, pues es el parámetro que debería relacionar linealmente ambas series 
+(dada la elevada correlación entre ellas). 
+Veamos si ocurre esto...
+
+
+* Actividad 4 - Regresar =d_GNP= sobre =d_Melanoma= y constatar que el ajuste es pésimo
+
+*** Calcular la primera diferencia de las series. Explorar si puede haber relación entre ellas. 
+
+Seleccione con el ratón la variable =GNP= y =Melanoma=. 
+Luego pulse en el menú desplegable */~Añadir~/* que aparece arriba, en el centro de la ventana principal de [[https://gretl.sourceforge.net/es.html][Gretl]].
+  + */~Añadir -> Primeras diferencias de las variables seleccionadas~/*
+
+Haga un gráfico con ambas series (verá que la tendencia ha desaparecido y que ya no se parecen entre sí).
+
+Calcule también la correlación entre ambas series diferenciadas
+(recuerde que en un modelo lineal simple el cuadrado de dicha correlación es el coeficiente de determinación).
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+begin_src gretl :tangle ./guiones/P-L09-A-MelanomaYPNBenEEUU.inp :eval no 
+diff GNP Melanoma
+GraficoSeriesEnDiferencias <- gnuplot d_GNP d_Melanoma --time-series --with-lines
+corr d_GNP d_Melanoma
+#+end_src
+#+latex: }
+
+
+*** Regresión en primeras diferencias
+
+Estime el modelo mediante los menús desplegables: */~Modelo -> Mínimos Cuadrados Ordinarios~/*; 
+indique a [[https://gretl.sourceforge.net/es.html][Gretl]] el regresando y regresor y pulse */~Aceptar~/*.
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+begin_src gretl :tangle ./guiones/P-L09-A-MelanomaYPNBenEEUU.inp :eval no 
+AjusteEnPrimerasDiferencias <- ols d_GNP 0 d_Melanoma
+#+end_src
+#+latex: }
+
+#+BEGIN_SRC R :tangle ./guiones/P-L09-A-MelanomaYPNBenEEUU.inp :results none :exports none
+outfile --quiet RegresionPrimerasDiferencias.txt
+    AjusteEnPrimerasDiferencias <- ols d_GNP 0 d_Melanoma
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./P-L09-A-MelanomaYPNBenEEUU/RegresionPrimerasDiferencias.txt example
+#+latex: }
+
+
+Ocurre justo lo contrario de lo que cabría esperar si hubiera una relación de tipo  
+$$\boldsymbol{y}=\beta_1 \boldsymbol{1} + \beta_2 \boldsymbol{x} +
+\boldsymbol{u}$$
+
+Al tomar diferencias el único parámetro significativo es la constante. 
+La pendiente ya no es significativa y el R cuadrado del ajuste es pequeñísimo. 
+
+*Conclusión.* 
+Las variables =GNP= y =Melanoma= muestran una tendencia creciente, 
+lo que conduce a un elevado coeficiente de correlación entre ellas; 
+pero la tendencia ni es común, ni la correlación se puede atribuir a ninguna relación de causalidad entre ellas. 
+La correlación es espuria (es decir, carece de sentido tratar de
+interpretarla); 
+y los resultados de la regresión en diferencias lo ponen de relieve.
+
+
+# # +LATEX: \clearpage
+# #+latex: {\vspace{10pt}
+# #+latex: \noindent
+# *Código completo de la práctica* ~P-L09-A-MelanomaYPNBenEEUU.inp~
+# #+latex: \vspace{10pt}
+# \lstinputlisting{guiones/P-L09-A-MelanomaYPNBenEEUU.inp}
+# #+LATEX: \clearpage }
+
+
+#+BEGIN_EXPORT latex
+\vspace{10pt}
+\noindent
+\textbf{Código completo de la práctica}
+\lstinputlisting{guiones/P-L09-A-MelanomaYPNBenEEUU.inp}
+#+END_EXPORT
+
