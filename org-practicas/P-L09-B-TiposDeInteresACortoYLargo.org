@@ -205,6 +205,7 @@ La lectura siempre en la otra dirección: /si hay relación causal, probablement
 
 
 * Actividad 3 - Regrese la primera diferencia de los tipos a corto sobre la diferencia de los tipos a largo
+
 1) Incluya las primeras diferencias de =Short= y =Long=
 2) Dibuje ambas series diferenciadas. 
    ¿Parecen /ser estacionarias en media/? 
@@ -219,12 +220,13 @@ La lectura siempre en la otra dirección: /si hay relación causal, probablement
 ** Análisis gráfico y coeficiente de correlación
 
 Realice los pasos con la interfaz gráfica y los menús desplegables,
-#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+latex: {\vspace{0pt} \footnotesize 
 /o bien teclee en linea de comandos/:
 #+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 diff Short Long
 GraficoSeriesEnDiferencias <- gnuplot d_Short d_Long --time-series --with-lines --output="d_Shortyd_Long.png"
 corr d_Short d_Long
+corr Short Long
 #+end_src
 #+latex: }
 
@@ -240,15 +242,16 @@ corr d_Short d_Long
 Estime el modelo mediante los menús desplegables: */~Modelo -> Mínimos Cuadrados Ordinarios~/*; 
 indique a [[https://gretl.sourceforge.net/es.html][Gretl]] el regresando y regresor y pulse */~Aceptar~/*.
 
-#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+latex: {\vspace{0pt} \footnotesize
 /o bien teclee en linea de comandos/:
 #+name: Ajuste en primeras diferencias
 #+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 AjusteEnPrimerasDiferencias <- ols d_Short 0 d_Long
 #+end_src
+
 #+latex: }
 
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :exports none  :eval no :noweb yes
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :exports none :eval no :noweb yes
 outfile --quiet RegresionPrimerasDiferencias.txt
     <<Ajuste en primeras diferencias>>
 end outfile
@@ -429,13 +432,13 @@ kpss 4 Short
 #+end_src
   
 #+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :exports none :eval no :noweb yes
-outfile --quiet kpss_Long.txt
+outfile --quiet kpss_Short.txt
     <<KPSS Short>>
 end outfile
 #+end_src
 
 #+latex: {\footnotesize
-#+include: ./P-L09-B-TiposDeInteresACortoYLargo/kpss_Long.txt example
+#+include: ./P-L09-B-TiposDeInteresACortoYLargo/kpss_Short.txt example
 #+latex: }
 
 El p-valor es inferior al 1%, así que rechazamos la $H_0:$ /la serie es una realización de un proceso $I(0)$/ para =Short=.

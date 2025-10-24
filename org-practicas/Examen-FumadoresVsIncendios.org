@@ -1,0 +1,801 @@
+#    -*- mode: org -*-
+
+#+title: Tasa de fumadores vs tasa de incendios
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+#+OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+# +INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: Examen-FumadoresVsIncendios
+#+BEGIN_SRC sh :exports none :results silent :var practica="Examen-FumadoresVsIncendios"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+
+#+begin_src gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+
+
+#+LATEX: \maketitle
+
+
+* Datos
+
+Analizamos 20 observaciones anuales, recopiladas entre 2001 y 2021, correspondientes a:
+
+- =Tasa_Fumadores= :: Porcentaje de fumadores entre residentes adultos en USA (Fuente: CDC).
+- =Tasa_Incendios= :: Número de incendios por cada 100.000 residentes en los USA (Fuente: FBI).
+
+El objetivo es evaluar si existe soporte estadístico para la hipótesis de que la reducción progresiva en el porcentaje de fumadores incide directamente en la disminución del número de incendios. 
+
+- Ficheros: :: Versión del ejercicio en [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-pdf/Examen-FumadoresVsIncendios.pdf][pdf]]; [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/Examen-FumadoresVsIncendios.html][html]].
+   - Datos:  [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/datos/FumadoresVsIncendios.gdt][FumadoresVsIncendios.gdt]]
+   - Guión de gretl: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/Practicas-html/guiones/Examen-FumadoresVsIncendios.inp][Examen-FumadoresVsIncendios.inp]]
+
+# [[https://github.com/mbujosab/EconometriaAplicada-SRC/tree/main/Ejercicios]]
+
+*** Gráfico de las series y diagrama de dispersión
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no
+open ../datos/FumadoresVsIncendios.gdt
+gnuplot Tasa_Fumadores Tasa_Incendios --time-series --with-lines --output="Tasa_FumadoresyTasa_Incendios.png"
+gnuplot Tasa_Incendios Tasa_Fumadores --output="Tasa_IncendiosVsTasa_Fumadores.png"
+#+END_SRC
+
+
+#+BEGIN_CENTER
+#+name: GraficoDispersión
+#+ATTR_LATEX: :width 0.5\textwidth :center
+#+CAPTION: Series temporales
+[[./Examen-FumadoresVsIncendios/Tasa_FumadoresyTasa_Incendios.png]] 
+#+ATTR_LATEX: :width 0.5\textwidth :center
+#+CAPTION: Diagrama de dispersión
+[[./Examen-FumadoresVsIncendios/Tasa_IncendiosVsTasa_Fumadores.png]]
+#+END_CENTER
+
+
+
+
+* Contrastes de raiz unitaria y de estacionariedad
+** =Tasa_Fumadores=
+*** Contraste aumentado de Dickey Fuller para =Tasa_Fumadores=
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no
+adf 4 Tasa_Fumadores --c --test-down
+#+END_SRC
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no :exports none
+outfile --quiet adf_Tasa_Fumadores.txt
+    adf 4 Tasa_Fumadores --c --test-down
+end outfile
+#+END_SRC
+
+
+#+latex: {\footnotesize
+#+include: ./Examen-FumadoresVsIncendios/adf_Tasa_Fumadores.txt example
+#+latex: }
+
+*** Conteste KPSS de estacionariedad para =Tasa_Fumadores=
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no
+kpss 4 Tasa_Fumadores
+#+END_SRC
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no :exports none
+outfile --quiet kpss_Tasa_Fumadores.txt
+    kpss 4 Tasa_Fumadores
+end outfile
+#+END_SRC
+
+
+#+latex: {\footnotesize
+#+include: ./Examen-FumadoresVsIncendios/kpss_Tasa_Fumadores.txt example
+#+latex: }
+
+** =Tasa_Incendios=
+
+*** Contraste aumentado de Dickey Fuller para =Tasa_Incendios=
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no
+adf 4 Tasa_Incendios --c --test-down
+#+END_SRC
+
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no :exports none
+outfile --quiet adf_Tasa_Incendios.txt
+    adf 4 Tasa_Incendios --c --test-down
+end outfile
+#+END_SRC
+
+
+#+latex: {\footnotesize
+#+include: ./Examen-FumadoresVsIncendios/adf_Tasa_Incendios.txt example
+#+latex: }
+
+*** Conteste KPSS de estacionariedad para =Tasa_Incendios=
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no
+kpss 4 Tasa_Incendios
+#+END_SRC
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no :exports none
+outfile --quiet kpss_Tasa_Incendios.txt
+    kpss 4 Tasa_Incendios
+end outfile
+#+END_SRC
+
+
+#+latex: {\footnotesize
+#+include: ./Examen-FumadoresVsIncendios/kpss_Tasa_Incendios.txt example
+#+latex: }
+
+
+* Regresión en niveles: =Tasa_Incendios= sobre =Tasa_Fumadores=
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no
+MCOIncendiosSobreFumadores <- ols Tasa_Incendios 0 Tasa_Fumadores
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 4 --quiet
+#+END_SRC
+# P-valor Durbin-Watson
+# scalar dwpval = $dwpval
+# print dwpval 
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no :exports none
+outfile --quiet modeloMCO.txt
+  ols Tasa_Incendios 0 Tasa_Fumadores
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 4 --quiet
+  #series uhat = MCOIncendiosSobreFumadores.$uhat
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./Examen-FumadoresVsIncendios/modeloMCO.txt example
+#+latex: }
+
+
+* Regresión en primeras diferencias: =d_Tasa_Incendios= sobre =d_Tasa_Fumadores=
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no
+diff Tasa_Incendios Tasa_Fumadores
+MCOIncendiosSobreFumadores_en_Diff <- ols d_Tasa_Incendios 0 d_Tasa_Fumadores
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 4 --quiet
+#+END_SRC
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no :exports none
+outfile --quiet modeloMCO_en_diff.txt
+  ols d_Tasa_Incendios 0 d_Tasa_Fumadores
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 4 --quiet
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./Examen-FumadoresVsIncendios/modeloMCO_en_diff.txt example
+#+latex: }
+
+#+latex: \newpage
+
+* Contrastes de raíz unitaria y de estacionariedad para los residuos =uhat= del modelo de regresión en niveles
+
+** Contraste aumentado de Dickey Fuller sobre la existencia de una raíz unitaria para =uhat=
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no
+series uhat = MCOIncendiosSobreFumadores.$uhat
+adf 4 uhat --c --test-down
+#+END_SRC
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no :exports none
+outfile --quiet adf_uhat.txt
+    series uhat = MCOIncendiosSobreFumadores.$uhat
+    adf 4 uhat --c --test-down
+end outfile
+#+END_SRC
+
+
+#+latex: {\footnotesize
+#+include: ./Examen-FumadoresVsIncendios/adf_uhat.txt example
+#+latex: }
+
+** Conteste KPSS de estacionariedad para =uhat=
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no
+kpss 4 uhat
+#+END_SRC
+
+#+BEGIN_SRC gretl :tangle guiones/Examen-FumadoresVsIncendios.inp :eval no :exports none
+outfile --quiet kpss_uhat.txt
+    kpss 4 uhat
+end outfile
+#+END_SRC
+
+#+latex: {\footnotesize
+#+include: ./Examen-FumadoresVsIncendios/kpss_uhat.txt example
+#+latex: }
+
+# +latex: \newpage
+
+
+* Preguntas
+
+** Pregunta 1
+
+(*1 pts.*) Utilice la información disponible en la sección [[Datos]] y en la sección [[Contrastes de raiz unitaria y de estacionariedad]] para discutir exhaustivamente si las series =Tasa_Fumadores= y =Tasa_Incendios= son realizaciones de procesos estacionarios en media o no.
+
+([[Respuesta 1]])
+
+** Pregunta 2
+
+(*1 pts.*) Discuta exhaustivamente la información que se muestra en la sección [[Regresión en niveles: =Tasa_Incendios= sobre =Tasa_Fumadores=]]. Concretamente, comente 
+1) la interpretación de los coeficientes de la regresión (constante y pendiente).
+2) interpretación de los estadísticos de ajuste
+3) evidencias sobre el cumplimiento o incumplimiento de los supuestos estándar del modelo de regresión lineal además de cualquier otro resultado que considere de interés.
+
+([[Respuesta 2]])
+
+** Pregunta 3
+
+(*1 pts.*) Compare de todas las formas posibles la [[Regresión en niveles: =Tasa_Incendios= sobre =Tasa_Fumadores=][regresión en niveles]] con la [[Regresión en primeras diferencias: =d_Tasa_Incendios= sobre =d_Tasa_Fumadores=][regresión en primeras diferencias]] ¿Cuál de los dos modelos es más adecuado? ¿Qué se puede concluir sobre la relación entre ambas series?
+
+([[Respuesta 3]])
+
+** Pregunta 4
+
+(*0.5 pts.*) Indique cuáles de las siguientes expresiones son correctas respecto del modelo correspondiente a la [[Regresión en niveles: =Tasa_Incendios= sobre =Tasa_Fumadores= ][regresión en niveles]] ajustada a los datos de =Tasa_Incendios= (con un redondeo a tres decimales).
+- Expresión 1 :: $\widehat{I_t} = -9.014 + 1.517\, (F_t)$
+- Expresión 2 :: ${I_t} = -9.014 + 1.517\, (F_t) +  \widehat{\varepsilon_t}$
+- Expresión 3 :: ${I_t} = -9.014 + 1.517\, (F_t)$
+- Expresión 4 :: $\widehat{I_t} = -9.014 + 1.517\, (F_t) + \widehat{\varepsilon_t}$
+donde \(I_t\) denota la serie =Tasa_Incendios=, \(F_t\) denota la serie =Tasa_Fumadores= y \(\widehat{\varepsilon_t}\) es el residuo de la regresión correspondiente a la observación /t/-ésima.
+
+([[Respuesta 4]])
+
+** Pregunta 5
+
+(*0.5 pts.*) Respecto al resultado del [[=Tasa_Fumadores=][test aumentado de Dickey-Fuller (ADF)]] para =Tasa_Fumadores=, discuta sobre la veracidad o falsedad de la siguiente afirmación:
+#+begin_quote
+/No se rechaza la hipótesis nula de *estacionariedad* con un 5% de significación/.
+#+end_quote
+
+([[Respuesta 5]])
+
+** Pregunta 6
+
+(*0.5 pts.*) Respecto al resultado del [[=Tasa_Fumadores=][test KPSS]] para =Tasa_Fumadores=, discuta brevemente sobre la veracidad o falsedad de la siguiente afirmación:
+#+begin_quote
+/Se rechaza la hipótesis nula de *estacionariedad* con un 5% de significación/.
+#+end_quote
+
+([[Respuesta 6]])
+
+** Pregunta 7
+
+(*0.5 pts.*) Respecto al resultado del [[=Tasa_Incendios=][test ADF]] para =Tasa_Incendios=, discuta brevemente sobre la veracidad o falsedad de la siguiente afirmación:
+#+begin_quote
+/No se rechaza la hipótesis nula de *NO estacionariedad* con un 5% de significación/.
+#+end_quote
+
+([[Respuesta 7]])
+
+** Pregunta 8
+
+(*0.5 pts.*) Respecto al resultado del [[=Tasa_Incendios=][test KPSS]] para =Tasa_Incendios=, discuta brevemente sobre la veracidad o falsedad de la siguiente afirmación:
+#+begin_quote
+/Se rechaza la hipótesis nula de *NO estacionariedad* con un 5% de significación/.
+#+end_quote
+
+([[Respuesta 8]])
+
+** Pregunta 9
+
+(*0.5 pts.*) En referencia al [[Gráfico de las series y diagrama de dispersión][/``diagrama de dispersión''/]] entre ambas tasas, discuta brevemente sobre la veracidad o falsedad de la siguiente afirmación:
+#+begin_quote
+/Muestra que existe una relación causal entre las variables =Tasa_Fumadores= y =Tasa_Incendios=./
+#+end_quote
+
+([[Respuesta 9]])
+
+** Pregunta 10
+
+(*1 pts.*) Observe los contrastes de hipótesis que aparecen tras la [[Regresión en niveles: =Tasa_Incendios= sobre =Tasa_Fumadores=][regresión en niveles]] y discuta brevemente sobre el cumplimiento de las hipótesis del modelo lineal general (MLG) en dicha regresión.
+
+([[Respuesta 10]])
+
+** Pregunta 11
+
+(*1 pts.*) Con un nivel de significación del 5%, discuta si:
+- los resultados que se muestran respecto a los [[Contrastes de raiz unitaria y de estacionariedad]] 
+- las regresiones en  [[Regresión en niveles: =Tasa_Incendios= sobre =Tasa_Fumadores=][niveles]]
+- y los [[Contrastes de raíz unitaria y de estacionariedad para los residuos =uhat= del modelo de regresión en niveles]]
+sugieren conjuntamente que las series analizadas podrían estar /cointegradas/.
+
+([[Respuesta 11]])
+
+** Pregunta 12
+
+(*0.5 pts.*) Discuta brevemente sobre la veracidad o falsedad de la siguiente afirmación respecto a los [[Contrastes de raíz unitaria y de estacionariedad para los residuos =uhat= del modelo de regresión en niveles]]:
+#+begin_quote
+/Con un nivel de significación del 10%, los resultados de los test ADF y KPSS son contradictorios/.
+#+end_quote
+
+([[Respuesta 12]])
+
+** Pregunta 13
+
+(*0.5 pts.*) Discuta brevemente sobre la veracidad o falsedad de la siguiente afirmación:
+#+begin_quote
+/La comparación de los resultados de la [[Regresión en niveles: =Tasa_Incendios= sobre =Tasa_Fumadores=][regresión en niveles]] con la [[Regresión en primeras diferencias: =d_Tasa_Incendios= sobre =d_Tasa_Fumadores=][regresión en primeras diferencias]] sugiere que la relación entre =Tasa_Incendios= y =Tasa_Fumadores= podría ser espúria/.
+#+end_quote
+
+([[Respuesta 13]])
+
+** Pregunta 14
+
+(*1 pts.*) Discuta brevemente sobre la veracidad o falsedad de la siguiente afirmación:
+#+begin_quote
+/La estimación del término constante del modelo correspondiente a la [[Regresión en primeras diferencias: =d_Tasa_Incendios= sobre =d_Tasa_Fumadores=][regresión en primeras diferencias]] sugiere que, por cada año que pasa, cabe esperar que la incidencia de incendios se reduzca en aproximadamente ~1~ incendio menos por cada 100.000 residentes/.
+#+end_quote
+
+([[Respuesta 14]])
+
+
+* Respuestas
+
+** Respuesta 1
+
+- La primera figura muestra con claridad que ambas series temporales tienen una tendencia decreciente y que, por tanto, no podemos asumir que estas series sean realizaciones de procesos estocásticos estacionarios en media.
+
+- En cuanto a los resultados de la sección [[Contrastes de raiz unitaria y de estacionariedad]], los test ADF para las series =Tasa_Fumadores= y =Tasa_Incendios= no rechazan la hipótesis nula ($H_0:$ la serie es integrada al menos de primer orden) para los niveles de significación habituales (10%, 5% 0 1%), pues arrojan /p/-valores de =0,991= y =0,698=, respectivamente.
+
+- Los resultados del test KPSS no son tan contundentes, ya que los /p/-valores interpolados son de =0,038= para =Tasa_Fumadores= y de =0,037= para =Tasa_Incendios=. Por tanto, la hipótesis nula ($H_0:$ la serie es estacionaria en media) se rechazaría al 5% de significación, aunque no se rechazaría al 1%.
+
+En conjunto, podemos asumir que estos datos *no* son realizaciones de procesos estocásticos estacionarios (lo que coloquialmente se expresa diciendo que /"estas series no son estacionarias en media"/).
+
+([[Pregunta 1]])
+
+** Respuesta 2
+
+- Interpretación de los coeficientes de la regresión :: Ambos coeficientes estimados resultan ser estadísticamente significativos a los niveles de significación habituales (10%, 5% ó 1%).
+
+  - El término constante NO admite una interpretación coherente. Intentar interpretarlo implicaría suponer que si =Tasa_Fumadores= fuera 0 (*caso que no se observa en la muestra*) la tasa de incendios por cada 100.000 habitantes sería negativa. /En este modelo la constante es un parámetro no interpretable/.
+
+  - La pendiente indica que si la tasa de fumadores aumentase en un punto porcentual, el valor esperado estimado para la tasa de incendios crecería en 1,52 incendios por cada 100.000 residentes.
+
+- Interpretación de los indicadores de ajuste :: La desviación típica residual es de 1,87 incendios/100.000 residentes. Es una medida de la dispersión de los residuos.
+
+  # También puede interpretarse como el error estándar de la previsión, si se conoce el valor de la variable explicativa (esta interpretación es más avanzada de lo que se ha explicado de momento en el curso).
+
+  El R-cuadrado es =0,89=. Como el $R^2$ es un ratio entre la varianza muestral de los datos ajustados y la varianza muestral de los datos del regresando, el $R^2$ se interpreta como una medida de la bondad del ajuste de los datos (el modelo ajustado capta el 89% de la varianza muestral del regresando). 
+
+  El R-cuadrado corregido es un ratio de las correspondientes cuasivarianza que sirve para comparar el ajuste de distintos modelos anidados (i.e., modelos con el mismo regresando y donde los regresores de uno de los modelos son un subconjunto de los regresores del otro).
+
+  Los criterios de información de Akaike, Schwarz y Hannan Quinn toman los valores =87,78=, =89,87= y =88,23=, respectivamente. Se trata de otros medidas de ajuste que permiten comparar modelos con el mismo regresando, por lo que, sin otro modelo con el compararlos, no nos dan mucha información.
+
+- Evidencia sobre sobre el cumplimiento de los supuestos del modelo clásico de regresión lineal :: Los contrastes de normalidad, homoscedasticidad y ausencia de autocorrelación no rechazan a los niveles de significación habituales sus respectivas hipótesis nulas ($H_0$: los datos provienen de una distribución normal; $H_0$: los datos son realizaciones de variables aleatorias con la misma varianza; y $H_0$: los datos provienen de variables aleatorias que no muestran correlación serial).
+
+([[Pregunta 2]])
+  
+** Respuesta 3
+
+Al comparar modelos, lo habitual es fijarse tanto en estadísticos de ajuste, como en el cumplimiento de las hipótesis del MLG y la consistencia de los resultados.
+
+- Estadísticos de ajuste :: En este caso, en el que estos modelos ajustan variables distintas (=Tasa_Incendios= en el primer caso y =d_Tasa_Incendios= en el segundo), por tanto *los estadísticos de ajuste no son comparables*.
+
+  No obstante, es evidente que la primera regresión muestra un elevado $R^2$ (el ajuste reproduce un elevado porcentaje de la varianza muestral de la =Tasa_Incendios=) y que, sin embargo, la segunda regresión muestra un bajísimo $R^2$ (un paupérrimo ajuste de los datos). Aunque no cabe comparar los R-cuadrado corregidos ya que estos modelos no están anidados (como se apuntaba más arriba).
+      
+- Cumplimiento de hipótesis :: Todos los parámetros del modelo de la primera regresión son significativos. Los test residuales no rechazan las hipótesis nulas de normalidad, homoscedasticidad y ausencia de autocorrelación.
+
+  El ajuste del segundo modelo tiene un parámetro no significativo y sus residuos rechazan la hipótesis nula de normalidad.
+
+- Consistencia de los resultados de la primera regresión en niveles :: Si la relación entre las variables fuera como la que implica la primera regresión (que aparentemente es la muestra un buen ajuste de los datos y no evidencia incumplimientos del los supuestos clásicos), es decir, si realmente  $$\boldsymbol{y}=\beta_1\boldsymbol{1}+\beta_2\boldsymbol{x}+\boldsymbol{u}.$$ Entonces también debería ser cierto que $$\nabla\boldsymbol{y}=\beta_2\nabla\boldsymbol{x}+\nabla\boldsymbol{u}.$$
+
+Sin embargo, en la [[Regresión en primeras diferencias: =d_Tasa_Incendios= sobre =d_Tasa_Fumadores=]] la única variable estadísticamente significtiva la constante (que debería ser cero). 
+Es decir, la [[Regresión en primeras diferencias: =d_Tasa_Incendios= sobre =d_Tasa_Fumadores=]] *contradice la posibilidad de que ambas variables estén relacionadas*. Es decir, los resultados de la primera regresión no son consistentes con los de la segunda. Dicho de otro modo, los resultados de la segunda estimación indican que estamos ante un caso de correlación espúria, ya que la relación entre ambas variables se vuelve no significativa al diferenciarlas.
+  
+  A este respecto, podemos argumentar que, pese a los estadísticos de significación y los de ajuste, el segundo modelo es mejor que el primero; ya que refleja que ambas variables no están relacionadas, es decir, que fumar menos no afecta significativamente en la incidencia de incendios.
+  
+([[Pregunta 3]])
+
+** Respuesta 4
+
+Dado que  \(\widehat{\varepsilon_t}\) es el residuo de la regresión correspondiente a la observación /t/-ésima; es decir, que \(\widehat{\varepsilon_t}={I_t}-\widehat{I_t}\), sólo las dos primeras expresiones son correctas. La primera corresponde a los valores ajustados \(\widehat{I_t}\) y, por tanto, la segunda expresión resulta ser \({I_t}=\widehat{I_t}+\widehat{\varepsilon_t}\): es decir, la regresión descompone los datos observados en /datos ajustados/ más el /error cometido por dicho ajuste/.
+
+([[Pregunta 4]])
+
+** Respuesta 5
+
+La afirmación es FALSA. La hipótesis nula del test es $H_0:$ /la serie es NO estacionaria/.
+
+([[Pregunta 5]])
+
+** Respuesta 6
+
+La afirmación es VERDADERA. La hipótesis nula del test KPSS es $H_0:$ /la serie es estacionaria/; y el p valor interpolado (3,8%) da lugar a un rechazo al 5% de significación.
+
+([[Pregunta 6]])
+
+** Respuesta 7
+
+La afirmación es VERDADERA. La hipótesis nula del test es $H_0:$ /la serie es NO estacionaria/ y el p valor (69,8%) da lugar a un no rechazo al 5% de significación.
+
+([[Pregunta 7]])
+
+** Respuesta 8
+
+La afirmación es FALSA. La hipótesis nula del test es $H_0:$ /la serie es estacionaria/.
+
+([[Pregunta 8]])
+
+** Respuesta 9
+
+La afirmación es FALSA. Dos variables pueden estar fuertemente correladas sin que exista una relación causal entre ellas. Esto sucede, por ejemplo, si la correlación entre ambas es espúria.
+
+([[Pregunta 9]])
+
+** Respuesta 10
+
+En primer lugar, independientemente de los resultados que arrojen los test, los contrastes de hipótesis no pueden dar una garantía plena sobre el cumplimiento de las hipótesis. Además, no se incluyen contrastes para todas las hipótesis; por ejemplo, no se muestra un test de linealidad.
+
+Pese a todo ello, los test mostrados NO inducen a rechazar las
+correspondientes hipótesis nulas a los niveles de significación habituales ($H_0$: distribución normal, $H_0$: homocedasticidad y $H_0$: ausencia de autocorrelación).
+
+([[Pregunta 10]])
+
+** Respuesta 11
+
+A un 5% de significación 
+- a) los [[Contrastes de raiz unitaria y de estacionariedad]] realizados sugieren que ambas series son no estacionarias.
+- b) la [[* Regresión en niveles: =Tasa_Incendios= sobre =Tasa_Fumadores= ][regresion en niveles]] indica que existe una relación significativa entre ambas variables, y
+- c) por otra parte, los [[Contrastes de raíz unitaria y de estacionariedad para los residuos =uhat= del modelo de regresión en niveles]] no se refuerzan, ya que el ADF no rechaza su hipótesis nula (*no estacionariedad*) por un margen pequeño (7,1% frente a 5%) y el KPSS tampoco rechaza la suya (*estacionariedad*). 
+
+Consecuentemente, a la luz de estos resultados, las series podrían estar cointegradas, aunque la conclusión de la etapa 4 es dudosa, ya que según el ADF no habría cointegración al 5%, mientras que el KPSS no la descarta.
+
+([[Pregunta 11]])
+
+** Respuesta 12
+
+La afirmación es FALSA. A un 10% de significación el test ADF rechaza la hipótesis nula (*no estacionariedad*) y el KPSS no rechaza su hipótesis nula (*estacionariedad*). Por tanto, ambos contraste no se contradicen a este nivel de significación.
+
+([[Pregunta 12]])
+
+** Respuesta 13
+
+Efectivamente la afirmación es VERDADERA. La regresión en niveles es muy significativa. En primeras diferencias no hay relación. Por tanto, la apariencia de relación se debe, sencillamente, a que ambas series son realizaciones de procesos no estacionarios.
+
+([[Pregunta 13]])
+
+** Respuesta 14
+
+La afirmación es VERDADERA. El valor estimado del término constante (~-0,951~) está muy próximo a ~-1~ y puede interpretarse como el valor esperado del cambio en =Tasa_Incendios=, en ausencia de efectos de la variable explicativa (que en cualquier caso no afecta significativamente a la endógena).
+
+([[Pregunta 14]])
+
+
+* COMMENT Respuestas examen anterior
+
+
+** Respuesta 1
+
+Ambas series (=Tasa_Fumadores= y =Tasa_Fumadores=) parecen ser NO
+estacionarias en media,
+- Analizando los gráficos de las series, ambas parecen tener una
+  tendencia estocástica sin deriva. 
+  # Además la media en ambos casos parece ser distinta de cero.
+
+- Ambas funciones de autocorrelación (FAC) muestran persistencia (sus
+  coeficientes decrecen despacio y a un ritmo aproximadamente lineal);
+  y el primer coeficiente de la PACF está próximo a uno en ambos
+  casos.
+
+- En ambos casos el contraste Dickey-Fuller aumentado no rechaza la
+  hipótesis nula de existencia de una raíz unitaria ni al 1%, ni al
+  5%, ni tampoco al 10% de significación.
+
+- En consonancia con lo anterior, en ambos casos el test KPSS rechaza
+  contundentemente que las series sean estacionarias.
+
+- Además (aunque el enunciado no hace referencia a la sección
+  "[[Contraste de cointegración de Engle y Granger]]"), los test ADF
+  calculados en las etapas 1 y 2 no rechazan la hipótesis (raíz
+  unitaria) pues, de hecho, son los mismos test mostrados más arriba.
+
+#+BEGIN_QUOTE
+*Aclaraciones a algunas respuestas incorrectas en los exámenes*:
+
+- Las regresiones auxiliares corresponden al contraste Dickey-Fuller
+  (en este caso Dickey-Fuller /aumentado/ por incluir tanto un término
+  constante como tres retardos de la variable). *De este contraste
+  solo nos interesa el ratio* $t$ (parámetro estimado dividido por
+  desviación típica) para $\delta$ (la pendiente correspondiente al
+  primer retardo de la variable). 
+
+  Dicho ratio, bajo la $H_0$ de que la serie es $I(1)$, no tiene la
+  habitual distribución /t/-student. Por eso se compara el ratio con
+  unas tablas especiales (las del Dickey-Fuller aumentado con
+  constante, tres retardos y en tamaño muestral correspondiente) que
+  para una significación del 5% arrojan un valor crítico de =-2.86=
+  como se indica tras los resultados de la regresión.
+
+  *El valor de $R^2$ o los criterios de información, o cualquier otro
+  estadístico no nos importan* (esta regresión auxiliar no trata de
+  encontrar un modelo para la serie, solo pretende contrastar si hay
+  una raíz unitaria, es decir, contrastar si $\delta=0$). Por último,
+  *que el $R^2$ sea bajo NO indica ni que la serie sea estacionaria ni
+  que no lo sea*.
+
+#+END_QUOTE
+
+
+([[Pregunta 1]])
+
+** Respuesta 2
+
+El resumen de las distintas etapas del test de cointegración son:
+- Etapa 1 :: El test ADF no rechaza que la serie =Tasa_Fumadores= sea
+  I(1) para niveles de significación inferiores al 13% (p-valor
+  asintótico =0,1312=).
+- Etapa 2 :: El test ADF no rechaza que la serie =Tasa_Fumadores= sea
+  I(1) para niveles de significación inferiores al 13% (p-valor
+  asintótico =0,1308=).
+- Etapa 3 :: En la regresión (cointegrante) de las letras a 3 meses
+  sobre las letras a 6 meses la pendiente es muy significativa, y el
+  $R^2$ está próximo a 1.
+- Etapa 4 :: El test ADF rechaza *contundentemente* que los residuos
+  de la regresión cointegrante sean I(1) a casi cualquier nivel
+  de significación (p-valor asintótico =0.000000000000355=)
+
+Por lo que podemos concluir que, siendo las series =Tasa_Fumadores= y =Tasa_Fumadores= no
+estacionarias (etapas 1 y 2), la regresión cointegrante muestra que
+existe una estrecha y significativa relación entre ellas (etapa 3) con
+residuos estacionarios (etapa 4). En otras palabras, aunque =Tasa_Fumadores= y
+=Tasa_Fumadores= no son estacionarias en media, la diferencia entre ellas
+$Tasa_Fumadores-\widehat{\beta_2}Tasa_Fumadores$ sí es estacionaria en
+media. Consecuentemente, _el test NO rechaza la cointegración de los
+tipos de interés a 3 y 6 meses_.
+
+#+BEGIN_QUOTE
+*Aclaraciones a algunas respuestas incorrectas en los exámenes*:
+
+- La etapa 3 es tan importante como el resto de etapas (en dicha etapa
+  3 lo importante es que la pendiente sea significativa y el ajuste
+  elevado, pues indica que una serie ajusta los datos de la otra). Las
+  otras etapas añaden que ambas series son no estacionarias en media,
+  pero los residuos sí son estacionarios, es decir, que
+  $y_t-\widehat{cte}-\widehat{\beta_2} x_t$ (i.e. los residuos) es una
+  serie estacionaria en media.
+- En la regresión cointegrante, la interpretación de la constante es
+  que, en media, el tipo de interés =Tasa_Fumadores= es =-0,227230= puntos más
+  bajo que el =Tasa_Fumadores=. Si se fija en la primera gráfica con ambas series
+  se puede apreciar que en casi todo el periodo muestral =Tasa_Fumadores= (en
+  verde) se encuentra ligeramente por debajo de =Tasa_Fumadores= (en naranja). Es
+  decir, su interpretación *NO ES* que la media de =Tasa_Fumadores= sea negativa
+  (basta mirar el gráfico para constatar que su media no es negativa).
+#+END_QUOTE
+
+([[Pregunta 2]])
+
+** Respuesta 3
+
+Precisamente, ambas regresiones auxiliares son las que se han empleado
+en los respectivos contrastes ADF (en este caso incluyendo tres
+retardos) $$\nabla Y_{t} = \nu + \delta Y_{t-1} + \sum_{j=1}^3 \pi_j
+\nabla Y_{t-j} + U_t,$$ un $\delta=0$ implica, bajo la hipótesis de que
+la serie $Y_t$ es $I(1)$, que la primera diferencia es estacionaria en
+media, pues $$Y_{t}-Y_{t-1} = \nu + \underbrace{\sum_{j=1}^3 \pi_j
+\nabla Y_{t-j}}_{I(0)} + U_t.$$
+
+Bajo la hipótesis $H_0$ de que la serie $Y_t$ es $I(1)$, el ratio $t$
+correspondiente al parámetro $\delta$ no se distribuye como una
+/t/-student, por lo que el estadístico /t/ y el correspondiente
+p-valor mostrados en las regresiones auxiliares no son válidos. Por
+eso el contraste ADF emplea unos valores críticos distintos (en este
+ejemplo =-2.86=). Como los ratios /t/ (=-2,438= y =-2,440=) no superan
+el valor crítico, no se rechaza la hipótesis nula $\delta=0$, es
+decir, no se rechaza que las series sean $I(0)$ (nótese que la
+hipótesis alternativa es $\delta<0$, y que por tanto el contraste es
+de una sola cola: la cola izquierda; por tanto, para rechazar la
+hipótesis el ratio debería tomar valores a la izquierda de =-2.86=).
+
+([[Pregunta 3]])
+
+** Respuesta 4
+
+- [[Regresión de los tipos a 3 meses sobre los tipos a 6 meses]] :: Los
+  coeficientes estimados son muy significativos. El ajuste del modelo,
+  medido por el valor del \(R^2\) es muy elevado, pero los contrastes
+  rechazan las hipótesis habituales de distribución normal,
+  homocedasticidad y ausencia de autocorrelación en los residuos.
+
+- [[Regresión en primeras diferencias]] :: El único coeficiente
+  significativo es la pendiente (es decir, al diferenciar las series
+  NO desaparece la relación entre ellas; como cabe esperar entre
+  series cointegradas), y el ajuste del modelo, medido por el valor
+  del \(R^2\), es superior al 80%. Los contrastes residuales rechazan
+  las hipótesis habituales de distribución normal, homocedasticidad y
+  ausencia de autocorrelación en los residuos.
+
+#+BEGIN_QUOTE
+*Aclaraciones a algunas respuestas incorrectas en los exámenes*
+
+- Un coeficiente de determinación ($R^2$) muy elevado indica un buen
+  *ajuste* de los datos. Eso no significa una buena /explicación/ (no
+  confunda lo que es un /ajuste/ con lo que es una /explicación/... si
+  no lo entiende, repase el concepto de correlación espuria).
+- En un modelo con constante, el coeficiente de determinación ($R^2$)
+  indica el porcentaje de la varianza de los datos del regresando que
+  es replicada por los datos de los regresores (es una medida de
+  /ajuste de los datos/).
+- La lectura de los criterios de información o del coeficiente de
+  determinación /ajustado/ es diferente al del $R^2$. Dichos
+  estadísticos sirven para comparar modelos con el mismo
+  regresando. Por eso no tiene sentido comparar dichos estadísticos
+  para un modelo de =Tasa_Fumadores= y otro para su primera diferencia =d_Tasa_Fumadores=
+  (al ser regresandos distintos, no cabe la comparación). Fíjese que
+  en mi respuesta solo indico la magnitud del $R^2$ en cada modelo,
+  pero no los comparo entre si.
+
+  Los valores de los criterios de información no nos indican la
+  calidad del modelo; es la comparación de dichos valores entre
+  modelos distintos la que nos indica comparativamente determinadas
+  cualidades de dichos modelos.
+
+- Las hipótesis habituales y que se han contrastado como hipótesis
+  nulas ($H_0$) en las salidas de Gretl son:
+  1. *Distribución normal* (o gaussiana) de las perturbaciones
+  2. *Homocedasticidad* (que la varianza de las perturbaciones es
+     constante a lo largo de la muestra). Cuando las perturbaciones no
+     son homocedásticas se dice que son /heterocedásticas/. Por tanto
+     la $H_0$ es la /homocedasticidad/ (igual varianza) y NO la
+     /heterocedasticidad/.
+  3. */Ausencia/ de autocorrelación* en las perturbaciones (es decir
+     que no hay autocorrelación). Por tanto, rechazar esta $H_0$
+     significa que vamos a asumir que hay autocorrelación.
+- El teorema de Gauss-Markov NO exige la distribución normal... pero
+  SI exige homocedasticidad y ausencia de autocorrelación. Por tanto
+  las estimaciones de las dos regresiones NO son eficientes en el
+  sentido de Gauss-Markov (tampoco en el máximo-verosímil).
+#+END_QUOTE
+
+([[Pregunta 4]])
+
+
+#+BEGIN_QUOTE
+*Aclaraciones generales*
+
+- En un contraste de hipótesis NO se rechaza ni el test, ni el
+  contraste, ni el p-valor, etc. *Se rechaza una hipótesis nula*, y
+  cada contraste corresponde a una hipótesis particular. Por tanto,
+  siempre se debe enunciar en qué consiste la hipótesis en cuestión.
+  Limitarse a decir que se rechaza la hipótesis nula *no indica nada
+  si no se explicita cuál es la hipótesis*... del mismo modo que
+  tampoco estoy informando de nada a quien me pregunta por el destino
+  de mi último viaje si le contesto... "pues es donde estuve").
+
+
+- Hablar de la significatividad de un parámetro es un modo abreviado
+  de decir que se rechaza la hipótesis de que el parámetro sea
+  cero. Así que decir que un parámetro es no significativo es un modo
+  de decir /no rechazamos la hipótesis de que sea cero/.
+
+  La significatividad se refiere a un parámetro, hablar de la
+  significatividad de un /p/-valor NO TIENE NINGÚN SENTIDO (el
+  /p/-valor es una probabilidad y no un parámetro). Afirmar que los
+  datos son (estadísticamente) significativos tiene el mismo sentido
+  que decir que un atardecer es muy esdrújulo o un teorema muy
+  longevo.
+
+
+- La significación (o nivel de significación) $\alpha$ es una
+  probabilidad fijada a priori que sirve para estableces los valores
+  críticos de un contraste limitando la probabilidad de cometer el
+  error tipo I bajo la hipótesis nula del contraste. Decir que la
+  variable de un modelo tiene un alto nivel de significación NO TIENE
+  NINGÚN SENTIDO (pero decir que es estadísticamente significativa
+  SÍ).
+
+
+- Correlación (tiene que ver con los momentos de una variable) y
+  regresión (es un modelo) son conceptos muy
+  distintos. Consecuentemente también lo son autocorrelación (entre
+  variables) y la expresión AR(p) (que es una abreviatura de modelo
+  autorregresivo de orden $p$). Así pues, las variables pueden mostrar
+  autocorrelación (PERO NO AUTORREGRESIÓN), y se contrasta la ausencia
+  de autocorrelación (NO AUTORREGRESIÓN). En el correlograma, el
+  primer palote representa la magnitud de la autocorrelación de orden
+  1 (eso NO ES UN AR(1)... recuerde que un AR(1) es un modelo y el
+  palote representa el valor de un parámetro).
+
+
+- Un proceso estocástico cuyo modelo univariante posee un polinomio AR
+  (o polinomio autorregresivo) con raíces en el círculo unidad no es
+  estacionario. Pero un proceso no estacionario no tiene por que tener
+  un modelo con raíces autorregresivas en el círculo unidad (su modelo
+  puede no tener nada que ver con los modelos ARIMA). El curso solo ha
+  tratado con modelos univariantes ARIMA, pero dichos modelos no
+  cubren todos los posibles procesos estocásticos.
+
+
+- En las salidas de Gretl aparecen expresiones como =(1-L)=, en dichas
+  expresiones, =L= es el operador retardo (que en otros programas o
+  libros también se denota con =B=). Por tanto el símbolo =L= NADA
+  TIENE QUE VER CON LOS LOGARITMOS.
+
+
+
+
+#+END_QUOTE

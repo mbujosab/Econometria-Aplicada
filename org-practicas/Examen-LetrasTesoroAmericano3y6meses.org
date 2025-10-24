@@ -7,60 +7,85 @@
 #+OPTIONS: author:nil
 #+OPTIONS: date:nil
 
-#+INFOJS_OPT: view:overview
+#+include: 00preambulo_practicas.txt
 
+# +INFOJS_OPT: view:overview
 # ###########
 # ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
-
-# +SETUPFILE: simple_inlineUCM.theme  
-# +SETUPFILE: white_clean.theme  
 #+SETUPFILE: ../css/bigblow_inline.theme
-# +SETUPFILE: readtheorg_inline.theme
-# +SETUPFILE: darksun.theme
 # ###########
 
-#+LATEX_HEADER: \usepackage[spanish]{babel}
-#+LATEX_HEADER: \usepackage{fontspec}
-#+latex_class_options: [10pt]
 
-#+LATEX: \maketitle
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
 
-
-#+NAME: if-no-guiones-makedir
+#+NAME: if-no--guiones-makefir
 #+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
 (unless (file-directory-p "guiones")
   (make-directory "guiones"))
-#+END_SRC
+#+end_src
 
 #+NAME: tangle-all-code-blocks
 #+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
 (org-babel-tangle)
-#+END_SRC
-
-#+name: gretl
-#+BEGIN_SRC sh :exports none :results silent :tangle no
-rm -fr $(pwd)/LetrasTesoroAmericano3y6meses
-mkdir -p $(pwd)/LetrasTesoroAmericano3y6meses 
-DIRECTORIO="$(pwd)/LetrasTesoroAmericano3y6meses" gretlcli -b $(pwd)/guiones/LetrasTesoroAmericano3y6meses.inp 
-#+END_SRC
-# echo "$(pwd)/guiones/LetrasTesoroAmericano3y6meses" > directorioDeTrabajo
-# gretlcli -c -b $(pwd)/guiones/LetrasTesoroAmericano3y6meses.inp
-
-#+BEGIN_SRC sh  :exports none :results silent :tangle no :eval no
-zip LetrasTesoroAmericano3y6meses LetrasTesoroAmericano3y6meses* LetrasTesoroAmericano3y6meses/*
-#+END_SRC
-
-#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :exports none
-# Necesario para que gretl guarde los ficheros en el directorio de la práctica.
-# Si no funciona, comente la primera línea y descomente la segunda (asegurándose de que el directoro de trabajo de gretl es el correcto):
-
-string directory = getenv("DIRECTORIO")
-#string directory = $(pwd) ~ "/LetrasTesoroAmericano3y6meses" 
-set workdir "@directory"
- 
 #+end_src
 
-#+RESULTS:
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: Examen-LetrasTesoroAmericano3y6meses
+#+BEGIN_SRC sh :exports none :results silent :var practica="Examen-LetrasTesoroAmericano3y6meses"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+end_src
+
+
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+
+
+#+LATEX: \maketitle
 
 
 * Datos
@@ -73,13 +98,16 @@ applications/ ([[https://www.chicagobooth.edu/-/media/faculty/ruey-s-tsay/teachi
 - =TB6= :: 6-month Treasury Bill
 
 
-#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
-open ../datos/LetrasTesoroAmericano3y6meses.gdt
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+open ../../datos/LetrasTesoroAmericano3y6meses.gdt
 gnuplot TB3 TB6  --time-series --with-lines --output="TB3yTB6.png"
 #+end_src
 
-#+ATTR_LATEX: :width 0.35\textwidth :center
-[[./LetrasTesoroAmericano3y6meses/TB3yTB6.png]]
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.5\textwidth :center
+[[./Examen-LetrasTesoroAmericano3y6meses/TB3yTB6.png]]
+
+#+END_CENTER
 
 - Ficheros 
 # [[https://github.com/mbujosab/EconometriaAplicada-SRC/tree/main/Ejercicios]]
@@ -87,13 +115,13 @@ gnuplot TB3 TB6  --time-series --with-lines --output="TB3yTB6.png"
    - Datos: [[https://mbujosab.github.io/Econometria-Aplicada/datos/LetrasTesoroAmericano3y6meses.gdt]]
    - Guión de gretl: [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Practicas/guiones/lecc01-airlinePass.inp][LetrasTesoroAmericano3y6meses.inp]]
 
-
 # +latex: \newpage
 
 * Letras a tres meses
+
 ** Gráfico y correlograma de la serie temporal TB3
 
-#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 gnuplot TB3 --time-series --with-lines --output="TB3.png"
 corrgm TB3 --plot="TB3ACF-PACF.png"
 #+end_src
@@ -101,9 +129,9 @@ corrgm TB3 --plot="TB3ACF-PACF.png"
 
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width 0.5\textwidth :center 
-[[./LetrasTesoroAmericano3y6meses/TB3.png]]
+[[./Examen-LetrasTesoroAmericano3y6meses/TB3.png]]
 #+ATTR_LATEX: :width 0.4\textwidth :center
-[[./LetrasTesoroAmericano3y6meses/TB3ACF-PACF.png]] 
+[[./Examen-LetrasTesoroAmericano3y6meses/TB3ACF-PACF.png]] 
 #+END_CENTER
 
 ** Regresión auxiliar para TB3
@@ -115,19 +143,19 @@ siguiente hipótesis nula acerca del parámetro $\delta$:
 $\,H_0: \delta = 0$, frente a $H_1: \delta < 0$
 #+END_QUOTE
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 diff TB3
 RegresionAUX_TB3 <- ols d_TB3 0 TB3(-1) d_TB3(-1) d_TB3(-2) d_TB3(-3) 
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+BEGIN_SRC R :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet RegresionAUX_TB3.txt
     ols d_TB3 0 TB3(-1) d_TB3(-1) d_TB3(-2) d_TB3(-3) 
 end outfile
-#+END_SRC
+#+end_src
 
 #+latex: {\footnotesize
-#+include: ./LetrasTesoroAmericano3y6meses/RegresionAUX_TB3.txt example
+#+include: ./Examen-LetrasTesoroAmericano3y6meses/RegresionAUX_TB3.txt example
 #+latex: }
 
 *** Contraste de la hipótesis nula 
@@ -143,41 +171,41 @@ valor crítico del contraste para un nivel de significación del 5% es
 
 ** Contraste aumentado de Dickey Fuller sobre la existencia de una raíz unitaria para TB3
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 adf 3 TB3 --c
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+BEGIN_SRC R :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet adf_TB3.txt
     adf 3 TB3 --c
 end outfile
-#+END_SRC
+#+end_src
 
 #+latex: {\footnotesize
-#+include: ./LetrasTesoroAmericano3y6meses/adf_TB3.txt example
+#+include: ./Examen-LetrasTesoroAmericano3y6meses/adf_TB3.txt example
 #+latex: }
 
 ** Conteste KPSS de estacionariedad para TB3
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 kpss 3 TB3
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+BEGIN_SRC R :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet kpss_TB3.txt
     kpss 3 TB3
 end outfile
-#+END_SRC
+#+end_src
 
 #+latex: {\footnotesize
-#+include: ./LetrasTesoroAmericano3y6meses/kpss_TB3.txt example
+#+include: ./Examen-LetrasTesoroAmericano3y6meses/kpss_TB3.txt example
 #+latex: }
 
 
 * Letras a seis meses
 ** Gráfico y correlograma de la serie temporal TB6
 
-#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 gnuplot TB6 --time-series --with-lines --output="TB6.png"
 corrgm TB6 --plot="TB6ACF-PACF.png"
 #+end_src
@@ -185,9 +213,9 @@ corrgm TB6 --plot="TB6ACF-PACF.png"
 
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width 0.5\textwidth :center 
-[[./LetrasTesoroAmericano3y6meses/TB6.png]] 
+[[./Examen-LetrasTesoroAmericano3y6meses/TB6.png]] 
 #+ATTR_LATEX: :width 0.4\textwidth :center
-[[./LetrasTesoroAmericano3y6meses/TB6ACF-PACF.png]] 
+[[./Examen-LetrasTesoroAmericano3y6meses/TB6ACF-PACF.png]] 
 #+END_CENTER
 
 ** Regresión auxiliar para TB6
@@ -199,19 +227,19 @@ siguiente hipótesis nula acerca del parámetro $\delta$:
 $\,H_0: \delta = 0$, frente a $H_1: \delta < 0$
 #+END_QUOTE
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 diff TB6
 RegresionAUX_TB6 <- ols d_TB6 0 TB6(-1) d_TB6(-1) d_TB6(-2) d_TB6(-3) 
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+BEGIN_SRC R :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet RegresionAUX_TB6.txt
     ols d_TB6 0 TB6(-1) d_TB6(-1) d_TB6(-2) d_TB6(-3) 
 end outfile
-#+END_SRC
+#+end_src
 
 #+latex: {\footnotesize
-#+include: ./LetrasTesoroAmericano3y6meses/RegresionAUX_TB6.txt example
+#+include: ./Examen-LetrasTesoroAmericano3y6meses/RegresionAUX_TB6.txt example
 #+latex: }
 
 *** Contraste de la hipótesis nula 
@@ -227,61 +255,61 @@ valor crítico del contraste para un nivel de significación del 5% es
 
 ** Contraste aumentado de Dickey Fuller sobre la existencia de una raíz unitaria para TB6
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 adf 3 TB6 --c
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+BEGIN_SRC R :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet adf_TB6.txt
     adf 3 TB6 --c
 end outfile
-#+END_SRC
+#+end_src
 
 #+latex: {\footnotesize
-#+include: ./LetrasTesoroAmericano3y6meses/adf_TB6.txt example
+#+include: ./Examen-LetrasTesoroAmericano3y6meses/adf_TB6.txt example
 #+latex: }
 
 ** Conteste KPSS de estacionariedad para TB6
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 kpss 3 TB6
-#+END_SRC
+#+end_src
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+BEGIN_SRC R :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet kpss_TB6.txt
     kpss 3 TB6
 end outfile
-#+END_SRC
+#+end_src
 
 #+latex: {\footnotesize
-#+include: ./LetrasTesoroAmericano3y6meses/kpss_TB6.txt example
+#+include: ./Examen-LetrasTesoroAmericano3y6meses/kpss_TB6.txt example
 #+latex: }
 
 
 * Contraste de cointegración de Engle y Granger
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 coint 3 TB3 TB6
-#+END_SRC
+#+end_src
 
-#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet test_cointegracion.txt
     coint 3 TB3 TB6
 end outfile
 #+end_src
 
 #+latex: {\footnotesize
-#+include: ./LetrasTesoroAmericano3y6meses/test_cointegracion.txt example
+#+include: ./Examen-LetrasTesoroAmericano3y6meses/test_cointegracion.txt example
 #+latex: }
 
 
 * COMMENT Contraste de cointegración de Johansen                   :noexport:
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 johansen 3 TB3 TB6 --rc
-#+END_SRC
+#+end_src
 
-#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet test_cointegracion_Johansen.txt
     johansen 3 TB3 TB6 --rc
 end outfile
@@ -291,18 +319,18 @@ end outfile
 
 * Regresión de los tipos a 3 meses sobre los tipos a 6 meses
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 MCO3sobre6 <- ols TB3 0 TB6
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 1 --quiet
-#+END_SRC
+#+end_src
 
 # P-valor Durbin-Watson
 # scalar dwpval = $dwpval
 # print dwpval 
 
-#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet modeloMCO.txt
   ols TB3 0 TB6
   modtest --normality --quiet
@@ -312,21 +340,21 @@ end outfile
 #+end_src
 
 #+latex: {\footnotesize
-#+include: ./LetrasTesoroAmericano3y6meses/modeloMCO.txt example
+#+include: ./Examen-LetrasTesoroAmericano3y6meses/modeloMCO.txt example
 #+latex: }
 
 
 * Regresión en primeras diferencias
 
-#+BEGIN_SRC R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports code 
 diff TB3 TB6
 MCO3sobre6_en_Diff <- ols d_TB3 0 d_TB6
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 2 --quiet
-#+END_SRC
+#+end_src
 
-#+begin_src R :tangle guiones/LetrasTesoroAmericano3y6meses.inp :eval no :exports none
+#+begin_src gretl :tangle guiones/Examen-LetrasTesoroAmericano3y6meses.inp :eval no :exports none
 outfile --quiet modeloMCO_en_diff.txt
   ols d_TB3 0 d_TB6
   modtest --normality --quiet
@@ -337,7 +365,7 @@ end outfile
 #+end_src
 
 #+latex: {\footnotesize
-#+include: ./LetrasTesoroAmericano3y6meses/modeloMCO_en_diff.txt example
+#+include: ./Examen-LetrasTesoroAmericano3y6meses/modeloMCO_en_diff.txt example
 #+latex: }
 
 

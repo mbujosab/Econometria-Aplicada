@@ -1,7 +1,7 @@
 #    -*- mode: org -*-
 
 #+title:  Índice de precios de viviendas nuevas y de segunda mano
-# +author: Marcos Bujosa
+#+author: Marcos Bujosa
 #+LANGUAGE: es
 #+OPTIONS: toc:nil
 # +OPTIONS: author:nil
@@ -103,7 +103,7 @@ vivienda nueva y de segunda mano con base 2015. La muestra disponible
 incluye 64 observaciones trimestrales, comprendidas entre el primer
 trimestre de 2007 y el cuarto de 2022. *Fuente:* Instituto Nacional de
 Estadística.
-#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code :eval no
 open ../datos/IndicePreciosViviendasNuevasYdeSegundaMano.gdt
 #+end_src
 - =IPVN= :: Índice de precios de vivienda nueva, base 2015.
@@ -116,13 +116,13 @@ A partir de esta muestra, se calculan las tasas de variación anual:
 
 - Ficheros 
    - Versiones: [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-pdf/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.pdf][pdf]]; [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.html][html]].
-   - Datos: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/datos/SerieCuentasFinancierasBE.gdt][Examen-IndicePreciosViviendasNuevasYdeSegundaMano.gdt]]
+   - Datos: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/datos/SerieCuentasFinancierasBE.gdt][IndicePreciosViviendasNuevasYdeSegundaMano.gdt]]
    - Guión de gretl: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/Practicas-html/guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp][Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp]]
 
 
 * Gráfico de las tasas de variación los índices de precios
 
-#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code :eval no
 gnuplot T4IPVN T4IPV2M  --time-series --with-lines --output="TasasDeVariacionAnual.png"
 #+end_src
 
@@ -147,14 +147,14 @@ estiman:
 
 Se ajusta el siguiente modelo estacional para  =T4IPVN=:
 #+NAME: Modelo ARIMA_T4IPVN
-#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code :eval no
 ARIMA_T4IPVN <- arima 0 1 0 ; 0 0 1 ; T4IPVN --nc
 modtest --normality --quiet
 modtest --arch --quiet
 modtest --autocorr 15 --quiet
 #+end_src
 
-#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes :eval no
 outfile --quiet ARIMA_T4IPVN.txt
   <<Modelo ARIMA_T4IPVN>>
 end outfile
@@ -167,14 +167,14 @@ end outfile
 
 Se ajusta el siguiente modelo estacional para =T4IPV2M=:
 #+NAME: Modelo ARIMA_T4IPV2M
-#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code :eval no
 ARIMA_T4IPV2M <- arima 2 1 0 ; 0 0 1 ; T4IPV2M --nc
 modtest --normality --quiet
 modtest --arch --quiet
 modtest --autocorr 15 --quiet
 #+end_src
 
-#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes :eval no
 outfile --quiet ARIMA_T4IPV2M.txt
   <<Modelo ARIMA_T4IPV2M>>
 end outfile
@@ -189,14 +189,14 @@ Se ajusta el siguiente modelo autorregresivo para =T4IPVN=, con una
 constante y =T4IPV2M= como variables exógenas:
 
 #+NAME: Modelo ARMAX_T4IPVN
-#+BEGIN_SRC  R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code 
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code :eval no
 ARMAX_T4IPVN <- arima 1 0 0 ; T4IPVN T4IPV2M 0
 modtest --normality --quiet
 modtest --arch --quiet
 modtest --autocorr 15 --quiet
-#+END_SRC
+#+end_src
 
-#+begin_src R :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes :eval no
 outfile --quiet ARMAX_T4IPVN.txt
   <<Modelo ARMAX_T4IPVN>>
 end outfile

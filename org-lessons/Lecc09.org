@@ -1,3 +1,5 @@
+#    -*- mode: org -*-
+
 #+TITLE: Lección 9. Cointegración
 #+author: Marcos Bujosa
 #+LANGUAGE: es
@@ -29,14 +31,6 @@ Veremos casos de correlación espuria (correlación sin causalidad) y una introd
 #+END_ABSTRACT
 
 - ([[https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc09.slides.html][slides]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc09.html][html]]) --- ([[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc09.pdf][pdf]]) --- ([[https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc09.ipynb][mybinder]])
-
-***** COMMENT para Jupyter-Notebook                               :noexport:
-\(
-\newcommand{\lag}{\mathsf{B}}
-\newcommand{\Sec}[1]{\boldsymbol{#1}}
-\newcommand{\Pol}[1]{\boldsymbol{#1}}
-\)
-
 
 ***  Carga de algunos módulos de python y creación de directorios auxiliares
    :PROPERTIES:
@@ -71,26 +65,20 @@ import os
 os.makedirs(imagenes_leccion, exist_ok=True) # crea el directorio si no existe
 #+END_SRC
 
-************** COMMENT Codigo aux
+
+************** Codigo aux
    :PROPERTIES:
    :metadata: (slideshow . ((slide_type . skip)))
    :UNNUMBERED: t 
    :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-Con el siguiente código mejoro los gráficos y logro transformar las tablas con formato $\LaTeX{}$ en ficheros png.
+Con el siguiente código mejoramos los gráficos.
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+BEGIN_SRC jupyter-python :results none
 # definimos parámetros para mejorar los gráficos
 mpl.rc('text', usetex=True)
 mpl.rc('text.latex', preamble=r'\usepackage{amsmath}')
-# transformaré salidas en \LaTeX{} de statsmodels a ficheros png que incluiré en las transparencias
-import dataframe_image as dfi
-from sympy.printing.preview import preview
-def repr_png(tex, ImgFile):
-    preamble = "\\documentclass[preview]{standalone}\n" \
-        "\\usepackage{booktabs,amsmath,amsfonts}\\begin{document}"    
-    preview(tex, filename=ImgFile, viewer='file', preamble=preamble, dvioptions=['-D','250'])
 #+END_SRC
 
 
@@ -238,10 +226,13 @@ Como ambas series presentan una tendencia creciente,
 
 
 *** Regresión en niveles
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . subslide)))
+   :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+NAME: Ajuste-MCO-GNP-melanoma
-#+begin_src jupyter-python  :results none
+#+begin_src jupyter-python  :results silent
 import statsmodels.api as sm
 # Definir variables independientes y dependientes
 y = df1['GNP']
@@ -269,32 +260,6 @@ La regresión del PNB sobre los casos de melanoma arroja un excelente ajuste
 
 *Pero esto no significa que el modelo sea bueno o tenga alguna capacidad explicativa o predictiva* 
 (/los casos de melanoma en Connecticut no aumentan la producción de EEUU/).
-
-**************  Codigo aux                                       :noexport:
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-~El objetivo de los siguientes bloques de código es mostrar en el texto los resultados de las estimaciones con un formato más agradable.~
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+NAME: Coef-correlacionGNPmelanoma
-#+BEGIN_SRC jupyter-python :results value  :results silent
-round(correlation,3)
-#+END_SRC
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+name: CoefCorrelacionGNPmelanoma
-#+BEGIN_SRC latex :noweb strip-export :exports result :results drawer
-- Valor del coeficiente de correlación: ~<<Coef-correlacionGNPmelanoma()>>~
-#+END_SRC
-
-
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-Generamos un fichero =png= con los resultados de la estimación MCO para que se vea bien en las transparencias.
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python file :file ./img/lecc09/resultsModel1.png  :results file none
-repr_png(results.summary(slim=True).as_latex(),  "./img/lecc09/resultsModel1.png") # pero emplearé esta para importar los resultados como imagen png en el material de clase
-#+END_SRC
 
 
 ** Explorando si la correlación es probablemente /espuria/ (no causalidad)
@@ -392,19 +357,6 @@ summary_diff = results_diff.summary(slim=True)
 [[./img/lecc09/resultsModel2.png]]
 
 *Todo confirma que la relación es (evidentemente) espuria*
-
-**************  Codigo aux                                       :noexport:
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-~El objetivo de los siguientes bloques de código es mostrar en el texto los resultados de las estimaciones con un formato más agradable.~
-
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-Generamos un fichero =png= con los resultados de la estimación MCO para que se vea bien en las transparencias.
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python file :file ./img/lecc09/resultsModel2.png :results file none
-repr_png(results_diff.summary(slim=True).as_latex(),  "./img/lecc09/resultsModel2.png") 
-#+END_SRC
-
 
 
 * Cointegración 
@@ -712,7 +664,7 @@ kpss_stat, kpss_p_value = kpss_result[0], kpss_result[1]
 
 #+RESULTS:
 :RESULTS:
-: /tmp/ipykernel_29100/3823668820.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
+: /tmp/ipykernel_76305/3823668820.py:2: InterpolationWarning: The test statistic is outside of the range of p-values available in the
 : look-up table. The actual p-value is greater than the p-value returned.
 : 
 :   kpss_result = kpss(residuos, regression='c')
@@ -784,10 +736,60 @@ sugieren que los cambios en los tipos de interés a corto y largo plazo pueden e
 \end{itemize}
 #+END_EXPORT
 
-**************  Codigo aux                                       :noexport:
+
+* Codigo aux
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
+
+**************  Codigo aux
+   :PROPERTIES:
+   :metadata: (slideshow . ((slide_type . skip)))
+   :END:
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 ~El objetivo de los siguientes bloques de código es mostrar en el texto los resultados de las estimaciones con un formato más agradable.~
+
+# transformar las tablas con formato $\LaTeX{}$ en ficheros png
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :results none
+# transformaré salidas en \LaTeX{} de statsmodels a ficheros png para incluirlas en las transparencias
+import dataframe_image as dfi
+from sympy.printing.preview import preview
+def repr_png(tex, ImgFile):
+    preamble = "\\documentclass[preview]{standalone}\n" \
+        "\\usepackage{booktabs,amsmath,amsfonts}\\begin{document}"    
+    preview(tex, filename=ImgFile, viewer='file', preamble=preamble, dvioptions=['-D','250'])
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+NAME: Coef-correlacionGNPmelanoma
+#+BEGIN_SRC jupyter-python :results value  :results silent
+round(correlation,3)
+#+END_SRC
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+name: CoefCorrelacionGNPmelanoma
+#+BEGIN_SRC latex :noweb strip-export :exports result :results drawer
+- Valor del coeficiente de correlación: ~<<Coef-correlacionGNPmelanoma()>>~
+#+END_SRC
+
+#+RESULTS: CoefCorrelacionGNPmelanoma
+:results:
+- Valor del coeficiente de correlación: ~0.932~
+:end:
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :file ./img/lecc09/resultsModel1.png :results silent :exports code
+repr_png(results.summary(slim=True).as_latex(),  "./img/lecc09/resultsModel1.png")
+#+END_SRC
+
+
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+BEGIN_SRC jupyter-python :file ./img/lecc09/resultsModel2.png :results silent :exports code
+repr_png(results_diff.summary(slim=True).as_latex(),  "./img/lecc09/resultsModel2.png") 
+#+END_SRC
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
 #+NAME: Coef-correlationUKinterestRates
@@ -801,23 +803,15 @@ round(correlationUKinterestRates,3)
 - Valor del coeficiente de correlación: ~<<Coef-correlationUKinterestRates()>>~
 #+END_SRC
 
-
-
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-Generamos un fichero =png= con los resultados de la estimación MCO para las series en diferencias
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python file :file ./img/lecc09/resultsModel3.png  :results file silent
-repr_png(results_model_UK_diff.summary(slim=True).as_latex(),  "./img/lecc09/resultsModel3.png") # pero emplearé esta para importar los resultados como imagen png en el material de clase
+#+BEGIN_SRC jupyter-python :file ./img/lecc09/resultsModel3.png :results silent :exports code
+repr_png(results_model_UK_diff.summary(slim=True).as_latex(),  "./img/lecc09/resultsModel3.png")
 #+END_SRC
 
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-Y otro con los resultados de la estimación MCO para las series en niveles
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
-#+BEGIN_SRC jupyter-python file :file ./img/lecc09/resultsModel4.png  :results file silent
-repr_png(results_model_UK.summary(slim=True).as_latex(),  "./img/lecc09/resultsModel4.png") # pero emplearé esta para importar los resultados como imagen png en el material de clase
+#+BEGIN_SRC jupyter-python :file ./img/lecc09/resultsModel4.png :results silent :exports code
+repr_png(results_model_UK.summary(slim=True).as_latex(),  "./img/lecc09/resultsModel4.png") 
 #+END_SRC
-
-
 
 
 * COMMENT ipynb y slides                                           :noexport:
