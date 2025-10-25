@@ -1,0 +1,112 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../../datos/UK_Interest_rates.csv
+setobs 4 1952:2
+setinfo Short --description="US Short"
+setinfo Long --description="Incidencia de melanoma en la población masculina de Connecticut"
+
+corr Short Long
+
+adf 4 Long --c
+
+outfile --quiet adf_Long.txt
+    adf 4 Long --c
+end outfile
+
+outfile --quiet adf_Long_pvalue.txt
+    printf "p-valor del contraste: =%.3f=\n", $pvalue
+end outfile
+
+adf 4 Short --c
+
+outfile --quiet adf_Short.txt
+    adf 4 Short --c
+end outfile
+
+outfile --quiet adf_Short_pvalue.txt
+    printf "p-valor del contraste: =%.3f=\n", $pvalue
+end outfile
+
+kpss 4 Long
+
+outfile --quiet kpss_Long.txt
+    kpss 4 Long
+end outfile
+
+kpss 4 Short
+
+outfile --quiet kpss_Short.txt
+    kpss 4 Short
+end outfile
+
+corrgm Long 14 --plot="LongACF-PACF.png"
+corr Long Long(-1)
+
+outfile --quiet rho1_Long.txt
+    corr Long Long(-1)
+end outfile
+
+corrgm Short 14 --plot="ShortACF-PACF.png"
+corr Short Short(-1)
+
+outfile --quiet rho1_Short.txt
+    corr Short Short(-1)
+end outfile
+
+arima 3 0 0 ; Long
+
+outfile --quiet modeloARLong.txt
+  arima 3 0 0 ; Long
+end outfile
+
+arima 3 0 0 ; Short
+
+outfile --quiet modeloARShort.txt
+  arima 3 0 0 ; Short
+end outfile
+
+adf 4 residuos --nc
+
+outfile --quiet adf_residuos.txt
+    adf 4 residuos --nc
+end outfile
+
+outfile --quiet adf_residuos_pvalue.txt
+    printf "p-valor del contraste: =%.3f=\n", $pvalue
+end outfile
+
+kpss 4 residuos
+
+outfile --quiet kpss_residuos.txt
+    kpss 4 residuos
+end outfile
+
+corrgm residuos 14 --plot="residuosACF-PACF.png"
+corr residuos residuos(-1)
+
+corrgm residuos 14 --plot="residuosACF-PACF.png"
+
+outfile --quiet rho1_residuos.txt
+    corr residuos residuos(-1)
+end outfile
+
+arima 3 0 0 ; residuos
+
+outfile --quiet modeloARresiduos.txt
+  arima 3 0 0 ; residuos
+end outfile
+
+coint 4 Short Long
+
+outfile --quiet test_cointegracion.txt
+    coint 4 Short Long
+end outfile

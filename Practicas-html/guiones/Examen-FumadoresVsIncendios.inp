@@ -1,0 +1,78 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../datos/FumadoresVsIncendios.gdt
+gnuplot Tasa_Fumadores Tasa_Incendios --time-series --with-lines --output="Tasa_FumadoresyTasa_Incendios.png"
+gnuplot Tasa_Incendios Tasa_Fumadores --output="Tasa_IncendiosVsTasa_Fumadores.png"
+
+adf 4 Tasa_Fumadores --c --test-down
+
+outfile --quiet adf_Tasa_Fumadores.txt
+    adf 4 Tasa_Fumadores --c --test-down
+end outfile
+
+kpss 4 Tasa_Fumadores
+
+outfile --quiet kpss_Tasa_Fumadores.txt
+    kpss 4 Tasa_Fumadores
+end outfile
+
+adf 4 Tasa_Incendios --c --test-down
+
+outfile --quiet adf_Tasa_Incendios.txt
+    adf 4 Tasa_Incendios --c --test-down
+end outfile
+
+kpss 4 Tasa_Incendios
+
+outfile --quiet kpss_Tasa_Incendios.txt
+    kpss 4 Tasa_Incendios
+end outfile
+
+MCOIncendiosSobreFumadores <- ols Tasa_Incendios 0 Tasa_Fumadores
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 4 --quiet
+
+outfile --quiet modeloMCO.txt
+  ols Tasa_Incendios 0 Tasa_Fumadores
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 4 --quiet
+  #series uhat = MCOIncendiosSobreFumadores.$uhat
+end outfile
+
+diff Tasa_Incendios Tasa_Fumadores
+MCOIncendiosSobreFumadores_en_Diff <- ols d_Tasa_Incendios 0 d_Tasa_Fumadores
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 4 --quiet
+
+outfile --quiet modeloMCO_en_diff.txt
+  ols d_Tasa_Incendios 0 d_Tasa_Fumadores
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 4 --quiet
+end outfile
+
+series uhat = MCOIncendiosSobreFumadores.$uhat
+adf 4 uhat --c --test-down
+
+outfile --quiet adf_uhat.txt
+    series uhat = MCOIncendiosSobreFumadores.$uhat
+    adf 4 uhat --c --test-down
+end outfile
+
+kpss 4 uhat
+
+outfile --quiet kpss_uhat.txt
+    kpss 4 uhat
+end outfile

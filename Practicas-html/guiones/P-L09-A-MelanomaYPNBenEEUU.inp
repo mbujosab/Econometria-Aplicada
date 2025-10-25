@@ -1,0 +1,37 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../../datos/GNPvsMelanoma.csv
+setobs 1 1936
+setinfo GNP --description="US GNP"
+setinfo Melanoma --description="Incidencia de melanoma en la población masculina de Connecticut"
+
+ GraficoSeriesEnNiveles <- gnuplot GNP Melanoma --time-series --with-lines   --output="GNPyMelanoma.png"
+
+DiagramDispersion <- gnuplot GNP Melanoma --fit=none --output="ScatterPlotGNPyMelanoma.png"
+
+corr GNP Melanoma
+
+AjusteEnNiveles <- ols GNP 0 Melanoma
+
+outfile --quiet RegresionNiveles.txt
+    AjusteEnNiveles <- ols GNP 0 Melanoma
+end outfile
+
+diff GNP Melanoma
+GraficoSeriesEnDiferencias <- gnuplot d_GNP d_Melanoma --time-series --with-lines
+corr d_GNP d_Melanoma
+
+AjusteEnPrimerasDiferencias <- ols d_GNP 0 d_Melanoma
+
+outfile --quiet RegresionPrimerasDiferencias.txt
+    AjusteEnPrimerasDiferencias <- ols d_GNP 0 d_Melanoma
+end outfile
