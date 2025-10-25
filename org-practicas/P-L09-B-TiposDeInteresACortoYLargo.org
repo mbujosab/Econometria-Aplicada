@@ -1,4 +1,4 @@
-#    -*- mode: org -*-o
+#    -*- mode: org -*-
 
 #+Title: Lección 9.B --- Tipos de interés a corto y largo plazo
 #+author: Marcos Bujosa
@@ -119,7 +119,7 @@ setobs 4 1952:2
 setinfo Short --description="US Short"
 setinfo Long --description="Incidencia de melanoma en la población masculina de Connecticut"
 #+end_src
-donde =RutaAlDirectorioDelFichero= es la ruta al directorio donde guardó el fichero =UK_Interest_rates.csv=
+donde =RutaAlDirectorioDelFichero= es la ruta al directorio donde guardó el fichero =GNPvsMelanoma.csv=
 #+latex: }
 
 #+NAME: Lectura del fichero de datos
@@ -130,7 +130,6 @@ setinfo Short --description="US Short"
 setinfo Long --description="Incidencia de melanoma en la población masculina de Connecticut"
 #+end_src
     
-
 * Actividad 1 - Dibujar ambas series en un mismo gráfico
 
 Marque las series =Short= y =Long=. 
@@ -138,25 +137,25 @@ Pulse sobre ellas con el botón derecho del ratón.
 En el menú desplegable seleccione */~Gráfico de Series Temporales~/* 
 (indique representar en un único gráfico).
 
+Guarde el gráfico en la sesión como un icono.
 #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
-/o bien teclee en linea de comandos/:
-#+NAME: Guardamos scatterplot como icono
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
+ /o bien teclee en linea de comandos/:
+ #+NAME: Guardamos scatterplot como icono
+ #+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 GraficoSeriesEnNiveles <- gnuplot Short Long --time-series --with-lines   --output="ShortyLong.png"
-#+end_src
+ #+end_src
 #+latex: }
 
 #+BEGIN_CENTER
 #+attr_org: :width 500
 #+attr_hmlt: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
-[[./P-L09-B-TiposDeInteresACortoYLargo/ShortyLong.png]]
+[[./P-L09-B-TiposDeInteresACortoYLargo/GNPyMelanoma.png]]
 #+END_CENTER
 
 1) ¿Tienen tendencia estas series temporales?
 2) ¿Hay una tendencia común a ambas series?
 3) ¿lo podemos saber con seguridad solo mirando el gráfico?
-
 
 * Actividad 2 - Dibujar el diagrama de dispersión y calcular la correlación
 
@@ -169,18 +168,19 @@ Guarde el gráfico en la sesión como un icono.
 
 #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
 /o bien teclee en linea de comandos/:
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
+    #+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 DiagramDispersion <- gnuplot Short Long --fit=none --output="ScatterPlotShortyLong.png"
-#+end_src
-#+latex: }
+    #+end_src
+      #+latex: }
 
 #+BEGIN_CENTER
 #+attr_org: :width 500
 #+attr_hmlt: :width 500
 #+ATTR_LATEX: :width 0.45\textwidth :center t
-[[./P-L09-B-TiposDeInteresACortoYLargo/ScatterPlotShortyLong.png]]
+[[./P-L09-B-TiposDeInteresACortoYLargo/ScatterPlotGNPyMelanoma.png]]
 #+END_CENTER
       
+
 ** Calcular la correlación entre ambas series
 
 Marque las series =Short= y =Long=. 
@@ -189,10 +189,10 @@ En el menú desplegable seleccione */~Matriz de correlación~/*
 
 #+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
 /o bien teclee en linea de comandos/:
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
+    #+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 corr Short Long
-#+end_src
-#+latex: }
+    #+end_src
+      #+latex: }
 
 - ¿Qué correlación hay? ¿Es elevada?
 - ¿Significa que una de las variables influye en la otra?
@@ -236,25 +236,18 @@ corr Short Long
 #+ATTR_LATEX: :width 0.45\textwidth :center t
 [[./P-L09-B-TiposDeInteresACortoYLargo/d_Shortyd_Long.png]]
 #+END_CENTER
-      
+
+
 ** Regresión en primeras diferencias
 
 Estime el modelo mediante los menús desplegables: */~Modelo -> Mínimos Cuadrados Ordinarios~/*; 
 indique a [[https://gretl.sourceforge.net/es.html][Gretl]] el regresando y regresor y pulse */~Aceptar~/*.
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-/o bien teclee en linea de comandos/:
-#+name: Ajuste en primeras diferencias
-#+begin_src gretl :eval no
-AjusteEnPrimerasDiferencias <- ols d_Short 0 d_Long
-#+end_src
-#+latex: }
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
-outfile --quiet RegresionPrimerasDiferencias.txt
-    AjusteEnPrimerasDiferencias <- ols d_Short 0 d_Long
-end outfile
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
+AjusteEnPrimerasDiferencias <- ols d_Short 0 d_Long
 #+end_src
 #+latex: }
 
@@ -264,11 +257,9 @@ outfile --quiet RegresionPrimerasDiferencias.txt
 end outfile
 #+END_SRC
 
-
-#+latex: {\footnotesize [[P-L09-B-TiposDeInteresACortoYLargo.org]] 
+#+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/RegresionPrimerasDiferencias.txt example
 #+latex: }
-
 
 Ocurre justo lo esperado si hay una relación de tipo  
 $$\boldsymbol{y}=\beta_1 \boldsymbol{1} + \beta_2 \boldsymbol{x} + \boldsymbol{u}$$
@@ -276,7 +267,6 @@ $$\boldsymbol{y}=\beta_1 \boldsymbol{1} + \beta_2 \boldsymbol{x} + \boldsymbol{u
 Al tomar diferencias el único parámetro significativo es la pendiente. 
 La constante ya no es significativa y el R cuadrado del ajuste no es despreciable. 
 De hecho, el modelo reproduce más del 20% de la varianza del regresando.
-
 
 * Actividad 5 - Ajuste los tipos corto plazo en función de los tipos a largo
 
@@ -290,20 +280,10 @@ debemos analizar los residuos de la regresión de =Short= sobre
    - ¿Reproduce el modelo parte de la varianza de =Short=?
 3) Dibuje los residuos de la regresión. ¿Parecen ``estacionarios en media''? dicho de otra forma ¿muestran alguna tendencia?
 
-Realice los pasos con la interfaz gráfica y los menús desplegables,
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 /o bien teclee en linea de comandos/:
-#+name: Ajuste en niveles
-#+begin_src gretl :eval no
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 AjusteEnNiveles <- ols Short 0 Long
-#+end_src
-#+latex: }
-
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
-outfile --quiet RegresionNiveles.txt
-    AjusteEnNiveles <- ols Short 0 Long
-end outfile
 #+end_src
 #+latex: }
 
@@ -313,13 +293,13 @@ outfile --quiet RegresionNiveles.txt
 end outfile
 #+END_SRC
 
-
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/RegresionNiveles.txt example
 #+latex: }
 
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no
+/o bien teclee en linea de comandos/:
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 residuos = $uhat
 GraficoResiduos <- gnuplot residuos --time-series --with-lines --output="GraficoResiduos.png"
 #+end_src
@@ -354,21 +334,23 @@ en este caso, y dado que la pendiente estimada es prácticamente $1$,  dicha com
 * Actividad 5 - Análisis sobre el orden de integración
 
 ** Realice las verificaciones para decidir que las series de tipos son $I(1)$
+
 *** Análisis gráfico
 
 Ya vimos que los gráficos de ambas series muestran una clara tendencia creciente.
 
 *** Contraste de Dickey-Fuller 
+
 **** para los tipos a largo plazo
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 adf 4 Long --c
 #+end_src
 #+latex: }
-  
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet adf_Long.txt
     adf 4 Long --c
 end outfile
@@ -376,13 +358,12 @@ end outfile
 outfile --quiet adf_Long_pvalue.txt
     printf "p-valor del contraste: =%.3f=\n", $pvalue
 end outfile
-#+end_src
-#+latex: }
-  
+#+END_SRC
+
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/adf_Long.txt example
 #+latex: }
-  
+
 #+NAME: leer-valor
 #+BEGIN_SRC sh :var file="./P-L09-B-TiposDeInteresACortoYLargo/adf_Long_pvalue.txt" :exports results :results output verbatim drawer
 cat $file
@@ -396,15 +377,15 @@ p-valor del contraste: =0,940=
 Así que no rechazamos la $H_0:$ /la serie es una realización de un proceso $I(1)$/ para =Long=.
   
 **** Para los tipos a corto plazo
-  
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 adf 4 Short --c
 #+end_src
 #+latex: }
-  
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet adf_Short.txt
     adf 4 Short --c
 end outfile
@@ -412,8 +393,7 @@ end outfile
 outfile --quiet adf_Short_pvalue.txt
     printf "p-valor del contraste: =%.3f=\n", $pvalue
 end outfile
-#+end_src
-#+latex: }
+#+END_SRC
 
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/adf_Short.txt example
@@ -428,23 +408,22 @@ p-valor del contraste: =0,594=
 
 Así que tampoco rechazamos la $H_0:$ /la serie es una realización de un proceso $I(1)$/ para =Short=.
 
+
 *** Contraste KPSS
+
 **** para los tipos a largo plazo
 
-
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 kpss 4 Long
 #+end_src
 #+latex: }
-  
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet kpss_Long.txt
     kpss 4 Long
 end outfile
-#+end_src
-#+latex: }
+#+END_SRC
 
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/kpss_Long.txt example
@@ -454,19 +433,17 @@ El p-valor es inferior al 1%, así que rechazamos la $H_0:$ /la serie es una rea
 
 **** para los tipos a corto plazo
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 kpss 4 Short
 #+end_src
 #+latex: }
-  
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet kpss_Short.txt
     kpss 4 Short
 end outfile
-#+end_src
-#+latex: }
+#+END_SRC
 
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/kpss_Short.txt example
@@ -478,8 +455,8 @@ El p-valor es inferior al 1%, así que rechazamos la $H_0:$ /la serie es una rea
 
 **** para los tipos a largo plazo
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 corrgm Long 14 --plot="LongACF-PACF.png"
 corr Long Long(-1)
 #+end_src
@@ -492,11 +469,8 @@ corr Long Long(-1)
 [[file:P-L09-B-TiposDeInteresACortoYLargo/LongACF-PACF.png]]
 #+END_CENTER
 
-
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
-corrgm Long 14 --plot="LongACF-PACF.png"
-
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 outfile --quiet rho1_Long.txt
     corr Long Long(-1)
 end outfile
@@ -510,10 +484,11 @@ end outfile
 
 La ACF decae de manera aparentemente lineal y el coeficiente de correlación de orden 1 es casi uno.
 
+
 **** para los tipos a corto plazo
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 corrgm Short 14 --plot="ShortACF-PACF.png"
 corr Short Short(-1)
 #+end_src
@@ -526,11 +501,8 @@ corr Short Short(-1)
 [[file:P-L09-B-TiposDeInteresACortoYLargo/ShortACF-PACF.png]]
 #+END_CENTER
 
-
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
-corrgm Short 14 --plot="ShortACF-PACF.png"
-
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 outfile --quiet rho1_Short.txt
     corr Short Short(-1)
 end outfile
@@ -545,21 +517,20 @@ end outfile
 La ACF decae de manera aparentemente lineal y el coeficiente de correlación de orden 1 es mayor que =0.9=.
 
 *** Análisis de la magnitud de raíces AR
+
 **** para los tipos a largo plazo
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 arima 3 0 0 ; Long
 #+end_src
 #+latex: }
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet modeloARLong.txt
   arima 3 0 0 ; Long
 end outfile
-#+end_src
-#+latex: }
+#+END_SRC
 
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/modeloARLong.txt example
@@ -569,19 +540,17 @@ El ajuste de un polinomio autorregresivo arroja una raíz de módulo casi =1=,
 
 **** para los tipos a largo plazo
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 arima 3 0 0 ; Short
 #+end_src
 #+latex: }
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet modeloARShort.txt
   arima 3 0 0 ; Short
 end outfile
-#+end_src
-#+latex: }
+#+END_SRC
 
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/modeloARShort.txt example
@@ -595,6 +564,7 @@ Todas las verificaciones apuntan a que las series de tipos a corto y largo plazo
 
 
 ** Realice las verificaciones para decidir que los residuos  son $I(0)$
+
 *** Análisis gráfico
 
 Ya vimos que el gráfico de los residuos no muestra una tendencia clara.
@@ -602,14 +572,14 @@ Ya vimos que el gráfico de los residuos no muestra una tendencia clara.
 *** Contraste de Dickey-Fuller 
 
 Indique que no hay constante (los residuos proceden de una regresión con constante, por lo que su media es cero).
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 adf 4 residuos --nc
 #+end_src
 #+latex: }
-  
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet adf_residuos.txt
     adf 4 residuos --nc
 end outfile
@@ -617,9 +587,9 @@ end outfile
 outfile --quiet adf_residuos_pvalue.txt
     printf "p-valor del contraste: =%.3f=\n", $pvalue
 end outfile
-#+end_src
-#+latex: }
-  
+#+END_SRC
+
+
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/adf_residuos.txt example
 #+latex: }
@@ -637,19 +607,17 @@ Se rechaza la $H_0:$ /la serie es una realización de un proceso $I(1)$/ a un ni
 
 *** Contraste KPSS  
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 kpss 4 residuos
 #+end_src
 #+latex: }
-  
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet kpss_residuos.txt
     kpss 4 residuos
 end outfile
-#+end_src
-#+latex: }
+#+END_SRC
 
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/kpss_residuos.txt example
@@ -659,12 +627,13 @@ El p-valor es superior al 10%, así que NO rechazamos la $H_0:$ /la serie es una
 
 *** Correlogramas, $\rho_1$
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 corrgm residuos 14 --plot="residuosACF-PACF.png"
 corr residuos residuos(-1)
 #+end_src
 #+latex: }
+
 
 #+BEGIN_CENTER
 #+attr_org: :width 500
@@ -674,15 +643,14 @@ corr residuos residuos(-1)
 #+END_CENTER
 
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 corrgm residuos 14 --plot="residuosACF-PACF.png"
 
 outfile --quiet rho1_residuos.txt
     corr residuos residuos(-1)
 end outfile
-#+end_src
-#+latex: }
+#+END_SRC
+
 
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/rho1_residuos.txt example
@@ -692,23 +660,23 @@ La ACF decae de manera exponencial y rápidamente y el coeficiente de correlaci�
 
 *** Análisis de la magnitud de raíces AR
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :eval no 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 arima 3 0 0 ; residuos
 #+end_src
 #+latex: }
 
-#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet modeloARresiduos.txt
   arima 3 0 0 ; residuos
 end outfile
-#+end_src
-#+latex: }
+#+END_SRC
 
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/modeloARresiduos.txt example
 #+latex: }
+
+El ajuste de un polinomio autorregresivo arroja una raíz de módulo casi =1=,
 
 El ajuste de un polinomio autorregresivo arroja raíces con módulos claramente mayores a =1=.
 
@@ -734,18 +702,16 @@ El contraste de cointegración de Engle y Granger
 */~Modelo --> Series temporales multivariantes --> Contraste de cointegracion (Engle-Granger)~/* y en la ventana emergente marque =Long= y =Short=. Pulse en la flecha verde para emplear ambas series. Luego pulse en */~Aceptar~/*. 
 
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-/o bien teclee en linea de comandos/:
-#+NAME: Contraste de cointegración
-#+begin_src gretl :eval no 
+#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no 
 coint 4 Short Long
-#+END_SRC
+#+end_src
+#+latex: }
 
-#+begin_src gretl :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :eval no :exports none
+#+BEGIN_SRC R :tangle ./guiones/P-L09-B-TiposDeInteresACortoYLargo.inp :results none :eval no
 outfile --quiet test_cointegracion.txt
     coint 4 Short Long
 end outfile
-#+end_src
-#+latex: }
+#+END_SRC
 
 #+latex: {\footnotesize
 #+include: ./P-L09-B-TiposDeInteresACortoYLargo/test_cointegracion.txt example
