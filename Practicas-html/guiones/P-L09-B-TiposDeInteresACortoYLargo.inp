@@ -14,7 +14,31 @@ setobs 4 1952:2
 setinfo Short --description="US Short"
 setinfo Long --description="Incidencia de melanoma en la población masculina de Connecticut"
 
+gnuplot Short Long --time-series --with-lines   --output="ShortyLong.png"
+
+gnuplot Short Long --fit=none --output="ScatterPlotShortyLong.png"
+
 corr Short Long
+
+diff Short Long
+gnuplot d_Short d_Long --time-series --with-lines --output="d_Shortyd_Long.png"
+corr d_Short d_Long
+corr Short Long
+
+ols d_Short 0 d_Long
+
+outfile --quiet RegresionPrimerasDiferencias.txt
+    ols d_Short 0 d_Long
+end outfile
+
+ols Short 0 Long
+
+outfile --quiet RegresionNiveles.txt
+    ols Short 0 Long
+end outfile
+
+residuos = $uhat
+gnuplot residuos --time-series --with-lines --output="GraficoResiduos.png"
 
 adf 4 Long --c
 

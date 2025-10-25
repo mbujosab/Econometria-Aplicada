@@ -1,0 +1,72 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open bjg
+
+gnuplot lg --time-series --with-lines  --output="log_AP.png"
+
+arima 0 1 0 ; 0 1 0 ; lg
+
+outfile --quiet Modelo0.txt
+  arima 0 1 0 ; 0 1 0 ; lg
+end outfile
+
+residuosModelo0 = $uhat
+corrgm residuosModelo0 36 --plot="residuosModelo0-ACF-PACF.png"
+
+outfile --quiet CorrelogramaModelo0.txt
+  corrgm residuosModelo0 36 --quiet
+end outfile
+
+arima 0 1 0 ; 0 1 1 ; lg
+
+outfile --quiet Modelo1.txt
+  arima 0 1 0 ; 0 1 1 ; lg
+end outfile
+
+residuosModelo1 = $uhat
+corrgm residuosModelo1 36 --plot="residuosModelo1-ACF-PACF.png"
+
+outfile --quiet CorrelogramaModelo1.txt
+  corrgm residuosModelo1 36 --quiet
+end outfile
+
+arima 1 1 0 ; 0 1 1 ; lg
+
+outfile --quiet Modelo2.txt
+  arima 1 1 0 ; 0 1 1 ; lg
+end outfile
+
+residuosModelo2 = $uhat
+corrgm residuosModelo2 12 --plot="residuosModelo2-ACF-PACF.png"
+
+outfile --quiet CorrelogramaModelo2.txt
+  corrgm residuosModelo2 12 --quiet
+end outfile
+
+arima 0 1 1 ; 0 1 1 ; lg
+
+outfile --quiet Modelo3.txt
+  arima 0 1 1 ; 0 1 1 ; lg
+end outfile
+
+residuosModelo3 = $uhat
+corrgm residuosModelo3 12 --plot="residuosModelo3-ACF-PACF.png"
+
+outfile --quiet CorrelogramaModelo3.txt
+  corrgm residuosModelo3 12 --quiet
+end outfile
+
+smpl 1949:01 1959:12
+arima 0 1 1 ; 0 1 1 ; lg --nc
+
+dataset addobs 12
+fcast 1959:01 1960:12 --plot="prediccion1960.png"
