@@ -1,0 +1,366 @@
+#    -*- mode: org -*-
+
+#+Title: Lección 8.A --- Número de viajeros internacionales
+#+author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+# +OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+#+INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: P-L08-A-airlinePass
+#+BEGIN_SRC sh  :exports none  :results silent :var practica="P-L08-A-airlinePass"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+#+begin_src gretl :tangle guiones/P-L08-A-airlinePass.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+
+#+LATEX: \maketitle
+
+
+* Número de viajeros internacionales
+
+   | Guión: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L08-A-airlinePass.inp][P-L08-A-airlinePass.inp]] |
+
+En esta práctica volvemos sobre la primera serie temporal estudiada en el curso: la serie temporal mensual correspondiente al número total de pasajeros (en miles) de vuelos internacionales de una importante aerolínea de EEUU que aparece en manual de Box & Jenkins.
+
+*Objetivo*
+
+1. Identificar un modelo para la serie temporal
+2. Pronosticar los datos correspondientes a los meses del último año de la muestra.
+
+Comencemos cargando los datos:
+
+*/~Archivo --> Abrir datos --> Archivo de muestra~/* y en la pestaña
+*/~Gretl~/* seleccione =bjg=.
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+/o bien teclee en linea de comandos/:
+#+NAME: Lectura del fichero de datos
+#+begin_src gretl :tangle ./guiones/P-L08-A-airlinePass.inp :eval no
+open bjg
+#+end_src
+#+latex: }
+
+
+* Actividad 1 - Gráfico de series temporales
+
+Obtenga la figura de la serie temporal en logaritmos =lg=.
+
+#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black} \color{gray!70!black}
+#+NAME: Guardamos scatterplot como icono
+#+begin_src gretl :tangle ./guiones/P-L08-A-airlinePass.inp :eval no 
+gnuplot lg --time-series --with-lines  --output="log_AP.png"
+#+end_src
+#+latex: }
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+attr_hmlt: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L08-A-airlinePass/log_AP.png]]
+#+END_CENTER
+
+
+* Actividad 2 - Identificar un modelo ARIMA para la serie temporal
+
+** Analizando los datos de la serie en logs tras una diferencia regular y otra estacional
+
+Ajuste un modelo ARIMA con constante sin parte AR ni parte MA, pero indicando una diferencia regular u otra estacional.
+
+#+NAME: Modelo 0
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+arima 0 1 0 ; 0 1 0 ; lg
+#+end_src
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
+outfile --quiet Modelo0.txt
+  <<Modelo 0>>
+end outfile
+#+end_src
+
+#+include: ./P-L08-A-airlinePass/Modelo0.txt example
+
+Y ahora analice el correlograma de los residuos hasta el retardo 36.
+
+#+NAME: Model0
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+residuosModelo0 = $uhat
+corrgm residuosModelo0 36 --plot="residuosModelo0-ACF-PACF.png"
+#+end_src
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
+outfile --quiet CorrelogramaModelo0.txt
+  corrgm residuosModelo0 36 --quiet
+end outfile
+#+end_src
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+attr_hmlt: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L08-A-airlinePass/residuosModelo0-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+#+include: ./P-L08-A-airlinePass/CorrelogramaModelo0.txt example
+#+latex: }
+
+Fijémonos en los retardos estacionales. 
+- En la ACF son significativos el 12, pero no el 24 ni el 36.
+- En la PACF son significativos el 12 y el 36.
+Esto sugiere un truncamiento en la ACF pero no el la PACF. Por tanto, probemos con un MA(1) estacional.
+
+** Probando con un MA(1) estacional
+
+#+NAME: Modelo 1
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+arima 0 1 0 ; 0 1 1 ; lg
+#+end_src
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
+outfile --quiet Modelo1.txt
+  <<Modelo 1>>
+end outfile
+#+end_src
+
+#+include: ./P-L08-A-airlinePass/Modelo1.txt example
+
+Y ahora analice el correlograma de los residuos hasta el retardo 36.
+
+#+NAME: Model0
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+residuosModelo1 = $uhat
+corrgm residuosModelo1 36 --plot="residuosModelo1-ACF-PACF.png"
+#+end_src
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
+outfile --quiet CorrelogramaModelo1.txt
+  corrgm residuosModelo1 36 --quiet
+end outfile
+#+end_src
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+attr_hmlt: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L08-A-airlinePass/residuosModelo1-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+#+include: ./P-L08-A-airlinePass/CorrelogramaModelo1.txt example
+#+latex: }
+
+Si nos fijamos en los retardos estacionales, ninguno es significativo ni el la ACF ni en la PACF.
+
+Pasemos a la parte regular del modelo.
+
+** Probando con un AR(1) regular (además del MA(1) estacional)
+
+En el correlograma se aprecia que el primer retardo es significativo tanto en la ACF como en la PACF. 
+Con el resto no es fácil detectar una estructura clara; aunque el cuarto retardo de la PACF es significativo.
+
+Probemos tentativamente a añadir un polinomio autoregresivo de orden 1.
+
+#+NAME: Modelo 2
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+arima 1 1 0 ; 0 1 1 ; lg
+#+end_src
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
+outfile --quiet Modelo2.txt
+  <<Modelo 2>>
+end outfile
+#+end_src
+
+#+include: ./P-L08-A-airlinePass/Modelo2.txt example
+
+Y ahora analice el correlograma de los residuos (puesto que ya no hay restos de estacionalidad, basta con mirar los primeros retardos).
+
+#+NAME: Model0
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+residuosModelo2 = $uhat
+corrgm residuosModelo2 12 --plot="residuosModelo2-ACF-PACF.png"
+#+end_src
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
+outfile --quiet CorrelogramaModelo2.txt
+  corrgm residuosModelo2 12 --quiet
+end outfile
+#+end_src
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+attr_hmlt: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L08-A-airlinePass/residuosModelo2-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+#+include: ./P-L08-A-airlinePass/CorrelogramaModelo2.txt example
+#+latex: }
+
+
+Parece que los residuos son ruido blanco. Pero estaba claro el motivo por el que probar con un AR(1) regular en lugar de una MA(1) regular (máxime cuando la PACF tenía un cuarto retardo significativo).
+
+Probemos tentativamente a añadir un polinomio MA de orden 1 (en lugar del polinomio AR).
+
+** Probando con un MA(1) regular (además del MA(1) estacional)
+
+#+NAME: Modelo 3
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+arima 0 1 1 ; 0 1 1 ; lg
+#+end_src
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
+outfile --quiet Modelo3.txt
+  <<Modelo 3>>
+end outfile
+#+end_src
+
+#+include: ./P-L08-A-airlinePass/Modelo3.txt example
+
+Y ahora analice el correlograma de los residuos (puesto que ya no hay restos de estacionalidad, basta con mirar los primeros retardos).
+
+#+NAME: Model0
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+residuosModelo3 = $uhat
+corrgm residuosModelo3 12 --plot="residuosModelo3-ACF-PACF.png"
+#+end_src
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
+outfile --quiet CorrelogramaModelo3.txt
+  corrgm residuosModelo3 12 --quiet
+end outfile
+#+end_src
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+attr_hmlt: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L08-A-airlinePass/residuosModelo3-ACF-PACF.png]]
+#+END_CENTER
+
+
+#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+#+include: ./P-L08-A-airlinePass/CorrelogramaModelo3.txt example
+#+latex: }
+
+También este modelo arroja residuos con aspecto de ruido blanco. Comparemos qué modelo parece mejor.
+
+Si nos fijamos en la significatividad de los parámetros, en ambos modelos todos los parámetros son significativos excepto la constate (que omitiremos en el futuro).
+
+Pero para este último modelo, los estadísticos Q de Ljung-Box tienen p-valores más altos, el R-cuadrado corregido es mayor y sus criterios de información más bajos. 
+
+Por tanto, nos quedaremos con este modelo para hacer la predicción (omitiendo la constante).
+
+
+* Actividad 4 - Previsión para los 12 meses de 1960
+
+Reestimaremos el modelo con datos hasta diciembre de 1959 y haremos la previsión de los meses de 1960.
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+smpl 1949:01 1959:12
+arima 0 1 1 ; 0 1 1 ; lg --nc
+#+end_src
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
+dataset addobs 12
+fcast 1959:01 1960:12 --plot="prediccion1960.png"
+#+end_src
+
+
+#+BEGIN_CENTER
+#+attr_org: :width 500
+#+attr_hmlt: :width 500
+#+ATTR_LATEX: :width 0.45\textwidth :center t
+[[./P-L08-A-airlinePass/prediccion1960.png]]
+#+END_CENTER
+
+
+#+BEGIN_EXPORT latex
+\vspace{10pt}
+\noindent
+\textbf{Código completo de la práctica}
+\lstinputlisting{guiones/P-L08-A-airlinePass.inp}
+#+END_EXPORT
+
+
+
+# # +LATEX: \clearpage
+# #+latex: {\vspace{10pt}
+# #+latex: \noindent
+# *Código completo de la práctica* ~P-L08-A-airlinePass.inp~
+# #+latex: \vspace{10pt}
+# \lstinputlisting{guiones/P-L08-A-airlinePass.inp}
+# #+LATEX: \clearpage }
