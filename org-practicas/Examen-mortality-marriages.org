@@ -1,0 +1,462 @@
+#    -*- mode: org -*-
+
+#+title: Mortalidad y matrimonio en Inglaterra 1866--1911
+# +author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+#+OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+# +INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: Examen-mortality-marriages
+#+BEGIN_SRC sh :exports none :results silent :var practica="Examen-mortality-marriages"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+
+#+begin_src gretl :tangle guiones/Examen-mortality-marriages.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+
+
+#+LATEX: \maketitle
+
+* Los datos
+
+Los datos de este ejercicio corresponden a la mortalidad anual y la
+proporción de matrimonios eclesiásticos en Inglaterra entre 1866 y
+1911 
+
+*Fuente:* Ejercicio proporcionado por el Prof. Miguel Jerez
+
+- =Std_mortality= :: Mortalidad anual por cada 1000 personas. Serie estandarizada.
+- =Proportion_marriages= :: Proporción de matrimonios eclesiásticos
+  anuales por cada 1000 personas.
+- =d_Std_mortality= :: Primera diferencia de =Std_mortality=.
+- =d_Proportion_marriages= :: Primera diferencia de
+  =Proportion_marriages=.
+
+#+begin_src R :tangle guiones/Examen-mortality-marriages.inp :results none :exports code 
+open ../../datos/mortality-marriages.gdt
+#+end_src
+
+- Ficheros: :: Versión del ejercicio en [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-pdf/Examen-mortality-marriages.pdf][pdf]]; [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/Examen-mortality-marriages.html][html]].
+   - Datos:  [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/datos/FumadoresVsIncendios.gdt][FumadoresVsIncendios.gdt]]
+   - Guión de gretl: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/Practicas-html/guiones/Examen-mortality-marriages.inp][Examen-mortality-marriages.inp]]
+
+
+* Gráficos de las series y correlogramas
+
+#+begin_src R :tangle guiones/Examen-mortality-marriages.inp :results none :exports code 
+gnuplot Std_mortality --time-series --with-lines --output="mortality.png"
+corrgm Std_mortality 9 --plot="mortalityACF-PACF.png"
+gnuplot Proportion_marriages --time-series --with-lines --output="marriages.png"
+corrgm Proportion_marriages 9 --plot="marriagesACF-PACF.png"
+#+end_src
+
+
+#+BEGIN_CENTER
+#+ATTR_LATEX: :width 0.45\textwidth :center nil
+[[./Examen-mortality-marriages/mortality.png]][[./Examen-mortality-marriages/mortalityACF-PACF.png]]
+
+#+ATTR_LATEX: :width 0.45\textwidth :center nil
+[[./Examen-mortality-marriages/marriages.png]][[./Examen-mortality-marriages/marriagesACF-PACF.png]]
+#+END_CENTER
+
+
+* Datos en nivel de la serie de mortalidad
+
+** Estimación de un modelo univariante para la serie de mortalidad
+
+#+NAME: Modelo ARIMA 1 0 2 con cte
+#+begin_src R :tangle guiones/Examen-mortality-marriages.inp :results none :exports code 
+arima 1 0 2 ; Std_mortality
+#+end_src
+
+
+#+begin_src R :tangle guiones/Examen-mortality-marriages.inp :results none :exports none :noweb yes
+outfile --quiet modelo1.txt
+  <<Modelo ARIMA 1 0 2 con cte>>
+end outfile
+#+end_src
+
+#+include: ./Examen-mortality-marriages/modelo1.txt example
+
+
+* Contraste de cointegración
+
+#+BEGIN_SRC R :tangle guiones/Examen-mortality-marriages.inp :results none :exports code 
+coint 9 Std_mortality Proportion_marriages --test-down
+#+END_SRC
+
+#+begin_src R :tangle guiones/Examen-mortality-marriages.inp :results none :exports none
+outfile --quiet test_cointegracion.txt
+    coint 9 Std_mortality Proportion_marriages --test-down
+end outfile
+#+end_src
+
+#+include: ./Examen-mortality-marriages/test_cointegracion.txt example
+
+
+* Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos
+
+#+BEGIN_SRC R :tangle guiones/Examen-mortality-marriages.inp :results none :exports code 
+ols Std_mortality 0 Proportion_marriages
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 5 --quiet
+#+END_SRC
+
+# P-valor Durbin-Watson
+# scalar dwpval = $dwpval
+# print dwpval 
+
+#+begin_src R :tangle guiones/Examen-mortality-marriages.inp :results none :exports none
+outfile --quiet modeloMCO.txt
+  ols Std_mortality 0 Proportion_marriages
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 5 --quiet
+end outfile
+#+end_src
+
+#+include: ./Examen-mortality-marriages/modeloMCO.txt example
+
+
+* Regresión en primeras diferencias
+
+#+BEGIN_SRC R :tangle guiones/Examen-mortality-marriages.inp :results none :exports code 
+diff Std_mortality Proportion_marriages
+ols d_Std_mortality 0 d_Proportion_marriages
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 5 --quiet
+#+END_SRC
+
+#+begin_src R :tangle guiones/Examen-mortality-marriages.inp :results none :exports none
+outfile --quiet modeloMCO_en_diff.txt
+  ols d_Std_mortality 0 d_Proportion_marriages
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 5 --quiet
+end outfile
+#+end_src
+
+#+include: ./Examen-mortality-marriages/modeloMCO_en_diff.txt example
+
+
+* Preguntas
+
+** Pregunta 1
+
+Discuta de todas las formas posibles si la serie temporal de
+mortalidad (=Std_mortality=) es estacionaria en media (i.e., la
+realización de un proceso estocástico estacionario), usando para ello
+los resultados de los apartados [[Datos en nivel de la serie de
+mortalidad]] y [[Contraste de cointegración]].
+
+([[Respuesta 1]])
+
+** Pregunta 2
+
+Discuta si las series de mortalidad y proporción de matrimonios
+eclesiásticos están cointegradas, a partir de los resultados del
+apartado [[Contraste de cointegración]].
+
+([[Respuesta 2]])
+
+** Pregunta 3
+
+Sin embargo, ¿qué sugieren los resultados de las secciones [[Regresión
+de la mortalidad sobre la proporción de matrimonios eclesiásticos]] y
+[[Regresión en primeras diferencias]] respecto a la relación entre
+=Std_mortality= y =Proportion_marriages=?
+
+([[Respuesta 3]])
+
+** Pregunta 4
+
+Los listados en [[Regresión de la mortalidad sobre la proporción de
+matrimonios eclesiásticos]] y [[Regresión en primeras diferencias]] muestran
+los principales resultados obtenidos al estimar por MCO dos modelos de
+regresión que relacionan las dos variables consideradas en este
+ejercicio. Resuma y comente los resultados de estimación y diagnosis
+que le parezcan más relevantes. Si detecta alguna desviación del
+cumplimiento de las hipótesis habituales, discuta sus consecuencias
+sobre las propiedades del estimador MCO y sugiera una forma de
+tratarla.
+
+([[Respuesta 4]])
+
+** Pregunta 5
+
+Interprete la pendiente de la regresión cointegrante estimada en la
+Etapa 3 del [[Contraste de cointegración]].
+
+([[Respuesta 5]])
+
+** Pregunta 6
+
+Indique cuáles de las siguientes expresiones representan el modelo de
+la sección [[Estimación de un modelo univariante para la serie de
+mortalidad]], con un redondeo a tres decimales 
+# (0.2 puntos por respuesta correcta, -0.2 puntos por respuesta incorrecta, 0 puntos por respuesta “en blanco”):
+
+A) $\left( 1 - 0.997 \, \mathsf{B} \right) \, \left(X_t - 18.078 \right) = \left( 1 + 0.401 \, \mathsf{B} + 0.345 \, \mathsf{B}^2 \right) \hat U_t$ 
+B) $\left( 1 - 0.997 \, \mathsf{B} \right) \, \left(X_t - 18.078 \right) = \left( 1 - 0.401 \, \mathsf{B}  - 0.345 \, \mathsf{B}^2 \right) \hat U_t$
+C) $\left( 1 + 0.997 \, \mathsf{B} \right) \, \left(X_t - 18.078 \right) = \left( 1 + 0.401 \, \mathsf{B}  + 0.345 \, \mathsf{B}^2 \right) \hat U_t$
+D) $\,{X_t} = 18.078 + \frac{  1 + 0.401 \, \mathsf{B}  + 0.345 \, \mathsf{B}^2 }{ 1 - 0.997 \, \mathsf{B} } \hat U_t$ 
+E) $\,{X_t} = -18.078 + \frac{  1 + 0.401 \, \mathsf{B}  + 0.345 \, \mathsf{B}^2 }{ 1 - 0.997 \, \mathsf{B} } \hat U_t$
+F) $\,{X_t} = 18.078 + \frac{  1 - 0.401 \, \mathsf{B} - 0.345 \, \mathsf{B}^2 }{ 1 - 0.997 \, \mathsf{B} } \hat U_t$
+G) $\,{X_t} = 18.078 + \frac{  1 + 0.401 \, \mathsf{B}  + 0.345 \, \mathsf{B}^2 }{ 1 + 0.997 \, \mathsf{B} } \hat U_t$
+H) $\frac{ 1 - 0.997 \, \mathsf{B} }{1 + 0.401 \, \mathsf{B}  + 0.345 \, \mathsf{B}^2 } \, \left(X_t - 18.078 \right)=  \hat U_t$ 
+I) $\frac{ 1 - 0.997 \, \mathsf{B} }{1 + 0.401 \, \mathsf{B}  + 0.345 \, \mathsf{B}^2 } \, X_t = 18.078 + \hat U_t$
+J) $\frac{ 1 - 0.997 \, \mathsf{B} }{1 - 0.401 \, \mathsf{B} - 0.345 \, \mathsf{B}^2 } \, \left(X_t - 18.078 \right)=  \hat U_t$
+
+([[Respuesta 6]])
+
+** Pregunta 7
+
+A la luz de la [[Estimación de un modelo univariante para la serie de
+mortalidad]], si tuviera que clasificar el proceso estocástico
+subyacente del que la serie temporal es una realización ¿diría que es
+invertible?  ¿O que no lo es?  ¿diría que es estacionario? ¿O que no
+lo es? Explique su respuesta.
+
+([[Respuesta 7]])
+
+** Pregunta 8
+
+¿Cuáles de los modelos de más arriba considera aceptables? ¿O qué
+mejoras sugeriría para ellos?
+
+([[Respuesta 8]])
+
+#+latex: \newpage
+
+
+* Respuestas
+
+** Respuesta 1
+
+La serie temporal =Std_mortality= NO es estacionaria en media, como se
+aprecia en las secciones:
+- [[Gráficos de las series y correlogramas]]. 
+  - El gráfico de la serie muestra una tendencia decreciente.
+  - La FAC muestra mucha persistencia, los coeficientes decrecen a un
+    ritmo aproximadamente lineal; y el primer coeficiente de la PACF
+    está próximo a uno.
+- [[Estimación de un modelo univariante para la serie de mortalidad]]: El
+  modelo univariante estimado tiene una raíz AR aproximadamente igual
+  a $1$.
+- [[Contraste de cointegración]]: El test ADF calculado en la Etapa 1 no
+  rechaza la hipótesis (raíz unitaria) con un p-valor de =0.9902=
+
+([[Pregunta 1]])
+
+** Respuesta 2
+
+Las conclusiones de las distintas etapas del test de cointegración son los siguientes:
+- Etapa 1 :: El test ADF no rechaza que la serie de mortalidad sea
+  I(1). =(valor p asintótico 0,9902)=
+- Etapa 2 :: El test ADF no rechaza que la serie de proporción de
+  matrimonios eclesiásticos sea I(1). =(valor p asintótico 0,9971)=
+- Etapa 3 :: La regresión (cointegrante) de mortalidad sobre la
+  proporción de matrimonios eclesiásticos es significativa (parámetros
+  significativos y elevado $R^2$ =(0,905434)=.
+- Etapa 4 :: El test ADF rechaza contundentemente que los residuos de
+  la regresión cointegrante sean I(1). =(valor p asintótico
+  5,236e-05)=
+
+Consecuentemente, el test indica que ambas series están cointegradas
+(/pero, como sugiere tanto el sentido común como la [[Regresión en
+primeras diferencias]] la relación es espuria/, véase la pregunta 3).
+
+([[Pregunta 2]])
+
+** Respuesta 3
+
+Aunque el modelo de [[Regresión de la mortalidad sobre la proporción de
+matrimonios eclesiásticos]] muestra un buen ajuste (un elevado $R^2$) y
+los parámetros estimados son muy significativos, la relación entre
+ambas variables se desvanece al diferenciar los datos para lograr la
+estacionariedad. Ello sugiere, al igual que el sentido común, que _la
+relación es espuria_.
+
+([[Pregunta 3]])
+
+** Respuesta 4
+
+- Modelo de regresión MCO para datos en nivel :: ([[Regresión de la
+  mortalidad sobre la proporción de matrimonios eclesiásticos]]): Todos
+  los coeficientes son muy significativos. El ajuste del modelo,
+  medido por el valor del \(R^2\) es muy elevado. Los contrastes sobre
+  los residuos no rechazan (ni al 1%, ni al 5% ni al 10% de
+  significación) las hipótesis nulas de normalidad, homoscedasticidad
+  y ausencia de autocorrelación. Es decir, de la salida de Gretl no se
+  puede inferir que haya ningún problema con este modelo.
+
+- Modelo para datos en primeras diferencias :: ([[Regresión en primeras diferencias]]): El único coeficiente significativo es el término
+  constante. El ajuste del modelo, medido por el valor del \(R^2\), es
+  prácticamente nulo. Los contrastes residuales rechazan la hipótesis
+  nula de normalidad, aunque no rechazan las de homoscedasticidad y
+  ausencia de autocorrelación. 
+
+  Si las perturbaciones no tienen distribución normal las estimaciones
+  no serán eficientes en el sentido máximo-verosímil (aunque sí en el
+  de Gauss-Markov) y la distribución de los estadísticos habituales
+  será distinta de la teórica bajo el supuesto de normalidad de las
+  perturbaciones (por ejemplo, los estadísticos de la $t$ no tendrán
+  exactamente una distribución /t/ de student).
+
+  No obstante, dado que la relación entre variables es espuria,
+  ninguno de estos modelos de regresión es válido como explicación de
+  la tasa de mortalidad.
+
+#  A partir de estos resultados cabría, por ejemplo, volver a estimar
+#  el modelo seleccionando la iopción de _desviaciones típicas
+#  _robustas_, para corregir los contrastes de significación dado que
+#  los errores no parecen gaussianos.
+
+([[Pregunta 4]])
+
+** Respuesta 5
+
+La pendiente de la regresión estimada en la Etapa 3 (que es la misma
+que la de la sección de la regresión en niveles) indica que un aumento
+de un uno por mil en la proporción de matrimonios eclesiásticos da
+lugar a un aumento de un 0.419 por mil en la mortalidad esperada
+(pero, dado que la relación es espuria, interpretar este resultado
+carece de sentido).
+
+([[Pregunta 5]])
+
+** Respuesta 6
+
+Recuerde que signo de los parámetros MA en las salidas de Gretl tienen
+el signo cambiado respecto a convenio habitual en los manuales de
+series temporales, es decir, para los polinomios AR
+$(1-\phi_1\mathsf{B}-\cdots-\phi_p\mathsf{B}^p)$, tenemos que =phi_j=
+es "$\phi_j$" (es decir, al escribir el modelo el signo del parámetro
+=phi_j= aparece con un menos delante); pero para los MA
+$(1-\theta_1\mathsf{B}-\cdots-\theta_p\mathsf{B}^p)$, tenemos que
+=theta_j= es "$-\theta_j$" (es decir, al escribir no cambiamos el
+signo de parámetro =theta_j= pues ya lleva el "$-$" incorporado).
+Además, =const= es la estimación del valor esperado $\mu$ del proceso
+$\boldsymbol{X}$, es decir, que $(X_t-\mu\mid t\in\mathbb{Z})$ es un
+proceso ARMA de media cero.
+
+Por tanto, las expresiones correctas son:
+
+- Expresión 1 :: modelo ARMA($1,2$): $\;\boldsymbol{\phi}(\mathsf{B})({X_t}-\mu)=\boldsymbol{\theta}(\mathsf{B}){U_t}$
+- Expresión 4 :: su representación MA($\infty$): $\;({X_t}-\mu)=\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}(\mathsf{B}){U_t}\;\rightarrow\;{X_t}=\mu+\frac{\boldsymbol{\theta}}{\boldsymbol{\phi}}(\mathsf{B}){U_t}$
+- Expresión 8 :: su representación AR($\infty$): $\;\frac{\boldsymbol{\phi}}{\boldsymbol{\theta}}(\mathsf{B})({X_t}-\mu)={U_t}$
+
+¡Ojo, la cuarta expresión solo es posible porque $\phi_1$ no es
+exactamente 1! Si fuera 1, el polinomio autorregresivo $1-\mathsf{B}$
+no tendría una inversa sumable y, por tanto, ni el proceso sería
+estacionario, ni habría una representación del proceso como media
+móvil infinita como la Expresión 4.
+
+
+([[Pregunta 6]])
+
+** Respuesta 7
+
+La raíz AR estimada está muy próxima a 1, por lo que cabe pensar que
+la serie proviene de un proceso estocástico NO estacionario. Sin
+embargo, las raíces del polinomio MA tienen un módulo claramente mayor
+que uno, por lo que el modelo tiene claramente una representación
+AR($\infty$), es decir, es invertible.
+
+([[Pregunta 7]])
+
+** Respuesta 8
+
+¿Cuáles de los modelos de más arriba considera aceptables? ¿O qué
+mejoras sugeriría para ellos?
+
+- En cuanto al modelo univariante :: Probablemente debería incorporar
+  una diferencia ordinaria, en lugar de un término AR(1).
+
+- En cuanto a los modelos de regresión :: En el modelo de las serie en
+  diferencias hay, probablemente, un problema de autocorrelación dado
+  el elevado valor del estadístico Durbin-Watson (es próximo a 2), por
+  lo que quizá debería ser estimado por mínimos cuadrados
+  generalizados asumiendo un modelo autorregresivo AR(1) para el
+  error.
+
+  No obstante, el modelo en diferencias (y el sentido común) sugiere
+  que la relación entre ambas variables es espuria. Consecuentemente,
+  ninguna de las dos regresiones (en niveles o en diferencias)
+  arrojará un modelo aceptable ni siquiera con las mejoras sugeridas.
+
+([[Pregunta 8]])
+
+
