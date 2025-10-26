@@ -144,7 +144,7 @@ corrgm ConsumoPetroleo 9 --plot="consumoPetroleoACF-PACF.png"
 
 #+NAME: Modelo Petroleo ARIMA 1 0 1 con cte
 #+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
-ARMApetroleo <- arima 1 0 1 ; ConsumoPetroleo
+arima 1 0 1 ; ConsumoPetroleo
 #+end_src
 
 
@@ -178,7 +178,7 @@ end outfile
 
 #+NAME: Modelo Petroleo ARIMA 1 1 0 sin cte
 #+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
-ARIpetroleo <- arima 1 1 0 --nc ; ConsumoPetroleo
+arima 1 1 0 --nc ; ConsumoPetroleo
 #+end_src
 
 
@@ -229,7 +229,7 @@ corrgm FrecuenciaOscar --plot="consumoOscarACF-PACF.png"
 
 #+NAME: Modelo OSCAR ARIMA 1 0 1 con cte
 #+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
-ARMAoscar <- arima 1 0 1 ; FrecuenciaOscar
+arima 1 0 1 ; FrecuenciaOscar
 #+end_src
 
 
@@ -263,7 +263,7 @@ end outfile
 
 #+NAME: Modelo OSCAR ARIMA 1 1 0 sin cte
 #+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
-ARIoscar <- arima 1 1 0 --nc ; FrecuenciaOscar
+arima 1 1 0 --nc ; FrecuenciaOscar
 #+end_src
 
 
@@ -315,7 +315,7 @@ end outfile
 ** Primer modelo
 
 #+BEGIN_SRC R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
-MCOpetroleoOscar <- ols ConsumoPetroleo 0 FrecuenciaOscar
+ols ConsumoPetroleo 0 FrecuenciaOscar
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 1 --quiet
@@ -341,7 +341,7 @@ end outfile
 ** Segundo modelo: regresión del consumo de petroleo sobre la popularidad del nombre Óscar con modelo de corrección de error AR1
 
 #+BEGIN_SRC R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
-MCOpetroleoOscarModeloErrorAR1 <- ar1 ConsumoPetroleo 0 FrecuenciaOscar
+ar1 ConsumoPetroleo 0 FrecuenciaOscar
 modtest --normality --quiet
 #+END_SRC
 
@@ -366,7 +366,7 @@ end outfile
 
 #+BEGIN_SRC R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
 diff ConsumoPetroleo FrecuenciaOscar
-MCOpetroleoOscar_en_Diff <- ols d_ConsumoPetroleo 0 d_FrecuenciaOscar
+ols d_ConsumoPetroleo 0 d_FrecuenciaOscar
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 2 --quiet
@@ -396,7 +396,7 @@ modelo).
 
 #+BEGIN_SRC R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
 diff ConsumoPetroleo FrecuenciaOscar Covid
-MCOpetroleoOscar_en_Diff_Covid <- ols d_ConsumoPetroleo 0 d_FrecuenciaOscar d_Covid
+ols d_ConsumoPetroleo 0 d_FrecuenciaOscar d_Covid
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 2 --quiet
@@ -409,7 +409,6 @@ outfile --quiet modeloMCO_en_diff_intervencionC.txt
   modtest --white --quiet
   modtest --autocorr 2 --quiet
 end outfile
-
 #+end_src
 
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
