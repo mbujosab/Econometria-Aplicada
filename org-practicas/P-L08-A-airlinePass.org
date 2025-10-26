@@ -93,7 +93,7 @@ En esta práctica volvemos sobre la primera serie temporal estudiada en el curso
 
 *Objetivo*
 
-1. Identificar un modelo para la serie temporal
+1. Identificar un modelo para la serie temporal.
 2. Pronosticar los datos correspondientes a los meses del último año de la muestra.
 
 Comencemos cargando los datos:
@@ -131,9 +131,11 @@ gnuplot lg --time-series --with-lines  --output="log_AP.png"
 
 * Actividad 2 - Identificar un modelo ARIMA para la serie temporal
 
-** Analizando los datos de la serie en logs tras una diferencia regular y otra estacional
+En su momento ya vimos que esta serie requiere una diferencia regular y otra estacional.
 
-Ajuste un modelo ARIMA con constante sin parte AR ni parte MA, pero indicando una diferencia regular u otra estacional.
+** Correlograma de los datos tras una diferencia regular y otra estacional
+
+Ajuste un modelo ARIMA con constante; es decir sin parte AR ni parte MA, pero indicando una diferencia regular y otra estacional sobre =lg=.
 
 #+NAME: Modelo 0
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
@@ -148,7 +150,9 @@ end outfile
 
 #+include: ./P-L08-A-airlinePass/Modelo0.txt example
 
-Y ahora analice el correlograma de los residuos hasta el retardo 36.
+Vemos que la constante no es significativa, por lo que omitiremos la constante en los próximos modelos ajustados a los datos. 
+
+*** Analice el correlograma de los residuos hasta el retardo 36.
 
 #+NAME: Model0
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
@@ -174,16 +178,16 @@ end outfile
 #+include: ./P-L08-A-airlinePass/CorrelogramaModelo0.txt example
 #+latex: }
 
-Fijémonos en los retardos estacionales. 
+Si nos fijamos en los retardos estacionales constatamos que:
 - En la ACF son significativos el 12, pero no el 24 ni el 36.
 - En la PACF son significativos el 12 y el 36.
-Esto sugiere un truncamiento en la ACF pero no el la PACF. Por tanto, probemos con un MA(1) estacional.
+Esto sugiere un truncamiento en la ACF en la parte de su estructura estacional (tras el primer retardo estacional), pero no el la PACF. A la luz de esto, probemos con un MA(1) estacional sin término constante.
 
 ** Probando con un MA(1) estacional
 
 #+NAME: Modelo 1
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
-arima 0 1 0 ; 0 1 1 ; lg
+arima 0 1 0 ; 0 1 1 ; lg --nc
 #+end_src
 
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
@@ -194,7 +198,11 @@ end outfile
 
 #+include: ./P-L08-A-airlinePass/Modelo1.txt example
 
-Y ahora analice el correlograma de los residuos hasta el retardo 36.
+El parámetro $\Theta_1$ es muy significativo. La raíz de media móvil tiene módulo claramente mayor que uno. Con solo un parámetro el ajuste es notable como se puede apreciar por el R-cuadrado.
+
+Analicemos el correlograma de los residuos hasta el retardo 36 para ver si queda alguna estructura dinámica en los residuos.
+
+*** Correlograma de los residuos
 
 #+NAME: Model0
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
@@ -222,18 +230,18 @@ end outfile
 
 Si nos fijamos en los retardos estacionales, ninguno es significativo ni el la ACF ni en la PACF.
 
-Pasemos a la parte regular del modelo.
+En cuanto a la parte regular del modelo: en el correlograma se aprecia que el primer retardo es significativo tanto en la ACF como en la PACF. 
+No es fácil detectar una estructura clara en los retardos restantes.
+Aunque el cuarto retardo de la PACF es significativo, no es fácil decidir si la ACF, la PACF o ambas tienen un decaimiento exponencial. 
+Pudiera ocurrir que debido a la reducida magnitud del valor de los parámetros AR(1) o MA(1) regulares el decaimiento fuera tan rápido que su detección visual resulte difícil.
+
+Dado que no hay una evidencia muy clara, empecemos probando tentativamente con un polinomio autoregresivo de orden 1 y analicemos qué tal funciona el nuevo modelo.
 
 ** Probando con un AR(1) regular (además del MA(1) estacional)
 
-En el correlograma se aprecia que el primer retardo es significativo tanto en la ACF como en la PACF. 
-Con el resto no es fácil detectar una estructura clara; aunque el cuarto retardo de la PACF es significativo.
-
-Probemos tentativamente a añadir un polinomio autoregresivo de orden 1.
-
 #+NAME: Modelo 2
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
-arima 1 1 0 ; 0 1 1 ; lg
+arima 1 1 0 ; 0 1 1 ; lg --nc
 #+end_src
 
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
@@ -244,7 +252,11 @@ end outfile
 
 #+include: ./P-L08-A-airlinePass/Modelo2.txt example
 
-Y ahora analice el correlograma de los residuos (puesto que ya no hay restos de estacionalidad, basta con mirar los primeros retardos).
+Los parámetros son muy significativos y si comparamos el R-cuadrado ajustado, así como los criterios de información entre el modelo anterior y eśte último. Este nuevo modelo parece superior.
+
+Ahora analicemos el correlograma de los residuos (puesto que ya no hay restos de estacionalidad, bastará con mirar los primeros retardos).
+
+*** Correlograma de los residuos
 
 #+NAME: Model0
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
@@ -271,7 +283,9 @@ end outfile
 #+latex: }
 
 
-Parece que los residuos son ruido blanco. Pero estaba claro el motivo por el que probar con un AR(1) regular en lugar de una MA(1) regular (máxime cuando la PACF tenía un cuarto retardo significativo).
+Los p-valores de los estadísticos Q de Ljung-Box son elevados, no hay retardos significativos ni en la ACF ni en la PACF, y ambas funciones muestran un perfil muy similar. Por tanto, parece que los residuos del modelo son ruido blanco. 
+
+Pero estaba claro el motivo por el que probar con un AR(1) regular en lugar de una MA(1) regular (máxime cuando la PACF tenía un cuarto retardo significativo).
 
 Probemos tentativamente a añadir un polinomio MA de orden 1 (en lugar del polinomio AR).
 
@@ -279,7 +293,7 @@ Probemos tentativamente a añadir un polinomio MA de orden 1 (en lugar del polin
 
 #+NAME: Modelo 3
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
-arima 0 1 1 ; 0 1 1 ; lg
+arima 0 1 1 ; 0 1 1 ; lg --nc
 #+end_src
 
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
@@ -290,7 +304,11 @@ end outfile
 
 #+include: ./P-L08-A-airlinePass/Modelo3.txt example
 
-Y ahora analice el correlograma de los residuos (puesto que ya no hay restos de estacionalidad, basta con mirar los primeros retardos).
+Los parámetros son muy significativos y las raíces alejadas de círculo unidad
+(el reducido valor de $\theta_1$ justifica que no se viera claramente el decaimiento de la PACF, pues dicho decaimiento es necesariamente muy rápido para potencias de =0.4=: $\;0.4,\; 0.16,\; 0.064,\ldots$).
+Si nos fijamos en el R-cuadrado ajustado, así como los criterios de información, este modelo resulta superior respecto a todos los anteriores.
+
+*** Correlograma de los residuos
 
 #+NAME: Model0
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
@@ -316,26 +334,27 @@ end outfile
 #+include: ./P-L08-A-airlinePass/CorrelogramaModelo3.txt example
 #+latex: }
 
-También este modelo arroja residuos con aspecto de ruido blanco. Comparemos qué modelo parece mejor.
+También este modelo arroja residuos con aspecto de ruido blanco (con retardos no significativos y perfiles de la ACF y PACF semejantes). No solo eso, además los estadísticos Q de Ljung-Box tienen p-valores más elevados que en el caso del modelo con parte AR(1) regular.
 
-Si nos fijamos en la significatividad de los parámetros, en ambos modelos todos los parámetros son significativos excepto la constate (que omitiremos en el futuro).
-
-Pero para este último modelo, los estadísticos Q de Ljung-Box tienen p-valores más altos, el R-cuadrado corregido es mayor y sus criterios de información más bajos. 
-
-Por tanto, nos quedaremos con este modelo para hacer la predicción (omitiendo la constante).
+Todo indica que este modelo es mejor que cualquiera de los anteriores (pruebe más tarde con otras especificaciones e intente ver si es capaz de encontrar algún modelo claramente mejor).
 
 
 * Actividad 4 - Previsión para los 12 meses de 1960
 
-Reestimaremos el modelo con datos hasta diciembre de 1959 y haremos la previsión de los meses de 1960.
+Queremos hacer previsión con este último modelo; y poder comparar sus previsiones con las observaciones correspondientes al año 1960. 
+Para hacer este ejercicio, debemos estimar el modelo sin incorporar los datos de dicho año (prever algo que ya ha sido observado no tiene mérito). Dicho de otro modo, debemos usar el conjunto de información $\mathcal{H}_{Y_{1959:12}}$ de tal manera que el número de viajeros en los meses de 1960 no sea ``observado''.
 
+** Re-estimación del modelo truncando la muestra
+
+Reestimaremos el modelo con datos hasta diciembre de 1959 
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
 smpl 1949:01 1959:12
 arima 0 1 1 ; 0 1 1 ; lg --nc
 #+end_src
 
+** Previsión de los 12 últimos meses de la muestra
+
 #+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports code 
-dataset addobs 12
 fcast 1959:01 1960:12 --plot="prediccion1960.png"
 #+end_src
 
@@ -347,6 +366,18 @@ fcast 1959:01 1960:12 --plot="prediccion1960.png"
 [[./P-L08-A-airlinePass/prediccion1960.png]]
 #+END_CENTER
 
+
+#+begin_src R :tangle guiones/P-L08-A-airlinePass.inp :results none :exports none :noweb yes
+outfile --quiet Predicciones.txt
+  fcast --out-of-sample
+end outfile
+#+end_src
+
+#+latex: {\vspace{1pt} \footnotesize \color{gray!70!black}
+#+include: ./P-L08-A-airlinePass/Predicciones.txt example
+#+latex: }
+
+Pruebe con otras especificaciones e intente ver si es capaz de encontrar algún modelo mejor tanto por el ajuste como por los errores cometidos con sus predicciones.
 
 #+BEGIN_EXPORT latex
 \vspace{10pt}
