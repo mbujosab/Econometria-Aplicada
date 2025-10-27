@@ -106,13 +106,17 @@ Datos anuales. Muestra: 1980--2022
 - Fuente :: [[https://www.ssa.gov/oact/babynames/index.html][US Social Security Administration]]
 
 
-#+begin_src gretl :tangle guiones/Examen-mortality-marriages.inp :eval no :exports code 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none
 open ../../datos/NombreOscarYConsumoDePetroleo.gdt
 #+end_src
+#+latex: }
 
-#+begin_src gretl :tangle guiones/Examen-mortality-marriages.inp :eval no :exports code 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports code 
 gnuplot ConsumoPetroleo FrecuenciaOscar  --time-series --with-lines --output="PetroleoOscar.png"
 #+end_src
+#+latex: }
 
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width 0.65\textwidth :center t
@@ -128,10 +132,12 @@ gnuplot ConsumoPetroleo FrecuenciaOscar  --time-series --with-lines --output="Pe
 
 ** Gráfico de la serie temporal y su correlograma
 
-#+begin_src gretl :tangle guiones/Examen-mortality-marriages.inp :eval no :exports code 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports code 
 gnuplot ConsumoPetroleo --time-series --with-lines --output="consumoPetroleo.png"
 corrgm ConsumoPetroleo 9 --plot="consumoPetroleoACF-PACF.png"
 #+end_src
+#+latex: }
 
 
 #+BEGIN_CENTER
@@ -141,25 +147,29 @@ corrgm ConsumoPetroleo 9 --plot="consumoPetroleoACF-PACF.png"
 
 ** Estimación de un primer modelo univariante para la serie de consumo de petroleo
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Modelo Petroleo ARIMA 1 0 1 con cte
 #+begin_src gretl :eval no :exports code 
 arima 1 0 1 ; ConsumoPetroleo
 #+end_src
+#+latex: }
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloPetroleo1.txt
-    arima 1 0 1 ; ConsumoPetroleo
+    <<Modelo Petroleo ARIMA 1 0 1 con cte>>
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/modeloPetroleo1.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloPetroleo1.txt example
+#+latex: }
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+begin_src gretl :eval no :exports code 
 series res1petroleo = $uhat
 corrgm res1petroleo
 #+end_src
+#+latex: }
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 series res1petroleo = $uhat
@@ -168,32 +178,37 @@ outfile --quiet Residuos1PetroleoACF-PACF.txt
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/Residuos1PetroleoACF-PACF.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/Residuos1PetroleoACF-PACF.txt example
+#+latex: }
 
 ** Estimación de un segundo modelo univariante para la serie de consumo de petroleo
 
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Modelo Petroleo ARIMA 1 1 0 sin cte
 #+begin_src gretl :eval no :exports code 
 arima 1 1 0 --nc ; ConsumoPetroleo
 #+end_src
+#+latex: }
 
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloPetroleo2.txt
-    arima 1 1 0 --nc ; ConsumoPetroleo
+    <<Modelo Petroleo ARIMA 1 1 0 sin cte>>
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/modeloPetroleo2.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloPetroleo2.txt example
+#+latex: }
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+begin_src gretl :eval no :exports code 
 series res2petroleo = $uhat
 corrgm res2petroleo
 #+end_src
+#+latex: }
 
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
@@ -203,19 +218,20 @@ outfile --quiet Residuos2PetroleoACF-PACF.txt
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/Residuos2PetroleoACF-PACF.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/Residuos2PetroleoACF-PACF.txt example
+#+latex: }
 
 
 * Datos en nivel de la popularidad del nombre Óscar en EEUU
 ** Gráfico de la serie temporal y su correlograma
 
-#+begin_src gretl :tangle guiones/Examen-mortality-marriages.inp :eval no :exports code 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports code 
 gnuplot FrecuenciaOscar --time-series --with-lines --output="consumoOscar.png"
 corrgm FrecuenciaOscar --plot="consumoOscarACF-PACF.png"
 #+end_src
-
+#+latex: }
 
 #+BEGIN_CENTER
 #+ATTR_LATEX: :width 0.5\textwidth :center 
@@ -226,26 +242,31 @@ corrgm FrecuenciaOscar --plot="consumoOscarACF-PACF.png"
 
 ** Estimación de un primer modelo univariante para la serie de popularidad del nombre Óscar
 
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Modelo OSCAR ARIMA 1 0 1 con cte
 #+begin_src gretl :eval no :exports code 
 arima 1 0 1 ; FrecuenciaOscar
 #+end_src
+#+latex: }
 
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloOscar1.txt
-    arima 1 0 1 ; FrecuenciaOscar
+    <<Modelo OSCAR ARIMA 1 0 1 con cte>>
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/modeloOscar1.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloOscar1.txt example
+#+latex: }
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+begin_src gretl :eval no :exports code 
 series res1Oscar = $uhat
 corrgm res1Oscar
 #+end_src
+#+latex: }
 
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
@@ -255,32 +276,36 @@ outfile --quiet Residuos1OscarACF-PACF.txt
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/Residuos1OscarACF-PACF.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/Residuos1OscarACF-PACF.txt example
+#+latex: }
 
 ** Estimación de un segundo modelo univariante para la serie de popularidad del nombre Óscar
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Modelo OSCAR ARIMA 1 1 0 sin cte
 #+begin_src gretl :eval no :exports code 
 arima 1 1 0 --nc ; FrecuenciaOscar
 #+end_src
+#+latex: }
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloOscar2.txt
-    arima 1 1 0 --nc ; FrecuenciaOscar
+    <<Modelo OSCAR ARIMA 1 1 0 sin cte>>
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/modeloOscar2.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloOscar2.txt example
+#+latex: }
 
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+begin_src gretl :eval no :exports code 
 series res2Oscar = $uhat
 corrgm res2Oscar
 #+end_src
+#+latex: }
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 series res2Oscar = $uhat
@@ -289,43 +314,47 @@ outfile --quiet Residuos2OscarACF-PACF.txt
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/Residuos2OscarACF-PACF.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/Residuos2OscarACF-PACF.txt example
+#+latex: }
 
 
 * Contraste de cointegración
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Contraste de cointegración
 #+begin_src gretl :eval no :exports code 
 coint 2 ConsumoPetroleo FrecuenciaOscar --test-down
 #+end_src
+#+latex: }
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet test_cointegracion.txt
-    coint 2 ConsumoPetroleo FrecuenciaOscar --test-down
+    <<Contraste de cointegración>>
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/test_cointegracion.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/test_cointegracion.txt example
+#+latex: }
 
 
 * Regresión del consumo de petroleo sobre la popularidad del nombre Óscar
 ** Primer modelo
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Regresión en niveles
-#+begin_src gretl :eval no :exports none
+#+begin_src gretl :eval no :exports code 
 ols ConsumoPetroleo 0 FrecuenciaOscar
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 1 --quiet
 #+end_src
+#+latex: }
 
-#  P-valor Durbin-Watson
-#  scalar dwpval = $dwpval
-#  print dwpval 
+# P-valor Durbin-Watson
+# scalar dwpval = $dwpval
+# print dwpval 
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloMCO.txt
@@ -333,22 +362,24 @@ outfile --quiet modeloMCO.txt
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/modeloMCO.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloMCO.txt example
+#+latex: }
 
 ** Segundo modelo: regresión del consumo de petroleo sobre la popularidad del nombre Óscar con modelo de corrección de error AR1
 
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Regresión con corrección de error
-#+begin_src gretl :eval no :exports none
+#+begin_src gretl :eval no :exports code 
 ar1 ConsumoPetroleo 0 FrecuenciaOscar
 modtest --normality --quiet
 #+end_src
+#+latex: }
 
-#  P-valor Durbin-Watson
-#  scalar dwpval = $dwpval
-#  print dwpval 
+# P-valor Durbin-Watson
+# scalar dwpval = $dwpval
+# print dwpval 
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloMCO_AR1.txt
@@ -356,22 +387,24 @@ outfile --quiet modeloMCO_AR1.txt
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/modeloMCO_AR1.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloMCO_AR1.txt example
+#+latex: }
 
 
 * Regresión en primeras diferencias
 ** Primer modelo
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Regresión en primeras diferencias
-#+begin_src gretl :eval no :exports none
+#+begin_src gretl :eval no :exports code 
 diff ConsumoPetroleo FrecuenciaOscar
 ols d_ConsumoPetroleo 0 d_FrecuenciaOscar
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 2 --quiet
 #+end_src
+#+latex: }
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloMCO_en_diff.txt
@@ -379,9 +412,9 @@ outfile --quiet modeloMCO_en_diff.txt
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/modeloMCO_en_diff.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloMCO_en_diff.txt example
+#+latex: }
 
 ** Segundo modelo: Regresión en primeras diferencias con intervención en el año 2020
 Dado que hubo una caída muy acusada en el consumo de petroleo del año 20 debido al confinamiento por la Covid19 
@@ -389,14 +422,16 @@ Dado que hubo una caída muy acusada en el consumo de petroleo del año 20 debid
 el siguiente modelo introduce una variable ficticia para el año 2020 
 (se introduce en primeras diferencias como el resto de variables del modelo).
 
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Regresión en primeras diferencias con intervención
-#+begin_src gretl :eval no :exports none
+#+begin_src gretl :eval no :exports code
 diff ConsumoPetroleo FrecuenciaOscar Covid
 ols d_ConsumoPetroleo 0 d_FrecuenciaOscar d_Covid
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 2 --quiet
 #+end_src
+#+latex: }
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloMCO_en_diff_intervencionC.txt
@@ -404,11 +439,11 @@ outfile --quiet modeloMCO_en_diff_intervencionC.txt
 end outfile
 #+end_src
 
-# +latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-# +include: ./Examen-NombreOscarYConsumoDePetroleo/modeloMCO_en_diff_intervencionC.txt example
-# +latex: }
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloMCO_en_diff_intervencionC.txt example
+#+latex: }
 
-#  +latex: \newpage
+# +latex: \newpage
 
 
 * Preguntas
