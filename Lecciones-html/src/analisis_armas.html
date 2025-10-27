@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-10-27 Mon 10:07 -->
+<!-- 2025-10-27 Mon 12:48 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Análisis y Visualización de Procesos Estocásticos ARMA: ACF, PACF y Espectros</title>
@@ -66,43 +66,43 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org0365019">ACF, PACF y densidad espectral teóricas</a>
+<li><a href="#orgfd39eaf">ACF, PACF y densidad espectral teóricas</a>
 <ul>
-<li><a href="#orgc1a407a">Ruido blanco</a></li>
+<li><a href="#org51bf380">Ruido blanco</a></li>
 </ul>
 </li>
-<li><a href="#org91d4cba">ACF, PACF y densidad espectral estimadas de un modelo simulado</a>
+<li><a href="#orgfdf77f7">ACF, PACF y densidad espectral estimadas de un modelo simulado</a>
 <ul>
-<li><a href="#orgf92e79b">Ruido blanco</a></li>
+<li><a href="#orgddadb01">Ruido blanco</a></li>
 </ul>
 </li>
-<li><a href="#org56cb900">Análisis de un modelo ARMA</a>
+<li><a href="#orgbbde65d">Análisis de un modelo ARMA</a>
 <ul>
-<li><a href="#org0dafb98">ACF, PACF y densidad espectral teóricas</a></li>
-<li><a href="#org9bc1d2c">Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma</a>
+<li><a href="#org9f532f4">ACF, PACF y densidad espectral teóricas</a></li>
+<li><a href="#orgf52ebc2">Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma</a>
 <ul>
-<li><a href="#org14e1e2b">Caso paseo aleatorio</a></li>
-<li><a href="#org84cae1b">Caso ARMA estacional</a></li>
+<li><a href="#org860cd55">Caso paseo aleatorio</a></li>
+<li><a href="#org9d9c400">Caso ARMA estacional</a></li>
 </ul>
 </li>
-<li><a href="#org4d46897">Raíces de uno de los polinomos</a></li>
+<li><a href="#orgb9b05c3">Raíces de uno de los polinomos</a></li>
 </ul>
 </li>
-<li><a href="#org65b329c">Ejemplo de uso</a></li>
-<li><a href="#org1710b05">Código en python</a>
+<li><a href="#org2219490">Ejemplo de uso</a></li>
+<li><a href="#org9a83aa0">Código en python</a>
 <ul>
-<li><a href="#orgcc480cc">Cálculo de la PACF a partir de la ACF (<code>theoretical_pacf_from_acf</code>)</a></li>
-<li><a href="#org7a420f1">Representación de la ACF, PACF y densidad espectral teóricas (<code>plot_arma_parametric_diagnostics</code>)</a></li>
-<li><a href="#org47eb843">Simulación y análisis de un modelo ARMA (<code>plot_arma_analysis</code>)</a>
+<li><a href="#orgdec1ff7">Cálculo de la PACF a partir de la ACF (<code>theoretical_pacf_from_acf</code>)</a></li>
+<li><a href="#org484ea6d">Representación de la ACF, PACF y densidad espectral teóricas (<code>plot_arma_parametric_diagnostics</code>)</a></li>
+<li><a href="#org1b2f69d">Simulación y análisis de un modelo ARMA (<code>plot_arma_analysis</code>)</a>
 <ul>
-<li><a href="#orgb182d86">Caso paseo aleatorio</a></li>
+<li><a href="#orga823767">Caso paseo aleatorio</a></li>
 </ul>
 </li>
-<li><a href="#orgadb412c">Análisis de las raíces de un polinomio (<code>polynomial_roots_table</code>)</a></li>
-<li><a href="#org124a289">Análisis de las raíces de un polinomio (<code>Localizacion_parametros_plot</code>)</a></li>
-<li><a href="#orgf5df882">Conversión de un polinomio \(B^s\) en un polinomio en \(B\)</a></li>
-<li><a href="#org73dcdf1">Gráfico región parámetros polinomio grado 2 (<code>RegionParametrica</code>)</a></li>
-<li><a href="#orgfa90223">Gráfico rango mediana (<code>RangoMediana</code>)</a></li>
+<li><a href="#org4b0e1e8">Análisis de las raíces de un polinomio (<code>polynomial_roots_table</code>)</a></li>
+<li><a href="#orga8e5dea">Análisis de las raíces de un polinomio (<code>Localizacion_parametros_plot</code>)</a></li>
+<li><a href="#org1d1e344">Conversión de un polinomio \(B^s\) en un polinomio en \(B\)</a></li>
+<li><a href="#org5659af2">Gráfico región parámetros polinomio grado 2 (<code>RegionParametrica</code>)</a></li>
+<li><a href="#orgb56de58">Gráfico rango mediana (<code>RangoMediana</code>)</a></li>
 </ul>
 </li>
 </ul>
@@ -122,13 +122,13 @@ warnings.filterwarnings(<span style="font-style: italic;">"ignore"</span>, categ
 %run -i analisis_armas.py
 </code></pre>
 </div>
-<div id="outline-container-org0365019" class="outline-2">
-<h2 id="org0365019">ACF, PACF y densidad espectral teóricas</h2>
-<div class="outline-text-2" id="text-org0365019">
+<div id="outline-container-orgfd39eaf" class="outline-2">
+<h2 id="orgfd39eaf">ACF, PACF y densidad espectral teóricas</h2>
+<div class="outline-text-2" id="text-orgfd39eaf">
 </div>
-<div id="outline-container-orgc1a407a" class="outline-3">
-<h3 id="orgc1a407a">Ruido blanco</h3>
-<div class="outline-text-3" id="text-orgc1a407a">
+<div id="outline-container-org51bf380" class="outline-3">
+<h3 id="org51bf380">Ruido blanco</h3>
+<div class="outline-text-3" id="text-org51bf380">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1,]
 <span style="font-weight: bold; font-style: italic;">ma_params</span> = [1,]
@@ -142,13 +142,13 @@ plot_arma_parametric_diagnostics(ar_params, ma_params)
 </div>
 </div>
 </div>
-<div id="outline-container-org91d4cba" class="outline-2">
-<h2 id="org91d4cba">ACF, PACF y densidad espectral estimadas de un modelo simulado</h2>
-<div class="outline-text-2" id="text-org91d4cba">
+<div id="outline-container-orgfdf77f7" class="outline-2">
+<h2 id="orgfdf77f7">ACF, PACF y densidad espectral estimadas de un modelo simulado</h2>
+<div class="outline-text-2" id="text-orgfdf77f7">
 </div>
-<div id="outline-container-orgf92e79b" class="outline-3">
-<h3 id="orgf92e79b">Ruido blanco</h3>
-<div class="outline-text-3" id="text-orgf92e79b">
+<div id="outline-container-orgddadb01" class="outline-3">
+<h3 id="orgddadb01">Ruido blanco</h3>
+<div class="outline-text-3" id="text-orgddadb01">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code>plot_arma_analysis(ar_params, ma_params, seed=2026)
 </code></pre>
@@ -160,13 +160,13 @@ plot_arma_parametric_diagnostics(ar_params, ma_params)
 </div>
 </div>
 </div>
-<div id="outline-container-org56cb900" class="outline-2">
-<h2 id="org56cb900">Análisis de un modelo ARMA</h2>
-<div class="outline-text-2" id="text-org56cb900">
+<div id="outline-container-orgbbde65d" class="outline-2">
+<h2 id="orgbbde65d">Análisis de un modelo ARMA</h2>
+<div class="outline-text-2" id="text-orgbbde65d">
 </div>
-<div id="outline-container-org0dafb98" class="outline-3">
-<h3 id="org0dafb98">ACF, PACF y densidad espectral teóricas</h3>
-<div class="outline-text-3" id="text-org0dafb98">
+<div id="outline-container-org9f532f4" class="outline-3">
+<h3 id="org9f532f4">ACF, PACF y densidad espectral teóricas</h3>
+<div class="outline-text-3" id="text-org9f532f4">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1, 0.5]
 <span style="font-weight: bold; font-style: italic;">ma_params</span> = [1, -0.9, 0.4]
@@ -179,9 +179,9 @@ plot_arma_parametric_diagnostics(ar_params, ma_params)
 </pre>
 </div>
 </div>
-<div id="outline-container-org9bc1d2c" class="outline-3">
-<h3 id="org9bc1d2c">Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma</h3>
-<div class="outline-text-3" id="text-org9bc1d2c">
+<div id="outline-container-orgf52ebc2" class="outline-3">
+<h3 id="orgf52ebc2">Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma</h3>
+<div class="outline-text-3" id="text-orgf52ebc2">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code>plot_arma_analysis(ar_params, ma_params)
 </code></pre>
@@ -191,9 +191,9 @@ plot_arma_parametric_diagnostics(ar_params, ma_params)
 &lt;Figure size 1800x700 with 4 Axes&gt;
 </pre>
 </div>
-<div id="outline-container-org14e1e2b" class="outline-4">
-<h4 id="org14e1e2b">Caso paseo aleatorio</h4>
-<div class="outline-text-4" id="text-org14e1e2b">
+<div id="outline-container-org860cd55" class="outline-4">
+<h4 id="org860cd55">Caso paseo aleatorio</h4>
+<div class="outline-text-4" id="text-org860cd55">
 <p>
 Paseo aleatorio con deriva
 </p>
@@ -220,9 +220,9 @@ Paseo aleatorio sin deriva
 </pre>
 </div>
 </div>
-<div id="outline-container-org84cae1b" class="outline-4">
-<h4 id="org84cae1b">Caso ARMA estacional</h4>
-<div class="outline-text-4" id="text-org84cae1b">
+<div id="outline-container-org9d9c400" class="outline-4">
+<h4 id="org9d9c400">Caso ARMA estacional</h4>
+<div class="outline-text-4" id="text-org9d9c400">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code>plot_arma_seasonal_parametric_diagnostics(ar_params=[1, -0.9], s=12, seasonal_ar_params=[1, -0.9], logs=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 </code></pre>
@@ -244,9 +244,9 @@ Paseo aleatorio sin deriva
 </div>
 </div>
 </div>
-<div id="outline-container-org4d46897" class="outline-3">
-<h3 id="org4d46897">Raíces de uno de los polinomos</h3>
-<div class="outline-text-3" id="text-org4d46897">
+<div id="outline-container-orgb9b05c3" class="outline-3">
+<h3 id="orgb9b05c3">Raíces de uno de los polinomos</h3>
+<div class="outline-text-3" id="text-orgb9b05c3">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1, -0.9, 0.4]
 polynomial_roots_table(ar_params)
@@ -264,9 +264,9 @@ polynomial_roots_table(ar_params)
 </div>
 </div>
 </div>
-<div id="outline-container-org65b329c" class="outline-2">
-<h2 id="org65b329c">Ejemplo de uso</h2>
-<div class="outline-text-2" id="text-org65b329c">
+<div id="outline-container-org2219490" class="outline-2">
+<h2 id="org2219490">Ejemplo de uso</h2>
+<div class="outline-text-2" id="text-org2219490">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ma_params</span> = [1, -1.5, 0.54]
 <span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ma_params = [1, -1, 0.25]
@@ -310,15 +310,15 @@ polynomial_roots_table(ma_params)
 </pre>
 </div>
 </div>
-<div id="outline-container-org1710b05" class="outline-2">
-<h2 id="org1710b05">Código en python</h2>
-<div class="outline-text-2" id="text-org1710b05">
+<div id="outline-container-org9a83aa0" class="outline-2">
+<h2 id="org9a83aa0">Código en python</h2>
+<div class="outline-text-2" id="text-org9a83aa0">
 <p>
 Éstas son las librerías empleadas en las funciones de más abajo:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgdd9c381"><code><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np
+<pre class="src src-python" id="org3a4c9cc"><code><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np
 <span style="font-weight: bold;">from</span> numpy.polynomial <span style="font-weight: bold;">import</span> Polynomial
 
 <span style="font-weight: bold;">import</span> pandas <span style="font-weight: bold;">as</span> pd
@@ -341,15 +341,15 @@ polynomial_roots_table(ma_params)
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orgcc480cc" class="outline-3">
-<h3 id="orgcc480cc">Cálculo de la PACF a partir de la ACF (<code>theoretical_pacf_from_acf</code>)</h3>
-<div class="outline-text-3" id="text-orgcc480cc">
+<div id="outline-container-orgdec1ff7" class="outline-3">
+<h3 id="orgdec1ff7">Cálculo de la PACF a partir de la ACF (<code>theoretical_pacf_from_acf</code>)</h3>
+<div class="outline-text-3" id="text-orgdec1ff7">
 <p>
 La siguiente función calcula la PACF a partir de la ACF resolviendo las <a href="./Lecc05.html#org392fab2">ecuaciones de Yule-Walker</a> recursivamente con el algoritmo <a href="https://en.wikipedia.org/wiki/Levinson_recursion">Levinson-Durbin</a>; véase <i>Pourahmadi, M. (2001, Capítulo 7)</i> o <i>Brockwell &amp; Davis (1991, Capítulo 5)</i>). 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orge5e54f3"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">theoretical_pacf_from_acf</span>(acf_vals):
+<pre class="src src-python" id="orgda7f5a8"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">theoretical_pacf_from_acf</span>(acf_vals):
     <span style="font-style: italic;">"""
     Calcula la PACF te&#243;rica (para lags &gt;= 0) de forma param&#233;trica usando el algoritmo de Durbin-Levinson.
 
@@ -390,15 +390,15 @@ La siguiente función calcula la PACF a partir de la ACF resolviendo las <a href
 </div>
 </div>
 </div>
-<div id="outline-container-org7a420f1" class="outline-3">
-<h3 id="org7a420f1">Representación de la ACF, PACF y densidad espectral teóricas (<code>plot_arma_parametric_diagnostics</code>)</h3>
-<div class="outline-text-3" id="text-org7a420f1">
+<div id="outline-container-org484ea6d" class="outline-3">
+<h3 id="org484ea6d">Representación de la ACF, PACF y densidad espectral teóricas (<code>plot_arma_parametric_diagnostics</code>)</h3>
+<div class="outline-text-3" id="text-org484ea6d">
 <p>
 La siguiente función pinta las ACF, PACF y densidad espectral teóricas de un modelo ARMA.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org09699ba"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_parametric_diagnostics</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>):
+<pre class="src src-python" id="orgd0733bf"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_parametric_diagnostics</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>):
     <span style="font-style: italic;">"""
     Genera y retorna una figura con tres subgr&#225;ficas para un modelo ARMA:
       - ACF te&#243;rica (omitiendo retardo 0)
@@ -521,7 +521,7 @@ Esta fórmula es fundamental porque permite conocer la distribución de la varia
 
 
 <div class="org-src-container">
-<pre class="src src-python" id="org604bb56"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_seasonal_parametric_diagnostics</span>(ar_params=[1,], ma_params=[1,], s=5, seasonal_ar_params=[1,], seasonal_ma_params=[1,], sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>, logs=<span style="font-weight: bold; text-decoration: underline;">False</span>):
+<pre class="src src-python" id="org58a161a"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_seasonal_parametric_diagnostics</span>(ar_params=[1,], ma_params=[1,], s=5, seasonal_ar_params=[1,], seasonal_ma_params=[1,], sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>, logs=<span style="font-weight: bold; text-decoration: underline;">False</span>):
     <span style="font-style: italic;">"""
     Genera y retorna una figura con tres subgr&#225;ficas para un modelo ARMA estacional:
       - ACF te&#243;rica (omitiendo retardo 0)
@@ -621,7 +621,7 @@ Esta fórmula es fundamental porque permite conocer la distribución de la varia
 
 
 <div class="org-src-container">
-<pre class="src src-python" id="org69eda76"><code><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">axs</span> = plt.subplots(1, 3, figsize=(18, 3))
+<pre class="src src-python" id="org9a0abfd"><code><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">axs</span> = plt.subplots(1, 3, figsize=(18, 3))
 
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ACF te&#243;rica
 </span>axs[0].stem(lags_plot, acf_plot, basefmt=<span style="font-style: italic;">" "</span>)
@@ -655,7 +655,7 @@ axs[2].set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
 
 
 <div class="org-src-container">
-<pre class="src src-python" id="org1290866"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">SARIMA2ARMA</span>(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0):
+<pre class="src src-python" id="org9e9d237"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">SARIMA2ARMA</span>(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0):
     <span style="font-style: italic;">"""
     Devuelve los coeficientes de los polinomios AR y MA en B con todas las ra&#237;ces del modelo.
     """</span>        
@@ -676,15 +676,15 @@ axs[2].set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
 </div>
 </div>
 </div>
-<div id="outline-container-org47eb843" class="outline-3">
-<h3 id="org47eb843">Simulación y análisis de un modelo ARMA (<code>plot_arma_analysis</code>)</h3>
-<div class="outline-text-3" id="text-org47eb843">
+<div id="outline-container-org1b2f69d" class="outline-3">
+<h3 id="org1b2f69d">Simulación y análisis de un modelo ARMA (<code>plot_arma_analysis</code>)</h3>
+<div class="outline-text-3" id="text-org1b2f69d">
 <p>
 Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y densidad espectral estimadas con los datos simulados.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org5ee9a57"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_analysis</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20, n=400, seed=<span style="font-weight: bold; text-decoration: underline;">None</span>):
+<pre class="src src-python" id="org4a55bfd"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_analysis</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20, n=400, seed=<span style="font-weight: bold; text-decoration: underline;">None</span>):
     <span style="font-style: italic;">"""
     Simula una serie temporal utilizando un modelo ARMA y visualiza la serie generada junto con sus funciones de autocorrelaci&#243;n (ACF), autocorrelaci&#243;n parcial (PACF) y el periodograma estimado.
     
@@ -758,7 +758,7 @@ Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y 
 </div>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orga212f38"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_sarima_analysis</span>(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0, sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>, n=400, seed=<span style="font-weight: bold; text-decoration: underline;">None</span>):
+<pre class="src src-python" id="org744f81b"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_sarima_analysis</span>(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0, sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>, n=400, seed=<span style="font-weight: bold; text-decoration: underline;">None</span>):
     <span style="font-style: italic;">"""
     Simula una serie temporal utilizando un modelo ARMA y visualiza la serie generada junto con sus funciones de autocorrelaci&#243;n (ACF), autocorrelaci&#243;n parcial (PACF) y el periodograma estimado.
     
@@ -834,11 +834,11 @@ Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y 
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orgb182d86" class="outline-4">
-<h4 id="orgb182d86">Caso paseo aleatorio</h4>
-<div class="outline-text-4" id="text-orgb182d86">
+<div id="outline-container-orga823767" class="outline-4">
+<h4 id="orga823767">Caso paseo aleatorio</h4>
+<div class="outline-text-4" id="text-orga823767">
 <div class="org-src-container">
-<pre class="src src-python" id="orgacc844e"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_paseo_aleatorio_analysis</span>(sigma2=1, lags=20, n=400, semilla=<span style="font-weight: bold; text-decoration: underline;">None</span>, trend=<span style="font-style: italic;">"n"</span>, pendiente=0):
+<pre class="src src-python" id="orgd8c17c1"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_paseo_aleatorio_analysis</span>(sigma2=1, lags=20, n=400, semilla=<span style="font-weight: bold; text-decoration: underline;">None</span>, trend=<span style="font-style: italic;">"n"</span>, pendiente=0):
     <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Simulaci&#243;n de la serie temporal
 </span>    <span style="font-weight: bold; font-style: italic;">transitorio</span> = 50
     <span style="font-weight: bold;">if</span> semilla:
@@ -892,10 +892,10 @@ Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y 
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org665cc5b"></a>Código común para la generación de las 4 figuras<br />
-<div class="outline-text-5" id="text-org665cc5b">
+<li><a id="org22848c1"></a>Código común para la generación de las 4 figuras<br />
+<div class="outline-text-5" id="text-org22848c1">
 <div class="org-src-container">
-<pre class="src src-python" id="org01caf54"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura
+<pre class="src src-python" id="org55d58e9"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura
 </span><span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
 
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal
@@ -930,15 +930,15 @@ ax4.set_xlim(0, 0.5)  <span style="font-weight: bold; font-style: italic;"># </s
 </ul>
 </div>
 </div>
-<div id="outline-container-orgadb412c" class="outline-3">
-<h3 id="orgadb412c">Análisis de las raíces de un polinomio (<code>polynomial_roots_table</code>)</h3>
-<div class="outline-text-3" id="text-orgadb412c">
+<div id="outline-container-org4b0e1e8" class="outline-3">
+<h3 id="org4b0e1e8">Análisis de las raíces de un polinomio (<code>polynomial_roots_table</code>)</h3>
+<div class="outline-text-3" id="text-org4b0e1e8">
 <p>
 Función que muestra las raíces de un polinomio en una tabla junto a su parte real, parte imaginaria,  módulo, frecuencia, periodo y multiplicidad.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orga9f35b9"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">polynomial_roots_table</span>(coef_polinomio):
+<pre class="src src-python" id="orgd67080a"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">polynomial_roots_table</span>(coef_polinomio):
     <span style="font-style: italic;">"""
     Funci&#243;n que calcula las ra&#237;ces de un polinomio y presenta sus caracter&#237;sticas en forma de tabla.
 
@@ -1006,15 +1006,15 @@ Función que muestra las raíces de un polinomio en una tabla junto a su parte r
 </div>
 </div>
 </div>
-<div id="outline-container-org124a289" class="outline-3">
-<h3 id="org124a289">Análisis de las raíces de un polinomio (<code>Localizacion_parametros_plot</code>)</h3>
-<div class="outline-text-3" id="text-org124a289">
+<div id="outline-container-orga8e5dea" class="outline-3">
+<h3 id="orga8e5dea">Análisis de las raíces de un polinomio (<code>Localizacion_parametros_plot</code>)</h3>
+<div class="outline-text-3" id="text-orga8e5dea">
 <p>
 Programa que sitúa el par de parámetros de un polinomio de grado 2 respecto del triángulo donde que indica las regiones donde dicho polinomio es invertible.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org2907a29"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">Localizacion_parametros_plot</span>(parametro1, parametro2, modelo=<span style="font-style: italic;">'MA'</span>):
+<pre class="src src-python" id="org1208fed"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">Localizacion_parametros_plot</span>(parametro1, parametro2, modelo=<span style="font-style: italic;">'MA'</span>):
     <span style="font-style: italic;">"""
     Genera un gr&#225;fico que localiza el par de par&#225;metros de un polinomio de grado 2 en relaci&#243;n con un tri&#225;ngulo,
     indicando las regiones donde dicho polinomio es invertible.
@@ -1091,11 +1091,11 @@ Programa que sitúa el par de parámetros de un polinomio de grado 2 respecto de
 </div>
 </div>
 </div>
-<div id="outline-container-orgf5df882" class="outline-3">
-<h3 id="orgf5df882">Conversión de un polinomio \(B^s\) en un polinomio en \(B\)</h3>
-<div class="outline-text-3" id="text-orgf5df882">
+<div id="outline-container-org1d1e344" class="outline-3">
+<h3 id="org1d1e344">Conversión de un polinomio \(B^s\) en un polinomio en \(B\)</h3>
+<div class="outline-text-3" id="text-org1d1e344">
 <div class="org-src-container">
-<pre class="src src-python" id="orgff3c9a3"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">Seasonal_to_regular_polynomial</span>(coeffs, s):
+<pre class="src src-python" id="orgfd13ea2"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">Seasonal_to_regular_polynomial</span>(coeffs, s):
     <span style="font-style: italic;">"""
     Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
     """</span>        
@@ -1108,15 +1108,15 @@ Programa que sitúa el par de parámetros de un polinomio de grado 2 respecto de
 </div>
 </div>
 </div>
-<div id="outline-container-org73dcdf1" class="outline-3">
-<h3 id="org73dcdf1">Gráfico región parámetros polinomio grado 2 (<code>RegionParametrica</code>)</h3>
-<div class="outline-text-3" id="text-org73dcdf1">
+<div id="outline-container-org5659af2" class="outline-3">
+<h3 id="org5659af2">Gráfico región parámetros polinomio grado 2 (<code>RegionParametrica</code>)</h3>
+<div class="outline-text-3" id="text-org5659af2">
 <p>
 Gráfico que muestra las regiones para los pares de coeficientes donde un polinomio de grado dos es invertible. Si se indica que el modelo es <code>'AR'</code> la letra usada para los parámetros es \(\phi\), y si se indica <code>'MA'</code> la letra usada para los parámetros es \(\theta\)
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgddc69ef"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">RegionParametrica</span>(modelo=<span style="font-style: italic;">'generico'</span>):   
+<pre class="src src-python" id="org478ac04"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">RegionParametrica</span>(modelo=<span style="font-style: italic;">'generico'</span>):   
     <span style="font-style: italic;">"""
     Dibuja y anota un gr&#225;fico que representa regiones param&#233;tricas dependiendo del modelo especificado.
 
@@ -1223,11 +1223,11 @@ Gráfico que muestra las regiones para los pares de coeficientes donde un polino
 </div>
 </div>
 </div>
-<div id="outline-container-orgfa90223" class="outline-3">
-<h3 id="orgfa90223">Gráfico rango mediana (<code>RangoMediana</code>)</h3>
-<div class="outline-text-3" id="text-orgfa90223">
+<div id="outline-container-orgb56de58" class="outline-3">
+<h3 id="orgb56de58">Gráfico rango mediana (<code>RangoMediana</code>)</h3>
+<div class="outline-text-3" id="text-orgb56de58">
 <div class="org-src-container">
-<pre class="src src-python" id="org43ca27b"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">RangoMediana</span>(datos, k=6, ax=<span style="font-weight: bold; text-decoration: underline;">None</span>):
+<pre class="src src-python" id="org5a71776"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">RangoMediana</span>(datos, k=6, ax=<span style="font-weight: bold; text-decoration: underline;">None</span>):
     <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inicializar listas para almacenar las medianas y rangos
 </span>    <span style="font-weight: bold; font-style: italic;">medians</span> = []
     <span style="font-weight: bold; font-style: italic;">ranges</span> = []
@@ -1265,7 +1265,7 @@ Gráfico que muestra las regiones para los pares de coeficientes donde un polino
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-10-27 Mon 10:07</p>
+<p class="date">Created: 2025-10-27 Mon 12:48</p>
 </div>
 </body>
 </html>

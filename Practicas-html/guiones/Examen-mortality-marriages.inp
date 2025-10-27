@@ -16,22 +16,13 @@ corrgm Std_mortality 9 --plot="mortalityACF-PACF.png"
 gnuplot Proportion_marriages --time-series --with-lines --output="marriages.png"
 corrgm Proportion_marriages 9 --plot="marriagesACF-PACF.png"
 
-arima 1 0 2 ; Std_mortality
-
 outfile --quiet modelo1.txt
   arima 1 0 2 ; Std_mortality
 end outfile
 
-coint 9 Std_mortality Proportion_marriages --test-down
-
 outfile --quiet test_cointegracion.txt
     coint 9 Std_mortality Proportion_marriages --test-down
 end outfile
-
-ols Std_mortality 0 Proportion_marriages
-modtest --normality --quiet
-modtest --white --quiet
-modtest --autocorr 5 --quiet
 
 outfile --quiet modeloMCO.txt
   ols Std_mortality 0 Proportion_marriages
@@ -40,13 +31,8 @@ outfile --quiet modeloMCO.txt
   modtest --autocorr 5 --quiet
 end outfile
 
-diff Std_mortality Proportion_marriages
-ols d_Std_mortality 0 d_Proportion_marriages
-modtest --normality --quiet
-modtest --white --quiet
-modtest --autocorr 5 --quiet
-
 outfile --quiet modeloMCO_en_diff.txt
+  diff Std_mortality Proportion_marriages
   ols d_Std_mortality 0 d_Proportion_marriages
   modtest --normality --quiet
   modtest --white --quiet
