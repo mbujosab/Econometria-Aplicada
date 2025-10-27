@@ -486,7 +486,7 @@ Desde el segundo año, cada predicción es como la del mismo mes del año anteri
    :END:
 
 
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
+# +attr_ipynb: (slideshow . ((slide_type . skip)))
 /Consideremos primero modelos lineales, causales y estacionarios/.
 
 #+attr_ipynb: (slideshow . ((slide_type . subslide)))
@@ -516,10 +516,9 @@ Var(e_t(\ell))=
 \]
 donde \(1 + \psi_1^2 + \cdots + \psi_{\ell-1}^2\) es la suma del cuadrado de los $\ell$ primeros coeficientes de la secuencia $\boldsymbol{\psi}=\boldsymbol{\phi}^{-1}*\boldsymbol{\theta}$, que es una secuencia de cuadrado sumable.
 
-#+attr_ipynb: (slideshow . ((slide_type . skip)))
+#+attr_ipynb: (slideshow . ((slide_type . subslide)))
 /Y ahora consideremos modelos lineales, causales NO estacionarios/.
 
-#+attr_ipynb: (slideshow . ((slide_type . subslide)))
 - Suponga que $\boldsymbol{Y}$ es SARIMA ($\boldsymbol{\phi}$ tiene raíces en el círculo unidad) pero que simultáneamente $\boldsymbol{U}$ tiene un comienzo (que $U_t=0$ para $t<0$; por tanto \(Y_t = \psi(B)U_n=0\) para $t<0$).
 
 - El cálculo sigue siendo el mismo. Aunque ahora $\boldsymbol{\psi}=\boldsymbol{\phi}^{-\triangleright}*\boldsymbol{\theta}$ no es de cuadrado sumable, en las sumas solo hay una cantidad finita de términos no nulos.
@@ -596,6 +595,60 @@ Si no hay error de previsión un periodo adelante \((U_{t+1} = 0)\), no hay revi
 # \[
 # E(Y_{t+\ell} \mid Y_{t+1}) = E(Y_{t+\ell}) + \mathrm{cov}(Y_{t+1}, Y_{t+\ell}) \mathrm{var}^{-1}(Y_{t+1}) (Y_{t+1} - E(Y_{t+1})).
 # \]
+
+
+* Medidas del error de previsión
+  :PROPERTIES:
+  :metadata: (slideshow . ((slide_type . slide)))
+  :CUSTOM_ID: sec-fcast-stats
+  :END:
+
+- Error Medio (ME) :: $= \frac{1}{T} \sum_{t=1}^T e_t$
+
+  Promedio de los errores de previsión.
+
+- Raíz del Error Cuadrático Medio (RMSE) :: $= \sqrt{\frac{1}{T} \sum_{t=1}^T e_t^2}$
+
+  Es la norma euclídea de vector de errores.
+
+- Error Absoluto Medio (MAE) ::  $= \frac{1}{T} \sum_{t=1}^T |e_t|$
+
+  Promedio de los errores de previsión en términos absolutos
+
+- Error Porcentual Medio (MPE) :: $= \frac{1}{T} \sum_{t=1}^T 100\, \frac{e_t}{y_t}$
+
+  Promedio de los errores de previsión porcentuales
+
+- Error Porcentual Absoluto Medio (MAPE) :: $= \frac{1}{T} \sum_{t=1}^T 100\, \left|\frac{e_t}{y_t}\right|$
+
+  Promedio del valor absoluto de los errores porcentuales
+
+#+latex: \noindent
+Gretl muestra otros estadísticos adicionales (véase el manual).
+
+# Una estadística adicional relevante es el $U$ de Theil, que tiene dos variantes: $U_1$  y $U_2$. 
+# La primera se define así
+# \[U_1 = \left[\frac{1}{T}\sum_{t=1}^T(y_t-f_t)^2\right]^{0.5} \cdot 
+#         \left[\left(\frac{1}{T}\sum_{t=1}^Ty_t^2\right)^{0.5} +
+#         \left(\frac{1}{T}\sum_{t=1}^Tf_t^2\right)^{0.5}\right]^{-1}\]
+# y está acotado entre 0 y 1. Un valor cercano a cero indica alta precisión en el pronóstico; $U_1$ se acerca a 1 a medida que los errores de pronóstico crecen arbitrariamente. El segundo se define como la raíz cuadrada positiva de
+# \[U_2^2 = \frac{1}{T} \sum_{t=1}^{T-1} \left(\frac{f_{t+1} - y_{t+1}}{y_t}\right)^2 \cdot 
+#           \left[\frac{1}{T} \sum_{t=1}^{T-1} \left(\frac{y_{t+1} - y_t}{y_t}\right)^2 \right]^{-1}\]
+# $U_2$ depende de que los datos tengan un orden natural y es aplicable solo para datos de series temporales. Puede interpretarse como la relación entre el RMSE del modelo de pronóstico propuesto y el RMSE de un modelo ingenuo que simplemente predice $Y_{t+1} = Y_t= para todo $t$. 
+# El modelo ingenuo produce $U_2=1$; los valores menores a 1 indican una mejora en relación con este punto de referencia y los valores mayores a 1 indican un deterioro.
+# 
+# Además, Theil propuso una descomposición del MSE que puede ser útil para evaluar un conjunto de pronósticos. 
+# Mostró que el MSE puede descomponerse en tres componentes no negativas de la siguiente manera
+# \[MSE = \left(\bar{f}-\bar{y}\right)^2 + 
+#          \left(s_f - rs_y\right)^2 + 
+#          \left(1-r^2\right) s_y^2\]
+# donde $\bar{g}$ y $\bar{y}$ son las medias muestrales de los pronósticos y las observaciones, $s_g$ y $s_y$ son las respectivas desviaciones estándar (usando $T$ en el denominador), y $r$ es la correlación muestral entre $y$ y $g$. 
+# Dividiendo toda la ecuación por la MSE obtenemos
+# \[\frac{\left(\bar{f}-\bar{y}\right)^2}{\rm MSE} +
+#     \frac{\left(s_f - rs_y\right)^2}{\rm MSE} + 
+#     \frac{\left(1-r^2\right) s_y^2}{\rm MSE} = 1\]
+# Theil llamó a los tres términos del lado izquierdo de esta ecuación la proporción de sesgo (=U^M=), la proporción de regresión (=U^R=) y la proporción de disturbio (=U^D=), respectivamente. Si =y= y =f= representan las observaciones de la variable dependiente en la muestra y los valores ajustados de una regresión lineal, entonces los dos primeros componentes, =U^M= y =U^R=, serán cero (apartando errores de redondeo), y toda la MSE será explicada por la parte no sistemática, =U^D=. Sin embargo, en el caso de la predicción fuera de la muestra (o "predicción" sobre un subconjunto de los datos utilizados en la regresión), =U^M= y =U^R= no son necesariamente cercanos a cero. =U^M= difiere de cero si y solo si la media de los pronósticos difiere de la media de las realizaciones, y =U^R= es no cero si y solo si la pendiente de una regresión simple de las realizaciones sobre los pronósticos difiere de 1.
+
 
 
 * Modelos con logaritmos
