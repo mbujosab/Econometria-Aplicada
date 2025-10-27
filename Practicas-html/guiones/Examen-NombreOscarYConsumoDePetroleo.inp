@@ -1,0 +1,124 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../../datos/NombreOscarYConsumoDePetroleo.gdt
+
+gnuplot ConsumoPetroleo FrecuenciaOscar  --time-series --with-lines --output="PetroleoOscar.png"
+
+gnuplot ConsumoPetroleo --time-series --with-lines --output="consumoPetroleo.png"
+corrgm ConsumoPetroleo 9 --plot="consumoPetroleoACF-PACF.png"
+
+arima 1 0 1 ; ConsumoPetroleo
+
+outfile --quiet modeloPetroleo1.txt
+  arima 1 0 1 ; ConsumoPetroleo
+end outfile
+
+series res1petroleo = $uhat
+corrgm res1petroleo
+
+outfile --quiet Residuos1PetroleoACF-PACF.txt
+  corrgm res1petroleo --quiet
+end outfile
+
+arima 1 1 0 --nc ; ConsumoPetroleo
+
+outfile --quiet modeloPetroleo2.txt
+  arima 1 1 0 --nc ; ConsumoPetroleo
+end outfile
+
+series res2petroleo = $uhat
+corrgm res2petroleo
+
+outfile --quiet Residuos2PetroleoACF-PACF.txt
+  corrgm res2petroleo --quiet
+end outfile
+
+gnuplot FrecuenciaOscar --time-series --with-lines --output="consumoOscar.png"
+corrgm FrecuenciaOscar --plot="consumoOscarACF-PACF.png"
+
+arima 1 0 1 ; FrecuenciaOscar
+
+outfile --quiet modeloOscar1.txt
+  arima 1 0 1 ; FrecuenciaOscar
+end outfile
+
+series res1Oscar = $uhat
+corrgm res1Oscar
+
+outfile --quiet Residuos1OscarACF-PACF.txt
+   corrgm res1Oscar --quiet
+end outfile
+
+arima 1 1 0 --nc ; FrecuenciaOscar
+
+outfile --quiet modeloOscar2.txt
+  arima 1 1 0 --nc ; FrecuenciaOscar
+end outfile
+
+series res2Oscar = $uhat
+corrgm res2Oscar
+
+outfile --quiet Residuos2OscarACF-PACF.txt
+   corrgm res2Oscar --quiet
+end outfile
+
+coint 2 ConsumoPetroleo FrecuenciaOscar --test-down
+
+outfile --quiet test_cointegracion.txt
+    coint 2 ConsumoPetroleo FrecuenciaOscar --test-down
+end outfile
+
+ols ConsumoPetroleo 0 FrecuenciaOscar
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 1 --quiet
+
+outfile --quiet modeloMCO.txt
+  ols ConsumoPetroleo 0 FrecuenciaOscar
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 1 --quiet
+end outfile
+
+ar1 ConsumoPetroleo 0 FrecuenciaOscar
+modtest --normality --quiet
+
+outfile --quiet modeloMCO_AR1.txt
+  ar1 ConsumoPetroleo 0 FrecuenciaOscar
+  modtest --normality --quiet
+end outfile
+
+diff ConsumoPetroleo FrecuenciaOscar
+ols d_ConsumoPetroleo 0 d_FrecuenciaOscar
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 2 --quiet
+
+outfile --quiet modeloMCO_en_diff.txt
+  ols d_ConsumoPetroleo 0 d_FrecuenciaOscar
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 2 --quiet
+end outfile
+
+diff ConsumoPetroleo FrecuenciaOscar Covid
+ols d_ConsumoPetroleo 0 d_FrecuenciaOscar d_Covid
+modtest --normality --quiet
+modtest --white --quiet
+modtest --autocorr 2 --quiet
+
+outfile --quiet modeloMCO_en_diff_intervencionC.txt
+  ols d_ConsumoPetroleo 0 d_FrecuenciaOscar d_Covid
+  modtest --normality --quiet
+  modtest --white --quiet
+  modtest --autocorr 2 --quiet
+end outfile

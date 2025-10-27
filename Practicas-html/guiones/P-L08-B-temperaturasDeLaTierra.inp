@@ -45,7 +45,7 @@ outfile --quiet ARIMA013.txt
 end outfile
 
 residuosARIMA013 = $uhat
-corrgm residuosARIMA013 --plot="residuosARIMA013-ACF-PACF.png"
+corrgm residuosARIMA013 12 --plot="residuosARIMA013-ACF-PACF.png"
 
 outfile --quiet CorrelogramaARIMA013.txt
   corrgm residuosARIMA013 12 --quiet
@@ -54,5 +54,8 @@ end outfile
 smpl 1881:01 2001:12
 ARIMA013_2001 <- arima 0 1 3 ; Temperature_Deviations --nc
 
-dataset addobs 12
 fcast 2000:01 2002:12 --plot="prediccion2002.png"
+
+outfile --quiet Predicciones.txt
+  fcast --out-of-sample
+end outfile

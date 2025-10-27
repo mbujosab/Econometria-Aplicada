@@ -26,10 +26,10 @@ outfile --quiet CorrelogramaModelo0.txt
   corrgm residuosModelo0 36 --quiet
 end outfile
 
-arima 0 1 0 ; 0 1 1 ; lg
+arima 0 1 0 ; 0 1 1 ; lg --nc
 
 outfile --quiet Modelo1.txt
-  arima 0 1 0 ; 0 1 1 ; lg
+  arima 0 1 0 ; 0 1 1 ; lg --nc
 end outfile
 
 residuosModelo1 = $uhat
@@ -39,10 +39,10 @@ outfile --quiet CorrelogramaModelo1.txt
   corrgm residuosModelo1 36 --quiet
 end outfile
 
-arima 1 1 0 ; 0 1 1 ; lg
+arima 1 1 0 ; 0 1 1 ; lg --nc
 
 outfile --quiet Modelo2.txt
-  arima 1 1 0 ; 0 1 1 ; lg
+  arima 1 1 0 ; 0 1 1 ; lg --nc
 end outfile
 
 residuosModelo2 = $uhat
@@ -52,10 +52,10 @@ outfile --quiet CorrelogramaModelo2.txt
   corrgm residuosModelo2 12 --quiet
 end outfile
 
-arima 0 1 1 ; 0 1 1 ; lg
+arima 0 1 1 ; 0 1 1 ; lg --nc
 
 outfile --quiet Modelo3.txt
-  arima 0 1 1 ; 0 1 1 ; lg
+  arima 0 1 1 ; 0 1 1 ; lg --nc
 end outfile
 
 residuosModelo3 = $uhat
@@ -68,5 +68,8 @@ end outfile
 smpl 1949:01 1959:12
 arima 0 1 1 ; 0 1 1 ; lg --nc
 
-dataset addobs 12
 fcast 1959:01 1960:12 --plot="prediccion1960.png"
+
+outfile --quiet Predicciones.txt
+  fcast --out-of-sample
+end outfile
