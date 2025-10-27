@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-10-27 Mon 12:48 -->
+<!-- 2025-10-27 Mon 16:32 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Mortalidad y matrimonio en Inglaterra 1866&ndash;1911</title>
@@ -77,9 +77,9 @@ if (typeof HS_STARTUP_FOLDED === 'undefined') {    var HS_STARTUP_FOLDED = false
 <body>
 <div id="content" class="content">
 <h1 class="title">Mortalidad y matrimonio en Inglaterra 1866&ndash;1911</h1>
-<div id="outline-container-org07a3bfa" class="outline-2">
-<h2 id="org07a3bfa">Los datos</h2>
-<div class="outline-text-2" id="text-org07a3bfa">
+<div id="outline-container-orgadfc89a" class="outline-2">
+<h2 id="orgadfc89a">Los datos</h2>
+<div class="outline-text-2" id="text-orgadfc89a">
 <p>
 Los datos de este ejercicio corresponden a la mortalidad anual y la proporción de matrimonios eclesiásticos en Inglaterra entre 1866 y 1911 
 </p>
@@ -111,9 +111,9 @@ anuales por cada 1000 personas.</dd>
 </dl>
 </div>
 </div>
-<div id="outline-container-org452a376" class="outline-2">
-<h2 id="org452a376">Gráficos de las series y correlogramas</h2>
-<div class="outline-text-2" id="text-org452a376">
+<div id="outline-container-org5cc52b4" class="outline-2">
+<h2 id="org5cc52b4">Gráficos de las series y correlogramas</h2>
+<div class="outline-text-2" id="text-org5cc52b4">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>gnuplot Std_mortality --time-series --with-lines --output="mortality.png"
 corrgm Std_mortality 9 --plot="mortalityACF-PACF.png"
@@ -134,19 +134,19 @@ corrgm Proportion_marriages 9 --plot="marriagesACF-PACF.png"
 </div>
 </div>
 </div>
-<div id="outline-container-org033f42b" class="outline-2">
-<h2 id="org033f42b">Datos en nivel de la serie de mortalidad</h2>
-<div class="outline-text-2" id="text-org033f42b">
+<div id="outline-container-org87685a4" class="outline-2">
+<h2 id="org87685a4">Datos en nivel de la serie de mortalidad</h2>
+<div class="outline-text-2" id="text-org87685a4">
 </div>
-<div id="outline-container-orgf631c3c" class="outline-3">
-<h3 id="orgf631c3c">Estimación de un modelo univariante para la serie de mortalidad</h3>
-<div class="outline-text-3" id="text-orgf631c3c">
+<div id="outline-container-orgd164de6" class="outline-3">
+<h3 id="orgd164de6">Estimación de un modelo univariante para la serie de mortalidad</h3>
+<div class="outline-text-3" id="text-orgd164de6">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org0b6c0f2"><code>arima 1 0 2 ; Std_mortality
+<pre class="src src-gretl" id="orga111cc7"><code>arima 1 0 2 ; Std_mortality
 </code></pre>
 </div>
 
-<pre class="example" id="org98f12a1">
+<pre class="example" id="orged5ba5e">
 Function evaluations: 289
 Evaluations of gradient: 80
 
@@ -180,15 +180,15 @@ Schwarz criterion    0.972839   Hannan-Quinn        -4.745268
 </div>
 </div>
 </div>
-<div id="outline-container-org26d1b73" class="outline-2">
-<h2 id="org26d1b73">Contraste de cointegración</h2>
-<div class="outline-text-2" id="text-org26d1b73">
+<div id="outline-container-org6e5a410" class="outline-2">
+<h2 id="org6e5a410">Contraste de cointegración</h2>
+<div class="outline-text-2" id="text-org6e5a410">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org10f06ea"><code>coint 9 Std_mortality Proportion_marriages --test-down
+<pre class="src src-gretl" id="org751c104"><code>coint 9 Std_mortality Proportion_marriages --test-down
 </code></pre>
 </div>
 
-<pre class="example" id="orge3af5e1">
+<pre class="example" id="orgdc12331">
 Step 1: testing for a unit root in Std_mortality
 
 Augmented Dickey-Fuller test for Std_mortality
@@ -260,18 +260,18 @@ There is evidence for a cointegrating relationship if:
 </pre>
 </div>
 </div>
-<div id="outline-container-org192e12b" class="outline-2">
-<h2 id="org192e12b">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</h2>
-<div class="outline-text-2" id="text-org192e12b">
+<div id="outline-container-orga605748" class="outline-2">
+<h2 id="orga605748">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</h2>
+<div class="outline-text-2" id="text-orga605748">
 <div class="org-src-container">
-<pre class="src src-gretl" id="orga5baeba"><code>ols Std_mortality 0 Proportion_marriages
+<pre class="src src-gretl" id="orgf620d62"><code>ols Std_mortality 0 Proportion_marriages
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 5 --quiet
 </code></pre>
 </div>
 
-<pre class="example" id="orgda9abb7">
+<pre class="example" id="org2236928">
 Model 3: OLS, using observations 1866-1911 (T = 46)
 Dependent variable: Std_mortality
 
@@ -312,11 +312,11 @@ with p-value = P(Chi-square(5) &gt; 9.05845) = 0.107
 </pre>
 </div>
 </div>
-<div id="outline-container-orgf3f98b5" class="outline-2">
-<h2 id="orgf3f98b5">Regresión en primeras diferencias</h2>
-<div class="outline-text-2" id="text-orgf3f98b5">
+<div id="outline-container-orgcf7ca39" class="outline-2">
+<h2 id="orgcf7ca39">Regresión en primeras diferencias</h2>
+<div class="outline-text-2" id="text-orgcf7ca39">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org60102b2"><code>diff Std_mortality Proportion_marriages
+<pre class="src src-gretl" id="org2b3686b"><code>diff Std_mortality Proportion_marriages
 ols d_Std_mortality 0 d_Proportion_marriages
 modtest --normality --quiet
 modtest --white --quiet
@@ -324,7 +324,7 @@ modtest --autocorr 5 --quiet
 </code></pre>
 </div>
 
-<pre class="example" id="org23eb390">
+<pre class="example" id="org59839e6">
 Model 4: OLS, using observations 1867-1911 (T = 45)
 Dependent variable: d_Std_mortality
 
@@ -365,81 +365,81 @@ with p-value = P(Chi-square(5) &gt; 4.0454) = 0.543
 </pre>
 </div>
 </div>
-<div id="outline-container-orga7a8d0c" class="outline-2">
-<h2 id="orga7a8d0c">Preguntas</h2>
-<div class="outline-text-2" id="text-orga7a8d0c">
+<div id="outline-container-orge668f2c" class="outline-2">
+<h2 id="orge668f2c">Preguntas</h2>
+<div class="outline-text-2" id="text-orge668f2c">
 </div>
-<div id="outline-container-org5ff719d" class="outline-3">
-<h3 id="org5ff719d">Pregunta 1</h3>
-<div class="outline-text-3" id="text-org5ff719d">
+<div id="outline-container-org409cd55" class="outline-3">
+<h3 id="org409cd55">Pregunta 1</h3>
+<div class="outline-text-3" id="text-org409cd55">
 <p>
 Discuta de todas las formas posibles si la serie temporal de mortalidad (<code>Std_mortality</code>) es estacionaria en media 
 (i.e., la realización de un proceso estocástico estacionario), 
-usando para ello los resultados de los apartados <a href="#org033f42b">Datos en nivel de la serie de mortalidad</a> y <a href="#org10f06ea">No description for this link</a>.
+usando para ello los resultados de los apartados <a href="#org87685a4">Datos en nivel de la serie de mortalidad</a> y <a href="#org751c104">No description for this link</a>.
 </p>
 
 <p>
-(<a href="#orge6644e5">Respuesta 1</a>)
+(<a href="#orgfe42a0d">Respuesta 1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgdbdf6be" class="outline-3">
-<h3 id="orgdbdf6be">Pregunta 2</h3>
-<div class="outline-text-3" id="text-orgdbdf6be">
+<div id="outline-container-org87175d1" class="outline-3">
+<h3 id="org87175d1">Pregunta 2</h3>
+<div class="outline-text-3" id="text-org87175d1">
 <p>
-Discuta si las series de mortalidad y proporción de matrimonios eclesiásticos están cointegradas a partir de los resultados del apartado <a href="#org10f06ea">No description for this link</a>.
+Discuta si las series de mortalidad y proporción de matrimonios eclesiásticos están cointegradas a partir de los resultados del apartado <a href="#org751c104">No description for this link</a>.
 </p>
 
 <p>
-(<a href="#orgff6018c">Respuesta 2</a>)
+(<a href="#org2007627">Respuesta 2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgef333db" class="outline-3">
-<h3 id="orgef333db">Pregunta 3</h3>
-<div class="outline-text-3" id="text-orgef333db">
+<div id="outline-container-orgd799b67" class="outline-3">
+<h3 id="orgd799b67">Pregunta 3</h3>
+<div class="outline-text-3" id="text-orgd799b67">
 <p>
 Sin embargo, 
-¿qué sugieren los resultados de las secciones <a href="#org192e12b">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</a> y <a href="#orgf3f98b5">Regresión en primeras diferencias</a> respecto a la relación entre <code>Std_mortality</code> y <code>Proportion_marriages</code>?
+¿qué sugieren los resultados de las secciones <a href="#orga605748">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</a> y <a href="#orgcf7ca39">Regresión en primeras diferencias</a> respecto a la relación entre <code>Std_mortality</code> y <code>Proportion_marriages</code>?
 </p>
 
 <p>
-(<a href="#orgf7dfa00">Respuesta 3</a>)
+(<a href="#orgfb0fd4b">Respuesta 3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org36ccf1b" class="outline-3">
-<h3 id="org36ccf1b">Pregunta 4</h3>
-<div class="outline-text-3" id="text-org36ccf1b">
+<div id="outline-container-orgfff7bf5" class="outline-3">
+<h3 id="orgfff7bf5">Pregunta 4</h3>
+<div class="outline-text-3" id="text-orgfff7bf5">
 <p>
-Los listados en <a href="#org192e12b">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</a> y <a href="#orgf3f98b5">Regresión en primeras diferencias</a> muestran los principales resultados obtenidos al estimar por MCO dos modelos de
+Los listados en <a href="#orga605748">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</a> y <a href="#orgcf7ca39">Regresión en primeras diferencias</a> muestran los principales resultados obtenidos al estimar por MCO dos modelos de
 regresión que relacionan las dos variables consideradas en este ejercicio. 
 Resuma y comente los resultados de estimación y diagnosis que le parezcan más relevantes. 
 Si detecta alguna desviación del cumplimiento de las hipótesis habituales, discuta sus consecuencias sobre las propiedades del estimador MCO y sugiera una forma de tratarla.
 </p>
 
 <p>
-(<a href="#org1470420">Respuesta 4</a>)
+(<a href="#org95e2c2a">Respuesta 4</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org033e37b" class="outline-3">
-<h3 id="org033e37b">Pregunta 5</h3>
-<div class="outline-text-3" id="text-org033e37b">
+<div id="outline-container-org343c805" class="outline-3">
+<h3 id="org343c805">Pregunta 5</h3>
+<div class="outline-text-3" id="text-org343c805">
 <p>
-Interprete la pendiente de la regresión cointegrante estimada en la Etapa 3 del <a href="#org10f06ea">No description for this link</a>.
+Interprete la pendiente de la regresión cointegrante estimada en la Etapa 3 del <a href="#org751c104">No description for this link</a>.
 </p>
 
 <p>
-(<a href="#org6928879">Respuesta 5</a>)
+(<a href="#org2bb3f5e">Respuesta 5</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org0037f37" class="outline-3">
-<h3 id="org0037f37">Pregunta 6</h3>
-<div class="outline-text-3" id="text-org0037f37">
+<div id="outline-container-org1989315" class="outline-3">
+<h3 id="org1989315">Pregunta 6</h3>
+<div class="outline-text-3" id="text-org1989315">
 <p>
-Indique cuáles de las siguientes expresiones representan el modelo de la sección <a href="#orgf631c3c">Estimación de un modelo univariante para la serie de mortalidad</a>, con un redondeo a tres decimales.
+Indique cuáles de las siguientes expresiones representan el modelo de la sección <a href="#orgd164de6">Estimación de un modelo univariante para la serie de mortalidad</a>, con un redondeo a tres decimales.
 </p>
 
 <ol class="org-ol">
@@ -456,15 +456,15 @@ Indique cuáles de las siguientes expresiones representan el modelo de la secci�
 </ol>
 
 <p>
-(<a href="#org118e02b">Respuesta 6</a>)
+(<a href="#orga01f900">Respuesta 6</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org04987a3" class="outline-3">
-<h3 id="org04987a3">Pregunta 7</h3>
-<div class="outline-text-3" id="text-org04987a3">
+<div id="outline-container-org49147ec" class="outline-3">
+<h3 id="org49147ec">Pregunta 7</h3>
+<div class="outline-text-3" id="text-org49147ec">
 <p>
-A la luz de la <a href="#orgf631c3c">Estimación de un modelo univariante para la serie de mortalidad</a>, 
+A la luz de la <a href="#orgd164de6">Estimación de un modelo univariante para la serie de mortalidad</a>, 
 si tuviera que clasificar el proceso estocástico subyacente del que la serie temporal es una realización 
 ¿diría que es invertible? ¿O que no lo es? 
 ¿Diría que es estacionario? ¿O que no lo es? 
@@ -472,51 +472,51 @@ Explique su respuesta.
 </p>
 
 <p>
-(<a href="#org97f98a6">Respuesta 7</a>)
+(<a href="#orgf0b3c55">Respuesta 7</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org0e7766e" class="outline-3">
-<h3 id="org0e7766e">Pregunta 8</h3>
-<div class="outline-text-3" id="text-org0e7766e">
+<div id="outline-container-org0db7d54" class="outline-3">
+<h3 id="org0db7d54">Pregunta 8</h3>
+<div class="outline-text-3" id="text-org0db7d54">
 <p>
 ¿Cuáles de los modelos de más arriba considera aceptables? ¿O qué mejoras sugeriría para ellos?
 </p>
 
 <p>
-(<a href="#org2e24395">Respuesta 8</a>)
+(<a href="#org3407efc">Respuesta 8</a>)
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org3c12597" class="outline-2">
-<h2 id="org3c12597">Respuestas</h2>
-<div class="outline-text-2" id="text-org3c12597">
+<div id="outline-container-org8c57f1d" class="outline-2">
+<h2 id="org8c57f1d">Respuestas</h2>
+<div class="outline-text-2" id="text-org8c57f1d">
 </div>
-<div id="outline-container-orge6644e5" class="outline-3">
-<h3 id="orge6644e5">Respuesta 1</h3>
-<div class="outline-text-3" id="text-orge6644e5">
+<div id="outline-container-orgfe42a0d" class="outline-3">
+<h3 id="orgfe42a0d">Respuesta 1</h3>
+<div class="outline-text-3" id="text-orgfe42a0d">
 <p>
 La serie temporal <code>Std_mortality</code> NO es estacionaria en media, como se aprecia en las secciones:
 </p>
 <ul class="org-ul">
-<li><a href="#org452a376">Gráficos de las series y correlogramas</a>. 
+<li><a href="#org5cc52b4">Gráficos de las series y correlogramas</a>. 
 <ul class="org-ul">
 <li>El gráfico de la serie muestra una tendencia decreciente.</li>
 <li>La FAC muestra mucha persistencia, los coeficientes decrecen a un ritmo aproximadamente lineal; y el primer coeficiente de la PACF está próximo a uno.</li>
 </ul></li>
-<li><a href="#orgf631c3c">Estimación de un modelo univariante para la serie de mortalidad</a>: El modelo univariante estimado tiene una raíz AR aproximadamente igual a \(1\).</li>
-<li><a href="#org10f06ea">No description for this link</a>: El test ADF calculado en la Etapa 1 no rechaza la hipótesis (raíz unitaria) con un p-valor de <code>0.9902</code></li>
+<li><a href="#orgd164de6">Estimación de un modelo univariante para la serie de mortalidad</a>: El modelo univariante estimado tiene una raíz AR aproximadamente igual a \(1\).</li>
+<li><a href="#org751c104">No description for this link</a>: El test ADF calculado en la Etapa 1 no rechaza la hipótesis (raíz unitaria) con un p-valor de <code>0.9902</code></li>
 </ul>
 
 <p>
-(<a href="#org5ff719d">Pregunta 1</a>)
+(<a href="#org409cd55">Pregunta 1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgff6018c" class="outline-3">
-<h3 id="orgff6018c">Respuesta 2</h3>
-<div class="outline-text-3" id="text-orgff6018c">
+<div id="outline-container-org2007627" class="outline-3">
+<h3 id="org2007627">Respuesta 2</h3>
+<div class="outline-text-3" id="text-org2007627">
 <p>
 Las conclusiones de las distintas etapas del test de cointegración son los siguientes:
 </p>
@@ -528,40 +528,40 @@ Las conclusiones de las distintas etapas del test de cointegración son los sigu
 </dl>
 
 <p>
-Consecuentemente, el test indica que ambas series están cointegradas (<i>pero, como sugiere tanto el sentido común como la <a href="#orgf3f98b5">Regresión en primeras diferencias</a> la relación es espuria</i>, véase la pregunta 3).
+Consecuentemente, el test indica que ambas series están cointegradas (<i>pero, como sugiere tanto el sentido común como la <a href="#orgcf7ca39">Regresión en primeras diferencias</a> la relación es espuria</i>, véase la pregunta 3).
 </p>
 
 <p>
-(<a href="#orgdbdf6be">Pregunta 2</a>)
+(<a href="#org87175d1">Pregunta 2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgf7dfa00" class="outline-3">
-<h3 id="orgf7dfa00">Respuesta 3</h3>
-<div class="outline-text-3" id="text-orgf7dfa00">
+<div id="outline-container-orgfb0fd4b" class="outline-3">
+<h3 id="orgfb0fd4b">Respuesta 3</h3>
+<div class="outline-text-3" id="text-orgfb0fd4b">
 <p>
-Aunque el modelo de <a href="#org192e12b">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</a> muestra un buen ajuste (un elevado \(R^2\)) y los parámetros estimados son muy significativos, 
+Aunque el modelo de <a href="#orga605748">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</a> muestra un buen ajuste (un elevado \(R^2\)) y los parámetros estimados son muy significativos, 
 la relación entre ambas variables se desvanece al diferenciar los datos para lograr la estacionariedad. 
 Ello sugiere, al igual que el sentido común, que <span class="underline">la relación es espuria</span>.
 </p>
 
 <p>
-(<a href="#orgef333db">Pregunta 3</a>)
+(<a href="#orgd799b67">Pregunta 3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org1470420" class="outline-3">
-<h3 id="org1470420">Respuesta 4</h3>
-<div class="outline-text-3" id="text-org1470420">
+<div id="outline-container-org95e2c2a" class="outline-3">
+<h3 id="org95e2c2a">Respuesta 4</h3>
+<div class="outline-text-3" id="text-org95e2c2a">
 <dl class="org-dl">
-<dt>Modelo de regresión MCO para datos en nivel</dt><dd>(<a href="#org192e12b">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</a>): 
+<dt>Modelo de regresión MCO para datos en nivel</dt><dd>(<a href="#orga605748">Regresión de la mortalidad sobre la proporción de matrimonios eclesiásticos</a>): 
 Todos los coeficientes son muy significativos. 
 El ajuste del modelo, medido por el valor del \(R^2\) es muy elevado. 
 Los contrastes sobre los residuos no rechazan (ni al 1%, ni al 5% ni al 10% de significación) las hipótesis nulas de normalidad, homoscedasticidad y ausencia de autocorrelación. 
 Es decir, de la salida de Gretl no se puede inferir que haya ningún problema con este modelo.</dd>
 
 <dt>Modelo para datos en primeras diferencias</dt><dd><p>
-(<a href="#orgf3f98b5">Regresión en primeras diferencias</a>): 
+(<a href="#orgcf7ca39">Regresión en primeras diferencias</a>): 
 El único coeficiente significativo es el término constante.
 El ajuste del modelo, medido por el valor del \(R^2\), es prácticamente nulo.
 Los contrastes residuales rechazan la hipótesis nula de normalidad, aunque no rechazan las de homoscedasticidad y ausencia de autocorrelación. 
@@ -579,13 +579,13 @@ No obstante, dado que la relación entre variables es espuria, ninguno de estos 
 </dl>
 
 <p>
-(<a href="#org36ccf1b">Pregunta 4</a>)
+(<a href="#orgfff7bf5">Pregunta 4</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org6928879" class="outline-3">
-<h3 id="org6928879">Respuesta 5</h3>
-<div class="outline-text-3" id="text-org6928879">
+<div id="outline-container-org2bb3f5e" class="outline-3">
+<h3 id="org2bb3f5e">Respuesta 5</h3>
+<div class="outline-text-3" id="text-org2bb3f5e">
 <p>
 La pendiente de la regresión estimada en la Etapa 3 (que es la misma que la de la sección de la regresión en niveles) 
 indica que un aumento de un uno por mil en la proporción de matrimonios eclesiásticos da lugar a un aumento de un 0.419 por mil en la mortalidad esperada
@@ -593,13 +593,13 @@ indica que un aumento de un uno por mil en la proporción de matrimonios eclesi�
 </p>
 
 <p>
-(<a href="#org033e37b">Pregunta 5</a>)
+(<a href="#org343c805">Pregunta 5</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org118e02b" class="outline-3">
-<h3 id="org118e02b">Respuesta 6</h3>
-<div class="outline-text-3" id="text-org118e02b">
+<div id="outline-container-orga01f900" class="outline-3">
+<h3 id="orga01f900">Respuesta 6</h3>
+<div class="outline-text-3" id="text-orga01f900">
 <p>
 Recuerde que signo de los parámetros MA en las salidas de Gretl tienen el signo cambiado respecto a convenio habitual en los manuales de series temporales,
 es decir, para los polinomios AR \((1-\phi_1\mathsf{B}-\cdots-\phi_p\mathsf{B}^p)\), tenemos que <code>phi_j</code> es "\(\phi_j\)" 
@@ -628,26 +628,26 @@ ni el proceso sería estacionario, ni habría una representación del proceso co
 
 
 <p>
-(<a href="#org0037f37">Pregunta 6</a>)
+(<a href="#org1989315">Pregunta 6</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org97f98a6" class="outline-3">
-<h3 id="org97f98a6">Respuesta 7</h3>
-<div class="outline-text-3" id="text-org97f98a6">
+<div id="outline-container-orgf0b3c55" class="outline-3">
+<h3 id="orgf0b3c55">Respuesta 7</h3>
+<div class="outline-text-3" id="text-orgf0b3c55">
 <p>
 La raíz AR estimada está muy próxima a 1, por lo que cabe pensar que la serie proviene de un proceso estocástico NO estacionario. 
 Sin embargo, las raíces del polinomio MA tienen un módulo claramente mayor que uno, por lo que el modelo tiene claramente una representación AR(\(\infty\)), es decir, es invertible.
 </p>
 
 <p>
-(<a href="#org04987a3">Pregunta 7</a>)
+(<a href="#org49147ec">Pregunta 7</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org2e24395" class="outline-3">
-<h3 id="org2e24395">Respuesta 8</h3>
-<div class="outline-text-3" id="text-org2e24395">
+<div id="outline-container-org3407efc" class="outline-3">
+<h3 id="org3407efc">Respuesta 8</h3>
+<div class="outline-text-3" id="text-org3407efc">
 <p>
 ¿Cuáles de los modelos de más arriba considera aceptables? 
 ¿O qué mejoras sugeriría para ellos?
@@ -668,14 +668,14 @@ Consecuentemente, ninguna de las dos regresiones (en niveles o en diferencias) a
 </dl>
 
 <p>
-(<a href="#org0e7766e">Pregunta 8</a>)
+(<a href="#org0db7d54">Pregunta 8</a>)
 </p>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-10-27 Mon 12:48</p>
+<p class="date">Created: 2025-10-27 Mon 16:32</p>
 </div>
 </body>
 </html>
