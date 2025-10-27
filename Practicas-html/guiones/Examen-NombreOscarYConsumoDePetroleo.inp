@@ -9,6 +9,13 @@
 string directory = getenv("DIRECTORIO")
 set workdir "@directory"
 
+open ../../datos/NombreOscarYConsumoDePetroleo.gdt
+
+gnuplot ConsumoPetroleo FrecuenciaOscar  --time-series --with-lines --output="PetroleoOscar.png"
+
+gnuplot ConsumoPetroleo --time-series --with-lines --output="consumoPetroleo.png"
+corrgm ConsumoPetroleo 9 --plot="consumoPetroleoACF-PACF.png"
+
 outfile --quiet modeloPetroleo1.txt
     arima 1 0 1 ; ConsumoPetroleo
 end outfile
@@ -26,6 +33,9 @@ series res2petroleo = $uhat
 outfile --quiet Residuos2PetroleoACF-PACF.txt
   corrgm res2petroleo --quiet
 end outfile
+
+gnuplot FrecuenciaOscar --time-series --with-lines --output="consumoOscar.png"
+corrgm FrecuenciaOscar --plot="consumoOscarACF-PACF.png"
 
 outfile --quiet modeloOscar1.txt
     arima 1 0 1 ; FrecuenciaOscar
