@@ -106,11 +106,11 @@ Datos anuales. Muestra: 1980--2022
 - Fuente :: [[https://www.ssa.gov/oact/babynames/index.html][US Social Security Administration]]
 
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :tangle guiones/Examen-mortality-marriages.inp :eval no :exports code 
 open ../../datos/NombreOscarYConsumoDePetroleo.gdt
 #+end_src
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :tangle guiones/Examen-mortality-marriages.inp :eval no :exports code 
 gnuplot ConsumoPetroleo FrecuenciaOscar  --time-series --with-lines --output="PetroleoOscar.png"
 #+end_src
 
@@ -129,7 +129,7 @@ gnuplot ConsumoPetroleo FrecuenciaOscar  --time-series --with-lines --output="Pe
 
 ** Gráfico de la serie temporal y su correlograma
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :tangle guiones/Examen-mortality-marriages.inp :eval no :exports code 
 gnuplot ConsumoPetroleo --time-series --with-lines --output="consumoPetroleo.png"
 corrgm ConsumoPetroleo 9 --plot="consumoPetroleoACF-PACF.png"
 #+end_src
@@ -143,12 +143,12 @@ corrgm ConsumoPetroleo 9 --plot="consumoPetroleoACF-PACF.png"
 ** Estimación de un primer modelo univariante para la serie de consumo de petroleo
 
 #+NAME: Modelo Petroleo ARIMA 1 0 1 con cte
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :eval no :exports code 
 arima 1 0 1 ; ConsumoPetroleo
 #+end_src
 
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloPetroleo1.txt
   <<Modelo Petroleo ARIMA 1 0 1 con cte>>
 end outfile
@@ -158,13 +158,13 @@ end outfile
 #+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloPetroleo1.txt example
 #+latex: }
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :eval no :exports code 
 series res1petroleo = $uhat
 corrgm res1petroleo
 #+end_src
 
-
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
+series res1petroleo = $uhat
 outfile --quiet Residuos1PetroleoACF-PACF.txt
   corrgm res1petroleo --quiet
 end outfile
@@ -177,12 +177,12 @@ end outfile
 ** Estimación de un segundo modelo univariante para la serie de consumo de petroleo
 
 #+NAME: Modelo Petroleo ARIMA 1 1 0 sin cte
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :eval no :exports code 
 arima 1 1 0 --nc ; ConsumoPetroleo
 #+end_src
 
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloPetroleo2.txt
   <<Modelo Petroleo ARIMA 1 1 0 sin cte>>
 end outfile
@@ -192,13 +192,14 @@ end outfile
 #+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloPetroleo2.txt example
 #+latex: }
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :eval no :exports code 
 series res2petroleo = $uhat
 corrgm res2petroleo
 #+end_src
 
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
+series res2petroleo = $uhat
 outfile --quiet Residuos2PetroleoACF-PACF.txt
   corrgm res2petroleo --quiet
 end outfile
@@ -212,7 +213,7 @@ end outfile
 * Datos en nivel de la popularidad del nombre Óscar en EEUU
 ** Gráfico de la serie temporal y su correlograma
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :tangle guiones/Examen-mortality-marriages.inp :eval no :exports code 
 gnuplot FrecuenciaOscar --time-series --with-lines --output="consumoOscar.png"
 corrgm FrecuenciaOscar --plot="consumoOscarACF-PACF.png"
 #+end_src
@@ -228,12 +229,12 @@ corrgm FrecuenciaOscar --plot="consumoOscarACF-PACF.png"
 ** Estimación de un primer modelo univariante para la serie de popularidad del nombre Óscar
 
 #+NAME: Modelo OSCAR ARIMA 1 0 1 con cte
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :eval no :exports code 
 arima 1 0 1 ; FrecuenciaOscar
 #+end_src
 
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloOscar1.txt
   <<Modelo OSCAR ARIMA 1 0 1 con cte>>
 end outfile
@@ -243,13 +244,14 @@ end outfile
 #+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloOscar1.txt example
 #+latex: }
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :eval no :exports code 
 series res1Oscar = $uhat
 corrgm res1Oscar
 #+end_src
 
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
+series res1Oscar = $uhat
 outfile --quiet Residuos1OscarACF-PACF.txt
    corrgm res1Oscar --quiet
 end outfile
@@ -262,12 +264,11 @@ end outfile
 ** Estimación de un segundo modelo univariante para la serie de popularidad del nombre Óscar
 
 #+NAME: Modelo OSCAR ARIMA 1 1 0 sin cte
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+begin_src gretl :eval no :exports code 
 arima 1 1 0 --nc ; FrecuenciaOscar
 #+end_src
 
-
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloOscar2.txt
   <<Modelo OSCAR ARIMA 1 1 0 sin cte>>
 end outfile
@@ -277,13 +278,14 @@ end outfile
 #+include: ./Examen-NombreOscarYConsumoDePetroleo/modeloOscar2.txt example
 #+latex: }
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+
+#+begin_src gretl :eval no :exports code 
 series res2Oscar = $uhat
 corrgm res2Oscar
 #+end_src
 
-
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
+series res2Oscar = $uhat
 outfile --quiet Residuos2OscarACF-PACF.txt
    corrgm res2Oscar --quiet
 end outfile
@@ -296,13 +298,14 @@ end outfile
 
 * Contraste de cointegración
 
-#+BEGIN_SRC R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+NAME: Contraste de cointegración
+#+begin_src gretl :eval no :exports code 
 coint 2 ConsumoPetroleo FrecuenciaOscar --test-down
-#+END_SRC
+#+end_src
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet test_cointegracion.txt
-    coint 2 ConsumoPetroleo FrecuenciaOscar --test-down
+    <<Contraste de cointegración>>
 end outfile
 #+end_src
 
@@ -314,23 +317,21 @@ end outfile
 * Regresión del consumo de petroleo sobre la popularidad del nombre Óscar
 ** Primer modelo
 
-#+BEGIN_SRC R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+NAME: Regresión en niveles
+#+begin_src gretl :eval no :exports none
 ols ConsumoPetroleo 0 FrecuenciaOscar
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 1 --quiet
-#+END_SRC
+#+end_src
 
 # P-valor Durbin-Watson
 # scalar dwpval = $dwpval
 # print dwpval 
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloMCO.txt
-  ols ConsumoPetroleo 0 FrecuenciaOscar
-  modtest --normality --quiet
-  modtest --white --quiet
-  modtest --autocorr 1 --quiet
+  <<Regresión en niveles>>
 end outfile
 #+end_src
 
@@ -340,19 +341,20 @@ end outfile
 
 ** Segundo modelo: regresión del consumo de petroleo sobre la popularidad del nombre Óscar con modelo de corrección de error AR1
 
-#+BEGIN_SRC R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+
+#+NAME: Regresión con corrección de error
+#+begin_src gretl :eval no :exports none
 ar1 ConsumoPetroleo 0 FrecuenciaOscar
 modtest --normality --quiet
-#+END_SRC
+#+end_src
 
 # P-valor Durbin-Watson
 # scalar dwpval = $dwpval
 # print dwpval 
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloMCO_AR1.txt
-  ar1 ConsumoPetroleo 0 FrecuenciaOscar
-  modtest --normality --quiet
+  <<Regresión con corrección de error>>
 end outfile
 #+end_src
 
@@ -364,22 +366,19 @@ end outfile
 * Regresión en primeras diferencias
 ** Primer modelo
 
-#+BEGIN_SRC R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+NAME: Regresión en primeras diferencias
+#+begin_src gretl :eval no :exports none
 diff ConsumoPetroleo FrecuenciaOscar
 ols d_ConsumoPetroleo 0 d_FrecuenciaOscar
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 2 --quiet
-#+END_SRC
+#+end_src
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloMCO_en_diff.txt
-  ols d_ConsumoPetroleo 0 d_FrecuenciaOscar
-  modtest --normality --quiet
-  modtest --white --quiet
-  modtest --autocorr 2 --quiet
+  <<Regresión en primeras diferencias>>
 end outfile
-
 #+end_src
 
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
@@ -387,27 +386,23 @@ end outfile
 #+latex: }
 
 ** Segundo modelo: Regresión en primeras diferencias con intervención en el año 2020
-Dado que hubo una caída muy acusada en el consumo de petroleo del año
-20 debido al confinamiento por la Covid19 (/circunstancia que no
-afectó de manera particular a la popularidad del nombre "Óscar"/), el
-siguiente modelo introduce una variable ficticia para el año 2020 (se
-introduce en primeras diferencias como el resto de variables del
-modelo).
+Dado que hubo una caída muy acusada en el consumo de petroleo del año 20 debido al confinamiento por la Covid19 
+(/circunstancia que no afectó de manera particular a la popularidad del nombre "Óscar"/), 
+el siguiente modelo introduce una variable ficticia para el año 2020 
+(se introduce en primeras diferencias como el resto de variables del modelo).
 
-#+BEGIN_SRC R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports code 
+#+NAME: Regresión en primeras diferencias con intervención
+#+begin_src gretl :eval no :exports none
 diff ConsumoPetroleo FrecuenciaOscar Covid
 ols d_ConsumoPetroleo 0 d_FrecuenciaOscar d_Covid
 modtest --normality --quiet
 modtest --white --quiet
 modtest --autocorr 2 --quiet
-#+END_SRC
+#+end_src
 
-#+begin_src R :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :results none :exports none
+#+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloMCO_en_diff_intervencionC.txt
-  ols d_ConsumoPetroleo 0 d_FrecuenciaOscar d_Covid
-  modtest --normality --quiet
-  modtest --white --quiet
-  modtest --autocorr 2 --quiet
+  <<Regresión en primeras diferencias con intervención>>
 end outfile
 #+end_src
 
@@ -422,86 +417,62 @@ end outfile
 
 ** Pregunta 1
 
-Discuta de todas las formas posibles si las series temporales de
-consumo de petroleo (=ConsumoPetroleo=) y popularidad del nombre Óscar
-(=FrecuenciaOscar=) son estacionarias en media (i.e., son la
-realización de procesos estocásticos estacionarios), usando para ello
-los resultados de los apartados [[Datos en nivel del consumo de petroleo
-en Grecia]], [[Datos en nivel de la popularidad del nombre Óscar en EEUU]] y
-[[Contraste de cointegración]].
+Discuta de todas las formas posibles si las series temporales de consumo de petroleo (=ConsumoPetroleo=) y popularidad del nombre Óscar (=FrecuenciaOscar=) son estacionarias en media 
+(i.e., son la realización de procesos estocásticos estacionarios), 
+usando para ello los resultados de los apartados [[Datos en nivel del consumo de petroleo en Grecia]], [[Datos en nivel de la popularidad del nombre Óscar en EEUU]] y [[Contraste de cointegración]].
 
 ([[Respuesta 1]])
 
 ** Pregunta 2
 
-Discuta si las series temporales =ConsumoPetroleo= y =FrecuenciaOscar=
-están cointegradas, a partir de los resultados del apartado [[Contraste
-de cointegración]].
+Discuta si las series temporales =ConsumoPetroleo= y =FrecuenciaOscar= están cointegradas, a partir de los resultados del apartado [[Contraste de cointegración]].
 
 ([[Respuesta 2]])
 
 ** Pregunta 3
 
-¿Contradice la [[Regresión en primeras diferencias]] la posibilidad de que
-están relacionados el consumo de petroleo en Grecia y la popularidad
-del nombre de pila Oscar en los EEUU?
+¿Contradice la [[Regresión en primeras diferencias]] la posibilidad de que están relacionados el consumo de petroleo en Grecia y la popularidad del nombre de pila Oscar en los EEUU?
 
 ([[Respuesta 3]])
 
 ** Pregunta 4
 
-Los listados de la [[Regresión del consumo de petroleo sobre la
-popularidad del nombre Óscar]] y la [[Regresión en primeras diferencias]]
-muestran los principales resultados obtenidos al estimar por MCO dos
-modelos de regresión que relacionan las dos variables consideradas en
-este ejercicio (dichos modelos están referidos como "/primeros
-modelos/").
+Los listados de la [[Regresión del consumo de petroleo sobre la popularidad del nombre Óscar]] y la [[Regresión en primeras diferencias]] muestran los principales resultados obtenidos al estimar por MCO dos
+modelos de regresión que relacionan las dos variables consideradas en este ejercicio (dichos modelos están referidos como "/primeros modelos/").
 
-Resuma y comente los resultados de estimación y diagnosis que le
-parezcan más relevantes de esos dos primeros modelos en niveles y en
-diferencias.
+Resuma y comente los resultados de estimación y diagnosis que le parezcan más relevantes de esos dos primeros modelos en niveles y en diferencias.
 
-Si detecta alguna desviación del cumplimiento de las hipótesis
-habituales, discuta sus consecuencias sobre las propiedades del
-estimador MCO y sugiera alguna forma de tratarla.
+Si detecta alguna desviación del cumplimiento de las hipótesis habituales, discuta sus consecuencias sobre las propiedades del estimador MCO y sugiera alguna forma de tratarla.
 
 ([[Respuesta 4]])
 
 ** Pregunta 5
 
-Tanto en el caso de las regresiones en niveles como en el caso de las
-regresiones en primeras diferencias, también se muestra los resultados
-de un segundo modelo de regresión.
+Tanto en el caso de las regresiones en niveles como en el caso de las regresiones en primeras diferencias, también se muestra los resultados de un segundo modelo de regresión.
 
-Explique en cada caso si ese segundo modelo responde a algún posible
-tratamiento que haya indicado en la pregunta anterior y por qué (o si
-dicho tratamiento no tiene nada que ver con lo que usted dijo). En
-cualquier caso, señale (en cada caso) si considera que ese segundo
-modelo es mejor o peor que el primero, y en qué aspectos.
+Explique en cada caso si ese segundo modelo responde a algún posible tratamiento que haya indicado en la pregunta anterior y por qué (o si dicho tratamiento no tiene nada que ver con lo que usted dijo). 
+En cualquier caso, señale (en cada caso) si considera que ese segundo modelo es mejor o peor que el primero, y en qué aspectos.
 
 
 ([[Respuesta 5]])
 
 ** Pregunta 6
 
-En la Sección [[Datos en nivel del consumo de petroleo en Grecia]]
-aparecen dos modelos univariantes. Compare los resultados he indique
-si alguno de ellos es preferible y por qué.
+En la Sección [[Datos en nivel del consumo de petroleo en Grecia]] aparecen dos modelos univariantes. Compare los resultados he indique si alguno de ellos es preferible y por qué. 
 
 ([[Respuesta 6]])
 
 ** Pregunta 7
 
-En la Sección [[Datos en nivel de la popularidad del nombre Óscar en
-EEUU]] aparecen dos modelos univariantes. Compare los resultados he
-indique si alguno de ellos es preferible y por qué.
+En la Sección [[Datos en nivel de la popularidad del nombre Óscar en EEUU]] aparecen dos modelos univariantes. 
+Compare los resultados he indique si alguno de ellos es preferible y por qué.
 
 ([[Pregunta 7]])
 
 ** Pregunta 8
 
-¿Cuáles de los modelos de más arriba considera aceptables? ¿O qué
-mejoras sugeriría para ellos?
+¿Cuáles de los modelos de más arriba considera aceptables? 
+¿O qué mejoras sugeriría para ellos?
 
 ([[Respuesta 8]])
 
@@ -512,206 +483,131 @@ mejoras sugeriría para ellos?
 
 ** Respuesta 1
 
-Ambas series (=ConsumoPetroleo= y =FrecuenciaOscar=) parecen ser NO
-estacionarias en media,
-- Sus gráficos muestran una clara evolución de su nivel a lo largo de
-  la muestra (los primeros años ascendente y desde 2005 descendente).
+Ambas series (=ConsumoPetroleo= y =FrecuenciaOscar=) parecen ser NO estacionarias en media,
+- Sus gráficos muestran una clara evolución de su nivel a lo largo de la muestra (los primeros años ascendente y desde 2005 descendente).
 
-- Ambas funciones de autocorrelación (FAC) muestran persistencia (sus
-  coeficientes decrecen despacio y a un ritmo aproximadamente lineal);
-  y el primer coeficiente de la PACF está próximo a uno en ambos
-  casos.
+- Ambas funciones de autocorrelación (FAC) muestran persistencia (sus coeficientes decrecen despacio y a un ritmo aproximadamente lineal); y el primer coeficiente de la PACF está próximo a uno en ambos casos.
 
-- [[Estimación de un primer modelo univariante para la serie de consumo
-  de petroleo]]: El modelo univariante estimado tiene una raíz AR
-  aproximadamente igual a $1$.
+- [[Estimación de un primer modelo univariante para la serie de consumo de petroleo]]: El modelo univariante estimado tiene una raíz AR aproximadamente igual a $1$.
 
-- [[Estimación de un primer modelo univariante para la serie de
-  popularidad del nombre Óscar]]: El modelo univariante estimado tiene
-  una raíz AR aproximadamente igual a $1$.
+- [[Estimación de un primer modelo univariante para la serie de popularidad del nombre Óscar]]: El modelo univariante estimado tiene una raíz AR aproximadamente igual a $1$.
 
-- [[Contraste de cointegración]]: Los test ADF calculados en las etapas 1
-  y 2 no rechazan la hipótesis (raíz unitaria) con p-valores
-  superiores al 0.4
+- [[Contraste de cointegración]]: Los test ADF calculados en las etapas 1 y 2 no rechazan la hipótesis (raíz unitaria) con p-valores superiores al 0.4
 
 ([[Pregunta 1]])
 
 ** Respuesta 2
 
 Las conclusiones de las distintas etapas del test de cointegración son:
-- Etapa 1 :: El test ADF no rechaza que la serie =ConsumoPetroleo= sea
-  I(1) para niveles de significación inferiores al 40% (p-valor
-  asintótico =0,4672=).
-- Etapa 2 :: El test ADF no rechaza que la serie =FrecuenciaOscar= sea
-  I(1) para niveles de significación inferiores al 40% (p-valor
-  asintótico =0,4218=).
-- Etapa 3 :: En la regresión (cointegrante) de mortalidad sobre la
-  proporción de matrimonios eclesiásticos ambos parámetros (constante
-  y pendiente) resultan ser muy significativos, y el $R^2$ está
-  próximo a 1.
-- Etapa 4 :: El test ADF rechaza que los residuos de la regresión
-  cointegrante sean I(1) tanto al 10% como al 5% de significación
-  (p-valor asintótico =0,03258=)
+- Etapa 1 :: El test ADF no rechaza que la serie =ConsumoPetroleo= sea I(1) para niveles de significación inferiores al 40% (p-valor asintótico =0,4672=).
+- Etapa 2 :: El test ADF no rechaza que la serie =FrecuenciaOscar= sea I(1) para niveles de significación inferiores al 40% (p-valor asintótico =0,4218=).
+- Etapa 3 :: En la regresión (cointegrante) de mortalidad sobre la proporción de matrimonios eclesiásticos ambos parámetros (constante y pendiente) resultan ser muy significativos, y el $R^2$ está próximo a 1.
+- Etapa 4 :: El test ADF rechaza que los residuos de la regresión cointegrante sean I(1) tanto al 10% como al 5% de significación (p-valor asintótico =0,03258=)
 
-Consecuentemente, _el test NO rechaza la cointegración de ambas
-series_ (/en contra de lo que sugiere el sentido común/).
+Consecuentemente, _el test NO rechaza la cointegración de ambas series_ (/en contra de lo que sugiere el sentido común/).
 
 ([[Pregunta 2]])
 
 ** Respuesta 3
 
-_La relación NO se desvanece al diferenciar los datos_ para lograr la
-estacionariedad; que es precisamente lo que cabe esperar cuando la
-relación existe, pues si
-$$
+_La relación NO se desvanece al diferenciar los datos_ para lograr la estacionariedad; que es precisamente lo que cabe esperar cuando la relación existe, pues si 
+\[
 \boldsymbol{y}=\beta_1 \boldsymbol{1} + \beta_2 \boldsymbol{x} + \boldsymbol{u}
-$$
+\]
 Entonces también debe ser cierto que
-$$
+\[
 \nabla\boldsymbol{y}= \beta_2 \nabla\boldsymbol{x} + \nabla\boldsymbol{u}
-$$
+\]
 
-Sorprendentemente, en la [[Regresión en primeras diferencias]] la
-constante es NO significativa, la pendiente es muy significativa y el
-$R^2$ no es, en absoluto, despreciable (=R-cuadrado 0,327929=). Es
-decir, _la [[Regresión en primeras diferencias]] no contradice la
-posibilidad de que ambas variables estén relacionadas_.
+Sorprendentemente, en la [[Regresión en primeras diferencias]] la constante es NO significativa, la pendiente es muy significativa y el $R^2$ no es, en absoluto, despreciable (=R-cuadrado 0,327929=). 
+Es decir, _la [[Regresión en primeras diferencias]] no contradice la posibilidad de que ambas variables estén relacionadas_.
 
-/Comentario y moraleja/: Pese a los resultados estadísticos, la
-relación entre =ConsumoPetroleo= y =FrecuenciaOscar= es evidentemente
-espuria (es imposible argumentar con algún fundamento que la
-frecuencia del nombre Óscar en EEUU tenga ninguna influencia sobre el
-consumo de petroleo en Grecia... o viceversa). ¡Ojo con interpretar
-los resultados estadísticos sin un mínimo espíritu crítico!
+/Comentario y moraleja/: Pese a los resultados estadísticos, la relación entre =ConsumoPetroleo= y =FrecuenciaOscar= es evidentemente espuria (es imposible argumentar con algún fundamento que la
+frecuencia del nombre Óscar en EEUU tenga ninguna influencia sobre el consumo de petroleo en Grecia... o viceversa). 
+¡Ojo con interpretar los resultados estadísticos sin un mínimo espíritu crítico!
 
 ([[Pregunta 3]])
 
 ** Respuesta 4
 
-- Primer modelo para datos en nivel :: ([[Regresión del consumo de
-  petroleo sobre la popularidad del nombre Óscar]]): Todos los
-  coeficientes son muy significativos. El ajuste del modelo, medido
-  por el valor del \(R^2\) es muy elevado. Los contrastes sobre los
-  residuos no rechazan la hipótesis nula de normalidad, pero si
-  rechazan la hipótesis de homocedasticidad y de ausencia de
-  autocorrelación.
+- Primer modelo para datos en nivel :: ([[Regresión del consumo de petroleo sobre la popularidad del nombre Óscar]]): Todos los coeficientes son muy significativos.
+  El ajuste del modelo, medido por el valor del \(R^2\) es muy elevado. 
+  Los contrastes sobre los residuos no rechazan la hipótesis nula de normalidad, pero si rechazan la hipótesis de homocedasticidad y de ausencia de autocorrelación.
 
-  En cuanto a la heterocedasticidad, sería conveniente estimar
-  indicando la opción de desviaciones típicas robustas, pues los
-  p-valores están mal calculados en presencia de
-  heterocedasticidad. Más importante es la presencia de
-  autocorrelación; dado que hay indicios de autocorrelación de orden 1
-  en los errores de ajuste, sería conveniente estimar el modelo
-  incorporando un modelo AR(1) para el error.
+  En cuanto a la heterocedasticidad, sería conveniente estimar indicando la opción de desviaciones típicas robustas, pues los p-valores están mal calculados en presencia de heterocedasticidad.
+  Más importante es la presencia de autocorrelación; dado que hay indicios de autocorrelación de orden 1 en los errores de ajuste,
+  sería conveniente estimar el modelo incorporando un modelo AR(1) para el error.
 
-- Primer modelo para datos en primeras diferencias :: ([[Regresión en
-  primeras diferencias]]): El único coeficiente significativo es la
-  pendiente (es decir, al diferenciar las series NO ha desaparecido la
-  relación entre ellas), y el ajuste del modelo, medido por el valor
-  del \(R^2\), es superior al 30%. Los contrastes residuales rechazan
-  la hipótesis nula de normalidad, pero no rechazan las de
-  homocedasticidad y ausencia de autocorrelación.
+- Primer modelo para datos en primeras diferencias :: ([[Regresión en primeras diferencias]]): El único coeficiente significativo es la pendiente
+  (es decir, al diferenciar las series NO ha desaparecido la relación entre ellas), y el ajuste del modelo, medido por el valor del \(R^2\), es superior al 30%.
+  Los contrastes residuales rechazan la hipótesis nula de normalidad, pero no rechazan las de homocedasticidad y ausencia de autocorrelación.
 
-  Si las perturbaciones no tienen distribución normal las estimaciones
-  no serán eficientes en el sentido máximo-verosímil (aunque sí en el
-  de Gauss-Markov) y la distribución de los estadísticos habituales
-  será distinta de la teórica bajo el supuesto de normalidad de las
-  perturbaciones (por ejemplo, los estadísticos de la $t$ no tendrán
-  exactamente una distribución /t/ de student). En la práctica esto no
-  ocasiona un problema grave en general.
+  Si las perturbaciones no tienen distribución normal las estimaciones no serán eficientes en el sentido máximo-verosímil 
+  (aunque sí en el de Gauss-Markov) y la distribución de los estadísticos habituales será distinta de la teórica bajo el supuesto de normalidad de las perturbaciones
+  (por ejemplo, los estadísticos de la $t$ no tendrán exactamente una distribución /t/ de student).
+  En la práctica esto no ocasiona un problema grave en general.
 
 ([[Pregunta 4]])
 
 ** Respuesta 5
 
-
-- Segundo modelo para datos en nivel :: ([[Regresión del consumo de
-  petroleo sobre la popularidad del nombre Óscar]]): El segundo modelo
-  corresponde a una regresión con modelo AR(1) para el error (tal y
-  como se sugería en la pregunta anterior). La estimación ha
-  convergido en 5 iteraciones, los parámetros son muy significativos y
-  el $R^2$ ajustado es superior al del primer modelo. Tampoco en este
-  caso se rechaza la hipótesis de normalidad en los residuos del
-  ajuste. Todo ello sugiere que este segundo modelo sería ligeramente
-  superior al primero (/si no fuera porque la relación es
-  evidentemente espuria y, por tanto, ninguno de estos modelos es
-  aceptable/).
+- Segundo modelo para datos en nivel :: ([[Regresión del consumo de petroleo sobre la popularidad del nombre Óscar]]): El segundo modelo corresponde a una regresión con modelo AR(1) para el error
+  (tal y como se sugería en la pregunta anterior).
+  La estimación ha convergido en 5 iteraciones, los parámetros son muy significativos y el $R^2$ ajustado es superior al del primer modelo.
+  Tampoco en este caso se rechaza la hipótesis de normalidad en los residuos del ajuste.
+  Todo ello sugiere que este segundo modelo sería ligeramente superior al primero (/si no fuera porque la relación es evidentemente espuria y, por tanto, ninguno de estos modelos es aceptable/).
 
 
-- Segundo modelo para datos en primeras diferencias :: ([[Regresión en
-  primeras diferencias]]): El segundo modelo incluye un nuevo regresor
-  para captar la caída de consumo de petroleo del año 2020 debida al
-  confinamiento por la Covid19. Por tanto, esta modificación no tiene
-  nada que ver con lo indicado en la pregunta anterior.
+- Segundo modelo para datos en primeras diferencias :: ([[Regresión en primeras diferencias]]):
+  El segundo modelo incluye un nuevo regresor para captar la caída de consumo de petroleo del año 2020 debida al confinamiento por la Covid19.
+  Por tanto, esta modificación no tiene nada que ver con lo indicado en la pregunta anterior.
 
-  No obstante, este modelo parece superior al primero. Los parámetros
-  correspondientes a =d_FrecuenciaOscar= y =d_Covid= son muy
-  significativos, el $R^2$ ajustado es claramente superior y los
-  criterios de información han mejorado ligeramente (i.e., ahora toman
-  valores más bajos). Además, gracias a la intervención del año
-  atípico 2020, los residuos pasan todos los contrastes (incluido el
-  de normalidad).
+  No obstante, este modelo parece superior al primero.
+  Los parámetros correspondientes a =d_FrecuenciaOscar= y =d_Covid= son muy significativos, el $R^2$ ajustado es claramente superior y los criterios de información han mejorado ligeramente
+  (i.e., ahora toman valores más bajos).
+  Además, gracias a la intervención del año atípico 2020, los residuos pasan todos los contrastes (incluido el de normalidad).
 
 ([[Pregunta 5]])
 
 ** Respuesta 6
 
-El primer modelo es un ARMA($1,1$) con media distinta de cero, y los
-tres parámetros estimados son muy significativos. El mayor
-inconveniente es que la raíz autorregresiva es prácticamente $1$. Dado
-que hay una fuerte evidencia de que el proceso NO es estacionario en
-media, es preferible diferenciar la serie e identificar un proceso
-ARIMA.
+El primer modelo es un ARMA($1,1$) con media distinta de cero, y los tres parámetros estimados son muy significativos.
+El mayor inconveniente es que la raíz autorregresiva es prácticamente $1$. 
+Dado que hay una fuerte evidencia de que el proceso NO es estacionario en media, es preferible diferenciar la serie e identificar un proceso ARIMA.
 
-El segundo modelo es un ARIMA(1,1,0) con media cero. Su principal
-ventaja es que el modelo estimado corresponde a un proceso que (una
-vez diferenciado) es invertible y estacionario (pues no tiene
-polinomio MA, y el módulo de la raíz AR es =2,9879= $>1$). 
+El segundo modelo es un ARIMA(1,1,0) con media cero. 
+Su principal ventaja es que el modelo estimado corresponde a un proceso que (una vez diferenciado) es invertible y estacionario 
+(pues no tiene polinomio MA, y el módulo de la raíz AR es =2,9879= $>1$). 
 
-Pese a que tiene menos parámetros estimados, el ajuste y los criterios
-de información son ligeramente mejores. Además, los p-valores de los
-estadísticos Q de Ljung-Box son más elevados en este segundo modelo,
-por lo que sus residuos tienen una mayor apariencia de "ruido
-blanco". En resumen, este segundo modelo parece mejor que el primero.
+Pese a que tiene menos parámetros estimados, el ajuste y los criterios de información son ligeramente mejores. 
+Además, los p-valores de los estadísticos Q de Ljung-Box son más elevados en este segundo modelo, por lo que sus residuos tienen una mayor apariencia de "ruido blanco". 
+En resumen, este segundo modelo parece mejor que el primero. 
 
 ([[Pregunta 6]])
 
 ** Respuesta 7
 
-Como en el caso anterior, el primer modelo es un ARMA($1,1$) con media
-distinta de cero, y los tres parámetros estimados son muy
-significativos. De nuevo, el mayor inconveniente es que la raíz
-autorregresiva es prácticamente $1$. Dado que hay una fuerte evidencia
-de que el proceso NO es estacionario en media, es preferible
-diferenciar la serie e identificar un proceso ARIMA.
+Como en el caso anterior, el primer modelo es un ARMA($1,1$) con media distinta de cero, y los tres parámetros estimados son muy significativos. 
+De nuevo, el mayor inconveniente es que la raíz autorregresiva es prácticamente $1$. 
+Dado que hay una fuerte evidencia de que el proceso NO es estacionario en media, es preferible diferenciar la serie e identificar un proceso ARIMA.
 
+El segundo modelo es un ARIMA(1,1,0) con media cero. 
+Su principal ventaja es que el modelo estimado corresponde a un proceso que (una vez diferenciado) es invertible y estacionario (pues no tiene polinomio MA, y el módulo de la raíz AR es =1,8658= $>1$). 
 
-El segundo modelo es un ARIMA(1,1,0) con media cero. Su principal
-ventaja es que el modelo estimado corresponde a un proceso que (una
-vez diferenciado) es invertible y estacionario (pues no tiene
-polinomio MA, y el módulo de la raíz AR es =1,8658= $>1$). 
-
-Pese a que tiene menos parámetros estimados, el ajuste y los criterios
-de información son ligeramente mejores. Además, los p-valores de los
-estadísticos Q de Ljung-Box son más elevados en este segundo modelo,
-por lo que sus residuos tienen una mayor apariencia de "ruido
-blanco". En resumen, este segundo modelo parece mejor que el primero.
+Pese a que tiene menos parámetros estimados, el ajuste y los criterios de información son ligeramente mejores. 
+Además, los p-valores de los estadísticos Q de Ljung-Box son más elevados en este segundo modelo, por lo que sus residuos tienen una mayor apariencia de "ruido blanco". 
+En resumen, este segundo modelo parece mejor que el primero.
 
 ([[Pregunta 6]])
 
 ** Respuesta 8
 
-- En cuanto a los modelos univariantes :: Como se ha dicho, para ambas
-  series, el segundo modelo es mejor que el primero. En ambos casos
-  corresponde a un proceso invertible y estacionario, el parámetro
-  estimado es significativo y (según los estadísticos Q de Ljung-Box)
-  los residuos parecen ruido blanco.
+- En cuanto a los modelos univariantes :: Como se ha dicho, para ambas series, el segundo modelo es mejor que el primero.
+  En ambos casos corresponde a un proceso invertible y estacionario, el parámetro estimado es significativo y (según los estadísticos Q de Ljung-Box) los residuos parecen ruido blanco.
 
-- En cuanto a los modelos de regresión :: Los cuatro modelos intentan
-  modelizar una relación evidentemente espuria: nada tiene que ver la
-  popularidad del nombre Óscar en EEUU con el consumo de petroleo en
-  Grecia. Consecuentemente ninguna de estas regresiones ofrece un
-  modelo aceptable o, ni siquiera, razonable.
+- En cuanto a los modelos de regresión :: Los cuatro modelos intentan modelizar una relación evidentemente espuria:
+  nada tiene que ver la popularidad del nombre Óscar en EEUU con el consumo de petroleo en Grecia.
+  Consecuentemente ninguna de estas regresiones ofrece un modelo aceptable o, siquiera, razonable.
 
 ([[Pregunta 8]])
 
