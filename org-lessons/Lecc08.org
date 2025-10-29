@@ -107,7 +107,7 @@ Consideremos una serie temporal $\boldsymbol{y}_1^T=(y_1,\ldots,y_T)$. En relaci
 
   Es común expresar la incertidumbre con un intervalo de confianza para la predicción; un rango que con alta probabilidad (como 0.95 o 0.99) incluye el valor futuro pronosticado.
 - Además, la previsión es un proceso dinámico: al recibir nuevos datos, es necesario actualizar los pronósticos con la nueva información. 
-*Los modelos lineales facilitan el cálculo de estos tres aspectos*.
+*Los modelos lineales facilitan solventar estas tres necesidades*.
 
 
 * Predicciones de error cuadrático medio mínimo
@@ -128,7 +128,7 @@ Para evaluar diferentes funciones de predicción, estableceremos como criterio /
 MSE\big(Y_{t+\ell},\,g_t(\ell)\big) = E\Big(Y_{t+\ell}-g_t(\ell)\Big)^2.
 \]
 #+attr_ipynb: (slideshow . ((slide_type . skip)))
-Preferiremos aquel método $g_t(\ell)$ que minimiza la esperanza del error cuadrático $Y_{t+\ell}-g_t(\ell)$; donde \(g_t(\ell)\) es la función de predicción de \({Y}_{t+\ell}\), \(t\) es el índice de la última variable aleatoria considerada y \(\ell\) representa el horizonte de predicción.
+Preferiremos aquel método $g_t(\ell)$ que minimiza la esperanza del cuadrado del error de predicción $Y_{t+\ell}-g_t(\ell)$; donde \(g_t(\ell)\) es la función de predicción de \({Y}_{t+\ell}\), \(t\) es el índice de la última variable aleatoria considerada y \(\ell\) representa el horizonte de predicción.
 
 
 #+attr_ipynb: (slideshow . ((slide_type . fragment)))
@@ -153,7 +153,7 @@ Dicho de otro modo, determinar específicamente cuál es la transformación de $
 
 Como solución alternativa podemos limitarnos a buscar predictores entre:
 - las funciones de $\boldsymbol{Y}_{|:t}$ (i.e., funciones ``del pasado'') que son /_lineales_/; 
-- para seleccionar aquella con menor error cuadrático medio (MSEL).
+- y seleccionar aquella con menor error cuadrático medio (MSEL).
 
 Al adoptar esta estrategia, aceptamos cometer mayores errores de predicción, $MSEL \geq MSE$, pues al excluir funciones no lineales, podríamos estar omitiendo la que genera los errores más pequeños.
 
@@ -189,9 +189,8 @@ En el contexto de la predicción lineal, dicha diferencia $X-\widehat{X}$ recibi
    :metadata: (slideshow . ((slide_type . subslide)))
    :END:
 
-La forma general de un predictor /lineal/ es $\mathcal{h}$
-\[
-g_t(\ell)
+La forma general de un predictor /lineal/ es 
+\[g_t(\ell)
 \;=\; 
 {b_\ell}_0 Y_t + {b_\ell}_1 Y_{t-1} + {b_\ell}_2 Y_{t-2} + \cdots
 \;=\; 
@@ -220,12 +219,14 @@ Cuando $\boldsymbol{Y}=\boldsymbol{\varphi}*\boldsymbol{U}$ es un proceso estoc�
 
 #+latex:\medskip
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
 Restringir la búsqueda a funciones lineales implica que, si la esperanza condicional no es lineal respecto al pasado, el mejor predictor lineal será inferior a la esperanza condicional.
 \[
 MSE \leq MSEL.
 \]
 La igualdad se da solo cuando la esperanza condicional es lineal en $\boldsymbol{Y}_{|:t}$; y por tanto no ha sido excluida por la restricción. En resumen, $MSEL = MSE$ solo cuando la esperanza condicional $E\big(Y_{t+\ell}\mid \boldsymbol{Y}_{|:t}\big)$ coincide con la proyección ortogonal de $Y_{t+\ell}$ sobre $\mathcal{H}_{Y_t}$ (que es exactamente lo que ocurre cuando el proceso estocástico tiene distribución normal).
 
+#+attr_ipynb: (slideshow . ((slide_type . skip)))
 Los resultados anteriores, aplicables a procesos estacionarios infinitos, también son válidos para procesos no estacionarios si consideramos un tramo finito del pasado de $\boldsymbol{Y}$, es decir, si nuestra predicción depende de $\boldsymbol{Y}_{|1:T}=(Y_1,\ldots,Y_T)$. En tal caso la discusión se centra en proyectar (o condicionar la esperanza[fn::entonces estaremos proyectado ortogonalmente sobre funciones medibles de un conjunto finito de variables aleatorias: $\{Y_1,\ldots,Y_T\}$.]) sobre el conjunto finito de variables aleatorias del pasado $\boldsymbol{Y}_{|1:T}$. Así, tanto la esperanza como la varianza condicional serán finitas, lo que asegura que todo esté bien definido.
 
 *** Proyección sobre el pasado de un proceso lineal causal, estacionario e invertible
@@ -346,7 +347,7 @@ Y_{t+\ell} = c + \phi_1 Y_{t+\ell-1} + U_{t+\ell} - \theta_1 U_{t+\ell-1},
 la ecuación \eqref{eqn:predicion-recursiva-ARMA} da lugar a dos casos en función de $\ell$ 
 \begin{equation}
   \begin{cases}
-    \widehat{Y_{t+1|t}} & = c + \phi_1 Y_{t} - \theta_1 U_t. \\\\
+    \widehat{Y_{t+1|t}} & = c + \phi_1 Y_{t} - \theta_1 U_t \qquad \text{cuando } \ell=1 \\\\
     \widehat{Y_{t+\ell|t}} & = c + \phi_1 \widehat{Y_{t+\ell-1|t}}  \qquad \text{cuando } \ell\geq2. 
   \end{cases}
   \label{eqn:predicion-recursiva-ARMA11}
@@ -469,7 +470,7 @@ $$\begin{cases}
 Para $\nabla_{12}Y_t=(1-\Theta_1B^{12})U_t$ (con $\mu=0$ para simplificar); donde $j=1,2,\ldots,12$:
 $$\text{predicción de cada mes }
   \begin{cases}
-    \widehat{Y_{t+j|t}}          & = Y_{t+j-12} - \theta_1 U_{t+j-12-1}. \\
+    \widehat{Y_{t+j|t}}          & = Y_{t+j-12} - \Theta_1 U_{t+j-12-1}. \\
     \widehat{Y_{t+j+(12\ell)|t}} & = \widehat{Y_{t+j|t}}  \qquad \text{cuando } \ell\geq1. 
   \end{cases}$$
 Desde el segundo año, cada predicción es como la del mismo mes del año anterior.
