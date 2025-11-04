@@ -1,0 +1,712 @@
+#    -*- mode: org -*-
+
+#+title: PIB de EEUU desestacionalizado
+# +author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+#+OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+# +INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: Examen-GDP_de_EEUU_desestacionalizado
+#+BEGIN_SRC sh :exports none :results silent :var practica="Examen-GDP_de_EEUU_desestacionalizado"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+
+
+#+LATEX: \maketitle
+
+#+LATEX: \vspace{-2.5cm}
+
+
+* Datos
+
+PIB (GDP) trimestral de EE.UU. (desestacionalizado) en miles de millones de dólares.
+Muestra: desde el primer trimestre de 1991 hasta el tercer trimestre de 2023.
+Para el análisis econométrico, se trabaja con una muestra restringida que termina en el cuarto trimestre de 2019, antes del confinamiento por COVID.
+
+- Ficheros: :: Versión del ejercicio en [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-pdf/Examen-GDP_de_EEUU_desestacionalizado.pdf][pdf]]; [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/Examen-GDP_de_EEUU_desestacionalizado.html][html]].
+   - Datos:  [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/datos/GDP_de_EEUU.gdt][GDP_de_EEUU.gdt]]
+   - Guión de gretl: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/Practicas-html/guiones/Examen-GDP_de_EEUU_desestacionalizado.inp][Examen-GDP_de_EEUU_desestacionalizado.inp]]
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none
+open ../../datos/GDP_de_EEUU_desestacionalizado.gdt
+#+end_src
+#+latex: }
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports code 
+logs GDP
+diff l_GDP
+diff d_l_GDP
+smpl 1991:1 2019:4
+#+end_src
+#+latex: }
+
+* Análisis gráfico
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports code 
+gnuplot l_GDP --time-series --with-lines --output="l_GDP.png"
+#+end_src
+#+latex: }
+
+
+#+BEGIN_CENTER
+#+CAPTION: Serie temporal del logaritmo neperiano del PIB (GDP) de EE.UU.
+#+ATTR_LATEX: :width 0.4\textwidth :center t
+#+attr_org: :width 600
+[[./Examen-GDP_de_EEUU_desestacionalizado/l_GDP.png]]
+#+END_CENTER
+
+
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports code 
+gnuplot d_l_GDP --time-series --with-lines --output="d_l_GDP.png"
+gnuplot d_d_l_GDP --time-series --with-lines --output="d_d_l_GDP.png"
+#+end_src
+#+latex: }
+
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{./Examen-GDP_de_EEUU_desestacionalizado/d_l_GDP.png}
+\end{minipage}%
+\begin{minipage}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{./Examen-GDP_de_EEUU_desestacionalizado/d_d_l_GDP.png}
+\end{minipage}%
+\caption{Series \texttt{d_l_GDP} ($\nabla\ln GDP_t$) \; y \; \texttt{d_d_l_GDP} ($\nabla^2\ln GDP_t$).}
+\end{figure}
+#+END_EXPORT
+
+#+BEGIN_EXPORT HTML
+<figure style="display: flex; justify-content: center; gap: 10px;">
+    <img src="./Examen-GDP_de_EEUU_desestacionalizado/d_l_GDP.png" style="max-width:45%; height:auto;"/>
+    <img src="./Examen-GDP_de_EEUU_desestacionalizado/d_d_l_GDP.png" style="max-width:45%; height:auto;"/>
+    <figcaption>Series <code>d_l_GDP</code> y <code>d_d_l_GDP</code></figcaption>
+</figure>
+#+END_EXPORT
+
+* Test de raíces unitarias 
+
+# #+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+# smpl 1991:1 2022:1
+# #+END_SRC
+
+
+** Serie =d_l_GDP=
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: Dickey-Fuller d_l_GDP
+#+begin_src gretl :eval no :exports code 
+adf 8 d_l_GDP --c
+#+end_src
+#+latex: }
+
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet Dickey-Fuller_d_l_GDP.txt
+    <<Dickey-Fuller d_l_GDP>>
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \small
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/Dickey-Fuller_d_l_GDP.txt example
+#+latex: }
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: KPSS d_l_GDP
+#+begin_src gretl :eval no :exports code 
+kpss 4 d_l_GDP
+#+end_src
+#+latex: }
+
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet KPSS_d_l_GDP.txt
+    <<KPSS d_l_GDP>>
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \small
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/KPSS_d_l_GDP.txt example
+#+latex: }
+
+
+# +latex: \newpage
+
+
+** Serie =d_d_l_GDP=
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: Dickey-Fuller d_d_l_GDP
+#+begin_src gretl :eval no :exports code 
+adf 8 d_d_l_GDP --c
+#+end_src
+#+latex: }
+
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet Dickey-Fuller_d_d_l_GDP.txt
+    <<Dickey-Fuller d_d_l_GDP>>
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \small
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/Dickey-Fuller_d_d_l_GDP.txt example
+#+latex: }
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: KPSS d_d_l_GDP
+#+begin_src gretl :eval no :exports code 
+kpss 4 d_d_l_GDP
+#+end_src
+#+latex: }
+
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet KPSS_d_d_l_GDP.txt
+    <<KPSS d_d_l_GDP>>
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \small
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/KPSS_d_d_l_GDP.txt example
+#+latex: }
+
+
+# +latex: \newpage
+
+* Modelos ARIMA estimados
+
+# #+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+# smpl 1991:1 2019:4
+# #+END_SRC
+
+** Modelo 1
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: ARI l_GDP
+#+begin_src gretl :eval no :exports code 
+arima 2 1 0 ; l_GDP
+modtest --normality --quiet
+modtest --arch --quiet
+modtest --autocorr 15
+#+end_src
+#+latex: }
+
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet ARI-l_GDP.txt
+    <<ARI l_GDP>>
+end outfile
+
+outfile --quiet Predicciones-ARI.txt
+  fcast --out-of-sample --stats-only
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \small %  \footnotesize % 
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/ARI-l_GDP.txt example
+#+latex: }
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :eval no :exports code 
+fcast --out-of-sample --stats-only
+#+end_src
+#+latex: }
+(/Los resultados de la previsión aparecen en la sección de previsiones/)
+
+#+latex: \newpage
+
+** Modelo 2
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: IMA l_GDP
+#+begin_src gretl :eval no :exports code 
+arima 0 2 1 ; l_GDP --nc
+modtest --normality --quiet
+modtest --arch --quiet
+modtest --autocorr 15
+#+end_src
+#+latex: }
+
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet IMA-l_GDP.txt
+    <<IMA l_GDP>>
+end outfile
+
+outfile --quiet Predicciones-IMA.txt
+  fcast --out-of-sample --stats-only
+end outfile
+#+END_SRC
+
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \small
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/IMA-l_GDP.txt example
+#+latex: }
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :eval no :exports code 
+fcast --out-of-sample --stats-only
+#+end_src
+#+latex: }
+(/Resultados de la previsión aparecen en la sección de previsiones/)
+
+#+latex: \newpage
+
+
+* Evaluación de las previsiones de =l_GDP= para ambos modelos
+
+** Evaluación de las previsiones del Modelo 1
+
+#+latex: {\vspace{0pt}\color{gray!70!black} \small
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/Predicciones-ARI.txt example
+#+latex: }
+
+** Evaluación de las previsiones del Modelo 2
+
+#+latex: {\vspace{0pt}\color{gray!70!black} \small
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/Predicciones-IMA.txt example
+#+latex: }
+
+
+* Previsión del =GDP= calculada con las previsiones del Modelo 1
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+BEGIN_SRC gretl  :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no
+smpl 1991:1 2019:4
+arima 2 1 0 ; l_GDP
+fcast --out-of-sample --stats-only
+matrix ly_hat1 = $fcast
+matrix se_hat1 = $fcse
+matrix m_hat1 = exp(ly_hat1+(se_hat1.^2)/2)
+# Intervalos de confianza
+scalar ns = 0.05  # nivel de signifacion
+matrix m_inf1 = exp(ly_hat1 - critical(z, ns/2)*(se_hat1))
+matrix m_sup1 = exp(ly_hat1 + critical(z, ns/2)*(se_hat1))
+smpl 2020:1 2023:3
+series y_hat1 = m_hat1
+series lim_inf1 = m_inf1
+series lim_sup1 = m_sup1
+series error1 = GDP-y_hat1
+scalar SumaErrores1 = sumall(error1)
+scalar SumaGDP = sumall(GDP)
+scalar Ratio1 = SumaErrores1/SumaGDP
+scalar MAPE1 = 100*sumall(abs(error1)/GDP)/$nobs # error porcentual absoluto medio
+#+END_SRC
+#+latex: }
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: Resumen resultados1
+#+begin_src gretl :eval no :exports code 
+print GDP y_hat1 lim_inf1 lim_sup1  error1 -o
+print SumaErrores1 Ratio1 MAPE1
+#+end_src
+#+latex: }
+
+
+#+BEGIN_SRC gretl  :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet Predicciones_GDP1.txt
+    <<Resumen resultados1>>
+end outfile
+#+end_src
+
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \footnotesize 
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/Predicciones_GDP1.txt example
+#+latex: }
+
+# +latex: \newpage
+
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports code 
+smpl 2017:1 2023:3
+gnuplot GDP y_hat1 lim_inf1 lim_sup1 --time-series --with-lines --output="prediccion1.png"
+#+end_src
+#+latex: }
+
+
+
+* Previsión del =GDP= calculada con las previsiones del Modelo 2
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+BEGIN_SRC gretl  :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no
+smpl 1991:1 2019:4
+arima 0 2 1 ; l_GDP
+fcast --out-of-sample --stats-only
+matrix ly_hat2 = $fcast
+matrix se_hat2 = $fcse
+matrix m_hat2 = exp(ly_hat2+(se_hat2.^2)/2)
+# Intervalos de confianza
+scalar ns = 0.05  # nivel de signifacion
+matrix m_inf2 = exp(ly_hat2 - critical(z, ns/2)*(se_hat2))
+matrix m_sup2 = exp(ly_hat2 + critical(z, ns/2)*(se_hat2))
+smpl 2020:1 2023:3
+series y_hat2 = m_hat2
+series lim_inf2 = m_inf2
+series lim_sup2 = m_sup2
+series error2 = GDP-y_hat2
+scalar SumaErrores2 = sumall(error2)
+scalar Ratio2 = SumaErrores2/SumaGDP
+scalar MAPE2 = 100*sumall(abs(error2)/GDP)/$nobs # error porcentual absoluto medio
+#+END_SRC
+#+latex: }
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: Resumen resultados2
+#+begin_src gretl :eval no :exports code 
+print GDP y_hat2 lim_inf2 lim_sup2 error2 -o
+print SumaGDP Ratio2 MAPE2
+#+end_src
+#+latex: }
+
+
+#+BEGIN_SRC gretl  :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet Predicciones_GDP2.txt
+    <<Resumen resultados2>>
+end outfile
+#+end_src
+
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \footnotesize 
+#+include: ./Examen-GDP_de_EEUU_desestacionalizado/Predicciones_GDP2.txt example
+#+latex: }
+
+# +latex: \newpage
+
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_de_EEUU_desestacionalizado.inp :eval no :exports code 
+smpl 2017:1 2023:3
+gnuplot GDP y_hat2 lim_inf2 lim_sup2 --time-series --with-lines --output="prediccion2.png"
+#+end_src
+#+latex: }
+
+
+# #+BEGIN_CENTER
+# #+CAPTION: Predicción del PIB (GDP) de EE.UU para el periodo 2020:1 a 2023:3 e intervalos de confianza.
+# #+ATTR_LATEX: :width 0.5\textwidth :center t
+# #+attr_org: :width 600
+# [[./Examen-GDP_de_EEUU_desestacionalizado/prediccion2.png]]
+# #+END_CENTER
+
+
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.5\textwidth}
+  \includegraphics[width=\textwidth]{./Examen-GDP_de_EEUU_desestacionalizado/prediccion1.png}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+  \includegraphics[width=\textwidth]{./Examen-GDP_de_EEUU_desestacionalizado/prediccion2.png}
+\end{minipage}%
+\caption{Presiones para el GDP usando el Modelo 1 (a la izquierda) y el Modelo 2 (a la derecha).}
+\end{figure}
+#+END_EXPORT
+
+#+BEGIN_EXPORT HTML
+<figure style="display: flex; justify-content: center; gap: 10px;">
+    <img src="./Examen-GDP_de_EEUU_desestacionalizado/prediccion1.png" style="max-width:48%; height:auto;"/>
+    <img src="./Examen-GDP_de_EEUU_desestacionalizado/prediccion2.png" style="max-width:48%; height:auto;"/>
+    <figcaption>Presiones para el GDP usando el Modelo 1 (a la izquierda) y el Modelo 2 (a la derecha).</code></figcaption>
+</figure>
+#+END_EXPORT
+
+
+
+* Preguntas 
+
+** Pregunta 1
+
+(2 pts.) Discuta el orden de integración de la serie del logaritmo neperiano del PIB a partir del [[Análisis gráfico]] y los [[Test de raíces unitarias]]. Utilice esa información de manera exhaustiva, comentando detalladamente toda la evidencia proporcionada sobre este orden de integración. Si realiza algún contraste de hipótesis, indique su hipótesis nula y concluya según el p-valor.
+
+([[Respuesta 1]])
+
+
+** Pregunta 2
+
+(2 pts.) Comente exhaustivamente los resultados de estimación y diagnóstico de los modelos 1 y 2. ¿En qué unidades está medida la desviación típica de las innovaciones? ¿Muestran los modelos algún indicio de sobrediferenciación o infradiferenciación?
+
+([[Respuesta 2]])
+
+
+** Pregunta 3
+
+(2 pts.) Realice una comparación exhaustiva de los resultados de los modelos 1 y 2, utilizando también los resultados de [[Evaluación de las previsiones de =l_GDP= para ambos modelos]]. ¿Cuál de los dos modelos:
+1. ajusta mejor a la muestra y parece más adecuado?
+2. se espera que esté mejor especificado?
+3. produce mejores previsiones extramuestrales?
+Argumente su respuesta de todas las formas posibles. Para tratar el punto 3, haga referencia a los estadísticos presentados en la evaluación de las previsiones.
+
+([[Respuesta 3]])
+
+
+** Pregunta 4
+
+(1 pts. /Cada respuesta correcta 0.1 pts. Cada respuesta incorrecta -0.1 pts./) En relación a los [[Modelos ARIMA estimados]], indique cuáles de las siguientes formulaciones matemáticas expresan correctamente el modelo estimado, con un redondeo a tres decimales:
+
+El modelo 1 puede expresarse matemáticamente como:
+
+1. \(\ln\,GDP_t + 0.011= \frac{1}{\nabla(1 \, + \, 0,354 \, B \, + \, 0,200\, B^2)} \hat{a}_t; \Big.\quad t \in \mathbb{Z}\)
+2. \(\ln\,GDP_t - 0.011= \frac{1}{\nabla(1 \, - \, 0,354 \, B \, - \, 0,200\, B^2)} \hat{a}_t; \Big.\quad t \in \mathbb{Z}\)
+3. \( \nabla \ln \, GDP_t =  0.011 +  \frac{\hat{a}_t}{1\, - \, 0,354 \, B \, - \, 0,200\, B^2}; \Big.\quad t \in \mathbb{Z}\)
+4. \( (1 \, - \, 0,354 \, B \, - \, 0,200\, B^2) (\nabla \ln \, GDP_t - 0.011) = \hat{a}_t; \Big.\quad t \in \mathbb{Z}\)
+5. \( (1 \, - \, 0,354 \, B \, - \, 0,200\, B^2) (\nabla \ln \, GDP_t + 0.011) = \hat{a}_t; \Big.\quad t \in \mathbb{Z}\)
+
+El modelo 2 puede expresarse matemáticamente como:
+1. \( \nabla^2 \ln \, GDP_t = (1 \, - \, 0,611 \, B) \, \hat{a}_t; \Big.\quad t \in \mathbb{Z}\)
+2. \( \nabla^2 \ln \, GDP_t = (1 \, + \, 0,611 \, B) \, \hat{a}_t; \Big.\quad t \in \mathbb{Z}\)
+3. \( \frac{1}{1 \, + \, 0,611 \, B}\nabla^2 \ln \, GDP_t = \hat{a}_t; \Big.\quad t \in \mathbb{Z}\)
+4. \( \frac{1}{1 \, - \, 0,611 \, B}\nabla^2 \ln \, GDP_t = \hat{a}_t; \Big.\quad t \in \mathbb{Z}\)
+5. \( \nabla^2 \ln \, GDP_t = \frac{1}{1 \, - \, 0,611 \, B} \hat{a}_t; \Big.\quad t \in \mathbb{Z}\)
+
+([[Respuesta 4]])
+
+
+** Pregunta 5
+
+(3 pts. /Cada respuesta correcta 0.1 pts. Cada respuesta incorrecta -0.1 pts./)
+Indique si es cierta o no cada una de las siguientes afirmaciones (añada una breve explicación en cada caso):
+
+1. El p-valor del contraste LM de autocorrelación que aparece tras la estimación del Modelo 1 indica que la probabilidad de que los errores del modelo no estén autocorrelacionados es del 57,04%.
+
+2. La serie temporal =d_l_GDP=, que se muestra en el gráfico de la izquierda de la Figura 2, es una tasa interanual de variación del PIB.
+
+3. La serie temporal =d_d_l_GDP=, que se muestra en el gráfico de la derecha de la Figura 2, es el cambio (trimestre a trimestre) de una tasa anual de variación del PIB.
+
+4. Según los resultados de los [[Test de raíces unitarias]], no está claro que la serie temporal =d_l_GDP= sea estacionaria, ya que los test ADF y KPSS se contradicen.
+
+5. Según los resultados de la estimación del [[Modelo 2]], la serie temporal =d_d_l_GDP= no muestra signos de sobrediferenciación.
+
+6. De acuerdo con los resultados de previsión, el PIB total observado en el período post-COVID es mayor que el que habría resultado si la serie se hubiera comportado conforme a las previsiones de cualquiera de los dos modelos.
+
+7. Según los resultados de la [[Previsión del =GDP= calculada con las previsiones del Modelo 1]], el PIB total observado en el período de previsión del ejercicio (que incluye el confinamiento por el COVID) es un 1,18% _inferior_ al que habría resultado si la serie se hubiera comportado conforme a las previsiones.
+
+8. Observe los intervalos de confianza de las previsiones del PIB calculadas a partir de los modelos 1 y 2. ¿Qué puede comentar sobre la confianza en las previsiones a largo plazo? ¿Qué característica de estos modelos determina dicho comportamiento a largo plazo? ¿Qué puede explicar la diferencia en el comportamiento de los intervalos de confianza mostrados en las figuras de la izquierda y de la derecha?
+
+9. Observe los resultados numéricos referentes a las previsiones del PIB calculadas con los resultados de los modelos 1 y 2. 
+   - Indique en cada caso en qué periodo los intervalos de confianza no contienen los valores observados del PIB.
+   - Indique en cada caso en qué periodos las previsiones puntuales infra-pronostican o sobre-pronostican los valores observados del PIB.
+
+10. Valore las previsiones del PIB de EE.UU. que se obtienen con ambos modelos.
+
+([[Respuesta 5]])
+
+
+* Respuestas 
+
+*** Respuesta 1
+
+La Figura 1 muestra la serie del logaritmo neperiano del PIB (=GDP=) de EE.UU. La serie es claramente no estacionaria en media, por lo que, como mínimo, será integrada de orden 1.
+
+La Figura 2 presenta gráficos de la serie diferenciada una y dos veces. 
+- El gráfico de la serie con una sola diferencia (~d_l_GDP~) no es tan concluyente como el primero; podría ser estacionaria o no. Aunque no muestra una tendencia bien definida, parece tener periodos de valores relativamente largos por encima y por debajo de la media muestral. 
+- Sin embargo, el gráfico de la serie con dos diferencias (~d_d_l_GDP~) claramente refleja un proceso estacionario en media.
+
+En cuanto a los test de raíces unitarias:
+
+*Para la serie ~d_l_GDP~*
+- Al 10% de significación, no se puede rechazar la hipótesis nula del test ADF ($H_0$: la serie es I(1)), aunque por poco, ya que el p-valor es =0,1015=.
+- El test KPSS tiene un p-valor interpolado de =0,046=, por lo que se rechazaría la hipótesis nula ($H_0$: la serie es I(0)) con un nivel de significación del 5%, pero no con una significación del 10%. Por lo tanto, ni el gráfico ni los tests son definitivos (sería necesario analizar otras evidencias, como el perfil de la ACF).
+
+*Para la serie =d_d_l_GDP=*
+- El test ADF rechaza contundentemente la hipótesis nula ($H_0$: la serie es I(1)) con un p-valor infinitesimal. 
+- El test KPSS tiene un p-valor interpolado superior al 10%, por lo que no se rechaza la hipótesis nula ($H_0$: la serie es I(0)) con niveles de significación del 10% o menores. Por lo tanto, todo indica que =d_d_l_GDP= es estacionaria en media. Sin embargo, si ~d_l_GDP~ resultara ser estacionaria, implicaría que =d_d_l_GDP= está sobrediferenciada.
+
+En cualquier caso, los resultados de los test de raíces unitarias son compatibles con la posible estacionariedad de ambas series.
+
+([[Pregunta 1]])
+
+*** Respuesta 2
+
+- Resultados del modelo 1:: Los coeficientes son significativos a niveles de significación del 5% o inferiores. El test de normalidad de los residuos rechaza notablemente la hipótesis nula (distribución gaussiana), con un p-valor infinitesimal. Los test de homoscedasticidad y de ausencia de autocorrelación no rechazan sus respectivas hipótesis nulas (ausencia de heterocedasticidad y ausencia de autocorrelación) con p-valores de 43,6% y 57,0%, respectivamente.
+
+- Resultados del modelo 2:: El coeficiente es significativo con un p-valor infinitesimal. El test de normalidad de los residuos también rechaza la hipótesis nula (distribución gaussiana), con un p-valor infinitesimal. El p-valor del test de homoscedasticidad es del 4,1%, lo que supone un rechazo al 10% y 5% de significación. El test de ausencia de autocorrelación no rechaza claramente su hipótesis nula, con un p-valor del 51,3%.
+
+En ambos modelos, el ajuste a la muestra, medido con el \(R^2\), es muy elevado, algo habitual al ajustar series “no estacionarias”; por lo tanto, ni es extraordinario ni debemos darle mayor relevancia en comparación con los casos en los que ajustamos series estacionarias.
+
+La desviación típica de las innovaciones está medida en la misma unidad que la variable endógena; en este caso, miles de millones de dólares en escala logarítmica.
+
+Respecto a los indicios de sobrediferenciación o infradiferenciación, es difícil saberlo con la información actual. Los resultados no muestran raíces AR próximas al círculo unidad en el Modelo 1 (lo que sería un indicio de infradiferenciación) ni raíces MA cercanas a la unidad en el Modelo 2 (indicando sobrediferenciación). Por ejemplo, el coeficiente $\theta_1$ rechaza la hipótesis de ser $-1$ en una estimación con intervalo de confianza del 99%:
+\[
+-0.611\pm2.576\cdot0.0967 \Rightarrow (-0.86,\; -0.36).
+\]
+Sería necesario explorar más, añadiendo algún parámetro AR adicional en ambos modelos (especialmente en el segundo, que solo cuenta con un parámetro, lo que limita el ajuste y podría ocultar la no invertibilidad del proceso subyacente). Por lo tanto, o bien el primer modelo está infradiferenciado o el segundo está sobrediferenciado, puesto que ambas series no pueden ser I(0) simultáneamente (¡una incorpora una diferencia más que la otra!).
+
+Es decir, dado que ninguno de los dos modelos tiene parámetros no significativos ni muestra indicios evidentes de presencia de raíces unitarias, pero la serie sin diferenciar es claramente no estacionaria y la serie con dos diferencias es, evidentemente, estacionaria en media, debemos concluir que necesariamente hay problemas de infradiferenciación (en el primer modelo) o sobrediferenciación (en el segundo), sin poder determinar cuál es el problema presente con la información disponible.
+
+([[Pregunta 2]])
+
+*** Respuesta 3
+
+Como se ha mencionado anteriormente, el ajuste es muy elevado en ambos casos. Sin embargo, el Modelo 1 se ajusta mejor a la muestra y parece más adecuado porque:
+
+- El valor del \(R^2\) corregido por grados de libertad es ligeramente mayor.
+- La desviación típica residual es un poco menor.
+- Sus criterios de información son inferiores a los del modelo alternativo.
+- El test de homoscedasticidad de los errores tiene un p-valor elevado (43,6%), mientras que el del modelo alternativo rechazaría la nula (ausencia de heterocedasticidad) para niveles de significación del 5% y 1%.
+
+Respecto a la especificación, podemos esperar que el Modelo 1 esté mejor especificado, ya que el valor del criterio de Schwarz (-855,34) es más pequeño que el del modelo alternativo (-845,83).
+
+Finalmente, los estadísticos de evaluación de las previsiones indican que el Modelo 1 realiza mejores predicciones fuera de la muestra ya que:
+
+- aunque los estadísticos de error medio y porcentaje del error medio son más grandes que los del modelo alternativo,
+- el resto de los estadísticos (Raíz del Error Cuadrático Medio, Error Absoluto Medio y Porcentaje de Error Absoluto Medio) son menores.
+
+Estos últimos miden de forma más precisa el tamaño de los errores, ya que no compensan los errores de previsión de signo distinto.
+
+([[Pregunta 3]])
+
+
+*** Respuesta 4
+
+1. *El Modelo 1* estimado puede expresarse como AR en diferencias respecto a la media (dado que es invertible):
+   - \( (1\, - \, 0,354 \, B \, - \, 0,200\, B^2) (\nabla \ln \, GDP_t - 0.011) = \hat{a}_t\)
+   o como MA en diferencias respecto a la media (dado que es estacionario):
+   - \( \nabla \ln \, GDP_t - 0.011 = \frac{\hat{a}_t}{1\, - \, 0,354 \, B \, - \, 0,200\, B^2}\)
+   o haciendo explícito que el valor esperado es =0.011=:
+   - \( \nabla \ln \, GDP_t =  0.011 +  \frac{\hat{a}_t}{1\, - \, 0,354 \, B \, - \, 0,200\, B^2}\);
+
+   por lo que *las únicas formulaciones correctas son la 3. y la 4.*
+   - 1. es incorrecta ::  por el signo de la constante y los parámetros AR, y por la aparición de $\nabla$ en el denominador, lo que da lugar a una expresión no convergente y por el signo de los parámetros AR.
+   - 2. es incorrecta :: por aparecer $\nabla$ en el denominador, lo que da lugar a una expresión no convergente.
+   - 5. es incorrecta :: por el signo de la constante.
+
+2. *El Modelo 2* estimado puede expresarse como MA (dado que es estacionario):
+   - \( \nabla^2 \ln \, GDP_t = (1 \, - \, 0,611 \, B) \hat{a}_t\)
+   o como AR (dado que es invertible):
+   - \( \frac{\nabla^2 \ln \, GDP_t}{1 \, - \, 0,611 \, B} = \hat{a}_t\);
+
+   por lo que *las únicas formulaciones correctas son la 1. y la 4.*
+   - 2. es incorrecta :: por el signo del parámetro MA (recuerde que Gretl no sigue el mismo convenio en signos de los _coeficientes MA_ que se utiliza en el manual de Box y Jenkins).
+   - 3. es incorrecta :: por el signo del parámetro MA.
+   - 5. es incorrecta :: porque el polinomio MA debe aparecer en el numerador.
+
+([[Pregunta 4]])
+
+
+*** Respuesta 5
+
+1. La afirmación es FALSA. 
+
+   - Definición formal del p-valor en un contraste de hipótesis. El *p-valor* (o *valor-p*) de un contraste de hipótesis es una *probabilidad condicionada*, definida en términos de la distribución del estadístico de prueba bajo la hipótesis nula \( H_0 \):
+   
+   Sea \( T(\boldsymbol{X}) \) un *estadístico de prueba* basado en una muestra aleatoria \(\boldsymbol{X}\), y siendo \( H_0 \) la hipótesis nula:  
+   El **p-valor** es:
+   \[
+   p = P_{H_0}\big( T(\boldsymbol{X}) \text{ sea al menos tan extremo como el valor observado } t_{\text{obs}} \big)
+   \]
+   donde la expresión “tan extremo como” depende de la forma del contraste (unilateral o bilateral).
+   - *Contraste unilateral superior* (\( H_1: \theta > \theta_0 \)):
+     \[
+     p = P_{H_0}\big( T(X) \ge t_{\text{obs}} \big)
+     \]
+   - *Contraste unilateral inferior* (\( H_1: \theta < \theta_0 \)):
+     \[
+     p = P_{H_0}\big( T(X) \le t_{\text{obs}} \big)
+     \]
+   - *Contraste bilateral* (\( H_1: \theta \ne \theta_0 \)):
+     \[
+     p = P_{H_0}\big( |T(X)| \ge |t_{\text{obs}}| \big)
+     \]
+   
+   *Interpretación*: El p-valor *NO* es la probabilidad de que \( H_0 \) sea cierta, sino la *probabilidad de obtener un resultado tan extremo como el observado (o más)* si \( H_0 \) *fuera cierta*.
+   
+   La interpretación correcta es que, cuanto más pequeño es el p-valor, mayor es la evidencia en la muestra *en contra de \( H_0 \)*.
+
+2. La afirmación es FALSA. La serie =d_l_GDP= es una tasa intertrimestral de variación.
+
+3. La afirmación es FALSA. Se trata del cambio (trimestre a trimestre) de una tasa intertrimestral de variación.
+
+4. Es cierto que no está completamente claro si la serie es estacionaria. Sin embargo, la supuesta contradicción en los resultados de los tests depende del nivel de significación que utilicemos.
+   - Con un nivel de significación del 11% o superior, cada uno de los test rechaza su hipótesis nula en favor de la hipótesis nula correspondiente al otro test, lo que sería contradictorio.
+   - Con un nivel de significación del 10% o del 5%, el test ADF no rechaza la hipótesis de que la serie sea $I(1)$, mientras que el test KPSS rechaza la hipótesis de que la serie sea $I(0)$ en favor de que sea $I(1)$. Por lo tanto, no habría contradicción.
+   - Para niveles de significación del 4% o inferiores, ninguno de los test rechaza su hipótesis nula. Si bien esto no es contradictorio, impide llegar a una conclusión definitiva sobre el orden de integración.
+
+5. La afirmación es VERDADERA. La raíz del polinomio MA está alejada de ser una raíz =1=. Asimismo, un intervalo de confianza aproximado al 95% para el parámetro \( \theta \) sería \( 0,61 \pm 1.98 \times 0,0967 \), que no incluye el valor \(\theta=1\). Por consiguiente, en los resultados de la estimación no se observan indicios de sobrediferenciación. Esto no significa que la serie =d_d_l_GDP= no esté sobrediferenciada (de hecho, lo está. Descargue los datos, restrinja la muestra hasta el último trimestre de 2019 y trate de identificar un modelo para =l_GDP= analizando los correlogramas. Constatará que tomar una segunda diferencia es claramente erróneo).
+
+6. La afirmación es VERDADERA. En la última línea de la tabla se subtotalizan los valores de cada columna. Tanto la suma total de errores del Modelo 1 (=4305,86=) como la suma total de errores del Modelo 2 (=4482,86=) son positivas, lo que indica que el PIB total observado en el período post-COVID ha sido mayor a las previsiones de cada uno de los modelos.
+
+7. La afirmación es FALSA. El =Ratio1=, calculado como la suma total de los errores de previsión dividida por la suma total del =GDP=, es igual a =0.0118=, lo que indica un signo positivo. Esto significa que, en conjunto, el PIB agregado del periodo ha sido un 1.18% mayor que lo previsto utilizando los resultados del modelo 1.
+
+8. Las bandas de confianza aumentan con el horizonte de previsión. Esto se debe a que los modelos para el =GDP= no son estacionarios, lo que provoca que la varianza de las previsiones crezca con el horizonte. El [[Modelo 1]] tiene una raíz unitaria, por lo que las bandas de confianza /son crecientes/. El [[Modelo 2]] tiene dos raíces unitarias, por lo que los intervalos de confianza /crecen de manera acelerada/.
+
+9. El inesperado confinamiento causado por la COVID-19 hace que el PIB observado en el primer trimestre de 2020 quede fuera de las bandas de confianza en ambos modelos.
+   - Los valores observados quedan fuera de los intervalos de confianza hasta el cuarto trimestre de 2020 (=2020:4=). A partir del primer trimestre del año siguiente, las bandas de confianza contienen los PIB observados.
+   - Ambos modelos infra-pronostican el PIB a partir del tercer trimestre de 2021 (=2021:3=). 
+
+10. La incertidumbre asociada a las previsiones del segundo modelo es considerablemente mayor (debido a la presencia de dos raíces unitarias). Además, el error porcentual absoluto medio (MAPE) es más bajo con el primer modelo. Por lo tanto, el primer modelo arroja mejores previsiones que el segundo.
+
+
+([[Pregunta 5]])
