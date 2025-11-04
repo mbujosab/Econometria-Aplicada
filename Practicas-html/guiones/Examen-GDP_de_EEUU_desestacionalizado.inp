@@ -1,0 +1,115 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../../datos/GDP_de_EEUU_desestacionalizado.gdt
+
+logs GDP
+diff l_GDP
+diff d_l_GDP
+smpl 1991:1 2019:4
+
+gnuplot l_GDP --time-series --with-lines --output="l_GDP.png"
+
+gnuplot d_l_GDP --time-series --with-lines --output="d_l_GDP.png"
+gnuplot d_d_l_GDP --time-series --with-lines --output="d_d_l_GDP.png"
+
+outfile --quiet Dickey-Fuller_d_l_GDP.txt
+    adf 8 d_l_GDP --c
+end outfile
+
+outfile --quiet KPSS_d_l_GDP.txt
+    kpss 4 d_l_GDP
+end outfile
+
+outfile --quiet Dickey-Fuller_d_d_l_GDP.txt
+    adf 8 d_d_l_GDP --c
+end outfile
+
+outfile --quiet KPSS_d_d_l_GDP.txt
+    kpss 4 d_d_l_GDP
+end outfile
+
+outfile --quiet ARI-l_GDP.txt
+    arima 2 1 0 ; l_GDP
+    modtest --normality --quiet
+    modtest --arch --quiet
+    modtest --autocorr 15
+end outfile
+
+outfile --quiet Predicciones-ARI.txt
+  fcast --out-of-sample --stats-only
+end outfile
+
+outfile --quiet IMA-l_GDP.txt
+    arima 0 2 1 ; l_GDP --nc
+    modtest --normality --quiet
+    modtest --arch --quiet
+    modtest --autocorr 15
+end outfile
+
+outfile --quiet Predicciones-IMA.txt
+  fcast --out-of-sample --stats-only
+end outfile
+
+smpl 1991:1 2019:4
+arima 2 1 0 ; l_GDP
+fcast --out-of-sample --stats-only
+matrix ly_hat1 = $fcast
+matrix se_hat1 = $fcse
+matrix m_hat1 = exp(ly_hat1+(se_hat1.^2)/2)
+# Intervalos de confianza
+scalar ns = 0.05  # nivel de signifacion
+matrix m_inf1 = exp(ly_hat1 - critical(z, ns/2)*(se_hat1))
+matrix m_sup1 = exp(ly_hat1 + critical(z, ns/2)*(se_hat1))
+smpl 2020:1 2023:3
+series y_hat1 = m_hat1
+series lim_inf1 = m_inf1
+series lim_sup1 = m_sup1
+series error1 = GDP-y_hat1
+scalar SumaErrores1 = sumall(error1)
+scalar SumaGDP = sumall(GDP)
+scalar Ratio1 = SumaErrores1/SumaGDP
+scalar MAPE1 = 100*sumall(abs(error1)/GDP)/$nobs # error porcentual absoluto medio
+
+outfile --quiet Predicciones_GDP1.txt
+    print GDP y_hat1 lim_inf1 lim_sup1  error1 -o
+    print SumaErrores1 Ratio1 MAPE1
+end outfile
+
+smpl 2017:1 2023:3
+gnuplot GDP y_hat1 lim_inf1 lim_sup1 --time-series --with-lines --output="prediccion1.png"
+
+smpl 1991:1 2019:4
+arima 0 2 1 ; l_GDP
+fcast --out-of-sample --stats-only
+matrix ly_hat2 = $fcast
+matrix se_hat2 = $fcse
+matrix m_hat2 = exp(ly_hat2+(se_hat2.^2)/2)
+# Intervalos de confianza
+scalar ns = 0.05  # nivel de signifacion
+matrix m_inf2 = exp(ly_hat2 - critical(z, ns/2)*(se_hat2))
+matrix m_sup2 = exp(ly_hat2 + critical(z, ns/2)*(se_hat2))
+smpl 2020:1 2023:3
+series y_hat2 = m_hat2
+series lim_inf2 = m_inf2
+series lim_sup2 = m_sup2
+series error2 = GDP-y_hat2
+scalar SumaErrores2 = sumall(error2)
+scalar Ratio2 = SumaErrores2/SumaGDP
+scalar MAPE2 = 100*sumall(abs(error2)/GDP)/$nobs # error porcentual absoluto medio
+
+outfile --quiet Predicciones_GDP2.txt
+    print GDP y_hat2 lim_inf2 lim_sup2 error2 -o
+    print SumaGDP Ratio2 MAPE2
+end outfile
+
+smpl 2017:1 2023:3
+gnuplot GDP y_hat2 lim_inf2 lim_sup2 --time-series --with-lines --output="prediccion2.png"
