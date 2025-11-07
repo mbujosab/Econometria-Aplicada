@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-11-04 Tue 14:01 -->
+<!-- 2025-11-07 Fri 16:51 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 4.B - Simulación de procesos MA(1) y exploración de sus correlogramas</title>
@@ -101,30 +101,30 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org4528376">Objetivo de la práctica</a></li>
-<li><a href="#org191843d">Actividad 1 - Modelos MA(\(1\)) parámetro negativo</a>
+<li><a href="#orgbc178fd">Objetivo de la práctica</a></li>
+<li><a href="#orgdc7ee1d">Actividad 1 - Modelos MA(\(1\)) parámetro negativo</a>
 <ul>
-<li><a href="#orgddecb80">Parámetro negativo \(-0.9\) y \(-\frac{1}{0.9}\)</a></li>
-<li><a href="#org1ead4ab">Parámetro negativo \(-0.8\) y \(-\frac{1}{0.8}\)</a></li>
-<li><a href="#org436638c">Parámetro negativo \(-0.5\) y \(-\frac{1}{0.5}\)</a></li>
-<li><a href="#orgfcdb08c">Parámetro negativo \(-0.25\) y \(-\frac{1}{0.25}\)</a></li>
+<li><a href="#org5090eca">Parámetro negativo \(-0.9\) y \(-\frac{1}{0.9}\)</a></li>
+<li><a href="#org2c52f26">Parámetro negativo \(-0.8\) y \(-\frac{1}{0.8}\)</a></li>
+<li><a href="#orgc695904">Parámetro negativo \(-0.5\) y \(-\frac{1}{0.5}\)</a></li>
+<li><a href="#orgc378478">Parámetro negativo \(-0.25\) y \(-\frac{1}{0.25}\)</a></li>
 </ul>
 </li>
-<li><a href="#org17fc9eb">Actividad 2 - Modelos MA(\(1\)) parámetro positivo</a>
+<li><a href="#org72cd2a4">Actividad 2 - Modelos MA(\(1\)) parámetro positivo</a>
 <ul>
-<li><a href="#orgd28a929">Parámetro negativo \(0.9\) y \(\frac{1}{0.9}\)</a></li>
-<li><a href="#orgd5baaa6">Parámetro negativo \(0.8\) y \(\frac{1}{0.8}\)</a></li>
-<li><a href="#orgc8efd4d">Parámetro negativo \(0.5\) y \(\frac{1}{0.5}\)</a></li>
-<li><a href="#org3f069b1">Parámetro negativo \(0.25\) y \(\frac{1}{0.25}\)</a></li>
+<li><a href="#org698d25f">Parámetro negativo \(0.9\) y \(\frac{1}{0.9}\)</a></li>
+<li><a href="#org630601a">Parámetro negativo \(0.8\) y \(\frac{1}{0.8}\)</a></li>
+<li><a href="#org331b965">Parámetro negativo \(0.5\) y \(\frac{1}{0.5}\)</a></li>
+<li><a href="#orgd2f0630">Parámetro negativo \(0.25\) y \(\frac{1}{0.25}\)</a></li>
 </ul>
 </li>
-<li><a href="#org2733bd2">Código completo de la práctica</a></li>
+<li><a href="#orgba4c891">Código completo de la práctica</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org4528376" class="outline-2">
-<h2 id="org4528376">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-org4528376">
+<div id="outline-container-orgbc178fd" class="outline-2">
+<h2 id="orgbc178fd">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-orgbc178fd">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -163,7 +163,7 @@ org_html_manager.setup();  // activate after the parameters are set
 Programe o recupere de una práctica anterior una función que simule procesos MA(\(q\))
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org0755de5"><code>function series SimuladorMA(matrix theta)
+<pre class="src src-gretl" id="orgb310cc5"><code>function series SimuladorMA(matrix theta)
     # SimuladorMA(theta) simula un proceso MA(q), 
     # donde theta es el polinomio MA y q es su grado.
     series WN = normal (0,1)
@@ -189,9 +189,9 @@ setobs 12 1900:01 --time-series
 </div>
 </div>
 </div>
-<div id="outline-container-org191843d" class="outline-2">
-<h2 id="org191843d">Actividad 1 - Modelos MA(\(1\)) parámetro negativo</h2>
-<div class="outline-text-2" id="text-org191843d">
+<div id="outline-container-orgdc7ee1d" class="outline-2">
+<h2 id="orgdc7ee1d">Actividad 1 - Modelos MA(\(1\)) parámetro negativo</h2>
+<div class="outline-text-2" id="text-orgdc7ee1d">
 <p>
 Pruebe a simular modelos MA(\(1\)) 
 \[
@@ -202,9 +202,9 @@ Pruebe a simular modelos MA(\(1\))
 donde \(\boldsymbol{U}\sim WN(0,1)\), con los siguientes valores paramétricos: \(\theta=-0.9\), \(\theta=-0.8\),  \(\theta=-0.5\) y \(\theta=-0.25\); y estime los correlogramas.
 </p>
 </div>
-<div id="outline-container-orgddecb80" class="outline-3">
-<h3 id="orgddecb80">Parámetro negativo \(-0.9\) y \(-\frac{1}{0.9}\)</h3>
-<div class="outline-text-3" id="text-orgddecb80">
+<div id="outline-container-org5090eca" class="outline-3">
+<h3 id="org5090eca">Parámetro negativo \(-0.9\) y \(-\frac{1}{0.9}\)</h3>
+<div class="outline-text-3" id="text-org5090eca">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>scalar theta = -0.9
 set seed 123409
@@ -217,12 +217,12 @@ corrgm X 20 --plot="MA-0.9-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="orged2a084" class="figure">
+<div id="org515fbad" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-0.9.png" alt="MA-0.9.png" />
 </p>
 </div>
 
-<div id="org2a22147" class="figure">
+<div id="org00ac20a" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-0.9-ACF-PACF.png" alt="MA-0.9-ACF-PACF.png" />
 </p>
 </div>
@@ -240,21 +240,21 @@ corrgm XNI 20 --plot="MA-1.111-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="orgea0f3c3" class="figure">
+<div id="org0010834" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-1.111.png" alt="MA-1.111.png" />
 </p>
 </div>
 
-<div id="orged14ecd" class="figure">
+<div id="org9c9e99a" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-1.111-ACF-PACF.png" alt="MA-1.111-ACF-PACF.png" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org1ead4ab" class="outline-3">
-<h3 id="org1ead4ab">Parámetro negativo \(-0.8\) y \(-\frac{1}{0.8}\)</h3>
-<div class="outline-text-3" id="text-org1ead4ab">
+<div id="outline-container-org2c52f26" class="outline-3">
+<h3 id="org2c52f26">Parámetro negativo \(-0.8\) y \(-\frac{1}{0.8}\)</h3>
+<div class="outline-text-3" id="text-org2c52f26">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>scalar theta = -0.8
 set seed 123408
@@ -267,12 +267,12 @@ corrgm Y 20 --plot="MA-0.8-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org398c133" class="figure">
+<div id="org77a2717" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-0.8.png" alt="MA-0.8.png" />
 </p>
 </div>
 
-<div id="orgafdf659" class="figure">
+<div id="org9dbc33c" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-0.8-ACF-PACF.png" alt="MA-0.8-ACF-PACF.png" />
 </p>
 </div>
@@ -290,21 +290,21 @@ corrgm YNI 20 --plot="MA-1.25-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org2cd9b6e" class="figure">
+<div id="orgf43e56f" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-1.25.png" alt="MA-1.25.png" />
 </p>
 </div>
 
-<div id="orgcd09fd8" class="figure">
+<div id="org17da5eb" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-1.25-ACF-PACF.png" alt="MA-1.25-ACF-PACF.png" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org436638c" class="outline-3">
-<h3 id="org436638c">Parámetro negativo \(-0.5\) y \(-\frac{1}{0.5}\)</h3>
-<div class="outline-text-3" id="text-org436638c">
+<div id="outline-container-orgc695904" class="outline-3">
+<h3 id="orgc695904">Parámetro negativo \(-0.5\) y \(-\frac{1}{0.5}\)</h3>
+<div class="outline-text-3" id="text-orgc695904">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>scalar theta = -0.5
 set seed 123405
@@ -317,12 +317,12 @@ corrgm Z 20 --plot="MA-0.5-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org7f6ac90" class="figure">
+<div id="orgdc38bf1" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-0.5.png" alt="MA-0.5.png" />
 </p>
 </div>
 
-<div id="orgaedafad" class="figure">
+<div id="orgefa7d03" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-0.5-ACF-PACF.png" alt="MA-0.5-ACF-PACF.png" />
 </p>
 </div>
@@ -340,21 +340,21 @@ corrgm ZNI 20 --plot="MA-2-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="orgffee49d" class="figure">
+<div id="org72342a3" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-2.png" alt="MA-2.png" />
 </p>
 </div>
 
-<div id="orgfd3615d" class="figure">
+<div id="org6745148" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-2-ACF-PACF.png" alt="MA-2-ACF-PACF.png" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-orgfcdb08c" class="outline-3">
-<h3 id="orgfcdb08c">Parámetro negativo \(-0.25\) y \(-\frac{1}{0.25}\)</h3>
-<div class="outline-text-3" id="text-orgfcdb08c">
+<div id="outline-container-orgc378478" class="outline-3">
+<h3 id="orgc378478">Parámetro negativo \(-0.25\) y \(-\frac{1}{0.25}\)</h3>
+<div class="outline-text-3" id="text-orgc378478">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>scalar theta = -0.25
 set seed 123425
@@ -367,12 +367,12 @@ corrgm W 20 --plot="MA-0.25-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org7ecb408" class="figure">
+<div id="orgb080838" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-0.25.png" alt="MA-0.25.png" />
 </p>
 </div>
 
-<div id="org3797e72" class="figure">
+<div id="orgf635888" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-0.25-ACF-PACF.png" alt="MA-0.25-ACF-PACF.png" />
 </p>
 </div>
@@ -390,12 +390,12 @@ corrgm WNI 20 --plot="MA-4-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="orgd835c36" class="figure">
+<div id="orgc4a9aed" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-4.png" alt="MA-4.png" />
 </p>
 </div>
 
-<div id="org61313c1" class="figure">
+<div id="org7ff2cda" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA-4-ACF-PACF.png" alt="MA-4-ACF-PACF.png" />
 </p>
 </div>
@@ -403,9 +403,9 @@ corrgm WNI 20 --plot="MA-4-ACF-PACF.png"
 </div>
 </div>
 </div>
-<div id="outline-container-org17fc9eb" class="outline-2">
-<h2 id="org17fc9eb">Actividad 2 - Modelos MA(\(1\)) parámetro positivo</h2>
-<div class="outline-text-2" id="text-org17fc9eb">
+<div id="outline-container-org72cd2a4" class="outline-2">
+<h2 id="org72cd2a4">Actividad 2 - Modelos MA(\(1\)) parámetro positivo</h2>
+<div class="outline-text-2" id="text-org72cd2a4">
 <p>
 Pruebe a simular modelos MA(\(1\)) 
 \[
@@ -416,9 +416,9 @@ Pruebe a simular modelos MA(\(1\))
 donde \(\boldsymbol{U}\sim WN(0,1)\), con los siguientes valores paramétricos: \(\theta=0.9\), \(\theta=0.8\),  \(\theta=0.5\) y \(\theta=0.25\); y estime los correlogramas.
 </p>
 </div>
-<div id="outline-container-orgd28a929" class="outline-3">
-<h3 id="orgd28a929">Parámetro negativo \(0.9\) y \(\frac{1}{0.9}\)</h3>
-<div class="outline-text-3" id="text-orgd28a929">
+<div id="outline-container-org698d25f" class="outline-3">
+<h3 id="org698d25f">Parámetro negativo \(0.9\) y \(\frac{1}{0.9}\)</h3>
+<div class="outline-text-3" id="text-org698d25f">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>scalar theta = 0.9
 set seed 123409
@@ -431,12 +431,12 @@ corrgm A 20 --plot="MA+0.9-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org138411a" class="figure">
+<div id="org373aca0" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+0.9.png" alt="MA+0.9.png" />
 </p>
 </div>
 
-<div id="org48b58fa" class="figure">
+<div id="org1edb415" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+0.9-ACF-PACF.png" alt="MA+0.9-ACF-PACF.png" />
 </p>
 </div>
@@ -454,21 +454,21 @@ corrgm ANI 20 --plot="MA+1.111-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org13d365b" class="figure">
+<div id="org08b7588" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+1.111.png" alt="MA+1.111.png" />
 </p>
 </div>
 
-<div id="orgaa489b4" class="figure">
+<div id="org00ba26d" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+1.111-ACF-PACF.png" alt="MA+1.111-ACF-PACF.png" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-orgd5baaa6" class="outline-3">
-<h3 id="orgd5baaa6">Parámetro negativo \(0.8\) y \(\frac{1}{0.8}\)</h3>
-<div class="outline-text-3" id="text-orgd5baaa6">
+<div id="outline-container-org630601a" class="outline-3">
+<h3 id="org630601a">Parámetro negativo \(0.8\) y \(\frac{1}{0.8}\)</h3>
+<div class="outline-text-3" id="text-org630601a">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>scalar theta = 0.8
 set seed 123408
@@ -481,12 +481,12 @@ corrgm B 20 --plot="MA+0.8-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org585a569" class="figure">
+<div id="orga3a5d22" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+0.8.png" alt="MA+0.8.png" />
 </p>
 </div>
 
-<div id="org55cec2f" class="figure">
+<div id="org74fecdf" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+0.8-ACF-PACF.png" alt="MA+0.8-ACF-PACF.png" />
 </p>
 </div>
@@ -504,21 +504,21 @@ corrgm BNI 20 --plot="MA+1.25-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org5847023" class="figure">
+<div id="orgb16eb3f" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+1.25.png" alt="MA+1.25.png" />
 </p>
 </div>
 
-<div id="orgfe0fcae" class="figure">
+<div id="org8913081" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+1.25-ACF-PACF.png" alt="MA+1.25-ACF-PACF.png" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc8efd4d" class="outline-3">
-<h3 id="orgc8efd4d">Parámetro negativo \(0.5\) y \(\frac{1}{0.5}\)</h3>
-<div class="outline-text-3" id="text-orgc8efd4d">
+<div id="outline-container-org331b965" class="outline-3">
+<h3 id="org331b965">Parámetro negativo \(0.5\) y \(\frac{1}{0.5}\)</h3>
+<div class="outline-text-3" id="text-org331b965">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>scalar theta = 0.5
 set seed 123405
@@ -531,12 +531,12 @@ corrgm C 20 --plot="MA+0.5-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org0967bec" class="figure">
+<div id="orged13b80" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+0.5.png" alt="MA+0.5.png" />
 </p>
 </div>
 
-<div id="orgd762dcb" class="figure">
+<div id="orgef86f4f" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+0.5-ACF-PACF.png" alt="MA+0.5-ACF-PACF.png" />
 </p>
 </div>
@@ -554,21 +554,21 @@ corrgm CNI 20 --plot="MA+2-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="orgcfb0640" class="figure">
+<div id="org03448de" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+2.png" alt="MA+2.png" />
 </p>
 </div>
 
-<div id="org46c684c" class="figure">
+<div id="orgba5e040" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+2-ACF-PACF.png" alt="MA+2-ACF-PACF.png" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org3f069b1" class="outline-3">
-<h3 id="org3f069b1">Parámetro negativo \(0.25\) y \(\frac{1}{0.25}\)</h3>
-<div class="outline-text-3" id="text-org3f069b1">
+<div id="outline-container-orgd2f0630" class="outline-3">
+<h3 id="orgd2f0630">Parámetro negativo \(0.25\) y \(\frac{1}{0.25}\)</h3>
+<div class="outline-text-3" id="text-orgd2f0630">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>set seed 123425
 scalar theta = 0.25
@@ -581,12 +581,12 @@ corrgm W 20 --plot="MA+0.25-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="orgcbc2c8d" class="figure">
+<div id="org4ddb0f2" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+0.25.png" alt="MA+0.25.png" />
 </p>
 </div>
 
-<div id="org39401c0" class="figure">
+<div id="orgdf3c07c" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+0.25-ACF-PACF.png" alt="MA+0.25-ACF-PACF.png" />
 </p>
 </div>
@@ -604,12 +604,12 @@ corrgm WNI 20 --plot="MA+4-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org5e65e8a" class="figure">
+<div id="org4f19f09" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+4.png" alt="MA+4.png" />
 </p>
 </div>
 
-<div id="org902067e" class="figure">
+<div id="org07ba7bf" class="figure">
 <p><img src="P-L04-B-simulacion-procesos-MA/MA+4-ACF-PACF.png" alt="MA+4-ACF-PACF.png" />
 </p>
 </div>
@@ -617,9 +617,9 @@ corrgm WNI 20 --plot="MA+4-ACF-PACF.png"
 </div>
 </div>
 </div>
-<div id="outline-container-org2733bd2" class="outline-2">
-<h2 id="org2733bd2">Código completo de la práctica</h2>
-<div class="outline-text-2" id="text-org2733bd2">
+<div id="outline-container-orgba4c891" class="outline-2">
+<h2 id="orgba4c891">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-orgba4c891">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -639,7 +639,7 @@ corrgm WNI 20 --plot="MA+4-ACF-PACF.png"
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-11-04 Tue 14:01</p>
+<p class="date">Created: 2025-11-07 Fri 16:51</p>
 </div>
 </body>
 </html>
