@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-11-07 Fri 16:51 -->
+<!-- 2025-11-12 Wed 16:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 3. Modelos lineales</title>
@@ -66,44 +66,44 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org78c4c1a">Series temporales vs datos de sección cruzada</a>
+<li><a href="#orgd8e34d1">Series temporales vs datos de sección cruzada</a>
 <ul>
-<li><a href="#orgae25eca">Correlación serial vs muestreo aleatorio simple</a></li>
-<li><a href="#org5fe5313">Simplificación del escenario</a></li>
+<li><a href="#orgde1b150">Correlación serial vs muestreo aleatorio simple</a></li>
+<li><a href="#org6d16dbd">Simplificación del escenario</a></li>
 </ul>
 </li>
-<li><a href="#org1d71fac">Procesos estocásticos de segundo orden</a>
+<li><a href="#orgf04c609">Procesos estocásticos de segundo orden</a>
 <ul>
-<li><a href="#orgbf7fe33">Un poco de geometría</a></li>
-<li><a href="#orgf7d75c1">Primeros momentos de procesos estocásticos de segundo orden</a></li>
-<li><a href="#org095de22">Procesos estocásticos (débilmente) estacionarios y la ACF</a></li>
+<li><a href="#org980975f">Un poco de geometría</a></li>
+<li><a href="#orge0087b2">Primeros momentos de procesos estocásticos de segundo orden</a></li>
+<li><a href="#org0ab59f0">Procesos estocásticos (débilmente) estacionarios y la ACF</a></li>
 </ul>
 </li>
-<li><a href="#org1785861">Notación: convolución y el operador retardo</a></li>
-<li><a href="#orgba29dac">Ejemplos de procesos (débilmente) estacionarios</a>
+<li><a href="#org86fb861">Notación: convolución y el operador retardo</a></li>
+<li><a href="#org7e5ab12">Ejemplos de procesos (débilmente) estacionarios</a>
 <ul>
-<li><a href="#orga2bc1ea">Proceso de ruido blanco</a></li>
-<li><a href="#orge6bb6e4">Procesos lineales</a>
+<li><a href="#org859c593">Proceso de ruido blanco</a></li>
+<li><a href="#org05ceffa">Procesos lineales</a>
 <ul>
-<li><a href="#org38f1ffd">Media móvil infinita. MA(\(\infty\))</a></li>
-<li><a href="#orgc324b0a">Proceso de media móvil de orden \(q\). MA(\(q\))</a></li>
-<li><a href="#org4df4b74">Proceso autorregresivo de orden \(p\). AR(\(p\))</a></li>
-<li><a href="#orga129fd7">Proceso autorregresivo de media móvil. ARMA(\(p,q\))</a></li>
-<li><a href="#org85f5263">Proceso autorregresivo de media móvil con media no nula</a></li>
+<li><a href="#org0a66634">Media móvil infinita. MA(\(\infty\))</a></li>
+<li><a href="#org5a070a8">Proceso de media móvil de orden \(q\). MA(\(q\))</a></li>
+<li><a href="#orgcdfee3c">Proceso autorregresivo de orden \(p\). AR(\(p\))</a></li>
+<li><a href="#orgcfdb346">Proceso autorregresivo de media móvil. ARMA(\(p,q\))</a></li>
+<li><a href="#org6107c82">Proceso autorregresivo de media móvil con media no nula</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgb85c581">Primeros momentos de procesos lineales causales</a>
+<li><a href="#org87568e1">Primeros momentos de procesos lineales causales</a>
 <ul>
-<li><a href="#orgca4bbe9">Esperanza y autocovarianzas de un proceso lineal causal</a></li>
-<li><a href="#org9c6b4db">Covarianza cruzada entre dos procesos lineales causales</a></li>
+<li><a href="#org8818296">Esperanza y autocovarianzas de un proceso lineal causal</a></li>
+<li><a href="#orgc83dbd6">Covarianza cruzada entre dos procesos lineales causales</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div class="abstract" id="org00aec8b">
+<div class="abstract" id="org0ba3d49">
 <p>
 Analizaremos las dificultades que plantea la <b>correlación serial</b> y veremos cómo la estacionariedad en sentido débil las simplifica. 
 Los modelos de procesos estacionarios son útiles para representar la dependencia de los valores de una serie temporal respecto de su pasado.
@@ -115,9 +115,9 @@ Nos centraremos en los <b>procesos lineales</b>, estudiando su valor esperado, s
 <ul class="org-ul">
 <li>(<a href="https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc03.slides.html">slides</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc03.html">html</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc03.pdf">pdf</a>) &mdash; (<a href="https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc03.ipynb">mybinder</a>)</li>
 </ul>
-<div id="outline-container-org19075ce" class="outline-4">
-<h4 id="org19075ce">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-org19075ce">
+<div id="outline-container-orgdc3e4ce" class="outline-4">
+<h4 id="orgdc3e4ce">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-orgdc3e4ce">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python
 </span><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra
@@ -130,8 +130,8 @@ Nos centraremos en los <b>procesos lineales</b>, estudiando su valor esperado, s
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org2af15fe"></a>Creación del directorio auxiliar para albergar las figuras de la lección<br />
-<div class="outline-text-5" id="text-org2af15fe">
+<li><a id="org2071462"></a>Creación del directorio auxiliar para albergar las figuras de la lección<br />
+<div class="outline-text-5" id="text-org2071462">
 <p>
 Para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
@@ -145,9 +145,9 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 </li>
 </ul>
 </div>
-<div id="outline-container-org78c4c1a" class="outline-2">
-<h2 id="org78c4c1a">Series temporales vs datos de sección cruzada</h2>
-<div class="outline-text-2" id="text-org78c4c1a">
+<div id="outline-container-orgd8e34d1" class="outline-2">
+<h2 id="orgd8e34d1">Series temporales vs datos de sección cruzada</h2>
+<div class="outline-text-2" id="text-orgd8e34d1">
 <p>
 Corresponden a observaciones de un mismo objeto a lo largo del
 tiempo. El índice indica el instante de cada medición. <i>El orden
@@ -203,8 +203,8 @@ Veamos algunos ejemplos de series temporales&hellip;
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org97d8169"></a>Población en Australia<br />
-<div class="outline-text-5" id="text-org97d8169">
+<li><a id="orga450962"></a>Población en Australia<br />
+<div class="outline-text-5" id="text-orga450962">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code>df1.plot(x=<span style="font-style: italic;">'obs'</span>,xlabel=<span style="font-style: italic;">'A&#241;os'</span>,ylabel=<span style="font-style: italic;">'Habitantes'</span>,figsize=(15,4)).set_title(<span style="font-style: italic;">'Poblaci&#243;n australiana (datos anuales)'</span>,fontsize=18)
 plt.savefig(<span style="font-style: italic;">'./img/lecc03/PoblacionAustralia.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
@@ -212,14 +212,14 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc03/PoblacionAustralia.p
 </div>
 
 
-<div id="orgf105bbb" class="figure">
+<div id="orge01a001" class="figure">
 <p><img src="./img/lecc03/PoblacionAustralia.png" alt="PoblacionAustralia.png" width="900px" />
 </p>
 </div>
 </div>
 </li>
-<li><a id="orgf311a4a"></a>PIB UEM<br />
-<div class="outline-text-5" id="text-orgf311a4a">
+<li><a id="org918583a"></a>PIB UEM<br />
+<div class="outline-text-5" id="text-org918583a">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el gr&#225;fico
 </span><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax</span> = plt.subplots(figsize=(15, 5))
@@ -251,14 +251,14 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc03/PIB_UEM.png'</span>,
 </div>
 
 
-<div id="org45e99ac" class="figure">
+<div id="org4d781b7" class="figure">
 <p><img src="./img/lecc03/PIB_UEM.png" alt="PIB_UEM.png" width="900px" />
 </p>
 </div>
 </div>
 </li>
-<li><a id="org7793c11"></a>Temperatura media en el Parque del Retiro. Madrid<br />
-<div class="outline-text-5" id="text-org7793c11">
+<li><a id="org634309c"></a>Temperatura media en el Parque del Retiro. Madrid<br />
+<div class="outline-text-5" id="text-org634309c">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Generar una columna de fechas desde enero de 1985
 </span><span style="font-weight: bold; font-style: italic;">df3</span>[<span style="font-style: italic;">'Fecha'</span>] = pd.date_range(start=<span style="font-style: italic;">'1985-01'</span>, periods=<span style="font-weight: bold;">len</span>(df3), freq=<span style="font-style: italic;">'M'</span>) <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">cambiar por 'ME' en el futuro
@@ -298,14 +298,14 @@ ax.set_xticks(ticks)  <span style="font-weight: bold; font-style: italic;"># </s
 </div>
 
 
-<div id="org73afeb1" class="figure">
+<div id="orgdfc9f57" class="figure">
 <p><img src="./img/lecc03/TemperaturaRetiro.png" alt="TemperaturaRetiro.png" width="900px" />
 </p>
 </div>
 </div>
 </li>
-<li><a id="orged4e885"></a>Rendimiento porcentual diario del IBEX 35 (std)<br />
-<div class="outline-text-5" id="text-orged4e885">
+<li><a id="orga0034d6"></a>Rendimiento porcentual diario del IBEX 35 (std)<br />
+<div class="outline-text-5" id="text-orga0034d6">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code>df4.plot(x=<span style="font-style: italic;">'obs'</span>,xlabel=<span style="font-style: italic;">'D&#237;as'</span>,ylabel=<span style="font-style: italic;">'Desviaciones t&#237;picas'</span>,figsize=(15,4)).set_title(<span style="font-style: italic;">'Rendimiento porcentual diario del IBEX 35 (std.). Fuente: Archivo Prof. Miguel Jerez'</span>,fontsize=18)
 plt.savefig(<span style="font-style: italic;">'./img/lecc03/IBEX35.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
@@ -314,14 +314,14 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc03/IBEX35.png'</span>, 
 
 
 
-<div id="orgcc2d670" class="figure">
+<div id="org1e5c4b1" class="figure">
 <p><img src="./img/lecc03/IBEX35.png" alt="IBEX35.png" width="900px" />
 </p>
 </div>
 </div>
 </li>
-<li><a id="org8f1a3bf"></a>Producción de cemento<br />
-<div class="outline-text-5" id="text-org8f1a3bf">
+<li><a id="org4f7cdf1"></a>Producción de cemento<br />
+<div class="outline-text-5" id="text-org4f7cdf1">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax</span> = plt.subplots(figsize=(15, 5))
 df5.plot(x=<span style="font-style: italic;">'obs'</span>, xlabel=<span style="font-style: italic;">'Meses'</span>, ylabel=<span style="font-style: italic;">'Miles de Toneladas m&#233;tricas'</span>, ax=ax)
@@ -356,7 +356,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc03/ProduccionCemento.pn
 </div>
 
 
-<div id="orgfd335a9" class="figure">
+<div id="orgc4079de" class="figure">
 <p><img src="./img/lecc03/ProduccionCemento.png" alt="ProduccionCemento.png" width="900px" />
 </p>
 </div>
@@ -379,9 +379,9 @@ Todas estas características resaltan la complejidad de los procesos subyacentes
 </div>
 </li>
 </ul>
-<div id="outline-container-orgae25eca" class="outline-3">
-<h3 id="orgae25eca">Correlación serial vs muestreo aleatorio simple</h3>
-<div class="outline-text-3" id="text-orgae25eca">
+<div id="outline-container-orgde1b150" class="outline-3">
+<h3 id="orgde1b150">Correlación serial vs muestreo aleatorio simple</h3>
+<div class="outline-text-3" id="text-orgde1b150">
 <p>
 <i>Generalmente</i> cuando disponemos de datos de
 </p>
@@ -453,9 +453,9 @@ Pero en una serie temporal \(\boldsymbol{x}\) solo disponemos de <i>una</i> real
 </ul>
 </div>
 </div>
-<div id="outline-container-org5fe5313" class="outline-3">
-<h3 id="org5fe5313">Simplificación del escenario</h3>
-<div class="outline-text-3" id="text-org5fe5313">
+<div id="outline-container-org6d16dbd" class="outline-3">
+<h3 id="org6d16dbd">Simplificación del escenario</h3>
+<div class="outline-text-3" id="text-org6d16dbd">
 <p>
 Cuando \(\boldsymbol{X}\) es <a href="./Lecc01.slides.html#/3/1">débilmente estacionario</a> se reduce <i>drásticamente</i> el número de parámetros (aunque siga habiendo infinitos):
 </p>
@@ -487,9 +487,9 @@ Antes de atacar los temas de especificación y ajuste de modelos, debemos estudi
 </div>
 </div>
 </div>
-<div id="outline-container-org1d71fac" class="outline-2">
-<h2 id="org1d71fac">Procesos estocásticos de segundo orden</h2>
-<div class="outline-text-2" id="text-org1d71fac">
+<div id="outline-container-orgf04c609" class="outline-2">
+<h2 id="orgf04c609">Procesos estocásticos de segundo orden</h2>
+<div class="outline-text-2" id="text-orgf04c609">
 <p>
 El ambiente natural para estudiar las propiedades de segundo orden de
 una colección de variables aleatorias es el espacio de variables
@@ -498,9 +498,9 @@ aleatorias \(X\) definidas en un espacio de probabilidad tales que
 esperanza. Denotaremos este espacio con \(H\).
 </p>
 </div>
-<div id="outline-container-orgbf7fe33" class="outline-3">
-<h3 id="orgbf7fe33">Un poco de geometría</h3>
-<div class="outline-text-3" id="text-orgbf7fe33">
+<div id="outline-container-org980975f" class="outline-3">
+<h3 id="org980975f">Un poco de geometría</h3>
+<div class="outline-text-3" id="text-org980975f">
 <p>
 Un espacio vectorial, dotado de producto escalar y norma; por ejemplo \[\langle X \mid Y
 \rangle=E(XY),\qquad \lVert X \rVert= \sqrt{E(X^2)},\qquad X,Y \in
@@ -541,9 +541,9 @@ Una propiedad fundamental de los procesos estocásticos estacionarios es que for
 </p>
 </div>
 </div>
-<div id="outline-container-orgf7d75c1" class="outline-3">
-<h3 id="orgf7d75c1">Primeros momentos de procesos estocásticos de segundo orden</h3>
-<div class="outline-text-3" id="text-orgf7d75c1">
+<div id="outline-container-orge0087b2" class="outline-3">
+<h3 id="orge0087b2">Primeros momentos de procesos estocásticos de segundo orden</h3>
+<div class="outline-text-3" id="text-orge0087b2">
 <p>
 Si \(E(X_t)<\infty\) para \(t\in\mathbb{Z}\), entonces \(E(\boldsymbol{X})\) es
 la secuencia \[E(\boldsymbol{X})=\big(E(X_t)\mid
@@ -580,9 +580,9 @@ procesos estocásticos débilmente estacionarios</span>.
 </p>
 </div>
 </div>
-<div id="outline-container-org095de22" class="outline-3">
-<h3 id="org095de22">Procesos estocásticos (débilmente) estacionarios y la ACF</h3>
-<div class="outline-text-3" id="text-org095de22">
+<div id="outline-container-org0ab59f0" class="outline-3">
+<h3 id="org0ab59f0">Procesos estocásticos (débilmente) estacionarios y la ACF</h3>
+<div class="outline-text-3" id="text-org0ab59f0">
 <p>
 Un proceso estocástico de segundo orden \(\boldsymbol{X}\) se dice que es <i>débilmente estacionario</i> si:
 </p>
@@ -623,9 +623,9 @@ Y llamamos <span class="underline">función de autocorrelación</span> (ACF) a l
 </div>
 </div>
 </div>
-<div id="outline-container-org1785861" class="outline-2">
-<h2 id="org1785861">Notación: convolución y el operador retardo</h2>
-<div class="outline-text-2" id="text-org1785861">
+<div id="outline-container-org86fb861" class="outline-2">
+<h2 id="org86fb861">Notación: convolución y el operador retardo</h2>
+<div class="outline-text-2" id="text-org86fb861">
 <p>
 SI \(\boldsymbol{a}\) es una secuencia de números y \(\boldsymbol{X}\) un proceso estocástico tales que, para todo \(t\), 
 \[
@@ -682,13 +682,13 @@ converge para todo \(t\), entonces
 \end{align*}
 </div>
 </div>
-<div id="outline-container-orgba29dac" class="outline-2">
-<h2 id="orgba29dac">Ejemplos de procesos (débilmente) estacionarios</h2>
-<div class="outline-text-2" id="text-orgba29dac">
+<div id="outline-container-org7e5ab12" class="outline-2">
+<h2 id="org7e5ab12">Ejemplos de procesos (débilmente) estacionarios</h2>
+<div class="outline-text-2" id="text-org7e5ab12">
 </div>
-<div id="outline-container-orga2bc1ea" class="outline-3">
-<h3 id="orga2bc1ea">Proceso de ruido blanco</h3>
-<div class="outline-text-3" id="text-orga2bc1ea">
+<div id="outline-container-org859c593" class="outline-3">
+<h3 id="org859c593">Proceso de ruido blanco</h3>
+<div class="outline-text-3" id="text-org859c593">
 <p>
 Una secuencia \(\boldsymbol{U}=(U_t\mid t\in\mathbb{Z})\) de variables
 aleatorias <b>incorreladas</b> y tales que \[E(U_t)=0\quad\text{ y }\quad
@@ -729,9 +729,9 @@ Algunas aclaraciones:
 </ol>
 </div>
 </div>
-<div id="outline-container-orge6bb6e4" class="outline-3">
-<h3 id="orge6bb6e4">Procesos lineales</h3>
-<div class="outline-text-3" id="text-orge6bb6e4">
+<div id="outline-container-org05ceffa" class="outline-3">
+<h3 id="org05ceffa">Procesos lineales</h3>
+<div class="outline-text-3" id="text-org05ceffa">
 <p>
 Sea \(\boldsymbol{U}\sim WN(0,\sigma^2)\) y \(\boldsymbol{b}\in
 \ell^2\); una secuencia de <span class="underline">cuadrado sumable</span>
@@ -762,9 +762,9 @@ subclases de procesos, algunas de las cuales son objeto principal de
 estudio de este curso.
 </p>
 </div>
-<div id="outline-container-org38f1ffd" class="outline-4">
-<h4 id="org38f1ffd">Media móvil infinita. MA(\(\infty\))</h4>
-<div class="outline-text-4" id="text-org38f1ffd">
+<div id="outline-container-org0a66634" class="outline-4">
+<h4 id="org0a66634">Media móvil infinita. MA(\(\infty\))</h4>
+<div class="outline-text-4" id="text-org0a66634">
 <p>
 Sea \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y sea \(\;\boldsymbol{\psi}\in \ell^2\;\) una serie formal con <span class="underline">infinitos términos NO nulos</span> y \({\color{#008000}{\psi_{0}=1}}\); 
 entonces el proceso estocástico \(\boldsymbol{\psi}*\boldsymbol{U}\), cuyos elementos son 
@@ -782,9 +782,9 @@ Por ejemplo, cuando \(\boldsymbol{\psi}\) tiene un número finito de términos n
 </p>
 </div>
 </div>
-<div id="outline-container-orgc324b0a" class="outline-4">
-<h4 id="orgc324b0a">Proceso de media móvil de orden \(q\). MA(\(q\))</h4>
-<div class="outline-text-4" id="text-orgc324b0a">
+<div id="outline-container-org5a070a8" class="outline-4">
+<h4 id="org5a070a8">Proceso de media móvil de orden \(q\). MA(\(q\))</h4>
+<div class="outline-text-4" id="text-org5a070a8">
 <p>
 Sea \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y sea
 \(\;\boldsymbol{\theta}\;\) un <span class="underline">polinomio de grado \((q)\)</span> con
@@ -816,9 +816,9 @@ Hay otros procesos lineales con representación parsimoniosa.
 </p>
 </div>
 </div>
-<div id="outline-container-org4df4b74" class="outline-4">
-<h4 id="org4df4b74">Proceso autorregresivo de orden \(p\). AR(\(p\))</h4>
-<div class="outline-text-4" id="text-org4df4b74">
+<div id="outline-container-orgcdfee3c" class="outline-4">
+<h4 id="orgcdfee3c">Proceso autorregresivo de orden \(p\). AR(\(p\))</h4>
+<div class="outline-text-4" id="text-orgcdfee3c">
 <p>
 Sea \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\), se denomina <i>proceso autorregresivo de orden \(p\)</i> a aquel proceso estocástico <i>estacionario</i> \(\;\boldsymbol{X}\;\) que es solución de la siguiente ecuación
 \[
@@ -911,9 +911,9 @@ El siguiente modelo lineal es una generalización de los dos anteriores.
 </p>
 </div>
 </div>
-<div id="outline-container-orga129fd7" class="outline-4">
-<h4 id="orga129fd7">Proceso autorregresivo de media móvil. ARMA(\(p,q\))</h4>
-<div class="outline-text-4" id="text-orga129fd7">
+<div id="outline-container-orgcfdb346" class="outline-4">
+<h4 id="orgcfdb346">Proceso autorregresivo de media móvil. ARMA(\(p,q\))</h4>
+<div class="outline-text-4" id="text-orgcfdb346">
 <p>
 Sea \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\), se denomina <i>proceso autorregresivo de media móvil \((p,q)\)</i> al proceso estocástico estacionario \(\;\boldsymbol{X}\;\) que es solución de la ecuación en diferencias:
 \[
@@ -945,9 +945,9 @@ Tanto \(\boldsymbol{\phi}^{-1}\) como \(\boldsymbol{\theta}\) son series formale
 </p>
 </div>
 </div>
-<div id="outline-container-org85f5263" class="outline-4">
-<h4 id="org85f5263">Proceso autorregresivo de media móvil con media no nula</h4>
-<div class="outline-text-4" id="text-org85f5263">
+<div id="outline-container-org6107c82" class="outline-4">
+<h4 id="org6107c82">Proceso autorregresivo de media móvil con media no nula</h4>
+<div class="outline-text-4" id="text-org6107c82">
 <p>
 Consideremos un proceso \(\boldsymbol{Y}\) con media
 distinta de cero, es decir, \[E(Y_t)=\mu\ne0\] y definamos la
@@ -978,13 +978,13 @@ ARMA(\(p,q\)) <i>con media no nula</i>.
 </div>
 </div>
 </div>
-<div id="outline-container-orgb85c581" class="outline-2">
-<h2 id="orgb85c581">Primeros momentos de procesos lineales causales</h2>
-<div class="outline-text-2" id="text-orgb85c581">
+<div id="outline-container-org87568e1" class="outline-2">
+<h2 id="org87568e1">Primeros momentos de procesos lineales causales</h2>
+<div class="outline-text-2" id="text-org87568e1">
 </div>
-<div id="outline-container-orgca4bbe9" class="outline-3">
-<h3 id="orgca4bbe9">Esperanza y autocovarianzas de un proceso lineal causal</h3>
-<div class="outline-text-3" id="text-orgca4bbe9">
+<div id="outline-container-org8818296" class="outline-3">
+<h3 id="org8818296">Esperanza y autocovarianzas de un proceso lineal causal</h3>
+<div class="outline-text-3" id="text-org8818296">
 <p>
 Sea \(\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U},\;\) donde \(\boldsymbol{\psi}\) es una serie formal de cuadrado sumable y donde \(\;\boldsymbol{U}\sim WN(0,\sigma^2).\quad\) 
 Recordando que la convolución es una operación lineal: 
@@ -1016,9 +1016,9 @@ con grado igual al grado de \(\boldsymbol{\psi}\) y cogrado igual a menos el gra
 </p>
 </div>
 </div>
-<div id="outline-container-org9c6b4db" class="outline-3">
-<h3 id="org9c6b4db">Covarianza cruzada entre dos procesos lineales causales</h3>
-<div class="outline-text-3" id="text-org9c6b4db">
+<div id="outline-container-orgc83dbd6" class="outline-3">
+<h3 id="orgc83dbd6">Covarianza cruzada entre dos procesos lineales causales</h3>
+<div class="outline-text-3" id="text-orgc83dbd6">
 <p>
 Sean \(\;\boldsymbol{W}=\boldsymbol{\theta}*\boldsymbol{U}\quad\) e
 \(\quad\boldsymbol{Y}=\boldsymbol{\psi}*\boldsymbol{U},\quad\) donde
@@ -1045,7 +1045,7 @@ el grado de \(\boldsymbol{\psi}\).
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-11-07 Fri 16:51</p>
+<p class="date">Created: 2025-11-12 Wed 16:22</p>
 </div>
 </body>
 </html>
