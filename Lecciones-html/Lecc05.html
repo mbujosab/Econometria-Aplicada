@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-11-12 Wed 16:22 -->
+<!-- 2025-11-13 Thu 08:40 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 5. ACF, PACF y densidad espectral de modelos AR</title>
@@ -66,42 +66,42 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org3e4ad89">ACF, PACF y densidad espectral de más modelos lineales (AR)</a>
+<li><a href="#orge668eca">ACF, PACF y densidad espectral de más modelos lineales (AR)</a>
 <ul>
-<li><a href="#org8475ab5">Procesos lineales causales</a></li>
-<li><a href="#org6514c13">Proceso autorregresivo AR(\(p\))</a>
+<li><a href="#orgb1671de">Procesos lineales causales</a></li>
+<li><a href="#org38d06e1">Proceso autorregresivo AR(\(p\))</a>
 <ul>
-<li><a href="#orge5b4ecc">Demostración de que la PACF tiene cogrado \(-p\) y grado \(p\)</a></li>
+<li><a href="#org46b8545">Demostración de que la PACF tiene cogrado \(-p\) y grado \(p\)</a></li>
 </ul>
 </li>
-<li><a href="#orgec49596">Proceso autorregresivo AR(\(1\))</a>
+<li><a href="#org2ad9453">Proceso autorregresivo AR(\(1\))</a>
 <ul>
-<li><a href="#org507dc66">AR(1) con raíz positiva</a></li>
-<li><a href="#orgc71d977">AR(1) con raíz negativa</a></li>
+<li><a href="#org8fb28ff">AR(1) con raíz positiva</a></li>
+<li><a href="#orgfe04fbd">AR(1) con raíz negativa</a></li>
 </ul>
 </li>
-<li><a href="#orgcf22df5">Proceso autorregresivo AR(\(2\))</a>
+<li><a href="#orgb847d25">Proceso autorregresivo AR(\(2\))</a>
 <ul>
-<li><a href="#orgde396d8">AR(2) con dos parámetros positivos (\(+\), \(+\))</a></li>
-<li><a href="#orga934720">AR(2) con parámetros de distinto signo (\(-\), \(+\))</a></li>
-<li><a href="#org6129005">AR(2) con dos parámetros negativos (\(-\), \(-\))</a></li>
-<li><a href="#orgf4c9898">AR(2) con parámetros de distinto signo (\(+\), \(-\))</a></li>
-<li><a href="#orga5d7978">AR(2) con dos raíces reales, una positiva y la otra negativa</a></li>
-<li><a href="#orgeda71f9">AR(2) con un par de raíces complejas</a></li>
-<li><a href="#org8339d71">AR(2) con dos raíces reales y negativas</a></li>
-<li><a href="#org5400aa4">AR(2) con dos raíces reales y positivas</a></li>
+<li><a href="#org3165a9f">AR(2) con dos parámetros positivos (\(+\), \(+\))</a></li>
+<li><a href="#orgce1f59e">AR(2) con parámetros de distinto signo (\(-\), \(+\))</a></li>
+<li><a href="#org63f5a83">AR(2) con dos parámetros negativos (\(-\), \(-\))</a></li>
+<li><a href="#org540f55c">AR(2) con parámetros de distinto signo (\(+\), \(-\))</a></li>
+<li><a href="#orgbe4ec40">AR(2) con dos raíces reales, una positiva y la otra negativa</a></li>
+<li><a href="#orgfde1c4c">AR(2) con un par de raíces complejas</a></li>
+<li><a href="#org156812f">AR(2) con dos raíces reales y negativas</a></li>
+<li><a href="#orgd2d95b3">AR(2) con dos raíces reales y positivas</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org9b3984e">(Resumen) características de procesos AR(\(p\))</a></li>
-<li><a href="#org1aea69c">(Resumen) características de procesos MA(\(q\))</a></li>
-<li><a href="#org6282f8d">Nota final</a></li>
-<li><a href="#org7b12fce">Las Ecuaciones de Yule-Walker para un AR(\(p\)) estacionario</a></li>
+<li><a href="#org9fb504e">(Resumen) características de procesos AR(\(p\))</a></li>
+<li><a href="#orga651f94">(Resumen) características de procesos MA(\(q\))</a></li>
+<li><a href="#orgac096e5">Nota final</a></li>
+<li><a href="#org7a5e078">Las Ecuaciones de Yule-Walker para un AR(\(p\)) estacionario</a></li>
 </ul>
 </div>
 </div>
-<div class="abstract" id="orgbad2031">
+<div class="abstract" id="org5fa5088">
 <p>
 En esta lección analizaremos la ACF, la PACF y la densidad espectral de los procesos autorregresivos (AR). 
 Estos procesos se caracterizan por tener infinitos coeficientes de autocorrelación no nulos (i.e, una ACF de grado infinito), pero una PACF de grado finito. 
@@ -118,9 +118,9 @@ También veremos que los coeficientes de autocorrelación satisfacen las ecuacio
 <li>programas análisis modelos arma: (<a href="https://mbujosab.github.io/Econometria-Aplicada/Transparencias/analisis_armas.slides.html">slides</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/src/analisis_armas.html">html</a>) &mdash; (<a href="https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/analisis_armas.ipynb">mybinder</a>)</li>
 </ul></li>
 </ul>
-<div id="outline-container-org2658ea3" class="outline-4">
-<h4 id="org2658ea3">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-org2658ea3">
+<div id="outline-container-org5889e2f" class="outline-4">
+<h4 id="org5889e2f">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-org5889e2f">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python
 </span><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra
@@ -134,8 +134,8 @@ También veremos que los coeficientes de autocorrelación satisfacen las ecuacio
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="orgbb4a93b"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
-<div class="outline-text-5" id="text-orgbb4a93b">
+<li><a id="org7c7c152"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
+<div class="outline-text-5" id="text-org7c7c152">
 <p>
 para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
@@ -149,9 +149,9 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 </li>
 </ul>
 </div>
-<div id="outline-container-org564fc0d" class="outline-4">
-<h4 id="org564fc0d">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
-<div class="outline-text-4" id="text-org564fc0d">
+<div id="outline-container-orgc0da1ec" class="outline-4">
+<h4 id="orgc0da1ec">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
+<div class="outline-text-4" id="text-orgc0da1ec">
 <p>
 Cargamos las funciones auxiliares (véase la carpeta <code>src/</code>)
 </p>
@@ -164,13 +164,13 @@ warnings.filterwarnings(<span style="font-style: italic;">"ignore"</span>, categ
 </div>
 </div>
 </div>
-<div id="outline-container-org3e4ad89" class="outline-2">
-<h2 id="org3e4ad89">ACF, PACF y densidad espectral de más modelos lineales (AR)</h2>
-<div class="outline-text-2" id="text-org3e4ad89">
+<div id="outline-container-orge668eca" class="outline-2">
+<h2 id="orge668eca">ACF, PACF y densidad espectral de más modelos lineales (AR)</h2>
+<div class="outline-text-2" id="text-orge668eca">
 </div>
-<div id="outline-container-org8475ab5" class="outline-3">
-<h3 id="org8475ab5">Procesos lineales causales</h3>
-<div class="outline-text-3" id="text-org8475ab5">
+<div id="outline-container-orgb1671de" class="outline-3">
+<h3 id="orgb1671de">Procesos lineales causales</h3>
+<div class="outline-text-3" id="text-orgb1671de">
 <p>
 Sea \(\;\boldsymbol{X}=\boldsymbol{\psi}*\boldsymbol{U},\;\) donde \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y \(\;\boldsymbol{\psi}\in\ell^2\;\) es una serie formal:
 \[
@@ -207,9 +207,9 @@ A partir de \(\boldsymbol{\gamma}\) obtenemos las otras tres funciones:
 </p>
 </div>
 </div>
-<div id="outline-container-org6514c13" class="outline-3">
-<h3 id="org6514c13">Proceso autorregresivo AR(\(p\))</h3>
-<div class="outline-text-3" id="text-org6514c13">
+<div id="outline-container-org38d06e1" class="outline-3">
+<h3 id="org38d06e1">Proceso autorregresivo AR(\(p\))</h3>
+<div class="outline-text-3" id="text-org38d06e1">
 <p>
 Sea 
 \[
@@ -280,9 +280,9 @@ Pero la PACF, \(\;\boldsymbol{\pi},\;\) es una secuencia con grado \(p\) y cogra
 <li>Los coeficientes de autocorrelación verifican las Ecuaciones de <a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#section.5">Yule-Walker</a>.</li>
 </ul>
 </div>
-<div id="outline-container-orge5b4ecc" class="outline-4">
-<h4 id="orge5b4ecc">Demostración de que la PACF tiene cogrado \(-p\) y grado \(p\)</h4>
-<div class="outline-text-4" id="text-orge5b4ecc">
+<div id="outline-container-org46b8545" class="outline-4">
+<h4 id="org46b8545">Demostración de que la PACF tiene cogrado \(-p\) y grado \(p\)</h4>
+<div class="outline-text-4" id="text-org46b8545">
 <ul class="org-ul">
 <li>Sea \(\boldsymbol{X}\) un proceso causal AR(\(p\)): \(\quad X_t\;=\;\sum\limits_{j=1}^p\phi_j X_{t-j}+U_t\)</li>
 <li>La proyección de \(X_{k+1}\) sobre el espacio \(\bar{sp}(X_{2}:X_k)\) generado por \(X_2,\ldots X_k\) (con \(k>p\)) es:
@@ -311,9 +311,9 @@ ya que \(U_{k+1}\perp(X_{1}-\widetilde{X_{1}}) \in \bar{sp}(U_j\mid{j\leq k})\).
 </div>
 </div>
 </div>
-<div id="outline-container-orgec49596" class="outline-3">
-<h3 id="orgec49596">Proceso autorregresivo AR(\(1\))</h3>
-<div class="outline-text-3" id="text-orgec49596">
+<div id="outline-container-org2ad9453" class="outline-3">
+<h3 id="org2ad9453">Proceso autorregresivo AR(\(1\))</h3>
+<div class="outline-text-3" id="text-org2ad9453">
 <p>
 Sea \(\;(1-\phi z)*\boldsymbol{X}=\boldsymbol{U},\quad\) con \(\;|\phi|<1\;\) y con \(\;\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\), es decir \[X_t=\phi X_{t-1} + U_t.\]
 </p>
@@ -345,9 +345,9 @@ como \(\;|\phi|<1\;\) tenemos que \(\;\boldsymbol{X}=(1-\phi z)^{-1}*\boldsymbol
 \(\boldsymbol{\pi} \;=\; (\ldots,\; 0,\; 0,\; \phi,\; {\color{blue}1},\; \phi,\; 0,\; 0,\;\ldots)\qquad\) (grado \(1\)).
 </p>
 </div>
-<div id="outline-container-org507dc66" class="outline-4">
-<h4 id="org507dc66">AR(1) con raíz positiva</h4>
-<div class="outline-text-4" id="text-org507dc66">
+<div id="outline-container-org8fb28ff" class="outline-4">
+<h4 id="org8fb28ff">AR(1) con raíz positiva</h4>
+<div class="outline-text-4" id="text-org8fb28ff">
 <p>
 \[\boldsymbol{\phi}(z)=1-0.9z\quad\Rightarrow\quad X_t=0.9X_{t-1}+U_t\qquad {\color{blue}{(\phi>0)}}\]
 </p>
@@ -362,14 +362,14 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR1p.png'</span>
 
 
 
-<div id="org5a7c469" class="figure">
+<div id="org02dac35" class="figure">
 <p><img src="./img/lecc05/ACF-AR1p.png" alt="ACF-AR1p.png" width="900px" />
 </p>
 </div>
 
 
 
-<div id="orgd610265" class="figure">
+<div id="org93318b4" class="figure">
 <p><img src="img/lecc05/Roots-AR1p.png" alt="Roots-AR1p.png" width="500px" />
 </p>
 </div>
@@ -383,15 +383,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR1p.png'</span>
 
 
 
-<div id="orgd19c423" class="figure">
+<div id="orgdeb4eca" class="figure">
 <p><img src="./img/lecc05/Sim-AR1p.png" alt="Sim-AR1p.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc71d977" class="outline-4">
-<h4 id="orgc71d977">AR(1) con raíz negativa</h4>
-<div class="outline-text-4" id="text-orgc71d977">
+<div id="outline-container-orgfe04fbd" class="outline-4">
+<h4 id="orgfe04fbd">AR(1) con raíz negativa</h4>
+<div class="outline-text-4" id="text-orgfe04fbd">
 <p>
 \[\boldsymbol{\phi}(z)=1+0.9z\quad\Rightarrow\quad X_t=-0.9X_{t-1}+U_t\qquad {\color{blue}{(\phi<0)}}\]
 </p>
@@ -406,7 +406,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR1n.png'</span>
 
 
 
-<div id="orgd4eb1ab" class="figure">
+<div id="org3c40e0c" class="figure">
 <p><img src="./img/lecc05/ACF-AR1n.png" alt="ACF-AR1n.png" width="900px" />
 </p>
 </div>
@@ -414,7 +414,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR1n.png'</span>
 
 
 
-<div id="org4a21a0f" class="figure">
+<div id="orga179b8a" class="figure">
 <p><img src="img/lecc05/Roots-AR1n.png" alt="Roots-AR1n.png" width="500px" />
 </p>
 </div>
@@ -428,16 +428,16 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR1n.png'</span>
 
 
 
-<div id="org1fab5a0" class="figure">
+<div id="orgdf4a646" class="figure">
 <p><img src="./img/lecc05/Sim-AR1n.png" alt="Sim-AR1n.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-orgcf22df5" class="outline-3">
-<h3 id="orgcf22df5">Proceso autorregresivo AR(\(2\))</h3>
-<div class="outline-text-3" id="text-orgcf22df5">
+<div id="outline-container-orgb847d25" class="outline-3">
+<h3 id="orgb847d25">Proceso autorregresivo AR(\(2\))</h3>
+<div class="outline-text-3" id="text-orgb847d25">
 <p>
 Sea \(\quad(1-\phi_1 z-\phi_2 z^2)*\boldsymbol{X}=\boldsymbol{U},\quad\)
 con \(\;\boldsymbol{U}\sim WN(0,\sigma^2)\;\) y con
@@ -463,7 +463,7 @@ X_{t-2} + U_t.\] Entonces
 
 
 
-<div id="orgdd77182" class="figure">
+<div id="orgc32a55d" class="figure">
 <p><img src="img/lecc05/AR2roots.png" alt="AR2roots.png" width="600px" />
 </p>
 <p><span class="figure-number">Figura 1: </span>El interior del triángulo es la región paramétrica donde un AR(2) es estacionario. Por debajo de la parábola las raíces son complejas. El signo del parámetro \(\phi_1\) determina el signo del primer retardo de la PACF y \(\phi_2\) el signo del segundo. Las regiones 1, 2, 3, y 4 determinan cómo decae la ACF.</p>
@@ -474,9 +474,9 @@ X_{t-2} + U_t.\] Entonces
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orgde396d8" class="outline-4">
-<h4 id="orgde396d8">AR(2) con dos parámetros positivos (\(+\), \(+\))</h4>
-<div class="outline-text-4" id="text-orgde396d8">
+<div id="outline-container-org3165a9f" class="outline-4">
+<h4 id="org3165a9f">AR(2) con dos parámetros positivos (\(+\), \(+\))</h4>
+<div class="outline-text-4" id="text-org3165a9f">
 <p>
 \[\boldsymbol{\phi}(z)=1-0.6z -0.3z^2\quad\Rightarrow\quad
 (1-0.6\mathsf{B}-0.3\mathsf{B}^2)X_t= U_t \;\;
@@ -493,14 +493,14 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR2pp.png'</span
 
 
 
-<div id="org3cd124c" class="figure">
+<div id="org8dce002" class="figure">
 <p><img src="./img/lecc05/ACF-AR2pp.png" alt="ACF-AR2pp.png" width="900px" />
 </p>
 </div>
 
 
 
-<div id="org56d8401" class="figure">
+<div id="orgd4a2b2f" class="figure">
 <p><img src="img/lecc05/Roots-AR2pp.png" alt="Roots-AR2pp.png" width="500px" />
 </p>
 </div>
@@ -514,15 +514,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR2pp.png'</span
 
 
 
-<div id="org41ec3f9" class="figure">
+<div id="org8348362" class="figure">
 <p><img src="./img/lecc05/Sim-AR2pp.png" alt="Sim-AR2pp.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orga934720" class="outline-4">
-<h4 id="orga934720">AR(2) con parámetros de distinto signo (\(-\), \(+\))</h4>
-<div class="outline-text-4" id="text-orga934720">
+<div id="outline-container-orgce1f59e" class="outline-4">
+<h4 id="orgce1f59e">AR(2) con parámetros de distinto signo (\(-\), \(+\))</h4>
+<div class="outline-text-4" id="text-orgce1f59e">
 <p>
 \[\boldsymbol{\phi}(z)=1+0.6z-0.3z^2\quad\Rightarrow\quad
 (1+0.6\mathsf{B}-0.3\mathsf{B}^2)X_t= U_t \;\;
@@ -539,14 +539,14 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR2np.png'</span
 
 
 
-<div id="org416838b" class="figure">
+<div id="org6657bb3" class="figure">
 <p><img src="./img/lecc05/ACF-AR2np.png" alt="ACF-AR2np.png" width="900px" />
 </p>
 </div>
 
 
 
-<div id="org25f9bc9" class="figure">
+<div id="org4bcf797" class="figure">
 <p><img src="img/lecc05/Roots-AR2np.png" alt="Roots-AR2np.png" width="500px" />
 </p>
 </div>
@@ -560,15 +560,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR2np.png'</span
 
 
 
-<div id="orgcff7252" class="figure">
+<div id="orge38e0b6" class="figure">
 <p><img src="./img/lecc05/Sim-AR2np.png" alt="Sim-AR2np.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org6129005" class="outline-4">
-<h4 id="org6129005">AR(2) con dos parámetros negativos (\(-\), \(-\))</h4>
-<div class="outline-text-4" id="text-org6129005">
+<div id="outline-container-org63f5a83" class="outline-4">
+<h4 id="org63f5a83">AR(2) con dos parámetros negativos (\(-\), \(-\))</h4>
+<div class="outline-text-4" id="text-org63f5a83">
 <p>
 \[\boldsymbol{\phi}(z)=1+0.9z+0.9z^2\quad\Rightarrow\quad
 (1+0.9\mathsf{B}+0.9\mathsf{B}^2)X_t= U_t \;\;
@@ -585,14 +585,14 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR2nn.png'</span
 
 
 
-<div id="org40bc593" class="figure">
+<div id="org10fddf3" class="figure">
 <p><img src="./img/lecc05/ACF-AR2nn.png" alt="ACF-AR2nn.png" width="900px" />
 </p>
 </div>
 
 
 
-<div id="org5bcfb3b" class="figure">
+<div id="orgc1bef6d" class="figure">
 <p><img src="img/lecc05/Roots-AR2nn.png" alt="Roots-AR2nn.png" width="500px" />
 </p>
 </div>
@@ -607,15 +607,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR2nn.png'</span
 
 
 
-<div id="orgd9a094d" class="figure">
+<div id="orgfaf05c7" class="figure">
 <p><img src="./img/lecc05/Sim-AR2nn.png" alt="Sim-AR2nn.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgf4c9898" class="outline-4">
-<h4 id="orgf4c9898">AR(2) con parámetros de distinto signo (\(+\), \(-\))</h4>
-<div class="outline-text-4" id="text-orgf4c9898">
+<div id="outline-container-org540f55c" class="outline-4">
+<h4 id="org540f55c">AR(2) con parámetros de distinto signo (\(+\), \(-\))</h4>
+<div class="outline-text-4" id="text-org540f55c">
 <p>
 \[\boldsymbol{\phi}(z)=1-1.1z +0.9z^2\quad\Rightarrow\quad
 (1-1.1\mathsf{B}+0.9\mathsf{B}^2)X_t= U_t \;\;
@@ -633,14 +633,14 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR2pn.png'</span
 
 
 
-<div id="org52cbf49" class="figure">
+<div id="orge825c05" class="figure">
 <p><img src="./img/lecc05/ACF-AR2pn.png" alt="ACF-AR2pn.png" width="900px" />
 </p>
 </div>
 
 
 
-<div id="org25692b9" class="figure">
+<div id="org3b54d0a" class="figure">
 <p><img src="img/lecc05/Roots-AR2pn.png" alt="Roots-AR2pn.png" width="500px" />
 </p>
 </div>
@@ -655,15 +655,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR2pn.png'</span
 
 
 
-<div id="org380ec14" class="figure">
+<div id="org4067a82" class="figure">
 <p><img src="./img/lecc05/Sim-AR2pn.png" alt="Sim-AR2pn.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orga5d7978" class="outline-4">
-<h4 id="orga5d7978">AR(2) con dos raíces reales, una positiva y la otra negativa</h4>
-<div class="outline-text-4" id="text-orga5d7978">
+<div id="outline-container-orgbe4ec40" class="outline-4">
+<h4 id="orgbe4ec40">AR(2) con dos raíces reales, una positiva y la otra negativa</h4>
+<div class="outline-text-4" id="text-orgbe4ec40">
 <p>
 \[\boldsymbol{\phi}(z)=1+0.1z-0.8z^2\quad\Rightarrow\quad
 (1+.1\mathsf{B}-.8\mathsf{B}^2)X_t = U_t \;\;
@@ -681,14 +681,14 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR2RojoVioleta.p
 
 
 
-<div id="org9ca6fce" class="figure">
+<div id="org9ab5bed" class="figure">
 <p><img src="./img/lecc05/ACF-AR2RojoVioleta.png" alt="ACF-AR2RojoVioleta.png" width="900px" />
 </p>
 </div>
 
 
 
-<div id="org6770584" class="figure">
+<div id="org70a8dc1" class="figure">
 <p><img src="img/lecc05/Roots-AR2RojoVioleta.png" alt="Roots-AR2RojoVioleta.png" width="500px" />
 </p>
 </div>
@@ -703,15 +703,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR2RojoVioleta.p
 
 
 
-<div id="org860450e" class="figure">
+<div id="orgdd4dd51" class="figure">
 <p><img src="./img/lecc05/Sim-AR2RojoVioleta.png" alt="Sim-AR2RojoVioleta.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-orgeda71f9" class="outline-4">
-<h4 id="orgeda71f9">AR(2) con un par de raíces complejas</h4>
-<div class="outline-text-4" id="text-orgeda71f9">
+<div id="outline-container-orgfde1c4c" class="outline-4">
+<h4 id="orgfde1c4c">AR(2) con un par de raíces complejas</h4>
+<div class="outline-text-4" id="text-orgfde1c4c">
 <p>
 \[\boldsymbol{\phi}(z)=1-0.1z+0.8z^2\quad\Rightarrow\quad
  (1-.1\mathsf{B}+.8\mathsf{B}^2)X_t = U_t \;
@@ -729,7 +729,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-ARverde.png'</sp
 
 
 
-<div id="org66f26b2" class="figure">
+<div id="org4fe5ed8" class="figure">
 <p><img src="./img/lecc05/ACF-ARverde.png" alt="ACF-ARverde.png" width="900px" />
 </p>
 </div>
@@ -737,7 +737,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-ARverde.png'</sp
 
 
 
-<div id="org89883b2" class="figure">
+<div id="orgae168d5" class="figure">
 <p><img src="img/lecc05/Roots-AR2verde.png" alt="Roots-AR2verde.png" width="500px" />
 </p>
 </div>
@@ -751,15 +751,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-ARverde.png'</sp
 
 
 
-<div id="org8a59d9e" class="figure">
+<div id="orgaf9503c" class="figure">
 <p><img src="./img/lecc05/Sim-ARverde.png" alt="Sim-ARverde.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org8339d71" class="outline-4">
-<h4 id="org8339d71">AR(2) con dos raíces reales y negativas</h4>
-<div class="outline-text-4" id="text-org8339d71">
+<div id="outline-container-org156812f" class="outline-4">
+<h4 id="org156812f">AR(2) con dos raíces reales y negativas</h4>
+<div class="outline-text-4" id="text-org156812f">
 <p>
 \[\boldsymbol{\phi}(z)=1+1.6z+.64z^2\quad\Rightarrow\quad 
 (1+1.6\mathsf{B}+.64\mathsf{B}^2)X_t = U_t \;
@@ -776,7 +776,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR2violeta.png'<
 
 
 
-<div id="org91e9b47" class="figure">
+<div id="orgad1d3bd" class="figure">
 <p><img src="./img/lecc05/ACF-AR2violeta.png" alt="ACF-AR2violeta.png" width="900px" />
 </p>
 </div>
@@ -784,7 +784,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR2violeta.png'<
 
 
 
-<div id="org3483b57" class="figure">
+<div id="org5e65aa1" class="figure">
 <p><img src="img/lecc05/Roots-AR2violeta.png" alt="Roots-AR2violeta.png" width="500px" />
 </p>
 </div>
@@ -798,15 +798,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR2violeta.png'<
 
 
 
-<div id="orge54b725" class="figure">
+<div id="orgffc3971" class="figure">
 <p><img src="./img/lecc05/Sim-AR2violeta.png" alt="Sim-AR2violeta.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org5400aa4" class="outline-4">
-<h4 id="org5400aa4">AR(2) con dos raíces reales y positivas</h4>
-<div class="outline-text-4" id="text-org5400aa4">
+<div id="outline-container-orgd2d95b3" class="outline-4">
+<h4 id="orgd2d95b3">AR(2) con dos raíces reales y positivas</h4>
+<div class="outline-text-4" id="text-orgd2d95b3">
 <p>
 \[\boldsymbol{\phi}(z)=1-1.6z+.64z^2 \;\;\Rightarrow\;\;
 (1-1.6\mathsf{B}+.64\mathsf{B}^2)X_t = U_t \;
@@ -823,7 +823,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR2rojo.png'</sp
 
 
 
-<div id="orgf8830da" class="figure">
+<div id="orga4fcc78" class="figure">
 <p><img src="./img/lecc05/ACF-AR2rojo.png" alt="ACF-AR2rojo.png" width="900px" />
 </p>
 </div>
@@ -832,7 +832,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/ACF-AR2rojo.png'</sp
 
 
 
-<div id="org75c384d" class="figure">
+<div id="orgfa1fc6c" class="figure">
 <p><img src="img/lecc05/Roots-AR2rojo.png" alt="Roots-AR2rojo.png" width="500px" />
 </p>
 </div>
@@ -847,7 +847,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR2rojo.png'</sp
 
 
 
-<div id="org3635ef6" class="figure">
+<div id="org38b2a20" class="figure">
 <p><img src="./img/lecc05/Sim-AR2rojo.png" alt="Sim-AR2rojo.png" width="900px" />
 </p>
 </div>
@@ -855,9 +855,9 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc05/Sim-AR2rojo.png'</sp
 </div>
 </div>
 </div>
-<div id="outline-container-org9b3984e" class="outline-2">
-<h2 id="org9b3984e">(Resumen) características de procesos AR(\(p\))</h2>
-<div class="outline-text-2" id="text-org9b3984e">
+<div id="outline-container-org9fb504e" class="outline-2">
+<h2 id="org9fb504e">(Resumen) características de procesos AR(\(p\))</h2>
+<div class="outline-text-2" id="text-org9fb504e">
 <p>
 <span class="underline">Siempre invertible.</span> (i.e., posee representación AR).
 </p>
@@ -889,9 +889,9 @@ Para ser estacionario raíces de \(\boldsymbol{\phi}\) fuera del círculo unidad
 </p>
 </div>
 </div>
-<div id="outline-container-org1aea69c" class="outline-2">
-<h2 id="org1aea69c">(Resumen) características de procesos MA(\(q\))</h2>
-<div class="outline-text-2" id="text-org1aea69c">
+<div id="outline-container-orga651f94" class="outline-2">
+<h2 id="orga651f94">(Resumen) características de procesos MA(\(q\))</h2>
+<div class="outline-text-2" id="text-orga651f94">
 <p>
 <span class="underline">Siempre estacionario.</span>
 </p>
@@ -924,9 +924,9 @@ Para ser invertible raíces \(\boldsymbol{\theta}\) fuera del círculo unidad
 </p>
 </div>
 </div>
-<div id="outline-container-org6282f8d" class="outline-2">
-<h2 id="org6282f8d">Nota final</h2>
-<div class="outline-text-2" id="text-org6282f8d">
+<div id="outline-container-orgac096e5" class="outline-2">
+<h2 id="orgac096e5">Nota final</h2>
+<div class="outline-text-2" id="text-orgac096e5">
 <p>
 Se puede demostrar que
 </p>
@@ -979,9 +979,9 @@ Desgraciadamente para los modelos ARMA (qué veremos más adelante) tanto la ACF
 </table>
 </div>
 </div>
-<div id="outline-container-org7b12fce" class="outline-2">
-<h2 id="org7b12fce">Las Ecuaciones de Yule-Walker para un AR(\(p\)) estacionario</h2>
-<div class="outline-text-2" id="text-org7b12fce">
+<div id="outline-container-org7a5e078" class="outline-2">
+<h2 id="org7a5e078">Las Ecuaciones de Yule-Walker para un AR(\(p\)) estacionario</h2>
+<div class="outline-text-2" id="text-org7a5e078">
 <p>
 Sea un AR(\(p\)) estacionario:
 \(\;\;\boldsymbol{\phi}(\mathsf{B})X_t=U_t\;\;\) donde \(\;\;\boldsymbol{\phi}(z)=1-\phi_1z^1-\cdots-\phi_pz^p.\;\)
@@ -1088,7 +1088,7 @@ Yule-Walker.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-11-12 Wed 16:22</p>
+<p class="date">Created: 2025-11-13 Thu 08:40</p>
 </div>
 </body>
 </html>
