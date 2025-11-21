@@ -1,0 +1,484 @@
+#    -*- mode: org -*-
+
+#+title: IPC en la Eurozona
+# +author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+#+OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+# +INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: Examen-IPC-EnLaEurozona
+#+BEGIN_SRC sh :exports none :results silent :var practica="Examen-IPC-EnLaEurozona"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+
+
+#+LATEX: \maketitle
+
+# +LATEX: \vspace{-2.5cm}
+
+
+* Datos
+
+IPC en la Eurozona de 19 países (CPI_EZ19) desde enero de 1996 hasta septiembre de 2021. 
+La modelización univariante se restringe a las observaciones hasta diciembre de 2020.
+Las nueve observaciones disponibles correspondientes a 2021 se reservan para un ejercicio de previsión
+extramuestral.
+
+En la fase final del análisis, también se considera la serie análoga de IPC en USA (CPI_USA) observada
+en el mismo período.
+
+# La fuente de los datos es [[https://fred.stlouisfed.org/][The Federal Reserve Bank of St. Louis]].
+# 
+# - Ficheros: :: Versión del ejercicio en [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-pdf/Examen-NombreOscarYConsumoDePetroleo.pdf][pdf]]; [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/Examen-NombreOscarYConsumoDePetroleo.html][html]].
+#    - Datos:  [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/datos/NombreOscarYConsumoDePetroleo.gdt][IPC-EnLaEurozona.gdt]]
+#    - Guión de gretl: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/Practicas-html/guiones/Examen-IPC-EnLaEurozona.inp][Examen-IPC-EnLaEurozona.inp]]
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports none
+open ../../datos/IPC_Eurozona_y_USA.gdt
+#+end_src
+#+latex: }
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports code 
+logs CPI_EZ19 CPI_USA
+sdiff l_CPI_EZ19 l_CPI_USA
+diff sd_l_CPI_EZ19
+smpl 1996:01 2020:12
+#+end_src
+#+latex: }
+
+* Análisis gráfico
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports code 
+rmplot CPI_EZ19 --output="rango-media_CPI_EZ19.png"
+rmplot l_CPI_EZ19 --output="rango-media_l_CPI_EZ19.png"
+#+end_src
+#+latex: }
+
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{./Examen-IPC-EnLaEurozona/rango-media_CPI_EZ19.png}
+\end{minipage}%
+\begin{minipage}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{./Examen-IPC-EnLaEurozona/rango-media_l_CPI_EZ19.png}
+\end{minipage}%
+\caption{Gráficos rango-media de las series, en niveles \texttt{CPI_EZ19} y logarítmos \texttt{l_CPI_EZ19}}
+\end{figure}
+#+END_EXPORT
+
+
+#+BEGIN_EXPORT HTML
+<figure style="display: flex; justify-content: center; gap: 10px;">
+    <img src="./Examen-IPC-EnLaEurozona/rango-media_CPI_EZ19.png" style="max-width:45%; height:auto;"/>
+    <img src="./Examen-IPC-EnLaEurozona/rango-media_l_CPI_EZ19.png" style="max-width:45%; height:auto;"/>
+    <figcaption>Gráficos rango-media de las series, en niveles <code>CPI_EZ19</code> y logarítmos <code>l_CPI_EZ19</code></figcaption>
+</figure>
+#+END_EXPORT
+
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports code 
+gnuplot sd_l_CPI_EZ19 --time-series --with-lines --output="sd_l_CPI_EZ19.png"
+gnuplot d_sd_l_CPI_EZ19 --time-series --with-lines --output="d_sd_l_CPI_EZ19.png"
+#+end_src
+#+latex: }
+
+#+BEGIN_EXPORT latex
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{./Examen-IPC-EnLaEurozona/sd_l_CPI_EZ19.png}
+\end{minipage}%
+\begin{minipage}{0.45\textwidth}
+  \includegraphics[width=\textwidth]{./Examen-IPC-EnLaEurozona/d_sd_l_CPI_EZ19.png}
+\end{minipage}%
+\caption{Series sd_l_CPI_EZ19 ($\nabla_{12}\ln CPI\_EZ19_t$) y d_sd_l_CPI_EZ19 ($\nabla\nabla_{12}\ln CPI\_EZ19_t$)}
+\end{figure}
+#+END_EXPORT
+
+#+BEGIN_EXPORT HTML
+<figure style="display: flex; justify-content: center; gap: 10px;">
+    <img src="./Examen-IPC-EnLaEurozona/sd_l_CPI_EZ19.png" style="max-width:45%; height:auto;"/>
+    <img src="./Examen-IPC-EnLaEurozona/d_sd_l_CPI_EZ19.png" style="max-width:45%; height:auto;"/>
+    <figcaption>Series <code>sd_l_CPI_EZ19</code> y <code>d_sd_l_CPI_EZ19</code></figcaption>
+</figure>
+#+END_EXPORT
+
+* Modelo univariante
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: Modelo ARIMA sd_l_CPI_EZ19
+#+begin_src gretl :eval no :exports code 
+arima 2 1 1 ; 0 0 1 ; sd_l_CPI_EZ19 --nc
+#+end_src
+#+latex: }
+
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports none :noweb yes
+outfile --quiet modeloARIMAsd_l_CPI_EZ19.txt
+    <<Modelo ARIMA sd_l_CPI_EZ19>>
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt} \color{gray!70!black} % \footnotesize 
+#+name: estimación del modelo univariante
+#+include: ./Examen-IPC-EnLaEurozona/modeloARIMAsd_l_CPI_EZ19.txt example
+#+latex: }
+
+#+latex: \newpage
+
+* Previsiones de inflación
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: Modelo ARIMA sd_l_CPI_EZ19
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports none :noweb yes
+fcast 2019:01 2021:09 --plot="prediccion2021.png"
+#+end_src
+#+latex: }
+
+
+#+BEGIN_CENTER
+#+NAME: Previsiones
+#+CAPTION: Valores históricos, valores ajustados y previsiones extramuestrales estáticas (desde enero hasta septiembre de 2021) de la tasa logarítmica anual de inflación, calculadas con el [[Modelo univariante][modelo ARIMA]] que se muestra en la sección anterior. En este contexto, la expresión “previsión extramuestral” significa que los valores observados en 2021 no se han tenido en cuenta, ni para especificar ni para estimar el modelo ARIMA.
+#+ATTR_LATEX: :width 0.65\textwidth :center t
+#+attr_org: :width 600
+[[./Examen-IPC-EnLaEurozona/prediccion2021.png]]
+#+END_CENTER
+
+
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports none :noweb yes
+outfile --quiet Predicciones.txt
+  fcast --out-of-sample
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt}\color{gray!70!black} % \footnotesize 
+#+name: Tabla 1
+#+include: ./Examen-IPC-EnLaEurozona/Predicciones.txt example
+#+latex: }
+
+#+latex: \newpage
+
+* Test de cointegración
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \footnotesize 
+#+NAME: Test cointegración
+#+begin_src gretl :eval no
+coint 12 sd_l_CPI_EZ19 sd_l_CPI_USA --test-down
+#+end_src
+#+latex: }
+
+
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports none :noweb yes
+outfile --quiet test_cointegracion.txt
+    <<Test cointegración>>
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt}\color{gray!70!black}  \footnotesize % \small %
+#+include: ./Examen-IPC-EnLaEurozona/test_cointegracion.txt example
+#+latex: }
+
+* Preguntas 
+
+** Pregunta 1
+
+(2 pts.) 
+¿Qué implican las figuras 1 y 2 sobre la estabilidad en el nivel y la variabilidad del IPC? ¿Qué transformaciones de los datos resultan adecuadas para estabilizar los dos primeros momentos muestrales? Interprete las series mostradas en la Figura 2 considerando las transformaciones aplicadas a los datos originales.
+
+([[Respuesta 1]])
+
+
+** Pregunta 2
+
+(2 pts.) 
+Comente detalladamente los resultados de estimación y diagnóstico del [[Modelo univariante]] para la serie \( \nabla_{12}\, \ln\, {CPI\_EZ19}_t \).
+
+([[Respuesta 2]])
+
+
+** Pregunta 3
+
+(2 pts.) 
+Analice los resultados del ejercicio de previsión extramuestral presentados en la Figura [[Previsiones]] y en la [[Tabla 1][cuadro debajo de dicha figura]]. ¿Son satisfactorias las previsiones para los nueve meses de 2021? Justifique su respuesta y comente el error de September de 2021, sugiriendo posibles causas del comportamiento de la inflación en ese año.
+
+([[Respuesta 3]])
+
+
+** Pregunta 4
+
+(1 pts. --- cada apartado correcto $0.1$ pts. Cada apartado incorrecto $-0.1$ pts.) 
+
+En referencia a los resultados de estimación y diagnóstico del [[Modelo univariante]], indique cuáles de las siguientes formulaciones matemáticas expresan correctamente el modelo estimado, redondeando a tres decimales (preste atención al orden de las transformaciones, el signo de los parámetros, la coherencia de la expresión, etc.):
+
+1. \( (1 - .996B + .127{B^2})\nabla \texttt{sd\_l\_CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+
+2. \( (1 - .996B + .127{B^2})\nabla \texttt{sd\_l\_CPI\_EZ19}_t = (1 + .810B)(1 + .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+
+3. \( (1 + .996B - .127{B^2})\nabla \nabla_{12}\,\ln\,\texttt{CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+
+4. \( (1 - .996B + .127{B^2})\,\ln\,\nabla \nabla_{12}\,\texttt{CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+
+5. \( \nabla_{12}\,\ln\,\texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla \,(1 - .996B + .127{B^2})}}\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+
+6. \( {\nabla}\,\ln\,\texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla_{12} \,(1 - .996B + .127{B^2})}}\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+
+7. \(\ln\,\texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{{\nabla}\,\nabla_{12}\,(1 - .996B + .127{B^2})}} \, {\hat a_t}; \quad t \in \mathbb{Z}\)
+
+8. \( (1 - .996B + .127{B^2})\ln\,\texttt{CPI\_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{\nabla\,\nabla_{12}}\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+
+9. \( \frac{(1 - .996B + .127{B^2})}{(1 - .810B)(1 - .597{B^{12}})} \nabla \nabla_{12} \,\ln \, \texttt{CPI\_EZ19}_t = \hat a_t; \quad t \in \mathbb{Z}\)
+
+10. \( \nabla \nabla_{12} \,\ln\, \texttt{CPI\_EZ19}_t = \frac{(1 - .996B + .127{B^2})}{(1 - .810B)(1 - .597{B^{12}})} \hat a_t; \quad t \in \mathbb{Z}\)
+
+([[Respuesta 4]])
+
+
+** Pregunta 5
+
+(0.5 pts.) 
+En relación con los resultados del [[Test de cointegración]] de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+
+/El resultado de la Etapa 1 implica que se rechaza la hipótesis nula de _NO estacionariedad_ con un 10% de significación./
+
+([[Respuesta 5]])
+
+
+** Pregunta 6
+
+(0.5 pts.) 
+En relación con los resultados del [[Test de cointegración]] de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+
+/El resultado de la Etapa 1 implica que NO se rechaza la hipótesis nula de _estacionariedad_ con un 5% de significación./
+
+([[Respuesta 6]])
+
+
+** Pregunta 7
+
+(0.5 pts.) 
+En relación con los resultados del [[Test de cointegración]] de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+
+/A partir del resultado de la Etapa 2 NO rechazamos, con un 15% de significación, que el logaritmo de la diferencia estacional del IPC en EE.UU. es una serie _NO estacionaria_ en media./
+
+([[Respuesta 7]])
+
+
+** Pregunta 8
+
+(0.5 pts.) 
+En relación con los resultados del [[Test de cointegración]] de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+
+/A partir del resultado de la Etapa 2 rechazamos, con un 20% de significación, que el logaritmo de la diferencia estacional del IPC en EE.UU. _es estacionaria_ en media./
+
+([[Respuesta 8]])
+
+
+** Pregunta 9
+
+(0.5 pts.) 
+En relación con los resultados del [[Test de cointegración]] de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+
+/Los resultados globales del test de Engle-Granger sugieren que las series _están cointegradas_./
+
+([[Respuesta 9]])
+
+
+** Pregunta 10
+
+(0.5 pts.) 
+En relación con la Figura [[Previsiones]], explique por qué los intervalos de confianza son (o no son) crecientes con el horizonte temporal.
+
+([[Respuesta 10]])
+
+* Respuestas 
+
+*** Respuesta 1
+
+En la Figura 1, el gráfico de la izquierda muestra que la variabilidad local del IPC en la Eurozona (medida por el rango) aumenta con el nivel (media local), sugiriendo la conveniencia de aplicar una transformación logarítmica. El gráfico de la derecha revela que la transformación logarítmica elimina dicha dependencia, ya que la variabilidad de \( \ln\, {CPI\_EZ19}_t \) no crece con el nivel.
+
+En la Figura 2, el gráfico de la izquierda presenta \( \nabla_{12}\, \ln\, {CPI\_EZ19}_t \), que puede interpretarse como la tasa logarítmica de variación anual del IPC, y parece ser "no estacionaria en media". El gráfico de la derecha muestra los cambios mensuales de \( \nabla_{12}\, \ln\, {CPI\_EZ19}_t \), reflejando la variación de la inflación anual y parece ser estacionario en media, lo que sugiere que una diferencia regular logra estabilizar la media local de la serie \( \nabla_{12}\, \ln\, {CPI\_EZ19}_t \).
+
+([[Pregunta 1]])
+
+*** Respuesta 2
+
+Los coeficientes son significativos al 1%, excepto \( \phi_2 \), que solo es significativo al 10%. Las raíces de los polinomios AR y MA se encuentran fuera del círculo de radio unidad, aunque el coeficiente \( \theta_1 \) no rechaza la hipótesis de ser \(-1\) en una estimación dentro de un intervalo de confianza del 95%:
+\[
+-0.81 \pm 1.96 \cdot 0.186 \Rightarrow (-1.17, -0.44).
+\]
+Los estadísticos de los residuos no rechazan las hipótesis de:
+- Normalidad (p-valor = 13.63%)
+- Homoscedasticidad (p-valor = 77.57%)
+- Ausencia de autocorrelación hasta el rezago 39 (p-valor = 5.6%, muy ajustado).
+Por lo tanto, no hay indicios concluyentes de mala especificación o incumplimiento de hipótesis.
+
+([[Pregunta 2]])
+
+
+*** Respuesta 3
+
+Tanto la Figura 3 como el cuadro muestran que los valores observados de la tasa logarítmica de inflación exceden las bandas de error del 95% de las previsiones univariantes. Por lo tanto, las previsiones no son satisfactorias. Por ejemplo, la tasa de inflación anual prevista para septiembre de 2021 era del 0.70%, mientras que el valor observado fue del 3.31%, resultando en un error de 2.6 puntos porcentuales.
+
+Las previsiones univariantes se basan en la extrapolación del comportamiento histórico (con mayor peso en el pasado reciente). Los resultados sugieren que, tras un estancamiento en 2020 debido a la pandemia, la inflación ha repuntado, posiblemente debido al aumento de precios de materias primas, especialmente energía, y al incremento de la demanda que las cadenas de suministro globales aún no pueden satisfacer.
+
+([[Pregunta 3]])
+
+
+*** Respuesta 4
+
+1. \( (1 - .996B + .127{B^2})\nabla \texttt{sd\_l\_CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
+
+   En el polinomio AR aparecen los opuestos de los coeficientes \( \phi_1 \) y \( \phi_2 \). En los polinomios MA aparecen los valores de \( \theta_1 \) y \( \Theta_1 \) (recuerde que Gretl no sigue el mismo convenio en signos de los coeficientes MA que el que se utiliza en el manual de Box y Jenkins). *Expresión correcta*.
+
+2. \( (1 - .996B + .127{B^2})\nabla \texttt{sd\_l\_CPI\_EZ19}_t = (1 + .810B)(1 + .597{B^{12}})\,{\hat a_t} \)
+
+   Los coeficientes MA deberían tener los signos opuestos.  *Expresión INCORRECTA*.
+
+3. \( (1 + .996B - .127{B^2})\nabla \nabla_{12} \,\ln\, \texttt{CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
+
+   Los coeficientes \( \phi_1 \) y \( \phi_2 \) deberían aparecer cambiados de signo en el polinomio AR.  *Expresión INCORRECTA*.
+
+4. \( (1 - .996B + .127{B^2})\,\ln\,\nabla \nabla_{12}\,\texttt{CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
+
+   Los signos de los parámetros son correctos, pero el logaritmo se aplica a la diferenciación regular y estacional del IPC. *Expresión INCORRECTA*.
+
+5. \( \nabla_{12}\,\ln\, \texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla \,(1 - .996B + .127{B^2})}}\,{\hat a_t} \)
+
+   Esta es una representación de la tasa de inflación logarítmica anual en tanto por uno, como una media móvil infinita. Tenga en cuenta que, si la expresión tuviese sentido, querría decir que \( \nabla_{12}\,\ln\, \texttt{CPI\_EZ19}_t \) tiene representación MA, algo imposible ya que no es estacionaria (véase el gráfico izquierdo de la Figura 2). Para ello, se ha invertido el polinomio autorregresivo, así como el operador diferencia regular (que incluye una raíz unitaria). Dicha expresión NO es convergente. *Expresión INCORRECTA*.
+
+6. \( {\nabla}\,\ln\, \texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla_{12} \,(1 - .996B + .127{B^2})}}\,{\hat a_t} \)
+
+   Esta es una representación de la tasa de inflación logarítmica intermensual en tanto por uno, como una media móvil infinita (a pesar de no ser estacionaria). Para ello, se ha invertido el polinomio autorregresivo, así como el operador diferencia estacional (que incluye doce raíces unitarias). *Expresión INCORRECTA*.
+
+7. \( \ln\, \texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{{\nabla}\,\nabla_{12}\,(1 - .996B + .127{B^2})}} \, {\hat a_t} \)
+
+   Esta es una representación del logaritmo del IPC como una media móvil infinita (a pesar de no ser estacionaria). Para ello, se ha invertido el polinomio autorregresivo, incluyendo los operadores diferencia ordinaria y estacional (con raíces en el círculo unitario). Dicha expresión no es convergente. *Expresión INCORRECTA*.
+
+8. \( (1 - .996B + .127{B^2})\ln\, \texttt{CPI\_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{\nabla \, \nabla_{12}} \, {\hat a_t} \)
+
+   El modelo se ha formulado invirtiendo exclusivamente los operadores de diferencia ordinaria y estacional (con raíces en el círculo unitario). Dicha expresión no es convergente. *Expresión INCORRECTA*.
+
+9. \( \frac{(1 - .996B + .127{B^2})}{(1 - .810B)(1 - .597{B^{12}})} \nabla \nabla_{12} \, \ln\,  \texttt{CPI\_EZ19}_t = \hat a_t \)
+
+   Se trata de la representación AR de la variación de la inflación anual (\(\nabla \nabla_{12} \, \ln\,  \texttt{CPI\_EZ19}_t\)). Para ello, se ha empleado la inversa del polinomio MA (que no tiene raíces en el círculo unitario; véase [[estimación del modelo univariante][los resultados de estimación del modelo univariante]]). *Expresión correcta*.
+
+10. \( \nabla \nabla_{12} \,\ln\,  \texttt{CPI\_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{(1 - .996B + .127{B^2})} \hat a_t \)
+
+    El modelo se ha formulado invirtiendo el polinomio AR, \( 1 - \theta_1B - \theta_2{B^2} \), pero no los operadores diferencia. *Expresión correcta*, lo que significa que, una vez diferenciados los datos, hay una representación MA (ya que los datos diferenciados son estacionarios; véase el gráfico derecho de la Figura 2).
+
+([[Pregunta 4]])
+
+*** Respuesta 5
+
+Dado que el p-valor es mayor que 0.1, *la afirmación es falsa*: no se rechaza la hipótesis del contraste.
+
+([[Pregunta 5]])
+
+*** Respuesta 6
+
+*La afirmación es falsa*. La hipótesis nula del test ADF es que la serie es NO estacionaria.
+
+([[Pregunta 6]])
+
+*** Respuesta 7
+
+La hipótesis nula del test es que la serie es NO estacionaria y el p-valor del estadístico, 0.1769;  como dicho p-valor no es inferior 15%, no se rechaza la hipótesis nula al 15% de significación. *La afirmación es verdadera*.
+
+([[Pregunta 7]])
+
+*** Respuesta 8
+
+La hipótesis nula del test es que la serie es NO estacionaria y el p-valor del estadístico (0.3488) indica que no se rechaza a los niveles habituales. *La afirmación es falsa*.
+
+([[Pregunta 8]])
+
+*** Respuesta 9
+
+El test ADF aplicado a los residuos de la presunta regresión cointegrante no rechaza la no estacionariedad con un p-valor bastante elevado, por lo que la conclusión sería que las series no están cointegradas. *La afirmación es falsa*.
+
+([[Pregunta 9]])
+
+
+*** Respuesta 10
+
+Los intervalos de confianza de las previsiones son crecientes con el horizonte temporal porque el modelo es no estacionario (tenga en cuenta que el [[Modelo univariante]] estimado incorpora una diferencia regular, dado que la variable dependiente es: \( (1-L) sd_l_CPI_EZ19 \), donde \( (1-L) \) representa el operador diferencia regular).
+
+([[Pregunta 10]])
+
