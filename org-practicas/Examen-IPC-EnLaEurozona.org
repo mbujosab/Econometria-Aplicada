@@ -187,6 +187,9 @@ gnuplot d_sd_l_CPI_EZ19 --time-series --with-lines --output="d_sd_l_CPI_EZ19.png
 #+NAME: Modelo ARIMA sd_l_CPI_EZ19
 #+begin_src gretl :eval no :exports code 
 arima 2 1 1 ; 0 0 1 ; sd_l_CPI_EZ19 --nc
+modtest --normality --quiet
+modtest --arch 4 --quiet
+modtest --autocorr 39 --quiet
 #+end_src
 #+latex: }
 
@@ -196,18 +199,18 @@ outfile --quiet modeloARIMAsd_l_CPI_EZ19.txt
 end outfile
 #+end_src
 
-#+latex: {\vspace{0pt} \color{gray!70!black} % \footnotesize 
+#+latex: {\vspace{0pt} \color{gray!70!black} \footnotesize 
 #+name: estimación del modelo univariante
 #+include: ./Examen-IPC-EnLaEurozona/modeloARIMAsd_l_CPI_EZ19.txt example
 #+latex: }
 
-#+latex: \newpage
+# +latex: \newpage
 
 * Previsiones de inflación
 
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
 #+NAME: Modelo ARIMA sd_l_CPI_EZ19
-#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports none :noweb yes
+#+begin_src gretl :tangle guiones/Examen-IPC-EnLaEurozona.inp :eval no :exports code :noweb yes
 fcast 2019:01 2021:09 --plot="prediccion2021.png"
 #+end_src
 #+latex: }
@@ -233,7 +236,7 @@ end outfile
 #+include: ./Examen-IPC-EnLaEurozona/Predicciones.txt example
 #+latex: }
 
-#+latex: \newpage
+# +latex: \newpage
 
 * Test de cointegración
 
@@ -268,7 +271,7 @@ end outfile
 ** Pregunta 2
 
 (2 pts.) 
-Comente detalladamente los resultados de estimación y diagnóstico del [[Modelo univariante]] para la serie \( \nabla_{12}\, \ln\, {CPI\_EZ19}_t \).
+Comente detalladamente los resultados de estimación y diagnóstico del [[Modelo univariante]] para la serie \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \).
 
 ([[Respuesta 2]])
 
@@ -287,25 +290,25 @@ Analice los resultados del ejercicio de previsión extramuestral presentados en 
 
 En referencia a los resultados de estimación y diagnóstico del [[Modelo univariante]], indique cuáles de las siguientes formulaciones matemáticas expresan correctamente el modelo estimado, redondeando a tres decimales (preste atención al orden de las transformaciones, el signo de los parámetros, la coherencia de la expresión, etc.):
 
-1. \( (1 - .996B + .127{B^2})\nabla \texttt{sd\_l\_CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+1. \( (1 - .996B + .127{B^2})\nabla \texttt{sd_l_CPI_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
 
-2. \( (1 - .996B + .127{B^2})\nabla \texttt{sd\_l\_CPI\_EZ19}_t = (1 + .810B)(1 + .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+2. \( (1 - .996B + .127{B^2})\nabla \texttt{sd_l_CPI_EZ19}_t = (1 + .810B)(1 + .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
 
-3. \( (1 + .996B - .127{B^2})\nabla \nabla_{12}\,\ln\,\texttt{CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+3. \( (1 + .996B - .127{B^2})\nabla \nabla_{12}\,\ln\,\texttt{CPI_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
 
-4. \( (1 - .996B + .127{B^2})\,\ln\,\nabla \nabla_{12}\,\texttt{CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+4. \( (1 - .996B + .127{B^2})\,\ln\,\nabla \nabla_{12}\,\texttt{CPI_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t}; \quad t \in \mathbb{Z}\)
 
-5. \( \nabla_{12}\,\ln\,\texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla \,(1 - .996B + .127{B^2})}}\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+5. \( \nabla_{12}\,\ln\,\texttt{CPI_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla \,(1 - .996B + .127{B^2})}}\,{\hat a_t}; \quad t \in \mathbb{Z}\)
 
-6. \( {\nabla}\,\ln\,\texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla_{12} \,(1 - .996B + .127{B^2})}}\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+6. \( {\nabla}\,\ln\,\texttt{CPI_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla_{12} \,(1 - .996B + .127{B^2})}}\,{\hat a_t}; \quad t \in \mathbb{Z}\)
 
-7. \(\ln\,\texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{{\nabla}\,\nabla_{12}\,(1 - .996B + .127{B^2})}} \, {\hat a_t}; \quad t \in \mathbb{Z}\)
+7. \(\ln\,\texttt{CPI_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{{\nabla}\,\nabla_{12}\,(1 - .996B + .127{B^2})}} \, {\hat a_t}; \quad t \in \mathbb{Z}\)
 
-8. \( (1 - .996B + .127{B^2})\ln\,\texttt{CPI\_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{\nabla\,\nabla_{12}}\,{\hat a_t}; \quad t \in \mathbb{Z}\)
+8. \( (1 - .996B + .127{B^2})\ln\,\texttt{CPI_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{\nabla\,\nabla_{12}}\,{\hat a_t}; \quad t \in \mathbb{Z}\)
 
-9. \( \frac{(1 - .996B + .127{B^2})}{(1 - .810B)(1 - .597{B^{12}})} \nabla \nabla_{12} \,\ln \, \texttt{CPI\_EZ19}_t = \hat a_t; \quad t \in \mathbb{Z}\)
+9. \( \frac{(1 - .996B + .127{B^2})}{(1 - .810B)(1 - .597{B^{12}})} \nabla \nabla_{12} \,\ln \, \texttt{CPI_EZ19}_t = \hat a_t; \quad t \in \mathbb{Z}\)
 
-10. \( \nabla \nabla_{12} \,\ln\, \texttt{CPI\_EZ19}_t = \frac{(1 - .996B + .127{B^2})}{(1 - .810B)(1 - .597{B^{12}})} \hat a_t; \quad t \in \mathbb{Z}\)
+10. \( \nabla \nabla_{12} \,\ln\, \texttt{CPI_EZ19}_t = \frac{(1 - .996B + .127{B^2})}{(1 - .810B)(1 - .597{B^{12}})} \hat a_t; \quad t \in \mathbb{Z}\)
 
 ([[Respuesta 4]])
 
@@ -335,7 +338,7 @@ En relación con los resultados del [[Test de cointegración]] de Engle-Granger,
 (0.5 pts.) 
 En relación con los resultados del [[Test de cointegración]] de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
 
-/A partir del resultado de la Etapa 2 NO rechazamos, con un 15% de significación, que el logaritmo de la diferencia estacional del IPC en EE.UU. es una serie _NO estacionaria_ en media./
+/A partir del resultado de la Etapa 2 NO rechazamos, con un 15% de significación, que la diferencia estacional del logaritmo del IPC en EE.UU. es una serie _NO estacionaria_ en media./
 
 ([[Respuesta 7]])
 
@@ -345,7 +348,7 @@ En relación con los resultados del [[Test de cointegración]] de Engle-Granger,
 (0.5 pts.) 
 En relación con los resultados del [[Test de cointegración]] de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
 
-/A partir del resultado de la Etapa 2 rechazamos, con un 20% de significación, que el logaritmo de la diferencia estacional del IPC en EE.UU. _es estacionaria_ en media./
+/A partir del resultado de la Etapa 2 rechazamos, con un 20% de significación, que la diferencia estacional del logaritmo del IPC en EE.UU. _es estacionaria_ en media./
 
 ([[Respuesta 8]])
 
@@ -371,9 +374,9 @@ En relación con la Figura [[Previsiones]], explique por qué los intervalos de 
 
 *** Respuesta 1
 
-En la Figura 1, el gráfico de la izquierda muestra que la variabilidad local del IPC en la Eurozona (medida por el rango) aumenta con el nivel (media local), sugiriendo la conveniencia de aplicar una transformación logarítmica. El gráfico de la derecha revela que la transformación logarítmica elimina dicha dependencia, ya que la variabilidad de \( \ln\, {CPI\_EZ19}_t \) no crece con el nivel.
+En la Figura 1, el gráfico de la izquierda muestra que la variabilidad local del IPC en la Eurozona (medida por el rango) aumenta con el nivel (media local), sugiriendo la conveniencia de aplicar una transformación logarítmica. El gráfico de la derecha revela que la transformación logarítmica elimina dicha dependencia, ya que la variabilidad de \( \ln\, \texttt{CPI_EZ19}_t \) no crece con el nivel.
 
-En la Figura 2, el gráfico de la izquierda presenta \( \nabla_{12}\, \ln\, {CPI\_EZ19}_t \), que puede interpretarse como la tasa logarítmica de variación anual del IPC, y parece ser "no estacionaria en media". El gráfico de la derecha muestra los cambios mensuales de \( \nabla_{12}\, \ln\, {CPI\_EZ19}_t \), reflejando la variación de la inflación anual y parece ser estacionario en media, lo que sugiere que una diferencia regular logra estabilizar la media local de la serie \( \nabla_{12}\, \ln\, {CPI\_EZ19}_t \).
+En la Figura 2, el gráfico de la izquierda presenta \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \), que puede interpretarse como la tasa logarítmica de variación anual del IPC, y parece ser "no estacionaria en media". El gráfico de la derecha muestra los cambios mensuales de \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \), reflejando la variación de la inflación anual y parece ser estacionario en media, lo que sugiere que una diferencia regular logra estabilizar la media local de la serie \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \).
 
 ([[Pregunta 1]])
 
@@ -386,7 +389,7 @@ Los coeficientes son significativos al 1%, excepto \( \phi_2 \), que solo es sig
 Los estadísticos de los residuos no rechazan las hipótesis de:
 - Normalidad (p-valor = 13.63%)
 - Homoscedasticidad (p-valor = 77.57%)
-- Ausencia de autocorrelación hasta el rezago 39 (p-valor = 5.6%, muy ajustado).
+- Ausencia de autocorrelación hasta el retardo 39 (p-valor = 5.6%, muy ajustado).
 Por lo tanto, no hay indicios concluyentes de mala especificación o incumplimiento de hipótesis.
 
 ([[Pregunta 2]])
@@ -403,43 +406,43 @@ Las previsiones univariantes se basan en la extrapolación del comportamiento hi
 
 *** Respuesta 4
 
-1. \( (1 - .996B + .127{B^2})\nabla \texttt{sd\_l\_CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
+1. \( (1 - .996B + .127{B^2})\nabla \texttt{sd_l_CPI_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
 
    En el polinomio AR aparecen los opuestos de los coeficientes \( \phi_1 \) y \( \phi_2 \). En los polinomios MA aparecen los valores de \( \theta_1 \) y \( \Theta_1 \) (recuerde que Gretl no sigue el mismo convenio en signos de los coeficientes MA que el que se utiliza en el manual de Box y Jenkins). *Expresión correcta*.
 
-2. \( (1 - .996B + .127{B^2})\nabla \texttt{sd\_l\_CPI\_EZ19}_t = (1 + .810B)(1 + .597{B^{12}})\,{\hat a_t} \)
+2. \( (1 - .996B + .127{B^2})\nabla \texttt{sd_l_CPI_EZ19}_t = (1 + .810B)(1 + .597{B^{12}})\,{\hat a_t} \)
 
    Los coeficientes MA deberían tener los signos opuestos.  *Expresión INCORRECTA*.
 
-3. \( (1 + .996B - .127{B^2})\nabla \nabla_{12} \,\ln\, \texttt{CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
+3. \( (1 + .996B - .127{B^2})\nabla \nabla_{12} \,\ln\, \texttt{CPI_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
 
    Los coeficientes \( \phi_1 \) y \( \phi_2 \) deberían aparecer cambiados de signo en el polinomio AR.  *Expresión INCORRECTA*.
 
-4. \( (1 - .996B + .127{B^2})\,\ln\,\nabla \nabla_{12}\,\texttt{CPI\_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
+4. \( (1 - .996B + .127{B^2})\,\ln\,\nabla \nabla_{12}\,\texttt{CPI_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
 
    Los signos de los parámetros son correctos, pero el logaritmo se aplica a la diferenciación regular y estacional del IPC. *Expresión INCORRECTA*.
 
-5. \( \nabla_{12}\,\ln\, \texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla \,(1 - .996B + .127{B^2})}}\,{\hat a_t} \)
+5. \( \nabla_{12}\,\ln\, \texttt{CPI_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla \,(1 - .996B + .127{B^2})}}\,{\hat a_t} \)
 
-   Esta es una representación de la tasa de inflación logarítmica anual en tanto por uno, como una media móvil infinita. Tenga en cuenta que, si la expresión tuviese sentido, querría decir que \( \nabla_{12}\,\ln\, \texttt{CPI\_EZ19}_t \) tiene representación MA, algo imposible ya que no es estacionaria (véase el gráfico izquierdo de la Figura 2). Para ello, se ha invertido el polinomio autorregresivo, así como el operador diferencia regular (que incluye una raíz unitaria). Dicha expresión NO es convergente. *Expresión INCORRECTA*.
+   Esta es una representación de la tasa de inflación logarítmica anual en tanto por uno, como una media móvil infinita. Tenga en cuenta que, si la expresión tuviese sentido, querría decir que \( \nabla_{12}\,\ln\, \texttt{CPI_EZ19}_t \) tiene representación MA, algo imposible ya que no es estacionaria (véase el gráfico izquierdo de la Figura 2). Para ello, se ha invertido el polinomio autorregresivo, así como el operador diferencia regular (que incluye una raíz unitaria). Dicha expresión NO es convergente. *Expresión INCORRECTA*.
 
-6. \( {\nabla}\,\ln\, \texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla_{12} \,(1 - .996B + .127{B^2})}}\,{\hat a_t} \)
+6. \( {\nabla}\,\ln\, \texttt{CPI_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{\nabla_{12} \,(1 - .996B + .127{B^2})}}\,{\hat a_t} \)
 
    Esta es una representación de la tasa de inflación logarítmica intermensual en tanto por uno, como una media móvil infinita (a pesar de no ser estacionaria). Para ello, se ha invertido el polinomio autorregresivo, así como el operador diferencia estacional (que incluye doce raíces unitarias). *Expresión INCORRECTA*.
 
-7. \( \ln\, \texttt{CPI\_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{{\nabla}\,\nabla_{12}\,(1 - .996B + .127{B^2})}} \, {\hat a_t} \)
+7. \( \ln\, \texttt{CPI_EZ19}_t = \frac{{(1 - .810B)(1 - .597{B^{12}})}}{{{\nabla}\,\nabla_{12}\,(1 - .996B + .127{B^2})}} \, {\hat a_t} \)
 
    Esta es una representación del logaritmo del IPC como una media móvil infinita (a pesar de no ser estacionaria). Para ello, se ha invertido el polinomio autorregresivo, incluyendo los operadores diferencia ordinaria y estacional (con raíces en el círculo unitario). Dicha expresión no es convergente. *Expresión INCORRECTA*.
 
-8. \( (1 - .996B + .127{B^2})\ln\, \texttt{CPI\_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{\nabla \, \nabla_{12}} \, {\hat a_t} \)
+8. \( (1 - .996B + .127{B^2})\ln\, \texttt{CPI_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{\nabla \, \nabla_{12}} \, {\hat a_t} \)
 
    El modelo se ha formulado invirtiendo exclusivamente los operadores de diferencia ordinaria y estacional (con raíces en el círculo unitario). Dicha expresión no es convergente. *Expresión INCORRECTA*.
 
-9. \( \frac{(1 - .996B + .127{B^2})}{(1 - .810B)(1 - .597{B^{12}})} \nabla \nabla_{12} \, \ln\,  \texttt{CPI\_EZ19}_t = \hat a_t \)
+9. \( \frac{(1 - .996B + .127{B^2})}{(1 - .810B)(1 - .597{B^{12}})} \nabla \nabla_{12} \, \ln\,  \texttt{CPI_EZ19}_t = \hat a_t \)
 
-   Se trata de la representación AR de la variación de la inflación anual (\(\nabla \nabla_{12} \, \ln\,  \texttt{CPI\_EZ19}_t\)). Para ello, se ha empleado la inversa del polinomio MA (que no tiene raíces en el círculo unitario; véase [[estimación del modelo univariante][los resultados de estimación del modelo univariante]]). *Expresión correcta*.
+   Se trata de la representación AR de la variación de la inflación anual (\(\nabla \nabla_{12} \, \ln\,  \texttt{CPI_EZ19}_t\)). Para ello, se ha empleado la inversa del polinomio MA (que no tiene raíces en el círculo unitario; véase [[estimación del modelo univariante][los resultados de estimación del modelo univariante]]). *Expresión correcta*.
 
-10. \( \nabla \nabla_{12} \,\ln\,  \texttt{CPI\_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{(1 - .996B + .127{B^2})} \hat a_t \)
+10. \( \nabla \nabla_{12} \,\ln\,  \texttt{CPI_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{(1 - .996B + .127{B^2})} \hat a_t \)
 
     El modelo se ha formulado invirtiendo el polinomio AR, \( 1 - \theta_1B - \theta_2{B^2} \), pero no los operadores diferencia. *Expresión correcta*, lo que significa que, una vez diferenciados los datos, hay una representación MA (ya que los datos diferenciados son estacionarios; véase el gráfico derecho de la Figura 2).
 
@@ -478,7 +481,7 @@ El test ADF aplicado a los residuos de la presunta regresión cointegrante no re
 
 *** Respuesta 10
 
-Los intervalos de confianza de las previsiones son crecientes con el horizonte temporal porque el modelo es no estacionario (tenga en cuenta que el [[Modelo univariante]] estimado incorpora una diferencia regular, dado que la variable dependiente es: \( (1-L) sd_l_CPI_EZ19 \), donde \( (1-L) \) representa el operador diferencia regular).
+Los intervalos de confianza de las previsiones son crecientes con el horizonte temporal porque el modelo es no estacionario (tenga en cuenta que el [[Modelo univariante]] estimado incorpora una diferencia regular, dado que la variable dependiente es: =(1-L) sd_l_CPI_EZ19=, donde =(1-L)= representa el operador diferencia regular).
 
 ([[Pregunta 10]])
 
