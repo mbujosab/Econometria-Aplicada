@@ -1,0 +1,40 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../../datos/IPC_Eurozona_y_USA.gdt
+
+logs CPI_EZ19 CPI_USA
+sdiff l_CPI_EZ19 l_CPI_USA
+diff sd_l_CPI_EZ19
+smpl 1996:01 2020:12
+
+rmplot CPI_EZ19 --output="rango-media_CPI_EZ19.png"
+rmplot l_CPI_EZ19 --output="rango-media_l_CPI_EZ19.png"
+
+gnuplot sd_l_CPI_EZ19 --time-series --with-lines --output="sd_l_CPI_EZ19.png"
+gnuplot d_sd_l_CPI_EZ19 --time-series --with-lines --output="d_sd_l_CPI_EZ19.png"
+
+outfile --quiet modeloARIMAsd_l_CPI_EZ19.txt
+    arima 2 1 1 ; 0 0 1 ; sd_l_CPI_EZ19 --nc
+    modtest --normality --quiet
+    modtest --arch 4 --quiet
+    modtest --autocorr 39 --quiet
+end outfile
+
+fcast 2019:01 2021:09 --plot="prediccion2021.png"
+
+outfile --quiet Predicciones.txt
+  fcast --out-of-sample
+end outfile
+
+outfile --quiet test_cointegracion.txt
+    coint 12 sd_l_CPI_EZ19 sd_l_CPI_USA --test-down
+end outfile

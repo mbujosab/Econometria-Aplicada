@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-11-14 Fri 15:42 -->
+<!-- 2025-11-22 Sat 10:50 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 8. Predicción de modelos ARIMA</title>
@@ -66,46 +66,46 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgd5af895">Introducción</a></li>
-<li><a href="#org144154b">Predicciones de error cuadrático medio mínimo</a>
+<li><a href="#org8f1febc">Introducción</a></li>
+<li><a href="#org824ef23">Predicciones de error cuadrático medio mínimo</a>
 <ul>
-<li><a href="#orgabb1f08">Predicciones lineales</a>
+<li><a href="#org210c9fc">Predicciones lineales</a>
 <ul>
-<li><a href="#org0fec4b9">Breve recordatorio sobre las proyecciones ortogonales</a></li>
-<li><a href="#org2adead7">Las predicciones lineales son proyecciones ortogonales</a></li>
-<li><a href="#orge4e45eb">Proyección sobre el pasado de un proceso lineal causal, estacionario e invertible</a></li>
+<li><a href="#org129cc8d">Breve recordatorio sobre las proyecciones ortogonales</a></li>
+<li><a href="#org3c80f1a">Las predicciones lineales son proyecciones ortogonales</a></li>
+<li><a href="#org01ad090">Proyección sobre el pasado de un proceso lineal causal, estacionario e invertible</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org2eb7aa4">Cálculo de predicciones de procesos ARIMA</a>
+<li><a href="#orgf50ad60">Cálculo de predicciones de procesos ARIMA</a>
 <ul>
-<li><a href="#org9148fa4">Ejemplos</a>
+<li><a href="#org518a2ab">Ejemplos</a>
 <ul>
-<li><a href="#org29ac429">ARMA(1,1)</a></li>
-<li><a href="#orgbe26fd7">AR(1)</a></li>
-<li><a href="#org73abab1">MA(1)</a></li>
-<li><a href="#orgaaed091">Paseo aleatorio sin deriva</a></li>
-<li><a href="#org669227e">Paseo aleatorio con deriva</a></li>
-<li><a href="#org455965f">IMA(1)</a></li>
-<li><a href="#org604cec4">IMA(1) estacional</a></li>
+<li><a href="#org211ed6e">ARMA(1,1)</a></li>
+<li><a href="#orgf4fa5dc">AR(1)</a></li>
+<li><a href="#orgd6d14de">MA(1)</a></li>
+<li><a href="#orgba3c584">Paseo aleatorio sin deriva</a></li>
+<li><a href="#org40c5436">Paseo aleatorio con deriva</a></li>
+<li><a href="#org04eca09">IMA(1)</a></li>
+<li><a href="#orgc1e81b6">IMA(1) estacional</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org6b9e276">Varianza de las predicciones lineales</a>
+<li><a href="#orge4f131c">Varianza de las predicciones lineales</a>
 <ul>
-<li><a href="#orgd7240e3">Intervalos de confianza para las previsiones</a></li>
+<li><a href="#orgb87cce7">Intervalos de confianza para las previsiones</a></li>
 </ul>
 </li>
-<li><a href="#orgd6aa7fa">Adaptación de las predicciones a las nuevas observaciones</a></li>
+<li><a href="#org2a14eb3">Adaptación de las predicciones a las nuevas observaciones</a></li>
 <li><a href="#sec-fcast-stats">Medidas del error de previsión</a></li>
-<li><a href="#orgd70b590">Modelos con logaritmos</a></li>
-<li><a href="#org3420e77">Nota sobre subespacio sobre el que proyectamos al prever</a></li>
+<li><a href="#org3e19893">Modelos con logaritmos</a></li>
+<li><a href="#orgf84e04a">Nota sobre subespacio sobre el que proyectamos al prever</a></li>
 </ul>
 </div>
 </div>
-<div class="abstract" id="org514e1d3">
+<div class="abstract" id="org4d2fc2c">
 <p>
 Esta lección se centra en la predicción de modelos de series temporales univariantes.  
 </p>
@@ -115,9 +115,9 @@ Esta lección se centra en la predicción de modelos de series temporales univar
 <ul class="org-ul">
 <li>(<a href="https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc08.slides.html">slides</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc08.html">html</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc08.pdf">pdf</a>) &mdash; (<a href="https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc08.ipynb">mybinder</a>)</li>
 </ul>
-<div id="outline-container-org5903dee" class="outline-4">
-<h4 id="org5903dee">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-org5903dee">
+<div id="outline-container-orgd46a608" class="outline-4">
+<h4 id="orgd46a608">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-orgd46a608">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python
 </span><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra
@@ -131,8 +131,8 @@ Esta lección se centra en la predicción de modelos de series temporales univar
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org4a37bcd"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
-<div class="outline-text-5" id="text-org4a37bcd">
+<li><a id="org1933fc2"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
+<div class="outline-text-5" id="text-org1933fc2">
 <p>
 para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
@@ -146,9 +146,9 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 </li>
 </ul>
 </div>
-<div id="outline-container-orgcd98d36" class="outline-4">
-<h4 id="orgcd98d36">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
-<div class="outline-text-4" id="text-orgcd98d36">
+<div id="outline-container-org9250173" class="outline-4">
+<h4 id="org9250173">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
+<div class="outline-text-4" id="text-org9250173">
 <p>
 Cargamos las funciones auxiliares (véase la carpeta <code>src/</code>)
 </p>
@@ -161,9 +161,9 @@ warnings.filterwarnings(<span style="font-style: italic;">"ignore"</span>, categ
 </div>
 </div>
 </div>
-<div id="outline-container-orgd5af895" class="outline-2">
-<h2 id="orgd5af895">Introducción</h2>
-<div class="outline-text-2" id="text-orgd5af895">
+<div id="outline-container-org8f1febc" class="outline-2">
+<h2 id="org8f1febc">Introducción</h2>
+<div class="outline-text-2" id="text-org8f1febc">
 <p>
 Consideremos una serie temporal \(\boldsymbol{y}_1^T=(y_1,\ldots,y_T)\). En relación con la predicción de los valores futuros de la serie, hay tres aspectos a considerar : 
 </p>
@@ -183,9 +183,9 @@ Es común expresar la incertidumbre con un intervalo de confianza para la predic
 </p>
 </div>
 </div>
-<div id="outline-container-org144154b" class="outline-2">
-<h2 id="org144154b">Predicciones de error cuadrático medio mínimo</h2>
-<div class="outline-text-2" id="text-org144154b">
+<div id="outline-container-org824ef23" class="outline-2">
+<h2 id="org824ef23">Predicciones de error cuadrático medio mínimo</h2>
+<div class="outline-text-2" id="text-org824ef23">
 <p>
 Queremos predecir \(Y_{t+\ell}\) usando una función \(g\) de variables aleatorias con índice \(n\leq t\), es decir, una función del conjunto \(\boldsymbol{Y}_{|:t} = \{Y_n \mid n \leq t\}\).
 </p>
@@ -233,13 +233,13 @@ Al adoptar esta estrategia, aceptamos cometer mayores errores de predicción, \(
 <b>Pregunta</b>: ¿Cómo tiene que ser la esperanza condicional para que \(MSEL\) y \(MSE\) sean iguales? ¿En qué caso ocurrirá?
 </p>
 </div>
-<div id="outline-container-orgabb1f08" class="outline-3">
-<h3 id="orgabb1f08">Predicciones lineales</h3>
-<div class="outline-text-3" id="text-orgabb1f08">
+<div id="outline-container-org210c9fc" class="outline-3">
+<h3 id="org210c9fc">Predicciones lineales</h3>
+<div class="outline-text-3" id="text-org210c9fc">
 </div>
-<div id="outline-container-org0fec4b9" class="outline-4">
-<h4 id="org0fec4b9">Breve recordatorio sobre las proyecciones ortogonales</h4>
-<div class="outline-text-4" id="text-org0fec4b9">
+<div id="outline-container-org129cc8d" class="outline-4">
+<h4 id="org129cc8d">Breve recordatorio sobre las proyecciones ortogonales</h4>
+<div class="outline-text-4" id="text-org129cc8d">
 <p>
 Solo recordaremos que como
 </p>
@@ -266,9 +266,9 @@ En el contexto de la predicción lineal, dicha diferencia \(X-\widehat{X}\) reci
 </p>
 </div>
 </div>
-<div id="outline-container-org2adead7" class="outline-4">
-<h4 id="org2adead7">Las predicciones lineales son proyecciones ortogonales</h4>
-<div class="outline-text-4" id="text-org2adead7">
+<div id="outline-container-org3c80f1a" class="outline-4">
+<h4 id="org3c80f1a">Las predicciones lineales son proyecciones ortogonales</h4>
+<div class="outline-text-4" id="text-org3c80f1a">
 <p>
 La forma general de un predictor <i>lineal</i> es 
 \[g_t(\ell)
@@ -304,7 +304,7 @@ Es habitual referirse a los elementos de \(\mathcal{H}_{Y_t}\) como <i>variables
 Cuando \(\boldsymbol{Y}=\boldsymbol{\varphi}*\boldsymbol{U}\) es un proceso estocástico lineal causal, estacionario e invertible, se cumple que \(\;\mathcal{H}_{Y_t} = \mathcal{H}_{U_t}\) 
 </p>
 <p>
-(véase la sección <a href="#org3420e77">Nota sobre subespacio sobre el que proyectamos al prever</a>).<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
+(véase la sección <a href="#orgf84e04a">Nota sobre subespacio sobre el que proyectamos al prever</a>).<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
 </p>
 
 <p>
@@ -320,9 +320,9 @@ Los resultados anteriores, aplicables a procesos estacionarios infinitos, tambi�
 </p>
 </div>
 </div>
-<div id="outline-container-orge4e45eb" class="outline-4">
-<h4 id="orge4e45eb">Proyección sobre el pasado de un proceso lineal causal, estacionario e invertible</h4>
-<div class="outline-text-4" id="text-orge4e45eb">
+<div id="outline-container-org01ad090" class="outline-4">
+<h4 id="org01ad090">Proyección sobre el pasado de un proceso lineal causal, estacionario e invertible</h4>
+<div class="outline-text-4" id="text-org01ad090">
 <p>
 Sea \(\boldsymbol{Y}=\boldsymbol{\varphi}*\boldsymbol{U}\) es un proceso estocástico lineal causal, estacionario e invertible.
 </p>
@@ -365,9 +365,9 @@ Tras este repaso de las proyecciones ortogonales, ya podemos ver cómo calcular 
 </div>
 </div>
 </div>
-<div id="outline-container-org2eb7aa4" class="outline-2">
-<h2 id="org2eb7aa4">Cálculo de predicciones de procesos ARIMA</h2>
-<div class="outline-text-2" id="text-org2eb7aa4">
+<div id="outline-container-orgf50ad60" class="outline-2">
+<h2 id="orgf50ad60">Cálculo de predicciones de procesos ARIMA</h2>
+<div class="outline-text-2" id="text-orgf50ad60">
 <p>
 Sea \( \boldsymbol{Y} \) un proceso ARIMA\((p,d,q)\times(P,D,Q)_S\) 
 \[
@@ -447,13 +447,13 @@ donde lo que era ortogonal a \(\mathcal{H}_{Y_t}\) se anula, y lo que pertenece 
 A partir de esta expresión podemos obtener fórmulas recursivas tanto para los predictores como para sus actualizaciones cuando se disponen de nuevas observaciones.
 </p>
 </div>
-<div id="outline-container-org9148fa4" class="outline-3">
-<h3 id="org9148fa4">Ejemplos</h3>
-<div class="outline-text-3" id="text-org9148fa4">
+<div id="outline-container-org518a2ab" class="outline-3">
+<h3 id="org518a2ab">Ejemplos</h3>
+<div class="outline-text-3" id="text-org518a2ab">
 </div>
-<div id="outline-container-org29ac429" class="outline-4">
-<h4 id="org29ac429">ARMA(1,1)</h4>
-<div class="outline-text-4" id="text-org29ac429">
+<div id="outline-container-org211ed6e" class="outline-4">
+<h4 id="org211ed6e">ARMA(1,1)</h4>
+<div class="outline-text-4" id="text-org211ed6e">
 <p>
 \[
 Y_{t+\ell} = c + \phi_1 Y_{t+\ell-1} + U_{t+\ell} - \theta_1 U_{t+\ell-1},
@@ -491,9 +491,9 @@ Como \(|\phi_1|<1\) y \(|\theta|<1\), la predicción cuando \(\ell\to\infty\) ti
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe26fd7" class="outline-4">
-<h4 id="orgbe26fd7">AR(1)</h4>
-<div class="outline-text-4" id="text-orgbe26fd7">
+<div id="outline-container-orgf4fa5dc" class="outline-4">
+<h4 id="orgf4fa5dc">AR(1)</h4>
+<div class="outline-text-4" id="text-orgf4fa5dc">
 <p>
 Basta sustituir \(\theta=0\) en \eqref{eqn:predicion-recursiva-ARMA11} para particularizar el resultado un modelo AR(1), 
 \[
@@ -502,15 +502,15 @@ Basta sustituir \(\theta=0\) en \eqref{eqn:predicion-recursiva-ARMA11} para part
 </p>
 
 
-<div id="org2bed6a4" class="figure">
+<div id="orgcd6181a" class="figure">
 <p><img src="./img/figurasGretl/prediccionAR1.png" alt="prediccionAR1.png" width="400px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org73abab1" class="outline-4">
-<h4 id="org73abab1">MA(1)</h4>
-<div class="outline-text-4" id="text-org73abab1">
+<div id="outline-container-orgd6d14de" class="outline-4">
+<h4 id="orgd6d14de">MA(1)</h4>
+<div class="outline-text-4" id="text-orgd6d14de">
 <p>
 De igual manera, sustituyendo \(\phi=0\) en \eqref{eqn:predicion-recursiva-ARMA11} particularizamos para un modelo MA(1), 
 \[\begin{cases}
@@ -520,7 +520,7 @@ De igual manera, sustituyendo \(\phi=0\) en \eqref{eqn:predicion-recursiva-ARMA1
 </p>
 
 
-<div id="org74df46b" class="figure">
+<div id="org8bd9039" class="figure">
 <p><img src="./img/figurasGretl/prediccionMA1.png" alt="prediccionMA1.png" width="400px" />
 </p>
 </div>
@@ -531,9 +531,9 @@ En ambos casos se observa que \( \widehat{Y_{t+\ell|t}} \) converge a su valor e
 </p>
 </div>
 </div>
-<div id="outline-container-orgaaed091" class="outline-4">
-<h4 id="orgaaed091">Paseo aleatorio sin deriva</h4>
-<div class="outline-text-4" id="text-orgaaed091">
+<div id="outline-container-orgba3c584" class="outline-4">
+<h4 id="orgba3c584">Paseo aleatorio sin deriva</h4>
+<div class="outline-text-4" id="text-orgba3c584">
 <p>
 Para un paseo aleatorio \(\phi=1\), \(\theta=0\) y  \(\mu=0\)  en \eqref{eqn:predicion-recursiva-ARMA11}:
 \[
@@ -542,15 +542,15 @@ Para un paseo aleatorio \(\phi=1\), \(\theta=0\) y  \(\mu=0\)  en \eqref{eqn:pre
 </p>
 
 
-<div id="org84460b4" class="figure">
+<div id="org1e6c5b9" class="figure">
 <p><img src="./img/figurasGretl/prediccionRW.png" alt="prediccionRW.png" width="400px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org669227e" class="outline-4">
-<h4 id="org669227e">Paseo aleatorio con deriva</h4>
-<div class="outline-text-4" id="text-org669227e">
+<div id="outline-container-org40c5436" class="outline-4">
+<h4 id="org40c5436">Paseo aleatorio con deriva</h4>
+<div class="outline-text-4" id="text-org40c5436">
 <p>
 Si el paseo aleatorio tiene deriva, el modelo es  \(\phi=1\), \(\theta=0\) y  \(\mu\ne0\) en \eqref{eqn:predicion-recursiva-ARMA11}:
 \[
@@ -559,15 +559,15 @@ Si el paseo aleatorio tiene deriva, el modelo es  \(\phi=1\), \(\theta=0\) y  \(
 </p>
 
 
-<div id="org3232f51" class="figure">
+<div id="org9dc5634" class="figure">
 <p><img src="./img/figurasGretl/prediccionRWCD.png" alt="prediccionRWCD.png" width="400px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org455965f" class="outline-4">
-<h4 id="org455965f">IMA(1)</h4>
-<div class="outline-text-4" id="text-org455965f">
+<div id="outline-container-org04eca09" class="outline-4">
+<h4 id="org04eca09">IMA(1)</h4>
+<div class="outline-text-4" id="text-org04eca09">
 <p>
 Basta sustituir \(\phi_1=1\) en \eqref{eqn:predicion-recursiva-ARMA11} para particularizar el resultado a un modelo IMA(1), 
 \[\begin{cases}
@@ -577,15 +577,15 @@ Basta sustituir \(\phi_1=1\) en \eqref{eqn:predicion-recursiva-ARMA11} para part
 </p>
 
 
-<div id="org6f4296c" class="figure">
+<div id="org6d517fe" class="figure">
 <p><img src="./img/figurasGretl/prediccionIMA.png" alt="prediccionIMA.png" width="400px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org604cec4" class="outline-4">
-<h4 id="org604cec4">IMA(1) estacional</h4>
-<div class="outline-text-4" id="text-org604cec4">
+<div id="outline-container-orgc1e81b6" class="outline-4">
+<h4 id="orgc1e81b6">IMA(1) estacional</h4>
+<div class="outline-text-4" id="text-orgc1e81b6">
 <p>
 Para \(\nabla_{12}Y_t=(1-\Theta_1B^{12})U_t\) (con \(\mu=0\) para simplificar); donde \(j=1,2,\ldots,12\):
 \[\text{predicción de cada mes }
@@ -598,7 +598,7 @@ Desde el segundo año, cada predicción es como la del mismo mes del año anteri
 
 
 
-<div id="orgcd285aa" class="figure">
+<div id="org49f253d" class="figure">
 <p><img src="./img/figurasGretl/prediccionSIMA.png" alt="prediccionSIMA.png" width="300px" />
 </p>
 </div>
@@ -606,9 +606,9 @@ Desde el segundo año, cada predicción es como la del mismo mes del año anteri
 </div>
 </div>
 </div>
-<div id="outline-container-org6b9e276" class="outline-2">
-<h2 id="org6b9e276">Varianza de las predicciones lineales</h2>
-<div class="outline-text-2" id="text-org6b9e276">
+<div id="outline-container-orge4f131c" class="outline-2">
+<h2 id="orge4f131c">Varianza de las predicciones lineales</h2>
+<div class="outline-text-2" id="text-orge4f131c">
 <p>
 <i>Consideremos primero modelos lineales, causales y estacionarios</i>.
 </p>
@@ -669,9 +669,9 @@ Si \(|\phi|\) está próximo uno, la varianza marginal será mucho más grande q
 <li>En modelos no estacionarios, como la serie \(\sum \psi_i^2\) no converge, la incertidumbre en la predicción a largo plazo crece indefinidamente: <b>no se puede anticipar el comportamiento de un proceso no estacionario a largo plazo</b>.</li>
 </ul>
 </div>
-<div id="outline-container-orgd7240e3" class="outline-3">
-<h3 id="orgd7240e3">Intervalos de confianza para las previsiones</h3>
-<div class="outline-text-3" id="text-orgd7240e3">
+<div id="outline-container-orgb87cce7" class="outline-3">
+<h3 id="orgb87cce7">Intervalos de confianza para las previsiones</h3>
+<div class="outline-text-3" id="text-orgb87cce7">
 <p>
 Si asumimos que la distribución de las innovaciones es gaussiana, podemos calcular intervalos de confianza para diferentes horizontes de predicción. 
 </p>
@@ -692,9 +692,9 @@ En modelos MA(\(q\)) la varianza deja de crecer si \(\ell>q\), pues \(\psi_{k}=0
 </div>
 </div>
 </div>
-<div id="outline-container-orgd6aa7fa" class="outline-2">
-<h2 id="orgd6aa7fa">Adaptación de las predicciones a las nuevas observaciones</h2>
-<div class="outline-text-2" id="text-orgd6aa7fa">
+<div id="outline-container-org2a14eb3" class="outline-2">
+<h2 id="org2a14eb3">Adaptación de las predicciones a las nuevas observaciones</h2>
+<div class="outline-text-2" id="text-org2a14eb3">
 <p>
 Contamos con predicciones para \(t+1\) hasta \(t+j\) basadas en \(\mathcal{H}_{Y_t}\). Queremos actualizarlas con \(\mathcal{H}_{Y_{t+1}}\).
 Según \eqref{eqn:predicion-MA-infinito}, la predicción de \(Y_{t+\ell}\) con información hasta \(t\) es:
@@ -776,9 +776,9 @@ Gretl muestra otros estadísticos adicionales (véase el manual).
 </p>
 </div>
 </div>
-<div id="outline-container-orgd70b590" class="outline-2">
-<h2 id="orgd70b590">Modelos con logaritmos</h2>
-<div class="outline-text-2" id="text-orgd70b590">
+<div id="outline-container-org3e19893" class="outline-2">
+<h2 id="org3e19893">Modelos con logaritmos</h2>
+<div class="outline-text-2" id="text-org3e19893">
 <p>
 Si se tomaron logaritmos para estabilizar la varianza, es necesario recuperar las previsiones de la serie original a partir de las de la serie transformada.
 Si
@@ -804,9 +804,9 @@ que es no simétrico alrededor de la previsión.
 </p>
 </div>
 </div>
-<div id="outline-container-org3420e77" class="outline-2">
-<h2 id="org3420e77">Nota sobre subespacio sobre el que proyectamos al prever</h2>
-<div class="outline-text-2" id="text-org3420e77">
+<div id="outline-container-orgf84e04a" class="outline-2">
+<h2 id="orgf84e04a">Nota sobre subespacio sobre el que proyectamos al prever</h2>
+<div class="outline-text-2" id="text-orgf84e04a">
 <p>
 Sea un proceso estocástico lineal causal y estacionario de segundo orden definido por
 \[
@@ -891,7 +891,7 @@ Así, cada \(U_{t}\) pertenece al subespacio cerrado generado por
 </div>
 </div></div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-11-14 Fri 15:42</p>
+<p class="date">Created: 2025-11-22 Sat 10:50</p>
 </div>
 </body>
 </html>
