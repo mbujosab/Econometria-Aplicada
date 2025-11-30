@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-11-30 Sun 16:23 -->
+<!-- 2025-11-30 Sun 17:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 8.A &mdash; Número de viajeros internacionales</title>
@@ -101,44 +101,44 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org95ddf21">Número de viajeros internacionales</a></li>
-<li><a href="#orgd5202fb">Actividad 1 - Gráfico de series temporales</a></li>
-<li><a href="#org7928538">Actividad 2 - Identificar un modelo ARIMA para la serie temporal</a>
+<li><a href="#org2d91ab6">Número de viajeros internacionales</a></li>
+<li><a href="#org6acd896">Actividad 1 - Gráfico de series temporales</a></li>
+<li><a href="#orgdca1fcc">Actividad 2 - Identificar un modelo ARIMA para la serie temporal</a>
 <ul>
-<li><a href="#org3f75852">Correlograma de los datos tras una diferencia regular y otra estacional</a>
+<li><a href="#org50684ee">Correlograma de los datos tras una diferencia regular y otra estacional</a>
 <ul>
-<li><a href="#org547a717">Analice el correlograma de los residuos hasta el retardo 36.</a></li>
+<li><a href="#orgd2d912f">Analice el correlograma de los residuos hasta el retardo 36.</a></li>
 </ul>
 </li>
-<li><a href="#org6428f66">Probando con un MA(1) estacional</a>
+<li><a href="#orgb067bf2">Probando con un MA(1) estacional</a>
 <ul>
-<li><a href="#org9c94e42">Correlograma de los residuos</a></li>
+<li><a href="#org9b94f3b">Correlograma de los residuos</a></li>
 </ul>
 </li>
-<li><a href="#org2a74e90">Probando con un AR(1) regular (además del MA(1) estacional)</a>
+<li><a href="#org84138a9">Probando con un AR(1) regular (además del MA(1) estacional)</a>
 <ul>
-<li><a href="#org8452c65">Correlograma de los residuos</a></li>
+<li><a href="#org9017c65">Correlograma de los residuos</a></li>
 </ul>
 </li>
-<li><a href="#orgacfe0ee">Probando con un MA(1) regular (además del MA(1) estacional)</a>
+<li><a href="#org8ec6c3b">Probando con un MA(1) regular (además del MA(1) estacional)</a>
 <ul>
-<li><a href="#orgabc9503">Correlograma de los residuos</a></li>
+<li><a href="#org75bad54">Correlograma de los residuos</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgb919c00">Actividad 4 - Previsión para los 12 meses de 1960</a>
+<li><a href="#org0ecc21a">Actividad 4 - Previsión para los 12 meses de 1960</a>
 <ul>
-<li><a href="#orgead1458">Re-estimación del modelo truncando la muestra</a></li>
-<li><a href="#orgca9d8da">Previsión de los 12 últimos meses de la muestra</a></li>
+<li><a href="#org18425fc">Re-estimación del modelo truncando la muestra</a></li>
+<li><a href="#org565c1c9">Previsión de los 12 últimos meses de la muestra</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org95ddf21" class="outline-2">
-<h2 id="org95ddf21">Número de viajeros internacionales</h2>
-<div class="outline-text-2" id="text-org95ddf21">
+<div id="outline-container-org2d91ab6" class="outline-2">
+<h2 id="org2d91ab6">Número de viajeros internacionales</h2>
+<div class="outline-text-2" id="text-org2d91ab6">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -181,51 +181,51 @@ Comencemos cargando los datos:
 <i>o bien teclee en linea de comandos</i>:
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="orgb78ef13"><code>open bjg
+<pre class="src src-gretl" id="orge5c786b"><code>open bjg
 </code></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-orgd5202fb" class="outline-2">
-<h2 id="orgd5202fb">Actividad 1 - Gráfico de series temporales</h2>
-<div class="outline-text-2" id="text-orgd5202fb">
+<div id="outline-container-org6acd896" class="outline-2">
+<h2 id="org6acd896">Actividad 1 - Gráfico de series temporales</h2>
+<div class="outline-text-2" id="text-org6acd896">
 <p>
 Obtenga la figura de la serie temporal en logaritmos <code>lg</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-gretl" id="org5a3cd8f"><code>gnuplot lg --time-series --with-lines  --output="log_AP.png"
+<pre class="src src-gretl" id="org3227701"><code>gnuplot lg --time-series --with-lines  --output="log_AP.png"
 </code></pre>
 </div>
 <div class="org-center">
 
-<div id="orga8184c6" class="figure">
+<div id="org8b23635" class="figure">
 <p><img src="./P-L08-A-airlinePass/log_AP.png" alt="log_AP.png" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org7928538" class="outline-2">
-<h2 id="org7928538">Actividad 2 - Identificar un modelo ARIMA para la serie temporal</h2>
-<div class="outline-text-2" id="text-org7928538">
+<div id="outline-container-orgdca1fcc" class="outline-2">
+<h2 id="orgdca1fcc">Actividad 2 - Identificar un modelo ARIMA para la serie temporal</h2>
+<div class="outline-text-2" id="text-orgdca1fcc">
 <p>
 En su momento ya vimos que esta serie requiere una diferencia regular y otra estacional.
 </p>
 </div>
-<div id="outline-container-org3f75852" class="outline-3">
-<h3 id="org3f75852">Correlograma de los datos tras una diferencia regular y otra estacional</h3>
-<div class="outline-text-3" id="text-org3f75852">
+<div id="outline-container-org50684ee" class="outline-3">
+<h3 id="org50684ee">Correlograma de los datos tras una diferencia regular y otra estacional</h3>
+<div class="outline-text-3" id="text-org50684ee">
 <p>
 Ajuste un modelo ARIMA con constante; es decir sin parte AR ni parte MA, pero indicando una diferencia regular y otra estacional sobre <code>lg</code>.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-R" id="orgcfc7742"><code>arima 0 1 0 ; 0 1 0 ; lg
+<pre class="src src-R" id="orgbae6ae0"><code>arima 0 1 0 ; 0 1 0 ; lg
 </code></pre>
 </div>
 
-<pre class="example" id="org18ac6c8">
+<pre class="example" id="orga0485cd">
 Model 2: ARIMA, using observations 1950:02-1960:12 (T = 131)
 Estimated using least squares (= MLE)
 Dependent variable: (1-L)(1-Ls) lg
@@ -245,25 +245,25 @@ Schwarz criterion   -427.0849   Hannan-Quinn        -430.4986
 Vemos que la constante no es significativa, por lo que omitiremos la constante en los próximos modelos ajustados a los datos. 
 </p>
 </div>
-<div id="outline-container-org547a717" class="outline-4">
-<h4 id="org547a717">Analice el correlograma de los residuos hasta el retardo 36.</h4>
-<div class="outline-text-4" id="text-org547a717">
+<div id="outline-container-orgd2d912f" class="outline-4">
+<h4 id="orgd2d912f">Analice el correlograma de los residuos hasta el retardo 36.</h4>
+<div class="outline-text-4" id="text-orgd2d912f">
 <div class="org-src-container">
-<pre class="src src-R" id="orgbdf57ff"><code>residuosModelo0 = $uhat
+<pre class="src src-R" id="orgc97d677"><code>residuosModelo0 = $uhat
 corrgm residuosModelo0 36 --plot="residuosModelo0-ACF-PACF.png"
 </code></pre>
 </div>
 
 <div class="org-center">
 
-<div id="orgc70c5a4" class="figure">
+<div id="org523e441" class="figure">
 <p><img src="./P-L08-A-airlinePass/residuosModelo0-ACF-PACF.png" alt="residuosModelo0-ACF-PACF.png" />
 </p>
 </div>
 </div>
 
 
-<pre class="example" id="orgcddcd7e">
+<pre class="example" id="orgdfd1663">
 Autocorrelation function for residuosModelo0
 ***, **, * indicate significance at the 1%, 5%, 10% levels
 using standard error 1/T^0.5
@@ -320,15 +320,15 @@ Esto sugiere un truncamiento en la ACF en la parte de su estructura estacional (
 </div>
 </div>
 </div>
-<div id="outline-container-org6428f66" class="outline-3">
-<h3 id="org6428f66">Probando con un MA(1) estacional</h3>
-<div class="outline-text-3" id="text-org6428f66">
+<div id="outline-container-orgb067bf2" class="outline-3">
+<h3 id="orgb067bf2">Probando con un MA(1) estacional</h3>
+<div class="outline-text-3" id="text-orgb067bf2">
 <div class="org-src-container">
-<pre class="src src-R" id="org0487a47"><code>arima 0 1 0 ; 0 1 1 ; lg --nc
+<pre class="src src-R" id="org61a2754"><code>arima 0 1 0 ; 0 1 1 ; lg --nc
 </code></pre>
 </div>
 
-<pre class="example" id="org358ba67">
+<pre class="example" id="org4ae26ec">
 Function evaluations: 28
 Evaluations of gradient: 9
 
@@ -362,25 +362,25 @@ El parámetro \(\Theta_1\) es muy significativo. La raíz de media móvil tiene 
 Analicemos el correlograma de los residuos hasta el retardo 36 para ver si queda alguna estructura dinámica en los residuos.
 </p>
 </div>
-<div id="outline-container-org9c94e42" class="outline-4">
-<h4 id="org9c94e42">Correlograma de los residuos</h4>
-<div class="outline-text-4" id="text-org9c94e42">
+<div id="outline-container-org9b94f3b" class="outline-4">
+<h4 id="org9b94f3b">Correlograma de los residuos</h4>
+<div class="outline-text-4" id="text-org9b94f3b">
 <div class="org-src-container">
-<pre class="src src-R" id="org83957f1"><code>residuosModelo1 = $uhat
+<pre class="src src-R" id="orgb97a404"><code>residuosModelo1 = $uhat
 corrgm residuosModelo1 36 --plot="residuosModelo1-ACF-PACF.png"
 </code></pre>
 </div>
 
 <div class="org-center">
 
-<div id="org467c0f2" class="figure">
+<div id="orgfa99b1c" class="figure">
 <p><img src="./P-L08-A-airlinePass/residuosModelo1-ACF-PACF.png" alt="residuosModelo1-ACF-PACF.png" />
 </p>
 </div>
 </div>
 
 
-<pre class="example" id="org549311f">
+<pre class="example" id="org3949bf9">
 Autocorrelation function for residuosModelo1
 ***, **, * indicate significance at the 1%, 5%, 10% levels
 using standard error 1/T^0.5
@@ -441,15 +441,15 @@ Dado que no hay una evidencia muy clara, empecemos probando tentativamente con u
 </div>
 </div>
 </div>
-<div id="outline-container-org2a74e90" class="outline-3">
-<h3 id="org2a74e90">Probando con un AR(1) regular (además del MA(1) estacional)</h3>
-<div class="outline-text-3" id="text-org2a74e90">
+<div id="outline-container-org84138a9" class="outline-3">
+<h3 id="org84138a9">Probando con un AR(1) regular (además del MA(1) estacional)</h3>
+<div class="outline-text-3" id="text-org84138a9">
 <div class="org-src-container">
-<pre class="src src-R" id="orgb802b37"><code>arima 1 1 0 ; 0 1 1 ; lg --nc
+<pre class="src src-R" id="orgbefdf92"><code>arima 1 1 0 ; 0 1 1 ; lg --nc
 </code></pre>
 </div>
 
-<pre class="example" id="org3e64135">
+<pre class="example" id="org413f514">
 Function evaluations: 16
 Evaluations of gradient: 6
 
@@ -486,25 +486,25 @@ Los parámetros son muy significativos y si comparamos el R-cuadrado ajustado, a
 Ahora analicemos el correlograma de los residuos (puesto que ya no hay restos de estacionalidad, bastará con mirar los primeros retardos).
 </p>
 </div>
-<div id="outline-container-org8452c65" class="outline-4">
-<h4 id="org8452c65">Correlograma de los residuos</h4>
-<div class="outline-text-4" id="text-org8452c65">
+<div id="outline-container-org9017c65" class="outline-4">
+<h4 id="org9017c65">Correlograma de los residuos</h4>
+<div class="outline-text-4" id="text-org9017c65">
 <div class="org-src-container">
-<pre class="src src-R" id="org5808870"><code>residuosModelo2 = $uhat
+<pre class="src src-R" id="orgf3a3f7f"><code>residuosModelo2 = $uhat
 corrgm residuosModelo2 12 --plot="residuosModelo2-ACF-PACF.png"
 </code></pre>
 </div>
 
 <div class="org-center">
 
-<div id="org5bfea1c" class="figure">
+<div id="org1254a6f" class="figure">
 <p><img src="./P-L08-A-airlinePass/residuosModelo2-ACF-PACF.png" alt="residuosModelo2-ACF-PACF.png" />
 </p>
 </div>
 </div>
 
 
-<pre class="example" id="org7de116a">
+<pre class="example" id="org985df81">
 Autocorrelation function for residuosModelo2
 ***, **, * indicate significance at the 1%, 5%, 10% levels
 using standard error 1/T^0.5
@@ -538,15 +538,15 @@ Probemos tentativamente a añadir un polinomio MA de orden 1 (en lugar del polin
 </div>
 </div>
 </div>
-<div id="outline-container-orgacfe0ee" class="outline-3">
-<h3 id="orgacfe0ee">Probando con un MA(1) regular (además del MA(1) estacional)</h3>
-<div class="outline-text-3" id="text-orgacfe0ee">
+<div id="outline-container-org8ec6c3b" class="outline-3">
+<h3 id="org8ec6c3b">Probando con un MA(1) regular (además del MA(1) estacional)</h3>
+<div class="outline-text-3" id="text-org8ec6c3b">
 <div class="org-src-container">
-<pre class="src src-R" id="org03bd93b"><code>arima 0 1 1 ; 0 1 1 ; lg --nc
+<pre class="src src-R" id="org8911427"><code>arima 0 1 1 ; 0 1 1 ; lg --nc
 </code></pre>
 </div>
 
-<pre class="example" id="orgbc4c93f">
+<pre class="example" id="org37bfd9a">
 Function evaluations: 28
 Evaluations of gradient: 9
 
@@ -581,25 +581,25 @@ Los parámetros son muy significativos y las raíces alejadas de círculo unidad
 Si nos fijamos en el R-cuadrado ajustado, así como los criterios de información, este modelo resulta superior respecto a todos los anteriores.
 </p>
 </div>
-<div id="outline-container-orgabc9503" class="outline-4">
-<h4 id="orgabc9503">Correlograma de los residuos</h4>
-<div class="outline-text-4" id="text-orgabc9503">
+<div id="outline-container-org75bad54" class="outline-4">
+<h4 id="org75bad54">Correlograma de los residuos</h4>
+<div class="outline-text-4" id="text-org75bad54">
 <div class="org-src-container">
-<pre class="src src-R" id="orgee4c734"><code>residuosModelo3 = $uhat
+<pre class="src src-R" id="org304e4ce"><code>residuosModelo3 = $uhat
 corrgm residuosModelo3 12 --plot="residuosModelo3-ACF-PACF.png"
 </code></pre>
 </div>
 
 <div class="org-center">
 
-<div id="org97f82e3" class="figure">
+<div id="org065c22a" class="figure">
 <p><img src="./P-L08-A-airlinePass/residuosModelo3-ACF-PACF.png" alt="residuosModelo3-ACF-PACF.png" />
 </p>
 </div>
 </div>
 
 
-<pre class="example" id="org408f400">
+<pre class="example" id="orgc07016c">
 Autocorrelation function for residuosModelo3
 ***, **, * indicate significance at the 1%, 5%, 10% levels
 using standard error 1/T^0.5
@@ -630,17 +630,17 @@ Todo indica que este modelo es mejor que cualquiera de los anteriores (pruebe m�
 </div>
 </div>
 </div>
-<div id="outline-container-orgb919c00" class="outline-2">
-<h2 id="orgb919c00">Actividad 4 - Previsión para los 12 meses de 1960</h2>
-<div class="outline-text-2" id="text-orgb919c00">
+<div id="outline-container-org0ecc21a" class="outline-2">
+<h2 id="org0ecc21a">Actividad 4 - Previsión para los 12 meses de 1960</h2>
+<div class="outline-text-2" id="text-org0ecc21a">
 <p>
 Queremos hacer previsión con este último modelo; y poder comparar sus previsiones con las observaciones correspondientes al año 1960. 
 Para hacer este ejercicio, debemos estimar el modelo sin incorporar los datos de dicho año (prever algo que ya ha sido observado no tiene mérito). Dicho de otro modo, debemos usar el conjunto de información \(\mathcal{H}_{Y_{1959:12}}\) de tal manera que el número de viajeros en los meses de 1960 no sea ``observado''.
 </p>
 </div>
-<div id="outline-container-orgead1458" class="outline-3">
-<h3 id="orgead1458">Re-estimación del modelo truncando la muestra</h3>
-<div class="outline-text-3" id="text-orgead1458">
+<div id="outline-container-org18425fc" class="outline-3">
+<h3 id="org18425fc">Re-estimación del modelo truncando la muestra</h3>
+<div class="outline-text-3" id="text-org18425fc">
 <p>
 Reestimaremos el modelo con datos hasta diciembre de 1959 
 </p>
@@ -651,9 +651,9 @@ arima 0 1 1 ; 0 1 1 ; lg --nc
 </div>
 </div>
 </div>
-<div id="outline-container-orgca9d8da" class="outline-3">
-<h3 id="orgca9d8da">Previsión de los 12 últimos meses de la muestra</h3>
-<div class="outline-text-3" id="text-orgca9d8da">
+<div id="outline-container-org565c1c9" class="outline-3">
+<h3 id="org565c1c9">Previsión de los 12 últimos meses de la muestra</h3>
+<div class="outline-text-3" id="text-org565c1c9">
 <div class="org-src-container">
 <pre class="src src-R"><code>fcast 1959:01 1960:12 --plot="prediccion1960.png"
 </code></pre>
@@ -662,14 +662,14 @@ arima 0 1 1 ; 0 1 1 ; lg --nc
 
 <div class="org-center">
 
-<div id="org6bcaeed" class="figure">
+<div id="orgcc011f6" class="figure">
 <p><img src="./P-L08-A-airlinePass/prediccion1960.png" alt="prediccion1960.png" />
 </p>
 </div>
 </div>
 
 
-<pre class="example" id="orgd143b1c">
+<pre class="example" id="org57fb37f">
  For 95% confidence intervals, z(0.025) = 1.96
 
                   lg    prediction    std. error        95% interval
@@ -707,7 +707,7 @@ Pruebe con otras especificaciones e intente ver si es capaz de encontrar algún 
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-11-30 Sun 16:23</p>
+<p class="date">Created: 2025-11-30 Sun 17:22</p>
 </div>
 </body>
 </html>
