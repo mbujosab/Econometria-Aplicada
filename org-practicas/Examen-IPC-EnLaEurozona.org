@@ -367,7 +367,7 @@ En relación con la Figura [[Previsiones]], explique por qué los intervalos de 
 
 En la Figura 1, el gráfico de la izquierda muestra que la variabilidad local del IPC en la Eurozona (medida por el rango) aumenta con el nivel (media local), sugiriendo la conveniencia de aplicar una transformación logarítmica. El gráfico de la derecha revela que la transformación logarítmica elimina dicha dependencia, ya que la variabilidad de \( \ln\, \texttt{CPI_EZ19}_t \) no crece con el nivel.
 
-En la Figura 2, el gráfico de la izquierda presenta \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \), que puede interpretarse como la tasa logarítmica de variación anual del IPC, y parece ser "no estacionaria en media". El gráfico de la derecha muestra los cambios mensuales de \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \), reflejando la variación de la inflación anual y parece ser estacionario en media, lo que sugiere que una diferencia regular logra estabilizar la media local de la serie \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \).
+En la Figura 2, el gráfico de la izquierda presenta \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \), que puede interpretarse como la _tasa logarítmica de variación anual del IPC_, y parece ser "no estacionaria en media". El gráfico de la derecha muestra los cambios mensuales de \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \), reflejando la _variación de la inflación anual_ y parece ser estacionario en media, lo que sugiere que una diferencia regular logra estabilizar la media local de la serie \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \).
 
 ([[Pregunta 1]])
 
@@ -385,11 +385,26 @@ Los estadísticos de los residuos no rechazan las hipótesis de:
 - Ausencia de autocorrelación hasta el retardo 39 (p-valor = 5.6%, muy ajustado).
 Por lo tanto, no hay indicios concluyentes de mala especificación o incumplimiento de hipótesis.
 
+*Aclaraciones sobre la descripción del modelo*. Más arriba lo describo como un modelo estacional ARIMA$(2,1,1) \times (0,1,1)_{12}$ del _logaritmo del IPC_. Es necesario indicar a qué variable se refiere el modelo. También valdría decir que es un modelo estacional ARIMA$(2,1,1) \times (0,0,1)_{12}$ de _la diferencia estacional del logaritmo del IPC_; o que es un modelo estacional ARIMA$(2,0,1) \times (0,0,1)_{12}$ de _la primera diferencia de la diferencia estacional del logaritmo del IPC_; es decir, un modelo estacional ARMA$(2,1) \times (0,1)_{12}$ de _la primera diferencia de la diferencia estacional del logaritmo del IPC_. 
+
+Limitarse a decir que es un modelo estacional ARIMA$(2,1,1) \times (0,0,1)_{12}$ sin indicar de qué variable se trata, es una descripción incorrecta por ser insuficiente. Tenga en cuenta que para modelar los datos es necesario aplicar las transformaciones necesarias para tener una serie con aspecto de realización de un proceso estacionario (el gráfico de la derecha de la [[Análisis gráfico][figura 2]]). Fíjese que, de algún modo, en todas las descripciones del párrafo anterior se incluyen todas las transformaciones aplicadas al IPC para estimar los parámetros del [[Modelo univariante]]. 
+
+*Aclaraciones sobre la valoración del $R^2$*. Aunque hay distintas descripciones del modelo, el conjunto de datos usado en la estimación con Gretl es _la diferencia estacional del logaritmo del IPC_ ($\texttt{sd_l_CPI_EZ19}$). Como dicha serie es NO estacionaria en media (véase el gráfico de la izquierda de la  [[Análisis gráfico][figura 2]]), tanto los datos usados por Gretl como los datos ajustados son series no estacionarias. Por tanto, tenemos dos series no estacionarias que crecen y decrecen al unísono, presentando una correlación muy elevada (véase la primera parte del [[Previsiones de inflación][gráfico del ejercicio de predicción]] donde se ve el ajuste hasta diciembre del año 2020). Consecuentemente, el coeficiente de determinación $R^2$ es necesariamente muy elevado. Por ello, no es correcto sacar conclusiones de este hecho, ya que un elevado $R^2$ es lo que cabe esperar siempre que ajustamos datos no estacionarios. Para que el $R^2$ fuera más ilustrativo, deberíamos observar el ajuste a los datos del gráfico de la derecha de la  [[Análisis gráfico][figura 2]], no los de la izquierda. El motivo por el que se ha empleado la serie $\texttt{sd_l_CPI_EZ19}$ (de la izquierda) en lugar de la serie $\texttt{d_sd_l_CPI_EZ19}$ (de la derecha), es que luego realizamos un ejercicio de predicción; y es más ilustrativo prever los datos del gráfico de la izquierda de la [[Análisis gráfico][figura 2]] (tasa logarítmica de inflación interanual) que los de la derecha. 
+
+Por otra parte, hacer mención a los valores concretos tomados por estadísticos que sirven para comparar modelos (como el $R^2$ ajustado o los criterios de información) es ocioso, pues no se está comparando el modelo ajustado con ningún otro.
+
+
+*Aclaraciones a respuestas incorrectas dadas por algunos alumnos*. Es importante aclarar que un  parámetro con valor absoluto próximo a 1 en un modelo AR(2) no implica que exista una raíz próxima al círculo unidad. En un polinomio de grado 2, la relación entre los parámetros y sus raíces es más compleja (usted la conoce desde el colegio: para el polinomio $ax^2+bx+c$ es la función $\frac{-b \pm \sqrt {b^2-4ac}}{2a}$; donde, en el caso de un AR(2): $c=1$, $b=\phi_1$ y $a=\phi_2$). 
+
+De hecho, aunque \(\phi_1\) fuera exactamente $-1$, si \(\phi_2\) se encuentra en el intervalo (0, -1) el modelo es estacionario (consulte el triángulo de la región de estacionariedad de un AR 2 en la [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc05.pdf#subsection.1.4][figura 1]] de las notas de clase).
+
+En el polinomio de grado uno \(\;1-\phi_1 x,\;\) la raíz es simplemente la inversa de \(\phi_1\). Pero recuerde que esta relación tan simple no aplica a polinomios de grado superior.
+
 ([[Pregunta 2]])
 
 ** Respuesta 3
 
-Tanto la Figura 3 como el cuadro muestran que los valores observados de la tasa logarítmica de inflación exceden las bandas de error del 95% de las previsiones univariantes. Por lo tanto, las previsiones no son satisfactorias. Por ejemplo, la tasa de inflación anual prevista para septiembre de 2021 era del 0.70%, mientras que el valor observado fue del 3.31%, resultando en un error de 2.6 puntos porcentuales.
+Tanto la figura con las previsiones como el cuadro correspondiente muestran que los valores observados de la tasa logarítmica de inflación exceden las bandas de error del 95% de las previsiones univariantes. Por lo tanto, _las previsiones no son satisfactorias_. Por ejemplo, la tasa de inflación anual prevista para septiembre de 2021 era del 0.70%, mientras que el valor observado fue del 3.31%, resultando en un error de 2.6 puntos porcentuales.
 
 Las previsiones univariantes se basan en la extrapolación del comportamiento histórico (con mayor peso en el pasado reciente). Los resultados sugieren que, tras un estancamiento en 2020 debido a la pandemia, la inflación ha repuntado, posiblemente debido al aumento de precios de materias primas, especialmente energía, y al incremento de la demanda que las cadenas de suministro globales aún no pueden satisfacer.
 
@@ -436,6 +451,19 @@ Las previsiones univariantes se basan en la extrapolación del comportamiento hi
 10. \( \nabla \nabla_{12} \,\ln\,  \texttt{CPI_EZ19}_t = \frac{(1 - .810B)(1 - .597{B^{12}})}{(1 - .996B + .127{B^2})} \hat a_t \)
 
     El modelo se ha formulado invirtiendo el polinomio AR, \( 1 - \theta_1B - \theta_2{B^2} \), pero no los operadores diferencia. *Expresión correcta*, lo que significa que, una vez diferenciados los datos, hay una representación MA (ya que los datos diferenciados son estacionarios; véase el gráfico derecho de la Figura 2).
+
+*Aclaraciones a respuestas incorrectas dadas por algunos alumnos*. Las expresiones 5 a 8 son incorrectas porque contienen los operadores $\nabla$ o $\nabla_{12}$ (o ambos) en el denominador. Dado que $\nabla = 1 - B$ tiene una raíz en el círculo unidad y $\nabla_{12} = 1 - B^{12}$ tiene 12 raíces en el círculo unidad, cualquier expresión que incluya estos operadores en el denominador carece de sentido por dos razones. Primero, cualquier secuencia que utilice la inversa de estos operadores será no convergente. Segundo, dado que no estamos empleando la inversa convergente (que no existe), no queda claro qué tipo de inversa se está utilizando, ya que entre las inversas no convergentes existen infinitas alternativas.
+
+/En resumen/, estas expresiones son incorrectas porque implican la inversión de un polinomio con raíces unitarias al incluir los operadores $\nabla$ o $\nabla_{12}$ en el denominador.
+
+Por tanto, no es correcto argumentar que la expresión es inadecuada solo porque los operadores $\nabla$ o $\nabla_{12}$ no están junto a la variable. Por ejemplo, en la expresión 
+\[ 
+\nabla \nabla_{12} (1 - 0.996B + 0.127B^2)\texttt{l_CPI_EZ19}_t = 
+(1 - 0.810B)(1 - 0.597{B^{12}})\,{\hat a_t},
+\] 
+los operadores no se encuentran adyacentes a la variable; sin embargo, la expresión sigue siendo correcta, pues el [[https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc02.pdf#section.4][producto entre polinomios es conmutativo]]; por tanto, 
+\[\nabla \nabla_{12} (1 - 0.996B + 0.127B^2)=(1 - 0.996B + 0.127B^2)\nabla \nabla_{12}.\]
+
 
 ([[Pregunta 4]])
 
