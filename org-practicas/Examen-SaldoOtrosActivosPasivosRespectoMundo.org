@@ -7,10 +7,7 @@
 #+OPTIONS: author:nil
 #+OPTIONS: date:nil
 
-#+OPTIONS: :eval yes
-#+PROPERTY: header-args :eval yes
-
-#+INFOJS_OPT: view:overview
+#+include: 00preambulo_practicas.txt
 
 # M-x org-num-mode para secciones con números
 
@@ -19,19 +16,6 @@
 #+SETUPFILE: ../css/bigblow_inline.theme
 # ###########
 
-#+latex_class_options: [10pt]
-
-#+LATEX_HEADER: \usepackage[spanish]{babel}
-#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
-# +LaTeX_HEADER: \usepackage{framed}
-#+LaTeX_HEADER: \usepackage{listings}
-#+LaTeX_HEADER: \input{hansl.tex}
-#+LaTeX_HEADER: \lstnewenvironment{hansl-gretl}
-#+LaTeX_HEADER: {\lstset{language={hansl},basicstyle={\ttfamily\footnotesize},numbers,rame=single,breaklines=true}}
-#+LaTeX_HEADER: {}
-#+LaTeX_HEADER: \newcommand{\hansl}[1]{\lstset{language={hansl},basicstyle={\ttfamily\small}}\lstinline{#1}}
-
-#+LaTeX_HEADER: \lstset{backgroundcolor=\color{lightgray!20}, }
 
 #+name: setup-listings
 #+begin_src emacs-lisp :exports none :results silent :tangle no
@@ -450,12 +434,12 @@ La serie =d_BE_2_5_8_16= (la primera diferencia regular de =BE_2_5_8_16=) parece
 - Primer modelo. :: *Es un AR(2)* para la primera diferencia ordinaria de la serie ($\nabla \mathbf{y}$); es decir, es un modelo ARIMA(2,1,0). 
   Las raíces del polinomio AR están claramente fuera del círculo unidad (indicando que este modelo para la primera diferencia de los datos es *estacionario*). 
   Es más, mirando la ACF y la PACF se aprecia que los residuos parecen ser una realización de un proceso de ruido blanco, pues ningún retardo es estadísticamente significativo y, sobre todo, los p-valores de los estadísticos de Ljung-Box de los residuos son muy elevados, por lo que no se puede rechazar la hipótesis nula de que los residuos sean ``ruido blanco''. 
-  Por otra parte, aunque NI la constante NI el parámetro correspondiente al primer retardo del modelo AR son estadísticamente significativos, el modelo ajusta bastante bien los datos; pues tiene un $R^2$ muy elevado (=0,97611=); pero no es extraordinario, pues es lo habitual en ajustes de series no estacionarias en media.
+  Por otra parte, NI la constante NI el parámetro correspondiente al primer retardo del modelo AR son estadísticamente significativos. Aunque el modelo arroja un $R^2$ muy elevado (=0,97611=); esto no indica nada en absoluto, es lo que cabe esperar cuando se ajusta un modelo a series con tendencia (aunque el modelo sea muy malo, lo habitual es que el cálculo del $R^2$ arroje un valor muy elevado).
 
 - Segundo modelo. :: *Es un MA(2)* para la primera diferencia ordinaria de la serie ($\nabla \mathbf{y}$); es decir, es un modelo ARIMA(0,1,2). 
   Las raíces del polinomio MA están claramente fuera del círculo unidad (indicando que este modelo para la primera diferencia de los datos es *invertible*). 
   Es más, al igual que en el modelo anterior (y por los mismos motivos) no se puede rechazar la hipótesis de que los residuos sean ``ruido blanco''. 
-  Por otra parte, aunque NI la constante, NI el parámetro correspondiente al primer retardo del modelo MA son estadísticamente significativos, este modelo también ajusta muy bien los datos, pues tiene un $R^2$ muy elevado (=0,97605=); pero no es extraordinario, pues es lo habitual en ajustes de series no estacionarias en media.
+  Por otra parte, NI la constante, NI el parámetro correspondiente al primer retardo del modelo MA son estadísticamente significativos. Dado que la serie es no estacionaria en media, el valor del $R^2$ es muy elevado (=0,97605=) (pero como se ha dicho más arriba, este valor no es interpretable, es lo que cabe esperar en los ajustes de series no estacionarias en media).
 
 #+BEGIN_QUOTE
 *Aclaraciones a algunas respuestas incorrectas en los exámenes*:
@@ -463,21 +447,20 @@ La serie =d_BE_2_5_8_16= (la primera diferencia regular de =BE_2_5_8_16=) parece
 - Lo primero y *fundamental* es indicar el tipo de modelo: si el modelo es AR, MA o ARMA.
   Para ello es imprescindible indicar si es un modelo de los datos en niveles o si lo es de los datos en diferencias.
 
-- El $R^2$ es el ratio entre la varianza de los datos ajustados y la *varianza de los datos de la muestra* (en este caso de los datos de la muestra /en primeras diferencias/).
-  Dado que la serie no es estacionaria, hablar de la varianza del /modelo/ es *incorrecto*.
-  Como el modelo no es estacionario, pues incorpora una diferencia ordinaria, la varianza no está definida.
-  Consecuentemente no tiene sentido hablar de /la varianza del modelo/ (aunque si lo tiene hablar de la varianza de los datos).
+- El cálculo del coeficiente de determinación es \(R^2=1 -\frac{\sum\widehat{e_t}^2}{\sum (y_t-\bar{y})^2}\). Dado que la serie no es estacionaria en media (dado que la serie /deambula/), la mayoría de sus valores resultan estar lejos de la media muestral. En consecuencia, el denominador resulta ser muchísimo más grande que la suma del cuadrado de los errores de ajuste que aparece en el numerador (la serie ajustada suele estar próxima a los datos, /deambulando con ellos/ al tratar de seguir la trayectoria de la serie temporal en el ajuste). Por tanto la fracción $\frac{\sum\widehat{e_t}^2}{\sum (y_t-\bar{y})^2}$ tendrá un valor muy pequeño y consecuentemente el $R^2$ estará próximo a $1$.
 
-  Por otra parte, que el $R^2$ esté próximo a 1 no significa que el modelo sea muy /``explicativo''/.
+  Por tanto que el $R^2$ esté próximo a 1 no significa que el modelo sea muy /``explicativo''/.
   Un modelo puede tener un $R^2$ muy elevado y simultáneamente ser completamente inútil para explicar nada (hemos visto algunos ejemplos durante el curso$\ldots{}$ repase el tema sobre la correlación espuria).
 
-  Es habitual escuchar la coloquial expresión de que /``un modelo explica el $X$ por ciento''/ pero la frase no puede acabar ahí.
+  En el contexto de los modelos de regresión es habitual escuchar la coloquial expresión de que /``un modelo explica el $X$ por ciento''/ pero la frase no puede acabar ahí.
   Es necesario completarla diciendo /``el $X$ por ciento de la varianza de los datos''/.
 
-  Y no olvide que en realidad un $R^2$ elevado, por sí solo, no ``explica'' nada.
-  El $R^2$ en modelos con constante tan solo es un ratio de varianzas.
-  Y que solo cabe pretender dar una interpretación a ese ratio si el modelo es /previamente/ considerado como una descripción ``aceptable'' de la variable estudiada.
-  Además, el verbo /``explica''/ es un sinónimo ---mal escogido--- de /``replica (o reproduce)/ un $X$ por ciento de la varianza de los datos''.
+  Pero es que en el caso de los modelos ARMA (o ARIMA), que no son modelos de regresión con constante ajustados por MCO, la lectura del  $R^2$ ya no es un ratio entre la varianza muestral de los datos y la varianza de los datos ajustados. Tampoco es el cuadrado de la correlación muestral entre la serie y los datos ajustados. 
+
+  Pero incluso en el contexto del ajuste MCO (que usted estudió en el primer curso de econometría) un $R^2$ elevado, por sí solo, no ``explica'' nada.
+  El $R^2$ en modelos de regresión con constante tan solo es un ratio de varianzas muestrales (la del regresando $y_t$ y la del ajuste $\widehat{y_t}$).
+  Pero solo cabe pretender dar una interpretación a ese ratio si podemos considerar que modelo es una descripción ``teóricamente aceptable'' de la variable estudiada.
+  Es decir, el verbo /``explica''/ es un sinónimo ---mal escogido--- de /``replica (o reproduce)/ un $X$ por ciento de la varianza de los datos''.
 
 - Cuando se habla de si las raíces están fuera del círculo unidad, *hay que especificar si las raíces son de un polinomio AR o MA*, pues la lectura es distinta en cada caso (``modelo estacionario'' en el primer caso o ``modelo invertible'' en el segundo).
 
@@ -490,18 +473,17 @@ La serie =d_BE_2_5_8_16= (la primera diferencia regular de =BE_2_5_8_16=) parece
 - El primer modelo univariante es un AR(2) y el segundo un MA(2).
   Estos modelos son MUY DISTINTOS entre si.
   Afirmar que son parecidos no está justificado de ningún modo.
-  Lo que sí es parecido entre ambos es /el nivel de ajuste/ logrado por cada uno de ellos.
 
 - Un retardo significativo en la ACF o la PACF no es ``un atípico''.
   Aunque algunos datos pueden ser calificados de atípicos, los retardos de un correlograma NO.
 
-- La alusión a los $R^2$ /ajustados/ o los /criterios de información/ no debe hacerse aquí.
+- La alusión a los /criterios de información/ no debe hacerse aquí.
   Debe hacerse en la [[pregunta 4]], que es donde se pide comparar los dos modelos de la misma variable =d_BE_2_5_8_16=
 
 - Afirmar (y transcribo literalmente): /``El módulo del AR resulta ser mayor que uno''/ NO TIENE SENTIDO.
   En todo caso sería *el módulo de la raíz del polinomio AR*.
   Pero en este caso hay dos raíces, por lo que la frase tiene aún menos sentido.
-  Lo que se puede decir del primer modelo es que las dos raíces del polinomio autorregresivo tiene módulos mayores que uno (o que ambas raíces autorregresivas están fuera del círculo unidad).
+  Lo que se puede decir del primer modelo es que las dos raíces del polinomio autorregresivo tienen módulos mayores que uno (o que ambas raíces autorregresivas están fuera del círculo unidad).
 
   Peor aún (y vuelvo a transcribir): /``MA *contiene* un modulo mayor que uno''/ (la negrita es mía pero la frase es del mismo examen).
 
@@ -521,7 +503,7 @@ Respecto a la identificación de los modelos: el correlograma de la serie en dif
 retardo. 
 *Esto sugiere que el modelo es un AR(2)*.
 
-En cuanto al $R^2$ /ajustado/, es ligeramente superior en el primer modelo (en consonancia con ello la desviación típica de las innovaciones del primer modelo es menor).
+La desviación típica de las innovaciones del primer modelo es menor.
 Además, los criterios de información son ligeramente inferiores en el primer modelo. 
 Todos estos estadísticos apuntan a una ligera ventaja del primer modelo frente al segundo.
 Es más, los estadísticos de Ljung-Box para los residuos del primer modelo muestran unos p-valores sistemáticamente superiores a los del segundo. 

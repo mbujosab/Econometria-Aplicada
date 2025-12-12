@@ -396,7 +396,7 @@ end outfile
 ** Primer modelo
 
 #+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
-#+NAME: Regresión en primeras diferencias
+#+NAME: Modelo MCO en primeras diferencias
 #+begin_src gretl :eval no :exports code 
 diff ConsumoPetroleo FrecuenciaOscar
 ols d_ConsumoPetroleo 0 d_FrecuenciaOscar
@@ -408,7 +408,7 @@ modtest --autocorr 2 --quiet
 
 #+begin_src gretl :tangle guiones/Examen-NombreOscarYConsumoDePetroleo.inp :eval no :exports none :noweb yes
 outfile --quiet modeloMCO_en_diff.txt
-    <<Regresión en primeras diferencias>>
+    <<Modelo MCO en primeras diferencias>>
 end outfile
 #+end_src
 
@@ -534,7 +534,7 @@ Ambas series (=ConsumoPetroleo= y =FrecuenciaOscar=) parecen ser NO estacionaria
 Las conclusiones de las distintas etapas del test de cointegración son:
 - Etapa 1 :: El test ADF no rechaza que la serie =ConsumoPetroleo= sea I(1) para niveles de significación inferiores al 40% (p-valor asintótico =0,4672=).
 - Etapa 2 :: El test ADF no rechaza que la serie =FrecuenciaOscar= sea I(1) para niveles de significación inferiores al 40% (p-valor asintótico =0,4218=).
-- Etapa 3 :: En la regresión (cointegrante) de mortalidad sobre la proporción de matrimonios eclesiásticos ambos parámetros (constante y pendiente) resultan ser muy significativos, y el $R^2$ está próximo a 1.
+- Etapa 3 :: En la regresión (cointegrante) de =ConsumoPetroleo= sobre =FrecuenciaOscar= ambos parámetros (constante y pendiente) resultan ser muy significativos, y el $R^2$ está próximo a 1.
 - Etapa 4 :: El test ADF rechaza que los residuos de la regresión cointegrante sean I(1) tanto al 10% como al 5% de significación (p-valor asintótico =0,03258=)
 
 Consecuentemente, _el test NO rechaza la cointegración de ambas series_ (/en contra de lo que sugiere el sentido común/).
@@ -553,7 +553,7 @@ Entonces también debe ser cierto que
 \]
 
 Sorprendentemente, en la [[Regresión en primeras diferencias]] la constante es NO significativa, la pendiente es muy significativa y el $R^2$ no es, en absoluto, despreciable (=R-cuadrado 0,327929=). 
-Es decir, _la [[Regresión en primeras diferencias]] no contradice la posibilidad de que ambas variables estén relacionadas_.
+Es decir, _la [[Regresión en primeras diferencias]] NO contradice la posibilidad de que ambas variables estén relacionadas_.
 
 /Comentario y moraleja/: Pese a los resultados estadísticos, la relación entre =ConsumoPetroleo= y =FrecuenciaOscar= es evidentemente espuria (es imposible argumentar con algún fundamento que la
 frecuencia del nombre Óscar en EEUU tenga ninguna influencia sobre el consumo de petroleo en Grecia... o viceversa). 
@@ -586,7 +586,7 @@ frecuencia del nombre Óscar en EEUU tenga ninguna influencia sobre el consumo d
 
 - Segundo modelo para datos en nivel :: ([[Regresión del consumo de petroleo sobre la popularidad del nombre Óscar]]): El segundo modelo corresponde a una regresión con modelo AR(1) para el error
   (tal y como se sugería en la pregunta anterior).
-  La estimación ha convergido en 5 iteraciones, los parámetros son muy significativos y el $R^2$ ajustado es superior al del primer modelo.
+  La estimación ha convergido en 5 iteraciones, los parámetros son muy significativos.
   Tampoco en este caso se rechaza la hipótesis de normalidad en los residuos del ajuste.
   Todo ello sugiere que este segundo modelo sería ligeramente superior al primero (/si no fuera porque la relación es evidentemente espuria y, por tanto, ninguno de estos modelos es aceptable/).
 

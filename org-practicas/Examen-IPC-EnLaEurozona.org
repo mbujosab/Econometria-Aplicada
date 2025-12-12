@@ -92,12 +92,12 @@ set workdir "@directory"
 
 * Datos
 
-IPC en la Eurozona de 19 países (CPI_EZ19) desde enero de 1996 hasta septiembre de 2021. 
+IPC en la Eurozona de 19 países \( (\texttt{CPI_EZ19}) \) desde enero de 1996 hasta septiembre de 2021. 
 La modelización univariante se restringe a las observaciones hasta diciembre de 2020.
 Las nueve observaciones disponibles correspondientes a 2021 se reservan para un ejercicio de previsión
 extramuestral.
 
-En la fase final del análisis, también se considera la serie análoga de IPC en USA (CPI_USA) observada
+En la fase final del análisis, también se considera la serie análoga de IPC en USA  \( (\texttt{CPI_USA}) \) observada
 en el mismo período.
 
 La fuente de los datos es [[https://fred.stlouisfed.org/][The Federal Reserve Bank of St. Louis]].
@@ -389,9 +389,10 @@ Por lo tanto, no hay indicios concluyentes de mala especificación o incumplimie
 
 Limitarse a decir que es un modelo estacional ARIMA$(2,1,1) \times (0,0,1)_{12}$ sin indicar de qué variable se trata, es una descripción incorrecta por ser insuficiente. Tenga en cuenta que para modelar los datos es necesario aplicar las transformaciones necesarias para tener una serie con aspecto de realización de un proceso estacionario (el gráfico de la derecha de la [[Análisis gráfico][figura 2]]). Fíjese que, de algún modo, en todas las descripciones del párrafo anterior se incluyen todas las transformaciones aplicadas al IPC para estimar los parámetros del [[Modelo univariante]]. 
 
-*Aclaraciones sobre la valoración del $R^2$*. Aunque hay distintas descripciones del modelo, el conjunto de datos usado en la estimación con Gretl es _la diferencia estacional del logaritmo del IPC_ ($\texttt{sd_l_CPI_EZ19}$). Como dicha serie es NO estacionaria en media (véase el gráfico de la izquierda de la  [[Análisis gráfico][figura 2]]), tanto los datos usados por Gretl como los datos ajustados son series no estacionarias. Por tanto, tenemos dos series no estacionarias que crecen y decrecen al unísono, presentando una correlación muy elevada (véase la primera parte del [[Previsiones de inflación][gráfico del ejercicio de predicción]] donde se ve el ajuste hasta diciembre del año 2020). Consecuentemente, el coeficiente de determinación $R^2$ es necesariamente muy elevado. Por ello, no es correcto sacar conclusiones de este hecho, ya que un elevado $R^2$ es lo que cabe esperar siempre que ajustamos datos no estacionarios. Para que el $R^2$ fuera más ilustrativo, deberíamos observar el ajuste a los datos del gráfico de la derecha de la  [[Análisis gráfico][figura 2]], no los de la izquierda. El motivo por el que se ha empleado la serie $\texttt{sd_l_CPI_EZ19}$ (de la izquierda) en lugar de la serie $\texttt{d_sd_l_CPI_EZ19}$ (de la derecha), es que luego realizamos un ejercicio de predicción; y es más ilustrativo prever los datos del gráfico de la izquierda de la [[Análisis gráfico][figura 2]] (tasa logarítmica de inflación interanual) que los de la derecha. 
+*Aclaraciones sobre la valoración del $R^2$*. Aunque hay distintas descripciones del modelo, el conjunto de datos usado en la estimación con Gretl es _la diferencia estacional del logaritmo del IPC_ ($\texttt{sd_l_CPI_EZ19}$). Como dicha serie es NO estacionaria en media (véase el gráfico de la izquierda de la  [[Análisis gráfico][figura 2]]), tanto los datos usados por Gretl como los datos ajustados son series no estacionarias. Por tanto, tenemos dos series no estacionarias que crecen y decrecen al unísono, presentando una correlación muy elevada (véase la primera parte del [[Previsiones de inflación][gráfico del ejercicio de predicción]] donde se ve el ajuste hasta diciembre del año 2020). Consecuentemente, el coeficiente de determinación $R^2$ es necesariamente muy elevado. Por ello, no es correcto sacar conclusiones de este hecho, ya que un elevado $R^2$ es lo que cabe esperar siempre que ajustamos datos no estacionarios. El motivo por el que se ha empleado la serie $\texttt{sd_l_CPI_EZ19}$ (de la izquierda) en lugar de la serie $\texttt{d_sd_l_CPI_EZ19}$ (de la derecha), es que luego realizamos un ejercicio de predicción; y es más ilustrativo prever los datos del gráfico de la izquierda de la [[Análisis gráfico][figura 2]] (tasa logarítmica de inflación interanual) que los de la derecha. 
+# Para que el $R^2$ fuera más ilustrativo, deberíamos observar el ajuste a los datos del gráfico de la derecha de la  [[Análisis gráfico][figura 2]], no los de la izquierda. 
 
-Por otra parte, hacer mención a los valores concretos tomados por estadísticos que sirven para comparar modelos (como el $R^2$ ajustado o los criterios de información) es ocioso, pues no se está comparando el modelo ajustado con ningún otro.
+Por otra parte, hacer mención a los valores concretos tomados por estadísticos que sirven para comparar modelos (como el $R^2$ ajustado o los criterios de información) es ocioso, pues no se está comparando el modelo ajustado con ningún otro (además, estos modelos no son regresiones ajustadas por MCO).
 
 
 *Aclaraciones a respuestas incorrectas dadas por algunos alumnos*. Es importante aclarar que un  parámetro con valor absoluto próximo a 1 en un modelo AR(2) no implica que exista una raíz próxima al círculo unidad. En un polinomio de grado 2, la relación entre los parámetros y sus raíces es más compleja (usted la conoce desde el colegio: para el polinomio $ax^2+bx+c$ es la función $\frac{-b \pm \sqrt {b^2-4ac}}{2a}$; donde, en el caso de un AR(2): $c=1$, $b=\phi_1$ y $a=\phi_2$). 
