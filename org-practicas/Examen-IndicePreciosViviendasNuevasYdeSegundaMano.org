@@ -1,37 +1,20 @@
 #    -*- mode: org -*-
 
 #+title:  Índice de precios de viviendas nuevas y de segunda mano
-#+author: Marcos Bujosa
+# +author: Marcos Bujosa
 #+LANGUAGE: es
 #+OPTIONS: toc:nil
-# +OPTIONS: author:nil
+#+OPTIONS: author:nil
 #+OPTIONS: date:nil
 
-#+OPTIONS: :eval yes
-#+PROPERTY: header-args :eval yes
+#+include: 00preambulo_practicas.txt
 
-# M-x org-num-mode para secciones con números
-
+# +INFOJS_OPT: view:overview
 # ###########
 # ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
 #+SETUPFILE: ../css/bigblow_inline.theme
 # ###########
 
-#+INFOJS_OPT: view:overview
-
-#+latex_class_options: [10pt]
-
-#+LATEX_HEADER: \usepackage[spanish]{babel}
-#+LATEX_HEADER: \usepackage[margin=0.5in]{geometry}
-# +LaTeX_HEADER: \usepackage{framed}
-#+LaTeX_HEADER: \usepackage{listings}
-#+LaTeX_HEADER: \input{hansl.tex}
-#+LaTeX_HEADER: \lstnewenvironment{hansl-gretl}
-#+LaTeX_HEADER: {\lstset{language={hansl},basicstyle={\ttfamily\footnotesize},numbers,rame=single,breaklines=true}}
-#+LaTeX_HEADER: {}
-#+LaTeX_HEADER: \newcommand{\hansl}[1]{\lstset{language={hansl},basicstyle={\ttfamily\small}}\lstinline{#1}}
-
-#+LaTeX_HEADER: \lstset{backgroundcolor=\color{lightgray!20}, }
 
 #+name: setup-listings
 #+begin_src emacs-lisp :exports none :results silent :tangle no
@@ -60,8 +43,7 @@
        (format "\\%s{%s}" path desc)))))
 #+end_src
 
-
-#+NAME: if-no-guiones-makedir
+#+NAME: if-no--guiones-makefir
 #+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
 (unless (file-directory-p "guiones")
   (make-directory "guiones"))
@@ -72,10 +54,16 @@
 (org-babel-tangle)
 #+END_SRC
 
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
 
 #+name: execute-gretl-practice
-#+PROPERTY: Examen-IndicePreciosViviendasNuevasYdeSegundaMano
-#+BEGIN_SRC sh  :exports none  :results silent :var practica="Examen-IndicePreciosViviendasNuevasYdeSegundaMano"
+#+PROPERTY: Examen-IndiceVentasGrandesSuperficies
+#+BEGIN_SRC sh :exports none :results silent :var practica="Examen-IndicePreciosViviendasNuevasYdeSegundaMano"
 rm -fr $(pwd)/$practica
 mkdir -p $(pwd)/$practica 
 DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
@@ -84,13 +72,16 @@ DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
 
 
 #+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :exports none :eval no
-# Necesario para que gretl guarde los ficheros en el directorio de la práctica.
-# Si no funciona, comente la primera línea y descomente la segunda (asegurándose de que el directoro de trabajo de gretl, $(pwd), es el correcto, i.e, que Gretl puede encontrar el guión):
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
 
 string directory = getenv("DIRECTORIO")
-#string directory = $(pwd) ~ "/Examen-IndicePreciosViviendasNuevasYdeSegundaMano" 
 set workdir "@directory"
- 
 #+end_src
 
 
@@ -103,8 +94,8 @@ vivienda nueva y de segunda mano con base 2015. La muestra disponible
 incluye 64 observaciones trimestrales, comprendidas entre el primer
 trimestre de 2007 y el cuarto de 2022. *Fuente:* Instituto Nacional de
 Estadística.
-#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports code :eval no
-open ../datos/IndicePreciosViviendasNuevasYdeSegundaMano.gdt
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp ::eval no :exports none
+open ../../datos/IndicePreciosViviendasNuevasYdeSegundaMano.gdt
 #+end_src
 - =IPVN= :: Índice de precios de vivienda nueva, base 2015.
 - =IPV2M= :: Índice de precios de vivienda de segunda mano, base 2015.
@@ -154,7 +145,7 @@ modtest --arch --quiet
 modtest --autocorr 15 --quiet
 #+end_src
 
-#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes :eval no
+#+begin_src gretl :tangle guiones/Examen-IndicePreciosViviendasNuevasYdeSegundaMano.inp :results none :exports none :noweb yes
 outfile --quiet ARIMA_T4IPVN.txt
   <<Modelo ARIMA_T4IPVN>>
 end outfile
@@ -401,11 +392,9 @@ En ambos modelos
 
 
 El modelo [[Modelo ARMAX][ARMAX]] se ajusta mejor la muestra ya que
-- tiene coeficientes de determinación más elevados; tanto el
-  ordinario, $R^2$, (=0,917639= frente a =0,889602=) como el corregido
-  por los grados de libertad (=0,916219= frente a =0,889602=) y
-- tiene una menor desviación típica de las innovaciones (=1,943328=
-  frente a =2,208917=).
+- los errores de ajuste tienen una menor desviación típica (=D.T. innovaciones= de =1,943328= frente a =2,208917=).
+
+# - tiene coeficientes de determinación más elevados; tanto el ordinario, $R^2$, (=0,917639= frente a =0,889602=) como el corregido  por los grados de libertad (=0,916219= frente a =0,889602=) y
 
 Por otra parte, los criterios de información del modelo [[Modelo ARMAX][ARMAX]] toman un
 valor menores, es decir, son mejores, por lo que
