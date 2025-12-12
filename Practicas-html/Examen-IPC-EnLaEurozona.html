@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-11-30 Sun 17:22 -->
+<!-- 2025-12-12 Fri 16:49 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>IPC en la Eurozona</title>
@@ -77,18 +77,18 @@ if (typeof HS_STARTUP_FOLDED === 'undefined') {    var HS_STARTUP_FOLDED = false
 <body>
 <div id="content" class="content">
 <h1 class="title">IPC en la Eurozona</h1>
-<div id="outline-container-org7245f3d" class="outline-2">
-<h2 id="org7245f3d">Datos</h2>
-<div class="outline-text-2" id="text-org7245f3d">
+<div id="outline-container-orgf318916" class="outline-2">
+<h2 id="orgf318916">Datos</h2>
+<div class="outline-text-2" id="text-orgf318916">
 <p>
-IPC en la Eurozona de 19 países (CPI_EZ19) desde enero de 1996 hasta septiembre de 2021. 
+IPC en la Eurozona de 19 países \( (\texttt{CPI_EZ19}) \) desde enero de 1996 hasta septiembre de 2021. 
 La modelización univariante se restringe a las observaciones hasta diciembre de 2020.
 Las nueve observaciones disponibles correspondientes a 2021 se reservan para un ejercicio de previsión
 extramuestral.
 </p>
 
 <p>
-En la fase final del análisis, también se considera la serie análoga de IPC en USA (CPI_USA) observada
+En la fase final del análisis, también se considera la serie análoga de IPC en USA  \( (\texttt{CPI_USA}) \) observada
 en el mismo período.
 </p>
 
@@ -112,9 +112,9 @@ smpl 1996:01 2020:12
 </div>
 </div>
 </div>
-<div id="outline-container-org670aaf8" class="outline-2">
-<h2 id="org670aaf8">Análisis gráfico</h2>
-<div class="outline-text-2" id="text-org670aaf8">
+<div id="outline-container-org65088e0" class="outline-2">
+<h2 id="org65088e0">Análisis gráfico</h2>
+<div class="outline-text-2" id="text-org65088e0">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>rmplot CPI_EZ19 --output="rango-media_CPI_EZ19.png"
 rmplot l_CPI_EZ19 --output="rango-media_l_CPI_EZ19.png"
@@ -139,17 +139,17 @@ gnuplot d_sd_l_CPI_EZ19 --time-series --with-lines --output="d_sd_l_CPI_EZ19.png
 </figure>
 </div>
 </div>
-<div id="outline-container-orgf540a30" class="outline-2">
-<h2 id="orgf540a30">Modelo univariante</h2>
-<div class="outline-text-2" id="text-orgf540a30">
+<div id="outline-container-orgc5dd57e" class="outline-2">
+<h2 id="orgc5dd57e">Modelo univariante</h2>
+<div class="outline-text-2" id="text-orgc5dd57e">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org6d96bec"><code>arima 2 1 1 ; 0 0 1 ; sd_l_CPI_EZ19 --nc
+<pre class="src src-gretl" id="org64b8df1"><code>arima 2 1 1 ; 0 0 1 ; sd_l_CPI_EZ19 --nc
 modtest --normality --quiet
 modtest --arch 4 --quiet
 modtest --autocorr 39 --quiet
 </code></pre>
 </div>
-<pre class="example" id="org4451bb2">
+<pre class="example" id="orgdc34ce1">
 Function evaluations: 72
 Evaluations of gradient: 21
 
@@ -200,24 +200,24 @@ with p-value = P(Chi-square(35) &gt; 49.2155) = 0.05601
 </pre>
 </div>
 </div>
-<div id="outline-container-org4e552ec" class="outline-2">
-<h2 id="org4e552ec">Previsiones de inflación</h2>
-<div class="outline-text-2" id="text-org4e552ec">
+<div id="outline-container-org6504439" class="outline-2">
+<h2 id="org6504439">Previsiones de inflación</h2>
+<div class="outline-text-2" id="text-org6504439">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org1cb94ae"><code>fcast 2019:01 2021:09 --plot="prediccion2021.png"
+<pre class="src src-gretl" id="org7a9677b"><code>fcast 2019:01 2021:09 --plot="prediccion2021.png"
 </code></pre>
 </div>
 <div class="org-center">
 
-<div id="org97ed013" class="figure">
+<div id="org57636bf" class="figure">
 <p><img src="./Examen-IPC-EnLaEurozona/prediccion2021.png" alt="prediccion2021.png" />
 </p>
-<p><span class="figure-number">Figura 1: </span>Valores históricos, valores ajustados y previsiones extramuestrales estáticas (desde enero hasta septiembre de 2021) de la tasa logarítmica anual de inflación, calculadas con el <a href="#orgf540a30">modelo ARIMA</a> que se muestra en la sección anterior. En este contexto, la expresión “previsión extramuestral” significa que los valores observados en 2021 no se han tenido en cuenta, ni para especificar ni para estimar el modelo ARIMA.</p>
+<p><span class="figure-number">Figura 1: </span>Valores históricos, valores ajustados y previsiones extramuestrales estáticas (desde enero hasta septiembre de 2021) de la tasa logarítmica anual de inflación, calculadas con el <a href="#orgc5dd57e">modelo ARIMA</a> que se muestra en la sección anterior. En este contexto, la expresión “previsión extramuestral” significa que los valores observados en 2021 no se han tenido en cuenta, ni para especificar ni para estimar el modelo ARIMA.</p>
 </div>
 </div>
 
 
-<pre class="example" id="orgfa20481">
+<pre class="example" id="orgcd02404">
  For 95% confidence intervals, z(0.025) = 1.96
 
          sd_l_CPI_EZ19    prediction    std. error        95% interval
@@ -246,14 +246,14 @@ with p-value = P(Chi-square(35) &gt; 49.2155) = 0.05601
 </pre>
 </div>
 </div>
-<div id="outline-container-org2d8f4f9" class="outline-2">
-<h2 id="org2d8f4f9">Test de cointegración</h2>
-<div class="outline-text-2" id="text-org2d8f4f9">
+<div id="outline-container-orgb0596a1" class="outline-2">
+<h2 id="orgb0596a1">Test de cointegración</h2>
+<div class="outline-text-2" id="text-orgb0596a1">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org10186ec"><code>coint 12 sd_l_CPI_EZ19 sd_l_CPI_USA --test-down
+<pre class="src src-gretl" id="org0c908e0"><code>coint 12 sd_l_CPI_EZ19 sd_l_CPI_USA --test-down
 </code></pre>
 </div>
-<pre class="example" id="org470b56e">
+<pre class="example" id="orge3fa7d7">
 Step 1: testing for a unit root in sd_l_CPI_EZ19
 
 Augmented Dickey-Fuller test for sd_l_CPI_EZ19
@@ -327,58 +327,58 @@ There is evidence for a cointegrating relationship if:
 </pre>
 </div>
 </div>
-<div id="outline-container-org04df46c" class="outline-2">
-<h2 id="org04df46c">Preguntas</h2>
-<div class="outline-text-2" id="text-org04df46c">
+<div id="outline-container-org150fcbb" class="outline-2">
+<h2 id="org150fcbb">Preguntas</h2>
+<div class="outline-text-2" id="text-org150fcbb">
 </div>
-<div id="outline-container-org51c7368" class="outline-3">
-<h3 id="org51c7368">Pregunta 1</h3>
-<div class="outline-text-3" id="text-org51c7368">
+<div id="outline-container-org004aa98" class="outline-3">
+<h3 id="org004aa98">Pregunta 1</h3>
+<div class="outline-text-3" id="text-org004aa98">
 <p>
 (2 pts.) 
 ¿Qué implican las figuras 1 y 2 sobre la estabilidad en el nivel y la variabilidad del IPC? ¿Qué transformaciones de los datos resultan adecuadas para estabilizar los dos primeros momentos muestrales? Interprete las series mostradas en la Figura 2 considerando las transformaciones aplicadas a los datos originales.
 </p>
 
 <p>
-(<a href="#orgbd06f59">Respuesta 1</a>)
+(<a href="#orgb6ff025">Respuesta 1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgdc43994" class="outline-3">
-<h3 id="orgdc43994">Pregunta 2</h3>
-<div class="outline-text-3" id="text-orgdc43994">
+<div id="outline-container-orgcdd5a39" class="outline-3">
+<h3 id="orgcdd5a39">Pregunta 2</h3>
+<div class="outline-text-3" id="text-orgcdd5a39">
 <p>
 (2 pts.) 
-Comente detalladamente los resultados de estimación y diagnóstico del <a href="#orgf540a30">Modelo univariante</a> para la serie \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \).
+Comente detalladamente los resultados de estimación y diagnóstico del <a href="#orgc5dd57e">Modelo univariante</a> para la serie \( \nabla_{12}\, \ln\, \texttt{CPI_EZ19}_t \).
 </p>
 
 <p>
-(<a href="#org87c7784">Respuesta 2</a>)
+(<a href="#org6a53288">Respuesta 2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org67b966c" class="outline-3">
-<h3 id="org67b966c">Pregunta 3</h3>
-<div class="outline-text-3" id="text-org67b966c">
+<div id="outline-container-org747db50" class="outline-3">
+<h3 id="org747db50">Pregunta 3</h3>
+<div class="outline-text-3" id="text-org747db50">
 <p>
 (2 pts.) 
-Analice los resultados del ejercicio de previsión extramuestral presentados en la Figura <a href="#org97ed013">1</a> y en la <a href="#orgfa20481">cuadro debajo de dicha figura</a>. ¿Son satisfactorias las previsiones para los nueve meses de 2021? Justifique su respuesta y comente el error de September de 2021, sugiriendo posibles causas del comportamiento de la inflación en ese año.
+Analice los resultados del ejercicio de previsión extramuestral presentados en la Figura <a href="#org57636bf">1</a> y en la <a href="#orgcd02404">cuadro debajo de dicha figura</a>. ¿Son satisfactorias las previsiones para los nueve meses de 2021? Justifique su respuesta y comente el error de September de 2021, sugiriendo posibles causas del comportamiento de la inflación en ese año.
 </p>
 
 <p>
-(<a href="#orgd175037">Respuesta 3</a>)
+(<a href="#org25d7ffd">Respuesta 3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org8b6faed" class="outline-3">
-<h3 id="org8b6faed">Pregunta 4</h3>
-<div class="outline-text-3" id="text-org8b6faed">
+<div id="outline-container-orgf99595b" class="outline-3">
+<h3 id="orgf99595b">Pregunta 4</h3>
+<div class="outline-text-3" id="text-orgf99595b">
 <p>
 (1 pts. &mdash; cada apartado correcto \(0.1\) pts. Cada apartado incorrecto \(-0.1\) pts.) 
 </p>
 
 <p>
-En referencia a los resultados de estimación y diagnóstico del <a href="#orgf540a30">Modelo univariante</a>, indique cuáles de las siguientes formulaciones matemáticas expresan correctamente el modelo estimado, redondeando a tres decimales (preste atención al orden de las transformaciones, el signo de los parámetros, la coherencia de la expresión, etc.):
+En referencia a los resultados de estimación y diagnóstico del <a href="#orgc5dd57e">Modelo univariante</a>, indique cuáles de las siguientes formulaciones matemáticas expresan correctamente el modelo estimado, redondeando a tres decimales (preste atención al orden de las transformaciones, el signo de los parámetros, la coherencia de la expresión, etc.):
 </p>
 
 <ol class="org-ol">
@@ -404,16 +404,16 @@ En referencia a los resultados de estimación y diagnóstico del <a href="#orgf5
 </ol>
 
 <p>
-(<a href="#orgfeb861e">Respuesta 4</a>)
+(<a href="#org94e1b82">Respuesta 4</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org7db6135" class="outline-3">
-<h3 id="org7db6135">Pregunta 5</h3>
-<div class="outline-text-3" id="text-org7db6135">
+<div id="outline-container-orgc6a91ad" class="outline-3">
+<h3 id="orgc6a91ad">Pregunta 5</h3>
+<div class="outline-text-3" id="text-orgc6a91ad">
 <p>
 (0.5 pts.) 
-En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+En relación con los resultados del <a href="#orgb0596a1">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
 </p>
 
 <p>
@@ -421,16 +421,16 @@ En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración
 </p>
 
 <p>
-(<a href="#org65a5170">Respuesta 5</a>)
+(<a href="#org9ea5767">Respuesta 5</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org3cc4c5f" class="outline-3">
-<h3 id="org3cc4c5f">Pregunta 6</h3>
-<div class="outline-text-3" id="text-org3cc4c5f">
+<div id="outline-container-orgcb1bcb7" class="outline-3">
+<h3 id="orgcb1bcb7">Pregunta 6</h3>
+<div class="outline-text-3" id="text-orgcb1bcb7">
 <p>
 (0.5 pts.) 
-En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+En relación con los resultados del <a href="#orgb0596a1">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
 </p>
 
 <p>
@@ -438,16 +438,16 @@ En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración
 </p>
 
 <p>
-(<a href="#orgf598e0b">Respuesta 6</a>)
+(<a href="#org4748fca">Respuesta 6</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org17ec49f" class="outline-3">
-<h3 id="org17ec49f">Pregunta 7</h3>
-<div class="outline-text-3" id="text-org17ec49f">
+<div id="outline-container-org5fa9914" class="outline-3">
+<h3 id="org5fa9914">Pregunta 7</h3>
+<div class="outline-text-3" id="text-org5fa9914">
 <p>
 (0.5 pts.) 
-En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+En relación con los resultados del <a href="#orgb0596a1">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
 </p>
 
 <p>
@@ -455,16 +455,16 @@ En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración
 </p>
 
 <p>
-(<a href="#org336c08c">Respuesta 7</a>)
+(<a href="#orgf8632f7">Respuesta 7</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org9da7efb" class="outline-3">
-<h3 id="org9da7efb">Pregunta 8</h3>
-<div class="outline-text-3" id="text-org9da7efb">
+<div id="outline-container-orgfd144d2" class="outline-3">
+<h3 id="orgfd144d2">Pregunta 8</h3>
+<div class="outline-text-3" id="text-orgfd144d2">
 <p>
 (0.5 pts.) 
-En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+En relación con los resultados del <a href="#orgb0596a1">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
 </p>
 
 <p>
@@ -472,16 +472,16 @@ En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración
 </p>
 
 <p>
-(<a href="#orgf584c94">Respuesta 8</a>)
+(<a href="#org2e8c312">Respuesta 8</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org4c4dabf" class="outline-3">
-<h3 id="org4c4dabf">Pregunta 9</h3>
-<div class="outline-text-3" id="text-org4c4dabf">
+<div id="outline-container-orgacfb0d9" class="outline-3">
+<h3 id="orgacfb0d9">Pregunta 9</h3>
+<div class="outline-text-3" id="text-orgacfb0d9">
 <p>
 (0.5 pts.) 
-En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
+En relación con los resultados del <a href="#orgb0596a1">Test de cointegración</a> de Engle-Granger, indique si la siguiente afirmación es verdadera o falsa (incluya una breve explicación):
 </p>
 
 <p>
@@ -489,31 +489,31 @@ En relación con los resultados del <a href="#org2d8f4f9">Test de cointegración
 </p>
 
 <p>
-(<a href="#org5fa522d">Respuesta 9</a>)
+(<a href="#orge8c6097">Respuesta 9</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org2825218" class="outline-3">
-<h3 id="org2825218">Pregunta 10</h3>
-<div class="outline-text-3" id="text-org2825218">
+<div id="outline-container-org36f8c98" class="outline-3">
+<h3 id="org36f8c98">Pregunta 10</h3>
+<div class="outline-text-3" id="text-org36f8c98">
 <p>
 (0.5 pts.) 
-En relación con la Figura <a href="#org97ed013">1</a>, explique por qué los intervalos de confianza son (o no son) crecientes con el horizonte temporal.
+En relación con la Figura <a href="#org57636bf">1</a>, explique por qué los intervalos de confianza son (o no son) crecientes con el horizonte temporal.
 </p>
 
 <p>
-(<a href="#org5b0e79f">Respuesta 10</a>)
+(<a href="#orgfe8f37d">Respuesta 10</a>)
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org5b6e41e" class="outline-2">
-<h2 id="org5b6e41e">Respuestas</h2>
-<div class="outline-text-2" id="text-org5b6e41e">
+<div id="outline-container-orgd1a6a80" class="outline-2">
+<h2 id="orgd1a6a80">Respuestas</h2>
+<div class="outline-text-2" id="text-orgd1a6a80">
 </div>
-<div id="outline-container-orgbd06f59" class="outline-3">
-<h3 id="orgbd06f59">Respuesta 1</h3>
-<div class="outline-text-3" id="text-orgbd06f59">
+<div id="outline-container-orgb6ff025" class="outline-3">
+<h3 id="orgb6ff025">Respuesta 1</h3>
+<div class="outline-text-3" id="text-orgb6ff025">
 <p>
 En la Figura 1, el gráfico de la izquierda muestra que la variabilidad local del IPC en la Eurozona (medida por el rango) aumenta con el nivel (media local), sugiriendo la conveniencia de aplicar una transformación logarítmica. El gráfico de la derecha revela que la transformación logarítmica elimina dicha dependencia, ya que la variabilidad de \( \ln\, \texttt{CPI_EZ19}_t \) no crece con el nivel.
 </p>
@@ -523,13 +523,13 @@ En la Figura 2, el gráfico de la izquierda presenta \( \nabla_{12}\, \ln\, \tex
 </p>
 
 <p>
-(<a href="#org51c7368">Pregunta 1</a>)
+(<a href="#org004aa98">Pregunta 1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org87c7784" class="outline-3">
-<h3 id="org87c7784">Respuesta 2</h3>
-<div class="outline-text-3" id="text-org87c7784">
+<div id="outline-container-org6a53288" class="outline-3">
+<h3 id="org6a53288">Respuesta 2</h3>
+<div class="outline-text-3" id="text-org6a53288">
 <p>
 Es un modelo estacional ARIMA\((2,1,1)\times(0,1,1)\) del logaritmo del IPC (es decir, con una diferencia regular, otra estacional, y con partes AR(2) y MA(1) regulares y MA(1) estacional).
 </p>
@@ -555,15 +555,15 @@ Por lo tanto, no hay indicios concluyentes de mala especificación o incumplimie
 </p>
 
 <p>
-Limitarse a decir que es un modelo estacional ARIMA\((2,1,1) \times (0,0,1)_{12}\) sin indicar de qué variable se trata, es una descripción incorrecta por ser insuficiente. Tenga en cuenta que para modelar los datos es necesario aplicar las transformaciones necesarias para tener una serie con aspecto de realización de un proceso estacionario (el gráfico de la derecha de la <a href="#org670aaf8">figura 2</a>). Fíjese que, de algún modo, en todas las descripciones del párrafo anterior se incluyen todas las transformaciones aplicadas al IPC para estimar los parámetros del <a href="#orgf540a30">Modelo univariante</a>. 
+Limitarse a decir que es un modelo estacional ARIMA\((2,1,1) \times (0,0,1)_{12}\) sin indicar de qué variable se trata, es una descripción incorrecta por ser insuficiente. Tenga en cuenta que para modelar los datos es necesario aplicar las transformaciones necesarias para tener una serie con aspecto de realización de un proceso estacionario (el gráfico de la derecha de la <a href="#org65088e0">figura 2</a>). Fíjese que, de algún modo, en todas las descripciones del párrafo anterior se incluyen todas las transformaciones aplicadas al IPC para estimar los parámetros del <a href="#orgc5dd57e">Modelo univariante</a>. 
 </p>
 
 <p>
-<b>Aclaraciones sobre la valoración del \(R^2\)</b>. Aunque hay distintas descripciones del modelo, el conjunto de datos usado en la estimación con Gretl es <span class="underline">la diferencia estacional del logaritmo del IPC</span> (\(\texttt{sd_l_CPI_EZ19}\)). Como dicha serie es NO estacionaria en media (véase el gráfico de la izquierda de la  <a href="#org670aaf8">figura 2</a>), tanto los datos usados por Gretl como los datos ajustados son series no estacionarias. Por tanto, tenemos dos series no estacionarias que crecen y decrecen al unísono, presentando una correlación muy elevada (véase la primera parte del <a href="#org4e552ec">gráfico del ejercicio de predicción</a> donde se ve el ajuste hasta diciembre del año 2020). Consecuentemente, el coeficiente de determinación \(R^2\) es necesariamente muy elevado. Por ello, no es correcto sacar conclusiones de este hecho, ya que un elevado \(R^2\) es lo que cabe esperar siempre que ajustamos datos no estacionarios. Para que el \(R^2\) fuera más ilustrativo, deberíamos observar el ajuste a los datos del gráfico de la derecha de la  <a href="#org670aaf8">figura 2</a>, no los de la izquierda. El motivo por el que se ha empleado la serie \(\texttt{sd_l_CPI_EZ19}\) (de la izquierda) en lugar de la serie \(\texttt{d_sd_l_CPI_EZ19}\) (de la derecha), es que luego realizamos un ejercicio de predicción; y es más ilustrativo prever los datos del gráfico de la izquierda de la <a href="#org670aaf8">figura 2</a> (tasa logarítmica de inflación interanual) que los de la derecha. 
+<b>Aclaraciones sobre la valoración del \(R^2\)</b>. Aunque hay distintas descripciones del modelo, el conjunto de datos usado en la estimación con Gretl es <span class="underline">la diferencia estacional del logaritmo del IPC</span> (\(\texttt{sd_l_CPI_EZ19}\)). Como dicha serie es NO estacionaria en media (véase el gráfico de la izquierda de la  <a href="#org65088e0">figura 2</a>), tanto los datos usados por Gretl como los datos ajustados son series no estacionarias. Por tanto, tenemos dos series no estacionarias que crecen y decrecen al unísono. Por tanto la diferencia entre ellas \(|\widehat{e_t}|=|y_t-\widehat{y_t}|\) en cada instante es mucho menor que la distancia a la media muestral de la serie \(|y_t-\bar{y}|\) casi todo el tiempo. Consecuentemente, el coeficiente de determinación \(R^2=1 -\frac{\sum\widehat{e_t}^2}{\sum (y_t-\bar{y})^2}\) es necesariamente muy elevado. Por ello, no es correcto sacar conclusiones de este hecho, ya que un elevado \(R^2\) es lo que cabe esperar siempre que ajustamos datos no estacionarios.
 </p>
 
 <p>
-Por otra parte, hacer mención a los valores concretos tomados por estadísticos que sirven para comparar modelos (como el \(R^2\) ajustado o los criterios de información) es ocioso, pues no se está comparando el modelo ajustado con ningún otro.
+Por otra parte, hacer mención a los valores concretos tomados por estadísticos que sirven para comparar modelos (como los criterios de información) está fuera de lugar, pues no se está comparando el modelo con ningún otro (además, estos modelos no son modelos de regresión con término constante ajustados por MCO, por lo que el \(R^2\) y el \(R^2\) ajustado no tienen una interpretación clara).
 </p>
 
 
@@ -580,13 +580,13 @@ En el polinomio de grado uno \(\;1-\phi_1 x,\;\) la raíz es simplemente la inve
 </p>
 
 <p>
-(<a href="#orgdc43994">Pregunta 2</a>)
+(<a href="#orgcdd5a39">Pregunta 2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgd175037" class="outline-3">
-<h3 id="orgd175037">Respuesta 3</h3>
-<div class="outline-text-3" id="text-orgd175037">
+<div id="outline-container-org25d7ffd" class="outline-3">
+<h3 id="org25d7ffd">Respuesta 3</h3>
+<div class="outline-text-3" id="text-org25d7ffd">
 <p>
 Tanto la figura con las previsiones como el cuadro correspondiente muestran que los valores observados de la tasa logarítmica de inflación exceden las bandas de error del 95% de las previsiones univariantes. Por lo tanto, <span class="underline">las previsiones no son satisfactorias</span>. Por ejemplo, la tasa de inflación anual prevista para septiembre de 2021 era del 0.70%, mientras que el valor observado fue del 3.31%, resultando en un error de 2.6 puntos porcentuales.
 </p>
@@ -596,13 +596,13 @@ Las previsiones univariantes se basan en la extrapolación del comportamiento hi
 </p>
 
 <p>
-(<a href="#org67b966c">Pregunta 3</a>)
+(<a href="#org747db50">Pregunta 3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgfeb861e" class="outline-3">
-<h3 id="orgfeb861e">Respuesta 4</h3>
-<div class="outline-text-3" id="text-orgfeb861e">
+<div id="outline-container-org94e1b82" class="outline-3">
+<h3 id="org94e1b82">Respuesta 4</h3>
+<div class="outline-text-3" id="text-org94e1b82">
 <ol class="org-ol">
 <li><p>
 \( (1 - .996B + .127{B^2})\nabla \texttt{sd_l_CPI_EZ19}_t = (1 - .810B)(1 - .597{B^{12}})\,{\hat a_t} \)
@@ -673,7 +673,7 @@ El modelo se ha formulado invirtiendo exclusivamente los operadores de diferenci
 </p>
 
 <p>
-Se trata de la representación AR de la variación de la inflación anual (\(\nabla \nabla_{12} \, \ln\,  \texttt{CPI_EZ19}_t\)). Para ello, se ha empleado la inversa del polinomio MA (que no tiene raíces en el círculo unitario; véase <a href="#org4451bb2">los resultados de estimación del modelo univariante</a>). <b>Expresión correcta</b>.
+Se trata de la representación AR de la variación de la inflación anual (\(\nabla \nabla_{12} \, \ln\,  \texttt{CPI_EZ19}_t\)). Para ello, se ha empleado la inversa del polinomio MA (que no tiene raíces en el círculo unitario; véase <a href="#orgdc34ce1">los resultados de estimación del modelo univariante</a>). <b>Expresión correcta</b>.
 </p></li>
 
 <li><p>
@@ -705,86 +705,86 @@ los operadores no se encuentran adyacentes a la variable; sin embargo, la expres
 
 
 <p>
-(<a href="#org8b6faed">Pregunta 4</a>)
+(<a href="#orgf99595b">Pregunta 4</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org65a5170" class="outline-3">
-<h3 id="org65a5170">Respuesta 5</h3>
-<div class="outline-text-3" id="text-org65a5170">
+<div id="outline-container-org9ea5767" class="outline-3">
+<h3 id="org9ea5767">Respuesta 5</h3>
+<div class="outline-text-3" id="text-org9ea5767">
 <p>
 Dado que el p-valor (<code>0,2754</code>) es mayor que 0.1, <b>la afirmación es falsa</b>: no se rechaza la hipótesis del contraste.
 </p>
 
 <p>
-(<a href="#org7db6135">Pregunta 5</a>)
+(<a href="#orgc6a91ad">Pregunta 5</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgf598e0b" class="outline-3">
-<h3 id="orgf598e0b">Respuesta 6</h3>
-<div class="outline-text-3" id="text-orgf598e0b">
+<div id="outline-container-org4748fca" class="outline-3">
+<h3 id="org4748fca">Respuesta 6</h3>
+<div class="outline-text-3" id="text-org4748fca">
 <p>
 <b>La afirmación es falsa</b>. La hipótesis nula del test ADF es que la serie es NO estacionaria.
 </p>
 
 <p>
-(<a href="#org3cc4c5f">Pregunta 6</a>)
+(<a href="#orgcb1bcb7">Pregunta 6</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org336c08c" class="outline-3">
-<h3 id="org336c08c">Respuesta 7</h3>
-<div class="outline-text-3" id="text-org336c08c">
+<div id="outline-container-orgf8632f7" class="outline-3">
+<h3 id="orgf8632f7">Respuesta 7</h3>
+<div class="outline-text-3" id="text-orgf8632f7">
 <p>
 La hipótesis nula del test es que la serie es NO estacionaria y el p-valor del estadístico, <code>0.1769</code>;  como dicho p-valor no es inferior 15%, no se rechaza la hipótesis nula al 15% de significación. <b>La afirmación es verdadera</b>.
 </p>
 
 <p>
-(<a href="#org17ec49f">Pregunta 7</a>)
+(<a href="#org5fa9914">Pregunta 7</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgf584c94" class="outline-3">
-<h3 id="orgf584c94">Respuesta 8</h3>
-<div class="outline-text-3" id="text-orgf584c94">
+<div id="outline-container-org2e8c312" class="outline-3">
+<h3 id="org2e8c312">Respuesta 8</h3>
+<div class="outline-text-3" id="text-org2e8c312">
 <p>
 La hipótesis nula del test es que la serie es NO estacionaria. <b>La afirmación es falsa</b>.
 </p>
 
 <p>
-(<a href="#org9da7efb">Pregunta 8</a>)
+(<a href="#orgfd144d2">Pregunta 8</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org5fa522d" class="outline-3">
-<h3 id="org5fa522d">Respuesta 9</h3>
-<div class="outline-text-3" id="text-org5fa522d">
+<div id="outline-container-orge8c6097" class="outline-3">
+<h3 id="orge8c6097">Respuesta 9</h3>
+<div class="outline-text-3" id="text-orge8c6097">
 <p>
 El test ADF aplicado a los residuos de la presunta regresión cointegrante no rechaza la no estacionariedad con un p-valor bastante elevado (<code>0.7002</code>), por lo que la conclusión sería que las series no están cointegradas. <b>La afirmación es falsa</b>.
 </p>
 
 <p>
-(<a href="#org4c4dabf">Pregunta 9</a>)
+(<a href="#orgacfb0d9">Pregunta 9</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org5b0e79f" class="outline-3">
-<h3 id="org5b0e79f">Respuesta 10</h3>
-<div class="outline-text-3" id="text-org5b0e79f">
+<div id="outline-container-orgfe8f37d" class="outline-3">
+<h3 id="orgfe8f37d">Respuesta 10</h3>
+<div class="outline-text-3" id="text-orgfe8f37d">
 <p>
-Los intervalos de confianza de las previsiones son crecientes con el horizonte temporal porque el modelo es no estacionario (tenga en cuenta que el <a href="#orgf540a30">Modelo univariante</a> estimado incorpora una diferencia regular, dado que la variable dependiente es: <code>(1-L) sd_l_CPI_EZ19</code>, donde <code>(1-L)</code> representa el operador diferencia regular).
+Los intervalos de confianza de las previsiones son crecientes con el horizonte temporal porque el modelo es no estacionario (tenga en cuenta que el <a href="#orgc5dd57e">Modelo univariante</a> estimado incorpora una diferencia regular, dado que la variable dependiente es: <code>(1-L) sd_l_CPI_EZ19</code>, donde <code>(1-L)</code> representa el operador diferencia regular).
 </p>
 
 <p>
-(<a href="#org2825218">Pregunta 10</a>)
+(<a href="#org36f8c98">Pregunta 10</a>)
 </p>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-11-30 Sun 17:22</p>
+<p class="date">Created: 2025-12-12 Fri 16:49</p>
 </div>
 </body>
 </html>
