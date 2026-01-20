@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-12-12 Fri 16:49 -->
+<!-- 2026-01-20 Tue 21:49 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Índice de precios de viviendas nuevas y de segunda mano</title>
@@ -77,9 +77,9 @@ if (typeof HS_STARTUP_FOLDED === 'undefined') {    var HS_STARTUP_FOLDED = false
 <body>
 <div id="content" class="content">
 <h1 class="title">Índice de precios de viviendas nuevas y de segunda mano</h1>
-<div id="outline-container-org84b9451" class="outline-2">
-<h2 id="org84b9451">Los datos</h2>
-<div class="outline-text-2" id="text-org84b9451">
+<div id="outline-container-org4a2ced0" class="outline-2">
+<h2 id="org4a2ced0">Los datos</h2>
+<div class="outline-text-2" id="text-org4a2ced0">
 <p>
 Los datos de este ejercicio corresponden a los índices de precios de
 vivienda nueva y de segunda mano con base 2015. La muestra disponible
@@ -125,9 +125,9 @@ A partir de esta muestra, se calculan las tasas de variación anual:
 </ul>
 </div>
 </div>
-<div id="outline-container-org5ac30da" class="outline-2">
-<h2 id="org5ac30da">Gráfico de las tasas de variación los índices de precios</h2>
-<div class="outline-text-2" id="text-org5ac30da">
+<div id="outline-container-org5442f26" class="outline-2">
+<h2 id="org5442f26">Gráfico de las tasas de variación los índices de precios</h2>
+<div class="outline-text-2" id="text-org5442f26">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>gnuplot T4IPVN T4IPV2M  --time-series --with-lines --output="TasasDeVariacionAnual.png"
 </code></pre>
@@ -135,43 +135,43 @@ A partir de esta muestra, se calculan las tasas de variación anual:
 
 <div class="org-center">
 
-<div id="org14005f5" class="figure">
+<div id="org2bd73f8" class="figure">
 <p><img src="./Examen-IndicePreciosViviendasNuevasYdeSegundaMano/TasasDeVariacionAnual.png" alt="TasasDeVariacionAnual.png" />
 </p>
 </div>
 </div>
 
 <p>
-El perfil de las series que se muestran en la <a href="#org5ac30da">figura anterior</a> sugiere que
+El perfil de las series que se muestran en la <a href="#org5442f26">figura anterior</a> sugiere que
 ambas podrían estar cointegradas. Para estudiar esta posibilidad se
 estiman:
 </p>
 <ul class="org-ul">
-<li><a href="#org83053ba">modelos ARIMA</a> para las series <code>T4IPVN</code> y <code>T4IPV2M</code>, así como</li>
-<li><a href="#org61e10ec">un modelo AR(1) para la serie <code>T4IPVN</code> con <code>T4IPV2M</code> y como input
+<li><a href="#orgf4ba297">modelos ARIMA</a> para las series <code>T4IPVN</code> y <code>T4IPV2M</code>, así como</li>
+<li><a href="#orgf5419d1">un modelo AR(1) para la serie <code>T4IPVN</code> con <code>T4IPV2M</code> y como input
 exógeno</a>.</li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org83053ba" class="outline-2">
-<h2 id="org83053ba">Modelos ARIMA</h2>
-<div class="outline-text-2" id="text-org83053ba">
+<div id="outline-container-orgf4ba297" class="outline-2">
+<h2 id="orgf4ba297">Modelos ARIMA</h2>
+<div class="outline-text-2" id="text-orgf4ba297">
 </div>
-<div id="outline-container-orgd0552fb" class="outline-3">
-<h3 id="orgd0552fb">Vivienda nueva</h3>
-<div class="outline-text-3" id="text-orgd0552fb">
+<div id="outline-container-org8bdb149" class="outline-3">
+<h3 id="org8bdb149">Vivienda nueva</h3>
+<div class="outline-text-3" id="text-org8bdb149">
 <p>
 Se ajusta el siguiente modelo estacional para  <code>T4IPVN</code>:
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org5dd9843"><code>ARIMA_T4IPVN &lt;- arima 0 1 0 ; 0 0 1 ; T4IPVN --nc
+<pre class="src src-gretl" id="orgd08b6d5"><code>ARIMA_T4IPVN &lt;- arima 0 1 0 ; 0 0 1 ; T4IPVN --nc
 modtest --normality --quiet
 modtest --arch --quiet
 modtest --autocorr 15 --quiet
 </code></pre>
 </div>
 
-<pre class="example" id="org54e0b1e">
+<pre class="example" id="org6869834">
 Function evaluations: 16
 Evaluations of gradient: 9
 
@@ -216,21 +216,21 @@ with p-value = P(Chi-square(14) &gt; 12.8016) = 0.5422
 </pre>
 </div>
 </div>
-<div id="outline-container-org5f97591" class="outline-3">
-<h3 id="org5f97591">Vivienda de segunda mano</h3>
-<div class="outline-text-3" id="text-org5f97591">
+<div id="outline-container-org399e6de" class="outline-3">
+<h3 id="org399e6de">Vivienda de segunda mano</h3>
+<div class="outline-text-3" id="text-org399e6de">
 <p>
 Se ajusta el siguiente modelo estacional para <code>T4IPV2M</code>:
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="orgc1b511c"><code>ARIMA_T4IPV2M &lt;- arima 2 1 0 ; 0 0 1 ; T4IPV2M --nc
+<pre class="src src-gretl" id="org7b16344"><code>ARIMA_T4IPV2M &lt;- arima 2 1 0 ; 0 0 1 ; T4IPV2M --nc
 modtest --normality --quiet
 modtest --arch --quiet
 modtest --autocorr 15 --quiet
 </code></pre>
 </div>
 
-<pre class="example" id="orgbaf7a2c">
+<pre class="example" id="org64fc440">
 Function evaluations: 37
 Evaluations of gradient: 14
 
@@ -281,23 +281,23 @@ with p-value = P(Chi-square(12) &gt; 19.2946) = 0.08166
 </div>
 </div>
 </div>
-<div id="outline-container-org61e10ec" class="outline-2">
-<h2 id="org61e10ec">Modelo ARMAX</h2>
-<div class="outline-text-2" id="text-org61e10ec">
+<div id="outline-container-orgf5419d1" class="outline-2">
+<h2 id="orgf5419d1">Modelo ARMAX</h2>
+<div class="outline-text-2" id="text-orgf5419d1">
 <p>
 Se ajusta el siguiente modelo autorregresivo para <code>T4IPVN</code>, con una
 constante y <code>T4IPV2M</code> como variables exógenas:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-gretl" id="orgeefe490"><code>ARMAX_T4IPVN &lt;- arima 1 0 0 ; T4IPVN T4IPV2M 0
+<pre class="src src-gretl" id="org875ff81"><code>ARMAX_T4IPVN &lt;- arima 1 0 0 ; T4IPVN T4IPV2M 0
 modtest --normality --quiet
 modtest --arch --quiet
 modtest --autocorr 15 --quiet
 </code></pre>
 </div>
 
-<pre class="example" id="orgdfbedcd">
+<pre class="example" id="org19e9fce">
 Function evaluations: 18
 Evaluations of gradient: 8
 
@@ -343,15 +343,15 @@ Ljung-Box Q' = 9.64319,
 with p-value = P(Chi-square(14) &gt; 9.64319) = 0.7878
 </pre>
 </div>
-<div id="outline-container-org1c50b44" class="outline-3">
-<h3 id="org1c50b44">Intervalo de confianza de los parámetros estimados</h3>
-<div class="outline-text-3" id="text-org1c50b44">
+<div id="outline-container-org29170b4" class="outline-3">
+<h3 id="org29170b4">Intervalo de confianza de los parámetros estimados</h3>
+<div class="outline-text-3" id="text-org29170b4">
 <p>
 Los intervalos de confianza al 95 para los coeficientes del modelo
 anterior se muestra a continuación.
 </p>
 
-<pre class="example" id="org2124caa">
+<pre class="example" id="org349e3ff">
 z(0,025) = 1,9600
 
       VARIABLE         COEFICIENTE      INTERVALO DE CONFIANZA 95%
@@ -363,35 +363,35 @@ z(0,025) = 1,9600
 </div>
 </div>
 </div>
-<div id="outline-container-org774b4ec" class="outline-2">
-<h2 id="org774b4ec">Preguntas</h2>
-<div class="outline-text-2" id="text-org774b4ec">
+<div id="outline-container-org2162dc0" class="outline-2">
+<h2 id="org2162dc0">Preguntas</h2>
+<div class="outline-text-2" id="text-org2162dc0">
 </div>
-<div id="outline-container-org579e86c" class="outline-3">
-<h3 id="org579e86c">Pregunta 1</h3>
-<div class="outline-text-3" id="text-org579e86c">
+<div id="outline-container-org58f708b" class="outline-3">
+<h3 id="org58f708b">Pregunta 1</h3>
+<div class="outline-text-3" id="text-org58f708b">
 <p>
 Comente exhaustivamente los resultados de estimación y diagnosis de
-los <a href="#org83053ba">modelos ARIMA</a> estimados. 
+los <a href="#orgf4ba297">modelos ARIMA</a> estimados. 
 </p>
 
 <p>
-(<a href="#org2100ae2">Respuesta 1</a>)
+(<a href="#orgce6f871">Respuesta 1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org037e555" class="outline-3">
-<h3 id="org037e555">Pregunta 2</h3>
-<div class="outline-text-3" id="text-org037e555">
+<div id="outline-container-orgc5f27eb" class="outline-3">
+<h3 id="orgc5f27eb">Pregunta 2</h3>
+<div class="outline-text-3" id="text-orgc5f27eb">
 <p>
-Compare de todas las formas posibles los modelos <a href="#org83053ba">ARIMA</a> y <a href="#org61e10ec">ARMAX</a> de la
+Compare de todas las formas posibles los modelos <a href="#orgf4ba297">ARIMA</a> y <a href="#orgf5419d1">ARMAX</a> de la
 variable <code>T4IPVN</code>. ¿Cuál de los dos modelos
 </p>
 <ul class="org-ul">
 <li>ajusta mejor la muestra?</li>
 <li>cabe esperar que produzca mejores previsiones extra-muestrales?
 (suponiendo que se conoce el valor de la variable explicativa en el
-caso del modelo <a href="#org61e10ec">ARMAX</a>)</li>
+caso del modelo <a href="#orgf5419d1">ARMAX</a>)</li>
 <li>cabe esperar que esté mejor especificado?</li>
 </ul>
 
@@ -400,35 +400,35 @@ Argumente su respuesta de todas las formas posibles.
 </p>
 
 <p>
-(<a href="#org8fe62a4">Respuesta 2</a>)
+(<a href="#orgb70ac44">Respuesta 2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org95c257b" class="outline-3">
-<h3 id="org95c257b">Pregunta 3</h3>
-<div class="outline-text-3" id="text-org95c257b">
+<div id="outline-container-org51ae7d7" class="outline-3">
+<h3 id="org51ae7d7">Pregunta 3</h3>
+<div class="outline-text-3" id="text-org51ae7d7">
 <ol class="org-ol">
-<li>Suponga que los modelos <a href="#org83053ba">ARIMA</a> (para <code>T4IPVN</code> y <code>T4IPV2M</code>) y <a href="#org61e10ec">ARMAX</a>
+<li>Suponga que los modelos <a href="#orgf4ba297">ARIMA</a> (para <code>T4IPVN</code> y <code>T4IPV2M</code>) y <a href="#orgf5419d1">ARMAX</a>
 (para <code>T4IPVN</code>) están correctamente identificados y
 estimados. Considerando las estimaciones puntuales que se muestran,
 discuta detalladamente si las series <code>T4IPVN</code> y <code>T4IPV2M</code> están
 cointegradas (en este caso indique cuál es el vector de
 cointegración) o si, por el contrario, no lo están.</li>
 
-<li>Los <a href="#org1c50b44">intervalos de confianza de los parámetros estimados</a> ¿Introducen
+<li>Los <a href="#org29170b4">intervalos de confianza de los parámetros estimados</a> ¿Introducen
 algún matiz en su respuesta previa? ¿O no la afectan en absoluto?</li>
 </ol>
 
 <p>
-(<a href="#orga5333da">Respuesta 3</a>)
+(<a href="#org84f4ac0">Respuesta 3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org678f356" class="outline-3">
-<h3 id="org678f356">Pregunta 4</h3>
-<div class="outline-text-3" id="text-org678f356">
+<div id="outline-container-orgca064b8" class="outline-3">
+<h3 id="orgca064b8">Pregunta 4</h3>
+<div class="outline-text-3" id="text-orgca064b8">
 <p>
-Indique cuáles de las siguientes expresiones representan el modelo <a href="#org83053ba">ARIMA</a> ajustado a <code>T4IPV2M</code> con un redondeo a tres decimales.
+Indique cuáles de las siguientes expresiones representan el modelo <a href="#orgf4ba297">ARIMA</a> ajustado a <code>T4IPV2M</code> con un redondeo a tres decimales.
 </p>
 
 <p>
@@ -456,16 +456,16 @@ Indique cuáles de las siguientes expresiones NO están bien definidas.
 </p>
 
 <p>
-(<a href="#orgc654daa">Respuesta 4</a>)
+(<a href="#org5927c1b">Respuesta 4</a>)
 </p></dd>
 </dl>
 </div>
 </div>
-<div id="outline-container-org6b2c270" class="outline-3">
-<h3 id="org6b2c270">Pregunta 5</h3>
-<div class="outline-text-3" id="text-org6b2c270">
+<div id="outline-container-org48df0df" class="outline-3">
+<h3 id="org48df0df">Pregunta 5</h3>
+<div class="outline-text-3" id="text-org48df0df">
 <p>
-Indique cuáles de las siguientes expresiones representan el modelo <a href="#org61e10ec">ARMAX</a> ajustado a <code>T4IPVN</code> con un redondeo a tres decimales.
+Indique cuáles de las siguientes expresiones representan el modelo <a href="#orgf5419d1">ARMAX</a> ajustado a <code>T4IPVN</code> con un redondeo a tres decimales.
 </p>
 
 <dl class="org-dl">
@@ -477,40 +477,40 @@ Indique cuáles de las siguientes expresiones representan el modelo <a href="#or
 </dl>
 
 <p>
-(<a href="#org456cf8f">Respuesta 5</a>)
+(<a href="#org6400923">Respuesta 5</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgfff2b10" class="outline-3">
-<h3 id="orgfff2b10">Pregunta 6</h3>
-<div class="outline-text-3" id="text-orgfff2b10">
+<div id="outline-container-org950bfd5" class="outline-3">
+<h3 id="org950bfd5">Pregunta 6</h3>
+<div class="outline-text-3" id="text-org950bfd5">
 <p>
 Indique si es cierta o no la siguiente afirmación:
 </p>
 <blockquote>
 <p>
-El criterio de Akaike del modelo <a href="#org83053ba">ARIMA</a> ajustado a <code>T4IPV2M</code> es menor
-que el del modelo <a href="#org83053ba">ARIMA</a> ajustado a <code>T4IPVN</code>, lo que indica que el
+El criterio de Akaike del modelo <a href="#orgf4ba297">ARIMA</a> ajustado a <code>T4IPV2M</code> es menor
+que el del modelo <a href="#orgf4ba297">ARIMA</a> ajustado a <code>T4IPVN</code>, lo que indica que el
 primer modelo probablemente predecirá fuera de la muestra mejor que el
 segundo.
 </p>
 </blockquote>
 
 <p>
-(<a href="#org33eefcb">Respuesta 6</a>)
+(<a href="#org5ed5735">Respuesta 6</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgce6e065" class="outline-3">
-<h3 id="orgce6e065">Pregunta 7</h3>
-<div class="outline-text-3" id="text-orgce6e065">
+<div id="outline-container-org353aeb7" class="outline-3">
+<h3 id="org353aeb7">Pregunta 7</h3>
+<div class="outline-text-3" id="text-org353aeb7">
 <p>
 Indique si es cierta o no la siguiente afirmación:
 </p>
 
 <blockquote>
 <p>
-La pendiente estimada de la variable <code>T4IPV2M</code> en el modelo <a href="#org61e10ec">ARMAX</a>
+La pendiente estimada de la variable <code>T4IPV2M</code> en el modelo <a href="#orgf5419d1">ARMAX</a>
 indica que, si aumenta en un <code>1%</code> la tasa anual de variación del
 índice de precios de la vivienda de segunda mano <code>T4IPV2M</code>, cabe
 esperar que la tasa de variación del índice de precios de la vivienda
@@ -519,20 +519,20 @@ nueva <code>T4IPVN_t</code> aumente en un <code>0.612%</code>.
 </blockquote>
 
 <p>
-(<a href="#orga2d721f">Respuesta 7</a>)
+(<a href="#org2c7ce75">Respuesta 7</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orga406d28" class="outline-3">
-<h3 id="orga406d28">Pregunta 8</h3>
-<div class="outline-text-3" id="text-orga406d28">
+<div id="outline-container-orgec0ddc5" class="outline-3">
+<h3 id="orgec0ddc5">Pregunta 8</h3>
+<div class="outline-text-3" id="text-orgec0ddc5">
 <p>
 Indique si es cierta o no la siguiente afirmación:
 </p>
 
 <blockquote>
 <p>
-La pendiente estimada de la variable <code>T4IPV2M</code> en el modelo <a href="#org61e10ec">ARMAX</a>
+La pendiente estimada de la variable <code>T4IPV2M</code> en el modelo <a href="#orgf5419d1">ARMAX</a>
 indica que, si aumenta en un punto porcentual la tasa anual de
 variación del índice de precios de la vivienda de segunda mano
 <code>T4IPV2M</code>, cabe esperar que la tasa de variación del índice de precios
@@ -541,58 +541,58 @@ de la vivienda nueva <code>T4IPVN</code> aumente en <code>0.612</code> puntos.
 </blockquote>
 
 <p>
-(<a href="#orgb8d76d6">Respuesta 8</a>)
+(<a href="#org001ec7d">Respuesta 8</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org8fcc554" class="outline-3">
-<h3 id="org8fcc554">Pregunta 9</h3>
-<div class="outline-text-3" id="text-org8fcc554">
+<div id="outline-container-org8a85743" class="outline-3">
+<h3 id="org8a85743">Pregunta 9</h3>
+<div class="outline-text-3" id="text-org8a85743">
 <p>
 Indique si es cierta o no la siguiente afirmación:
 </p>
 
 <blockquote>
 <p>
-Los resultados que se muestran en la tabla de <a href="#org1c50b44">intervalos de confianza</a>
+Los resultados que se muestran en la tabla de <a href="#org29170b4">intervalos de confianza</a>
 indican que debe rechazarse la hipótesis nula de que el parámetro
 \(\phi_1\) sea igual a 1 con un 10% de significación.
 </p>
 </blockquote>
 
 <p>
-(<a href="#orgae0ee1b">Respuesta 9</a>)
+(<a href="#orgabbcb04">Respuesta 9</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org26e92e8" class="outline-3">
-<h3 id="org26e92e8">Pregunta 10</h3>
-<div class="outline-text-3" id="text-org26e92e8">
+<div id="outline-container-org2e43e2a" class="outline-3">
+<h3 id="org2e43e2a">Pregunta 10</h3>
+<div class="outline-text-3" id="text-org2e43e2a">
 <p>
 Indique si es cierta o no la siguiente afirmación:
 </p>
 
 <blockquote>
 <p>
-Los resultados que se muestran en la tabla de <a href="#org1c50b44">intervalos de confianza</a>
+Los resultados que se muestran en la tabla de <a href="#org29170b4">intervalos de confianza</a>
 sugieren que probablemente no se rechazaría la hipótesis nula de que
 el parámetro \(phi_1\) sea igual a 1 con un 1% de significación.
 </p>
 </blockquote>
 
 <p>
-(<a href="#org529bc9f">Respuesta 10</a>)
+(<a href="#org89acef5">Respuesta 10</a>)
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org6614197" class="outline-2">
-<h2 id="org6614197">Respuestas</h2>
-<div class="outline-text-2" id="text-org6614197">
+<div id="outline-container-orgf74ec06" class="outline-2">
+<h2 id="orgf74ec06">Respuestas</h2>
+<div class="outline-text-2" id="text-orgf74ec06">
 </div>
-<div id="outline-container-org2100ae2" class="outline-3">
-<h3 id="org2100ae2">Respuesta 1</h3>
-<div class="outline-text-3" id="text-org2100ae2">
+<div id="outline-container-orgce6f871" class="outline-3">
+<h3 id="orgce6f871">Respuesta 1</h3>
+<div class="outline-text-3" id="text-orgce6f871">
 <p>
 En ambos modelos
 </p>
@@ -612,22 +612,22 @@ confianza habituales, y</li>
 </ul>
 
 <p>
-(<a href="#org579e86c">Pregunta 1</a>)
+(<a href="#org58f708b">Pregunta 1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org8fe62a4" class="outline-3">
-<h3 id="org8fe62a4">Respuesta 2</h3>
-<div class="outline-text-3" id="text-org8fe62a4">
+<div id="outline-container-orgb70ac44" class="outline-3">
+<h3 id="orgb70ac44">Respuesta 2</h3>
+<div class="outline-text-3" id="text-orgb70ac44">
 <p>
-El modelo <a href="#org61e10ec">ARMAX</a> se ajusta mejor la muestra ya que
+El modelo <a href="#orgf5419d1">ARMAX</a> se ajusta mejor la muestra ya que
 </p>
 <ul class="org-ul">
 <li>los errores de ajuste tienen una menor desviación típica (<code>D.T. innovaciones</code> de <code>1,943328</code> frente a <code>2,208917</code>).</li>
 </ul>
 
 <p>
-Por otra parte, los criterios de información del modelo <a href="#org61e10ec">ARMAX</a> toman un
+Por otra parte, los criterios de información del modelo <a href="#orgf5419d1">ARMAX</a> toman un
 valor menores, es decir, son mejores, por lo que
 </p>
 <ul class="org-ul">
@@ -637,13 +637,13 @@ valor menores, es decir, son mejores, por lo que
 </ul>
 
 <p>
-(<a href="#org037e555">Pregunta 2</a>)
+(<a href="#orgc5f27eb">Pregunta 2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orga5333da" class="outline-3">
-<h3 id="orga5333da">Respuesta 3</h3>
-<div class="outline-text-3" id="text-orga5333da">
+<div id="outline-container-org84f4ac0" class="outline-3">
+<h3 id="org84f4ac0">Respuesta 3</h3>
+<div class="outline-text-3" id="text-org84f4ac0">
 <ol class="org-ol">
 <li><p>
 Los modelos estimados sugieren que las series <code>T4IPVN</code> y <code>T4IPV2M</code>
@@ -651,11 +651,11 @@ están cointegradas, con un vector de cointegración <code>[1 -
    0.612]</code>. Esta respuesta se apoya en que
 </p>
 <ul class="org-ul">
-<li>los modelos <a href="#org83053ba">ARIMA</a> para las series <code>T4IPVN</code> y <code>T4IPV2M</code> son
+<li>los modelos <a href="#orgf4ba297">ARIMA</a> para las series <code>T4IPVN</code> y <code>T4IPV2M</code> son
 ARIMA\((0,1,0)\times(0,0,1)_{12}\) y
 ARIMA\((2,1,0)\times(0,0,1)_{12}\), respectivamente, por lo que
 ambas series son integradas de primer orden, y</li>
-<li>el modelo <a href="#org61e10ec">ARMAX</a> tiene un término de error estacionario, ya que la
+<li>el modelo <a href="#orgf5419d1">ARMAX</a> tiene un término de error estacionario, ya que la
 raíz del término AR(1) está fuera del círculo de radio unidad
 (<code>1,2167</code>) y el correlograma de los residuos refuerza la hipótesis
 de que los residuos son estacionarios.</li>
@@ -670,8 +670,8 @@ Por tanto, al relacionar ambas series mediante un modelo lineal, es
 
 
 <ol class="org-ol">
-<li>Las estimaciones puntuales del modelo <a href="#org61e10ec">ARMAX</a> sugieren que los
-residuos son estacionarios. Sin embargo, al mirar los <a href="#org1c50b44">intervalos de
+<li>Las estimaciones puntuales del modelo <a href="#orgf5419d1">ARMAX</a> sugieren que los
+residuos son estacionarios. Sin embargo, al mirar los <a href="#org29170b4">intervalos de
 confianza de los parámetros estimados</a> se ve que el límite superior
 del intervalo de confianza al 95% para el coeficiente
 autorregresivo es <code>0,990186</code> por lo que, aunque un contraste al 5%
@@ -684,13 +684,13 @@ encontrada no serían \(I(0)\)).</li>
 </ol>
 
 <p>
-(<a href="#org95c257b">Pregunta 3</a>)
+(<a href="#org51ae7d7">Pregunta 3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgc654daa" class="outline-3">
-<h3 id="orgc654daa">Respuesta 4</h3>
-<div class="outline-text-3" id="text-orgc654daa">
+<div id="outline-container-org5927c1b" class="outline-3">
+<h3 id="org5927c1b">Respuesta 4</h3>
+<div class="outline-text-3" id="text-org5927c1b">
 <p>
 Recuerde que signo de los parámetros MA en las salidas de Gretl tienen
 el signo cambiado respecto a convenio habitual en los manuales de
@@ -744,13 +744,13 @@ existe</i>.
 </p>
 
 <p>
-(<a href="#org678f356">Pregunta 4</a>)
+(<a href="#orgca064b8">Pregunta 4</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org456cf8f" class="outline-3">
-<h3 id="org456cf8f">Respuesta 5</h3>
-<div class="outline-text-3" id="text-org456cf8f">
+<div id="outline-container-org6400923" class="outline-3">
+<h3 id="org6400923">Respuesta 5</h3>
+<div class="outline-text-3" id="text-org6400923">
 <p>
 Son correctas 
 </p>
@@ -767,13 +767,13 @@ media móvil infinita).</li>
 </ul>
 
 <p>
-(<a href="#org6b2c270">Pregunta 5</a>)
+(<a href="#org48df0df">Pregunta 5</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org33eefcb" class="outline-3">
-<h3 id="org33eefcb">Respuesta 6</h3>
-<div class="outline-text-3" id="text-org33eefcb">
+<div id="outline-container-org5ed5735" class="outline-3">
+<h3 id="org5ed5735">Respuesta 6</h3>
+<div class="outline-text-3" id="text-org5ed5735">
 <p>
 <b>Falso</b>. Los criterios de información no son comparables ya que
 corresponden a ajustes de modelos para variables endógenas distintas
@@ -782,13 +782,13 @@ corresponden a ajustes de modelos para variables endógenas distintas
 </p>
 
 <p>
-(<a href="#orgfff2b10">Pregunta 6</a>)
+(<a href="#org950bfd5">Pregunta 6</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orga2d721f" class="outline-3">
-<h3 id="orga2d721f">Respuesta 7</h3>
-<div class="outline-text-3" id="text-orga2d721f">
+<div id="outline-container-org2c7ce75" class="outline-3">
+<h3 id="org2c7ce75">Respuesta 7</h3>
+<div class="outline-text-3" id="text-org2c7ce75">
 <p>
 <b>Falso</b>. Sería correcto si las variables dependiente y explicativa
 fueran <i>tasas logarítmicas</i> anuales, en cuyo caso el coeficiente
@@ -797,13 +797,13 @@ porcentuales ordinarias, la interpretación no es correcta.
 </p>
 
 <p>
-(<a href="#orgce6e065">Pregunta 7</a>)
+(<a href="#org353aeb7">Pregunta 7</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgb8d76d6" class="outline-3">
-<h3 id="orgb8d76d6">Respuesta 8</h3>
-<div class="outline-text-3" id="text-orgb8d76d6">
+<div id="outline-container-org001ec7d" class="outline-3">
+<h3 id="org001ec7d">Respuesta 8</h3>
+<div class="outline-text-3" id="text-org001ec7d">
 <p>
 <b>Verdadero</b>. Las variables dependiente y explicativa son tasas
 porcentuales de variación anual y la pendiente, por tanto, se
@@ -812,13 +812,13 @@ explicativa crece en una unidad.
 </p>
 
 <p>
-(<a href="#orga406d28">Pregunta 8</a>)
+(<a href="#orgec0ddc5">Pregunta 8</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgae0ee1b" class="outline-3">
-<h3 id="orgae0ee1b">Respuesta 9</h3>
-<div class="outline-text-3" id="text-orgae0ee1b">
+<div id="outline-container-orgabbcb04" class="outline-3">
+<h3 id="orgabbcb04">Respuesta 9</h3>
+<div class="outline-text-3" id="text-orgabbcb04">
 <p>
 <b>Verdadero</b>. El intervalo de confianza indica que la hipótesis nula
 \(H_0:\; \phi_1=1\) se rechaza con un nivel de significación del
@@ -828,13 +828,13 @@ al 90% es aún más reducido.
 </p>
 
 <p>
-(<a href="#org8fcc554">Pregunta 9</a>)
+(<a href="#org8a85743">Pregunta 9</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org529bc9f" class="outline-3">
-<h3 id="org529bc9f">Respuesta 10</h3>
-<div class="outline-text-3" id="text-org529bc9f">
+<div id="outline-container-org89acef5" class="outline-3">
+<h3 id="org89acef5">Respuesta 10</h3>
+<div class="outline-text-3" id="text-org89acef5">
 <p>
 <b>Cierto</b>. El valor <code>1</code> queda fuera del del intervalo de confianza al
 95%, pero está muy, muy próximo al límite superior de dicho intervalo.
@@ -847,14 +847,14 @@ abriendo la base de datos en Gretl</i>).
 </p>
 
 <p>
-(<a href="#org26e92e8">Pregunta 10</a>)
+(<a href="#org2e43e2a">Pregunta 10</a>)
 </p>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-12-12 Fri 16:49</p>
+<p class="date">Created: 2026-01-20 Tue 21:49</p>
 </div>
 </body>
 </html>

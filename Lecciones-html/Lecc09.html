@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2025-12-12 Fri 16:49 -->
+<!-- 2026-01-20 Tue 21:49 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 9. Cointegración</title>
@@ -66,42 +66,42 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orgf911388">Correlación</a>
+<li><a href="#org5857ea8">Correlación</a>
 <ul>
-<li><a href="#orgc5c45a8">La causalidad y correlación</a></li>
-<li><a href="#org2a9b7be">Correlación espuria</a></li>
+<li><a href="#org8adc533">La causalidad y correlación</a></li>
+<li><a href="#org8aefb8a">Correlación espuria</a></li>
 </ul>
 </li>
-<li><a href="#org8a0a2c0">Las series con tendencia suelen tener elevadas correlaciones.</a>
+<li><a href="#org167fcca">Las series con tendencia suelen tener elevadas correlaciones.</a>
 <ul>
-<li><a href="#orgeed48c7">Ejemplo de correlación espuria: PNB vs incidencia de melanoma</a>
+<li><a href="#org894195a">Ejemplo de correlación espuria: PNB vs incidencia de melanoma</a>
 <ul>
-<li><a href="#org29ca99c">Regresión en niveles</a></li>
+<li><a href="#orgcb62aa0">Regresión en niveles</a></li>
 </ul>
 </li>
-<li><a href="#org3973959">Explorando si la correlación es probablemente <i>espuria</i> (no causalidad)</a>
+<li><a href="#orgf9e60ac">Explorando si la correlación es probablemente <i>espuria</i> (no causalidad)</a>
 <ul>
-<li><a href="#org31a4651">Regresión en primeras diferencias</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#orgd859aa2">Cointegración</a>
-<ul>
-<li><a href="#org89c39f8">Ejemplo de cointegración: tipos de interes en UK a corto y largo plazo</a>
-<ul>
-<li><a href="#org27c517a">Series en diferencias</a></li>
-<li><a href="#org4f4c20b">Regresión de las series en niveles</a></li>
-<li><a href="#orge5be24a">Conclusión</a></li>
+<li><a href="#orgc94b160">Regresión en primeras diferencias</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org0555b33">Codigo aux</a></li>
+<li><a href="#org8f31f5b">Cointegración</a>
+<ul>
+<li><a href="#org93d89fa">Ejemplo de cointegración: tipos de interes en UK a corto y largo plazo</a>
+<ul>
+<li><a href="#org02ffdd0">Series en diferencias</a></li>
+<li><a href="#orgcbbcf89">Regresión de las series en niveles</a></li>
+<li><a href="#org69c9021">Conclusión</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org7a91019">Codigo aux</a></li>
 </ul>
 </div>
 </div>
-<div class="ABSTRACT" id="org549d860">
+<div class="ABSTRACT" id="org014dfec">
 <p>
 En esta lección se discutirá la posible relación entre correlación y causalidad. 
 Veremos casos de correlación espuria (correlación sin causalidad) y una introducción a la cointegración (con un caso en el la correlación no desaparece al diferenciar las series). 
@@ -112,9 +112,9 @@ Veremos casos de correlación espuria (correlación sin causalidad) y una introd
 <ul class="org-ul">
 <li>(<a href="https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc09.slides.html">slides</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc09.html">html</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc09.pdf">pdf</a>) &mdash; (<a href="https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc09.ipynb">mybinder</a>)</li>
 </ul>
-<div id="outline-container-orgad3f1f9" class="outline-4">
-<h4 id="orgad3f1f9">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-orgad3f1f9">
+<div id="outline-container-org65ed3ea" class="outline-4">
+<h4 id="org65ed3ea">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-org65ed3ea">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python
 </span><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra
@@ -127,8 +127,8 @@ Veremos casos de correlación espuria (correlación sin causalidad) y una introd
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org7c829e6"></a>Creación del directorio auxiliar para albergar las figuras de la lección<br />
-<div class="outline-text-5" id="text-org7c829e6">
+<li><a id="org8c52c44"></a>Creación del directorio auxiliar para albergar las figuras de la lección<br />
+<div class="outline-text-5" id="text-org8c52c44">
 <p>
 Para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
@@ -140,8 +140,8 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="orga7945cf"></a>Codigo aux<br />
-<div class="outline-text-15" id="text-orga7945cf">
+<li><a id="org3ad58bd"></a>Codigo aux<br />
+<div class="outline-text-15" id="text-org3ad58bd">
 <p>
 Con el siguiente código mejoramos los gráficos.
 </p>
@@ -157,9 +157,9 @@ mpl.rc(<span style="font-style: italic;">'text.latex'</span>, preamble=r<span st
 </li>
 </ul>
 </div>
-<div id="outline-container-orgf911388" class="outline-2">
-<h2 id="orgf911388">Correlación</h2>
-<div class="outline-text-2" id="text-orgf911388">
+<div id="outline-container-org5857ea8" class="outline-2">
+<h2 id="org5857ea8">Correlación</h2>
+<div class="outline-text-2" id="text-org5857ea8">
 <p>
 La correlación entre dos muestras de tamaño \(N\) (dos vectores de datos de \(\mathbb{R}^N\)) es el <a href="https://mbujosab.github.io/Ectr/apuntes-Ectr-print.pdf#subsection.3.1"><b>coseno</b> del ángulo formado los vectores de dichos datos en desviaciones respecto a sus correspondientes medias</a>.
 \[\rho_{\boldsymbol{x}\boldsymbol{y}}=\frac{\sigma_{\boldsymbol{x}\boldsymbol{y}}}{\sigma_{\boldsymbol{x}}\sigma_{\boldsymbol{y}}}\]
@@ -174,9 +174,9 @@ Por tanto la correlación es algún valor entre \(-1\) y \(1\).
 <li>Cuando la correlación es \(0\) el vector \(\;\boldsymbol{y}-\boldsymbol{\bar{y}}\;\) es perpendicular al vector \(\;\boldsymbol{x}-\boldsymbol{\bar{x}}\;\)</li>
 </ul>
 </div>
-<div id="outline-container-orgc5c45a8" class="outline-3">
-<h3 id="orgc5c45a8">La causalidad y correlación</h3>
-<div class="outline-text-3" id="text-orgc5c45a8">
+<div id="outline-container-org8adc533" class="outline-3">
+<h3 id="org8adc533">La causalidad y correlación</h3>
+<div class="outline-text-3" id="text-org8adc533">
 <p>
 Cuando existe relación causal entre variables sus muestras suelen estar correladas.
 </p>
@@ -195,9 +195,9 @@ Pero <b>correlaciones significativas no indican la existencia de relaciones caus
 </ul>
 </div>
 </div>
-<div id="outline-container-org2a9b7be" class="outline-3">
-<h3 id="org2a9b7be">Correlación espuria</h3>
-<div class="outline-text-3" id="text-org2a9b7be">
+<div id="outline-container-org8aefb8a" class="outline-3">
+<h3 id="org8aefb8a">Correlación espuria</h3>
+<div class="outline-text-3" id="text-org8aefb8a">
 <p>
 La correlación entre variables sin relación causal se denomina <i>correlación espuria</i>.
 </p>
@@ -225,13 +225,13 @@ Puede ser que no exista causa alguna y aún así haya correlación
 </div>
 </div>
 </div>
-<div id="outline-container-org8a0a2c0" class="outline-2">
-<h2 id="org8a0a2c0">Las series con tendencia suelen tener elevadas correlaciones.</h2>
-<div class="outline-text-2" id="text-org8a0a2c0">
+<div id="outline-container-org167fcca" class="outline-2">
+<h2 id="org167fcca">Las series con tendencia suelen tener elevadas correlaciones.</h2>
+<div class="outline-text-2" id="text-org167fcca">
 </div>
-<div id="outline-container-orgeed48c7" class="outline-3">
-<h3 id="orgeed48c7">Ejemplo de correlación espuria: PNB vs incidencia de melanoma</h3>
-<div class="outline-text-3" id="text-orgeed48c7">
+<div id="outline-container-org894195a" class="outline-3">
+<h3 id="org894195a">Ejemplo de correlación espuria: PNB vs incidencia de melanoma</h3>
+<div class="outline-text-3" id="text-org894195a">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">path</span> = <span style="font-style: italic;">'../datos/'</span>
 <span style="font-weight: bold; font-style: italic;">df1</span> = pd.read_csv(path+<span style="font-style: italic;">'GNPvsMelanoma.csv'</span>)
@@ -273,7 +273,7 @@ Serie anual (1936&ndash;1972) del PNB anual de EEUU en miles de millones de dól
 </p>
 
 
-<div id="org57dd275" class="figure">
+<div id="org7bda3d7" class="figure">
 <p><img src="./img/lecc09/GNPvsMelanoma.png" alt="GNPvsMelanoma.png" width="900px" />
 </p>
 </div>
@@ -294,7 +294,7 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="org9878145"><code><span style="font-weight: bold; font-style: italic;">correlation</span> = df1[<span style="font-style: italic;">'GNP'</span>].corr(df1[<span style="font-style: italic;">'Melanoma'</span>])
+<pre class="src src-jupyter-python" id="org28b396f"><code><span style="font-weight: bold; font-style: italic;">correlation</span> = df1[<span style="font-style: italic;">'GNP'</span>].corr(df1[<span style="font-style: italic;">'Melanoma'</span>])
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">print(f'Coeficiente de correlaci&#243;n: {correlation:.3f}')</span>
 </code></pre>
 </div>
@@ -311,16 +311,16 @@ Como ambas series presentan una tendencia creciente,
 
 
 
-<div id="org47f57ef" class="figure">
+<div id="orge77f07c" class="figure">
 <p><img src="./img/lecc09/Scatter-GNPvsMelanoma.png" alt="Scatter-GNPvsMelanoma.png" width="550px" />
 </p>
 </div>
 </div>
-<div id="outline-container-org29ca99c" class="outline-4">
-<h4 id="org29ca99c">Regresión en niveles</h4>
-<div class="outline-text-4" id="text-org29ca99c">
+<div id="outline-container-orgcb62aa0" class="outline-4">
+<h4 id="orgcb62aa0">Regresión en niveles</h4>
+<div class="outline-text-4" id="text-orgcb62aa0">
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="orgb6746f1"><code><span style="font-weight: bold;">import</span> statsmodels.api <span style="font-weight: bold;">as</span> sm
+<pre class="src src-jupyter-python" id="org98d4f86"><code><span style="font-weight: bold;">import</span> statsmodels.api <span style="font-weight: bold;">as</span> sm
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir variables independientes y dependientes
 </span><span style="font-weight: bold; font-style: italic;">y</span> = df1[<span style="font-style: italic;">'GNP'</span>]
 <span style="font-weight: bold; font-style: italic;">X</span> = df1[<span style="font-style: italic;">'Melanoma'</span>]
@@ -343,7 +343,7 @@ La regresión del PNB sobre los casos de melanoma arroja un excelente ajuste
 
 
 
-<div id="org0a67e55" class="figure">
+<div id="orgb074695" class="figure">
 <p><img src="./img/lecc09/resultsModel1.png" alt="resultsModel1.png" width="600px" />
 </p>
 </div>
@@ -355,9 +355,9 @@ La regresión del PNB sobre los casos de melanoma arroja un excelente ajuste
 </div>
 </div>
 </div>
-<div id="outline-container-org3973959" class="outline-3">
-<h3 id="org3973959">Explorando si la correlación es probablemente <i>espuria</i> (no causalidad)</h3>
-<div class="outline-text-3" id="text-org3973959">
+<div id="outline-container-orgf9e60ac" class="outline-3">
+<h3 id="orgf9e60ac">Explorando si la correlación es probablemente <i>espuria</i> (no causalidad)</h3>
+<div class="outline-text-3" id="text-orgf9e60ac">
 <p>
 Si fuera cierto que 
 \[
@@ -413,7 +413,7 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 
 
 
-<div id="orgae7c216" class="figure">
+<div id="orgbf9974c" class="figure">
 <p><img src="./img/lecc09/d_GNPvsd_Melanoma.png" alt="d_GNPvsd_Melanoma.png" width="900px" />
 </p>
 </div>
@@ -422,9 +422,9 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 La aparente relación ya no se aprecia tras diferenciar las series.
 </p>
 </div>
-<div id="outline-container-org31a4651" class="outline-4">
-<h4 id="org31a4651">Regresión en primeras diferencias</h4>
-<div class="outline-text-4" id="text-org31a4651">
+<div id="outline-container-orgc94b160" class="outline-4">
+<h4 id="orgc94b160">Regresión en primeras diferencias</h4>
+<div class="outline-text-4" id="text-orgc94b160">
 <p>
 Además, al realizar la regresión de la primera diferencia de <code>GNP</code> sobre la primera diferencia de <code>Melanoma</code>, 
 obtenemos un ajuste pésimo (tan solo la constante es significativa&hellip; cuando debería ser la única no significativa).
@@ -449,7 +449,7 @@ obtenemos un ajuste pésimo (tan solo la constante es significativa&hellip; cuan
 </div>
 
 
-<div id="org5cbf643" class="figure">
+<div id="orgb8196cf" class="figure">
 <p><img src="./img/lecc09/resultsModel2.png" alt="resultsModel2.png" width="600px" />
 </p>
 </div>
@@ -461,9 +461,9 @@ obtenemos un ajuste pésimo (tan solo la constante es significativa&hellip; cuan
 </div>
 </div>
 </div>
-<div id="outline-container-orgd859aa2" class="outline-2">
-<h2 id="orgd859aa2">Cointegración</h2>
-<div class="outline-text-2" id="text-orgd859aa2">
+<div id="outline-container-org8f31f5b" class="outline-2">
+<h2 id="org8f31f5b">Cointegración</h2>
+<div class="outline-text-2" id="text-org8f31f5b">
 <ul class="org-ul">
 <li>Un proceso estocástico \(\boldsymbol{X}\) sin componentes deterministas es \(I(0)\) si tiene representación ARMA <span class="underline">estacionaria e invertible</span>.</li>
 </ul>
@@ -503,9 +503,9 @@ de manera que las desviaciones del equilibrio tienden a desaparecer a corto plaz
 (pues hay una combinación lineal entre ellas que cancela dicha tendencia).</li>
 </ol>
 </div>
-<div id="outline-container-org89c39f8" class="outline-3">
-<h3 id="org89c39f8">Ejemplo de cointegración: tipos de interes en UK a corto y largo plazo</h3>
-<div class="outline-text-3" id="text-org89c39f8">
+<div id="outline-container-org93d89fa" class="outline-3">
+<h3 id="org93d89fa">Ejemplo de cointegración: tipos de interes en UK a corto y largo plazo</h3>
+<div class="outline-text-3" id="text-org93d89fa">
 <p>
 Generamos un dataframe con los datos:
 </p>
@@ -565,7 +565,7 @@ Y calculamos la correlación de ambas series:
 (Muestra: 1952Q2&ndash;1970Q4)
 </p>
 
-<div id="orgf98f2c8" class="figure">
+<div id="org09132ed" class="figure">
 <p><img src="./img/lecc09/UK_Interest_rates.png" alt="UK_Interest_rates.png" width="900px" />
 </p>
 </div>
@@ -580,9 +580,9 @@ Como ambas series presentan una tendencia creciente,
 <li>Valor del coeficiente de correlación: <code>np.float64(0.898)</code></li>
 </ul>
 </div>
-<div id="outline-container-org27c517a" class="outline-4">
-<h4 id="org27c517a">Series en diferencias</h4>
-<div class="outline-text-4" id="text-org27c517a">
+<div id="outline-container-org02ffdd0" class="outline-4">
+<h4 id="org02ffdd0">Series en diferencias</h4>
+<div class="outline-text-4" id="text-org02ffdd0">
 <p>
 Añadamos al dataframe la primera diferencia de cada una de las series temporales:
 </p>
@@ -633,7 +633,7 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 
 
 
-<div id="orge21d7b9" class="figure">
+<div id="orgd2adcd1" class="figure">
 <p><img src="./img/lecc09/UK_Interest_ratesFirstDiff.png" alt="UK_Interest_ratesFirstDiff.png" width="900px" />
 </p>
 </div>
@@ -664,7 +664,7 @@ Resultados de la regresión en primeras diferencias de <code>Short</code> sobre 
 </p>
 
 
-<div id="org9776345" class="figure">
+<div id="orgffd14c4" class="figure">
 <p><img src="./img/lecc09/resultsModel3.png" alt="resultsModel3.png" width="600px" />
 </p>
 </div>
@@ -681,9 +681,9 @@ Resultados de la regresión en primeras diferencias de <code>Short</code> sobre 
 </p>
 </div>
 </div>
-<div id="outline-container-org4f4c20b" class="outline-4">
-<h4 id="org4f4c20b">Regresión de las series en niveles</h4>
-<div class="outline-text-4" id="text-org4f4c20b">
+<div id="outline-container-orgcbbcf89" class="outline-4">
+<h4 id="orgcbbcf89">Regresión de las series en niveles</h4>
+<div class="outline-text-4" id="text-orgcbbcf89">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir variables independientes y dependientes
 </span><span style="font-weight: bold; font-style: italic;">y_UK</span> = df2[<span style="font-style: italic;">'Short'</span>]
@@ -703,7 +703,7 @@ Resultados de la regresión en primeras diferencias de <code>Short</code> sobre 
 
 
 
-<div id="org772553a" class="figure">
+<div id="org928dee5" class="figure">
 <p><img src="./img/lecc09/resultsModel4.png" alt="resultsModel4.png" width="600px" />
 </p>
 </div>
@@ -725,8 +725,8 @@ Veamos si es así&hellip;
 </p>
 </div>
 <ul class="org-ul">
-<li><a id="org9b1d072"></a>Análisis gráfico de los residuos<br />
-<div class="outline-text-5" id="text-org9b1d072">
+<li><a id="orga5402cb"></a>Análisis gráfico de los residuos<br />
+<div class="outline-text-5" id="text-orga5402cb">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener residuos
 </span><span style="font-weight: bold; font-style: italic;">residuos</span> = ajuste_modelo_UK.resid
@@ -744,7 +744,7 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 
 
 
-<div id="org9720907" class="figure">
+<div id="orgb707800" class="figure">
 <p><img src="./img/lecc09/UK_Interest_ratesResiduals.png" alt="UK_Interest_ratesResiduals.png" width="900px" />
 </p>
 </div>
@@ -755,8 +755,8 @@ Por el gráfico, los residuos aparentan ser "<i>estacionarios en media</i>"
 </p>
 </div>
 </li>
-<li><a id="org4c90e52"></a>Contraste de hipótesis Dickey-Fuller de los residuos<br />
-<div class="outline-text-5" id="text-org4c90e52">
+<li><a id="orga7c71b7"></a>Contraste de hipótesis Dickey-Fuller de los residuos<br />
+<div class="outline-text-5" id="text-orga7c71b7">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold;">from</span> statsmodels.tsa.stattools <span style="font-weight: bold;">import</span> adfuller, kpss
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Contraste de Dickey-Fuller
@@ -793,8 +793,8 @@ Un p-valor tan bajo indica que debemos rechazar la hipótesis nula de que la ser
 </p>
 </div>
 </li>
-<li><a id="orgb663249"></a>Contraste de hipótesis KPSS de los residuos<br />
-<div class="outline-text-5" id="text-orgb663249">
+<li><a id="orgc3bbafe"></a>Contraste de hipótesis KPSS de los residuos<br />
+<div class="outline-text-5" id="text-orgc3bbafe">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Contraste de KPSS
 </span><span style="font-weight: bold; font-style: italic;">kpss_result</span> = kpss(residuos, regression=<span style="font-style: italic;">'c'</span>)
@@ -808,8 +808,8 @@ El test KPSS nos indica que el p-valor es mayor a \(0.1\); por tanto no podemos 
 </p>
 </div>
 </li>
-<li><a id="orgaa21488"></a>Función de autocorrelación simple ACF de los residuos<br />
-<div class="outline-text-5" id="text-orgaa21488">
+<li><a id="org6ad4010"></a>Función de autocorrelación simple ACF de los residuos<br />
+<div class="outline-text-5" id="text-org6ad4010">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt
 <span style="font-weight: bold;">from</span> statsmodels.graphics.tsaplots <span style="font-weight: bold;">import</span> plot_acf
@@ -827,7 +827,7 @@ Su aspecto es el de la ACF de una serie estacionaria.
 </p>
 
 
-<div id="org45737de" class="figure">
+<div id="org63832a4" class="figure">
 <p><img src="./img/lecc09/UK_Interest_rates_ACF.png" alt="UK_Interest_rates_ACF.png" width="500px" />
 </p>
 </div>
@@ -854,9 +854,9 @@ Su valor es claramente inferior a \(1\).
 </li>
 </ul>
 </div>
-<div id="outline-container-orge5be24a" class="outline-4">
-<h4 id="orge5be24a">Conclusión</h4>
-<div class="outline-text-4" id="text-orge5be24a">
+<div id="outline-container-org69c9021" class="outline-4">
+<h4 id="org69c9021">Conclusión</h4>
+<div class="outline-text-4" id="text-org69c9021">
 <p>
 Los análisis realizados sobre los residuos de la regresión entre los tipos de interés a corto y largo plazo sugieren que estos se comportan como un proceso estacionario. 
 </p>
@@ -876,13 +876,13 @@ sugieren que los cambios en los tipos de interés a corto y largo plazo pueden e
 </div>
 </div>
 </div>
-<div id="outline-container-org0555b33" class="outline-2">
-<h2 id="org0555b33">Codigo aux</h2>
-<div class="outline-text-2" id="text-org0555b33">
+<div id="outline-container-org7a91019" class="outline-2">
+<h2 id="org7a91019">Codigo aux</h2>
+<div class="outline-text-2" id="text-org7a91019">
 </div>
 <ul class="org-ul">
-<li><a id="orgc0903a6"></a>Codigo aux<br />
-<div class="outline-text-15" id="text-orgc0903a6">
+<li><a id="orgfb77365"></a>Codigo aux<br />
+<div class="outline-text-15" id="text-orgfb77365">
 <p>
 <code>El objetivo de los siguientes bloques de código es mostrar en el texto los resultados de las estimaciones con un formato más agradable.</code>
 </p>
@@ -899,12 +899,12 @@ sugieren que los cambios en los tipos de interés a corto y largo plazo pueden e
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="orgb4cd7eb"><code><span style="font-weight: bold;">round</span>(correlation,3)
+<pre class="src src-jupyter-python" id="org580a6a3"><code><span style="font-weight: bold;">round</span>(correlation,3)
 </code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-latex" id="org8382b66"><code>- Valor del coeficiente de correlaci&#243;n: ~<span style="font-weight: bold;">&lt;&lt;</span><span style="font-style: italic;">Coef-correlacionGNPmelanoma()</span><span style="font-weight: bold;">&gt;&gt;</span>~
+<pre class="src src-latex" id="org27d24a2"><code>- Valor del coeficiente de correlaci&#243;n: ~<span style="font-weight: bold;">&lt;&lt;</span><span style="font-style: italic;">Coef-correlacionGNPmelanoma()</span><span style="font-weight: bold;">&gt;&gt;</span>~
 </code></pre>
 </div>
 
@@ -924,12 +924,12 @@ sugieren que los cambios en los tipos de interés a corto y largo plazo pueden e
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="org28cc9df"><code><span style="font-weight: bold;">round</span>(correlationUKinterestRates,3)
+<pre class="src src-jupyter-python" id="orgb966024"><code><span style="font-weight: bold;">round</span>(correlationUKinterestRates,3)
 </code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-latex" id="orgc0ed987"><code>- Valor del coeficiente de correlaci&#243;n: ~<span style="font-weight: bold;">&lt;&lt;</span><span style="font-style: italic;">Coef-correlationUKinterestRates()</span><span style="font-weight: bold;">&gt;&gt;</span>~
+<pre class="src src-latex" id="orgd582a30"><code>- Valor del coeficiente de correlaci&#243;n: ~<span style="font-weight: bold;">&lt;&lt;</span><span style="font-style: italic;">Coef-correlationUKinterestRates()</span><span style="font-weight: bold;">&gt;&gt;</span>~
 </code></pre>
 </div>
 
@@ -948,7 +948,7 @@ sugieren que los cambios en los tipos de interés a corto y largo plazo pueden e
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2025-12-12 Fri 16:49</p>
+<p class="date">Created: 2026-01-20 Tue 21:49</p>
 </div>
 </body>
 </html>

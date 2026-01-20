@@ -1,0 +1,47 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../../datos/VentasGrandesSuperficies.gdt
+
+logs ventas
+sdiff l_ventas
+diff sd_l_ventas
+smpl 2004:01 2013:03
+
+rmplot ventas --output="rango-media_ventas.png"
+gnuplot ventas --time-series --with-lines --output="ventas.png"
+
+rmplot l_ventas --output="rango-media_l_ventas.png"
+gnuplot l_ventas --time-series --with-lines --output="l_ventas.png"
+
+gnuplot d_sd_l_ventas --time-series --with-lines --output="d_sd_l_ventas.png"
+
+outfile --quiet adf_d_sd_l_ventas.txt
+    adf 12 d_sd_l_ventas --c  --test-down=AIC
+end outfile
+
+outfile --quiet kpss_d_sd_l_ventas.txt
+    kpss 12 d_sd_l_ventas
+end outfile
+
+outfile --quiet modeloARIMAsd_l_ventas.txt
+    arima 2 1 0 ; 0 1 1 ; l_ventas --nc
+    modtest --normality --quiet
+    modtest --arch 4 --quiet
+    modtest --autocorr 39 --quiet
+end outfile
+
+outfile --quiet modeloARMAXsd_l_ventas.txt
+    arima 2 1 0 ; 0 1 1 ; l_ventas pulse082012 step092012 --nc
+    modtest --normality --quiet
+    modtest --arch 4 --quiet
+    modtest --autocorr 39 --quiet
+end outfile
