@@ -141,10 +141,13 @@ publicacion-practicas: $(patsubst $(PRACTICAS_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(
 	  --load ~/Software/scimax/init.el \
 	  -l publica-practicas.el
 	echo "FICHEROS EN Docs?..."
+	cp -a $(PRACTICAS_SRC)/LicenciaGuionesGretl/COPYING $(DOCS)/Practicas-html/guiones/
 	touch $@
 #	find $(DOCS)/Practicas-html
 #	find $(DOCS)/Practicas-pdf
 
+licencia: 
+	cp -a $(PRACTICAS_SRC)/LicenciaGuionesGretl/COPYING $(DOCS)/Practicas-html/guiones/
 
 notebooksYslides: $(patsubst $(LECCIONES_SRC)/%.org,$(CUADERNOS)/%.ipynb,$(wildcard $(SRC_FILES)))
 	touch $@
@@ -200,10 +203,10 @@ symlink_files:
 
 
 # Lista de archivos fuente .org en org-practicas
-PRACTICAS_SRC = $(wildcard org-practicas/*.org)
+PRACTICAS_ORG = $(wildcard org-practicas/*.org)
 
 # Ficheros .done como señal de que fueron tanglados
-PRACTICAS_DONE = $(patsubst org-practicas/%.org, $(PRACTICAS_tmp)/%.done, $(PRACTICAS_SRC))
+PRACTICAS_DONE = $(patsubst org-practicas/%.org, $(PRACTICAS_tmp)/%.done, $(PRACTICAS_ORG))
 
 # Objetivo principal de las prácticas en Gretl
 practicas: figuras_de_lecciones $(PRACTICAS_DONE)

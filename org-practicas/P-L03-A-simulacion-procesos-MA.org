@@ -9,7 +9,7 @@
 
 #+include: 00preambulo_practicas.txt
 
-#+INFOJS_OPT: view:overview
+# +INFOJS_OPT: view:overview
 # ###########
 # ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
 #+SETUPFILE: ../css/bigblow_inline.theme
@@ -69,6 +69,15 @@ DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
 # zip $practica $practica.* $practica/*
 #+END_SRC
 
+#+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none 
+# ------------------------------------------------------------
+# Copyright (C) 2025 Marcos Bujosa
+# Licencia: GNU General Public License v3.0 o posterior
+# Este código es software libre y puede ser redistribuido y/o modificado bajo los términos de la GPL.
+# Ver el archivo LICENSE del repositorio para más detalles.
+# ------------------------------------------------------------
+#+end_src
+
 #+begin_src gretl :tangle guiones/P-L03-A-simulacion-procesos-MA.inp :exports none :eval no
 # Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
 # al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
@@ -81,10 +90,12 @@ DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
 string directory = getenv("DIRECTORIO")
 set workdir "@directory"
 #+end_src
-# string directory = $(pwd) ~ "/P-L03-A-simulaciones"
 
 
 #+LATEX: \maketitle
+#+LATEX: \blfootnote{Licencia: Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0).}
+
+#+LATEX: \vspace{-1cm}
 
 
 * Objetivo de la práctica
@@ -138,7 +149,7 @@ Con los siguientes pasos generaremos un proceso de ruido blanco con distribució
 series WN = normal(0,1)
 #+END_SRC
 
-#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none :noweb yes
+#+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none :noweb yes
 ### Simulamos una serie temporal de ruido blanco con distribución normal
 <<Semilla y simulación ruido blanco>> 
 #+end_src
@@ -146,7 +157,7 @@ series WN = normal(0,1)
 #+latex: \noindent
 (la función ~randgen~ permite simular un montón de distribuciones, 
 pero en el script hemos empleado una función dedicada específicamente a la simulación de datos con distribución normal $N(\mu,\sigma)$. Teclee ~help normal~ para consultar su documentación.
-Si quiere usar otras distribuciones, use la función ~randgen~ siguiendo las instrucciones indicadas en la documentación).
+Si quiere usar otras distribuciones, use la función ~randgen~ siguiendo las instrucciones indicadas en la documentación de Gretl).
 #+latex: }
 
 
@@ -166,13 +177,13 @@ He utilizado dichos ficheros =.txt= y =.png= para poder mostrar los resultados a
 #+latex: }
 
 # El siguiente código hace lo mismo que el anterior pero guarda los resultados en sendos ficheros para poder ser visualizados en este documento.
-#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+#+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
 ### Estadísticos descriptivos básicos y gráfico
 outfile --quiet EstadisticosWN.txt
     summary WN --simple
 end outfile
 gnuplot WN --time-series --with-lines  --output="WN.png"
-#+END_SRC
+#+end_src
 
 #+latex: {\footnotesize
 #+include: ./P-L03-A-simulacion-procesos-MA/EstadisticosWN.txt example
@@ -210,13 +221,13 @@ summary WN --simple
 - Observe los estadísticos descriptivos de =WN=
 
 # El siguiente código hace lo mismo que el anterior pero guarda los resultados
-#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+#+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
 ### Estadísticos descriptivos básicos para la submuestra hasta 1997:2
 smpl 1960:1 1997:2
 outfile --quiet EstadisticosWN-1992.txt
     summary WN --simple
 end outfile
-#+END_SRC
+#+end_src
 
 
 #+latex: {\footnotesize
@@ -242,13 +253,13 @@ summary WN --simple
 - Observe los estadísticos descriptivos de =WN=
 
 # El siguiente código hace lo mismo que el anterior pero guarda los resultados
-#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+#+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
 ### Estadísticos descriptivos básicos para la submuestra desde 1997:3
 smpl 1997:3 2034:4
 outfile --quiet EstadisticosWN-2034.txt
     summary WN --simple
 end outfile
-#+END_SRC
+#+end_src
 
 
 #+latex: {\footnotesize
@@ -299,13 +310,13 @@ summary X --simple
 #+latex: }
 
 # El siguiente código guarda los resultados.
-#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+#+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
 ### Gráfico y estadísticos descriptivos básicos
 gnuplot X --time-series --with-lines  --output="MA1.png"
 outfile --quiet EstadisticosMA1.txt
     summary X --simple
 end outfile
-#+END_SRC
+#+end_src
 
 #+BEGIN_CENTER
 #+attr_org: :width 500
@@ -337,13 +348,13 @@ summary X --simple
 - Observe los estadísticos descriptivos de =X=
 
 # El siguiente código hace lo mismo que el anterior pero guarda los resultados
-#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+#+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
 ### Estadísticos descriptivos básicos para la submuestra hasta 1997:2
 smpl 1960:1 1997:2
 outfile --quiet EstadisticosMA1-1992.txt
     summary X --simple
 end outfile
-#+END_SRC
+#+end_src
 
 
 #+latex: {\footnotesize
@@ -370,13 +381,13 @@ summary X --simple
 - Observe los estadísticos descriptivos de =X=
 
 # El siguiente código hace lo mismo que el anterior pero guarda los resultados
-#+BEGIN_SRC R :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
+#+begin_src gretl :tangle ./guiones/P-L03-A-simulacion-procesos-MA.inp :eval no :exports none
 ### Estadísticos descriptivos básicos para la submuestra desde 1997:3
 smpl 1997:3 2034:4
 outfile --quiet EstadisticosMA1-2034.txt
     summary X --simple
 end outfile
-#+END_SRC
+#+end_src
 
 
 #+latex: {\footnotesize
@@ -397,10 +408,13 @@ Compare los estadísticos de las distintas sub-muestras.
 Comprobará que en todos los casos los estadísticos de la primera parte de la muestra serán similares a los de la segunda,
 pues los procesos MA siempre son estacionarios.
 
-
 * Código completo de la práctica
 
-   | Guión completo: | [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-A-simulacion-procesos-MA.inp][P-L03-A-simulacion-procesos-MA.inp]] |
+#+latex: {\vspace{10pt}
+#+latex: \noindent
+[[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-A-simulacion-procesos-MA.inp][P-L03-A-simulacion-procesos-MA.inp]]
+#+latex: \vspace{10pt}
+#+LATEX: \lstinputlisting{guiones/P-L03-A-simulacion-procesos-MA.inp}
+#+LATEX: \clearpage }
 
-#+latex: \lstinputlisting{guiones/P-L03-A-simulacion-procesos-MA.inp}
 
