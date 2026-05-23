@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-01-22 Thu 11:07 -->
+<!-- 2026-05-23 Sat 14:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Análisis y Visualización de Procesos Estocásticos ARMA: ACF, PACF y Espectros</title>
@@ -66,43 +66,43 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org39950ae">ACF, PACF y densidad espectral teóricas</a>
+<li><a href="#orgc1cf925">ACF, PACF y densidad espectral teóricas</a>
 <ul>
-<li><a href="#org1c199ef">Ruido blanco</a></li>
+<li><a href="#org7e91a99">Ruido blanco</a></li>
 </ul>
 </li>
-<li><a href="#orgeed1094">ACF, PACF y densidad espectral estimadas de un modelo simulado</a>
+<li><a href="#orgf0c5106">ACF, PACF y densidad espectral estimadas de un modelo simulado</a>
 <ul>
-<li><a href="#org4e3cfea">Ruido blanco</a></li>
+<li><a href="#orgecd5d87">Ruido blanco</a></li>
 </ul>
 </li>
-<li><a href="#org7c5f910">Análisis de un modelo ARMA</a>
+<li><a href="#org2128a88">Análisis de un modelo ARMA</a>
 <ul>
-<li><a href="#orgf7c67e6">ACF, PACF y densidad espectral teóricas</a></li>
-<li><a href="#org98f1b42">Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma</a>
+<li><a href="#orgd62b40d">ACF, PACF y densidad espectral teóricas</a></li>
+<li><a href="#orgebf5823">Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma</a>
 <ul>
-<li><a href="#orge9ebb34">Caso paseo aleatorio</a></li>
-<li><a href="#org8392821">Caso ARMA estacional</a></li>
+<li><a href="#org80d831d">Caso paseo aleatorio</a></li>
+<li><a href="#org2336901">Caso ARMA estacional</a></li>
 </ul>
 </li>
-<li><a href="#org6ec34d8">Raíces de uno de los polinomos</a></li>
+<li><a href="#org0153924">Raíces de uno de los polinomos</a></li>
 </ul>
 </li>
-<li><a href="#orga4a3fdf">Ejemplo de uso</a></li>
-<li><a href="#orga22d3fb">Código en python</a>
+<li><a href="#org587ffba">Ejemplo de uso</a></li>
+<li><a href="#orgb45b54f">Código en python</a>
 <ul>
-<li><a href="#orga0d8a2d">Cálculo de la PACF a partir de la ACF (<code>theoretical_pacf_from_acf</code>)</a></li>
-<li><a href="#orgcc6d949">Representación de la ACF, PACF y densidad espectral teóricas (<code>plot_arma_parametric_diagnostics</code>)</a></li>
-<li><a href="#org0e351fd">Simulación y análisis de un modelo ARMA (<code>plot_arma_analysis</code>)</a>
+<li><a href="#org1ed6a10">Cálculo de la PACF a partir de la ACF (<code>theoretical_pacf_from_acf</code>)</a></li>
+<li><a href="#orgb38d87b">Representación de la ACF, PACF y densidad espectral teóricas (<code>plot_arma_parametric_diagnostics</code>)</a></li>
+<li><a href="#org1b22ba5">Simulación y análisis de un modelo ARMA (<code>plot_arma_analysis</code>)</a>
 <ul>
-<li><a href="#orgc6b7c70">Caso paseo aleatorio</a></li>
+<li><a href="#org58d3f38">Caso paseo aleatorio</a></li>
 </ul>
 </li>
-<li><a href="#orgc094525">Análisis de las raíces de un polinomio (<code>polynomial_roots_table</code>)</a></li>
-<li><a href="#org51c28a7">Análisis de las raíces de un polinomio (<code>Localizacion_parametros_plot</code>)</a></li>
-<li><a href="#org797eeec">Conversión de un polinomio \(B^s\) en un polinomio en \(B\)</a></li>
-<li><a href="#orgeabdf9a">Gráfico región parámetros polinomio grado 2 (<code>RegionParametrica</code>)</a></li>
-<li><a href="#org999a803">Gráfico rango mediana (<code>RangoMediana</code>)</a></li>
+<li><a href="#org96f1b26">Análisis de las raíces de un polinomio (<code>polynomial_roots_table</code>)</a></li>
+<li><a href="#orga8d12fa">Análisis de las raíces de un polinomio (<code>Localizacion_parametros_plot</code>)</a></li>
+<li><a href="#org9c9a1e9">Conversión de un polinomio \(B^s\) en un polinomio en \(B\)</a></li>
+<li><a href="#org072f267">Gráfico región parámetros polinomio grado 2 (<code>RegionParametrica</code>)</a></li>
+<li><a href="#org0f5b626">Gráfico rango mediana (<code>RangoMediana</code>)</a></li>
 </ul>
 </li>
 </ul>
@@ -122,13 +122,13 @@ warnings.filterwarnings(<span style="font-style: italic;">"ignore"</span>, categ
 %run -i analisis_armas.py
 </code></pre>
 </div>
-<div id="outline-container-org39950ae" class="outline-2">
-<h2 id="org39950ae">ACF, PACF y densidad espectral teóricas</h2>
-<div class="outline-text-2" id="text-org39950ae">
+<div id="outline-container-orgc1cf925" class="outline-2">
+<h2 id="orgc1cf925">ACF, PACF y densidad espectral teóricas</h2>
+<div class="outline-text-2" id="text-orgc1cf925">
 </div>
-<div id="outline-container-org1c199ef" class="outline-3">
-<h3 id="org1c199ef">Ruido blanco</h3>
-<div class="outline-text-3" id="text-org1c199ef">
+<div id="outline-container-org7e91a99" class="outline-3">
+<h3 id="org7e91a99">Ruido blanco</h3>
+<div class="outline-text-3" id="text-org7e91a99">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1,]
 <span style="font-weight: bold; font-style: italic;">ma_params</span> = [1,]
@@ -142,13 +142,13 @@ plot_arma_parametric_diagnostics(ar_params, ma_params)
 </div>
 </div>
 </div>
-<div id="outline-container-orgeed1094" class="outline-2">
-<h2 id="orgeed1094">ACF, PACF y densidad espectral estimadas de un modelo simulado</h2>
-<div class="outline-text-2" id="text-orgeed1094">
+<div id="outline-container-orgf0c5106" class="outline-2">
+<h2 id="orgf0c5106">ACF, PACF y densidad espectral estimadas de un modelo simulado</h2>
+<div class="outline-text-2" id="text-orgf0c5106">
 </div>
-<div id="outline-container-org4e3cfea" class="outline-3">
-<h3 id="org4e3cfea">Ruido blanco</h3>
-<div class="outline-text-3" id="text-org4e3cfea">
+<div id="outline-container-orgecd5d87" class="outline-3">
+<h3 id="orgecd5d87">Ruido blanco</h3>
+<div class="outline-text-3" id="text-orgecd5d87">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code>plot_arma_analysis(ar_params, ma_params, seed=2026)
 </code></pre>
@@ -160,13 +160,13 @@ plot_arma_parametric_diagnostics(ar_params, ma_params)
 </div>
 </div>
 </div>
-<div id="outline-container-org7c5f910" class="outline-2">
-<h2 id="org7c5f910">Análisis de un modelo ARMA</h2>
-<div class="outline-text-2" id="text-org7c5f910">
+<div id="outline-container-org2128a88" class="outline-2">
+<h2 id="org2128a88">Análisis de un modelo ARMA</h2>
+<div class="outline-text-2" id="text-org2128a88">
 </div>
-<div id="outline-container-orgf7c67e6" class="outline-3">
-<h3 id="orgf7c67e6">ACF, PACF y densidad espectral teóricas</h3>
-<div class="outline-text-3" id="text-orgf7c67e6">
+<div id="outline-container-orgd62b40d" class="outline-3">
+<h3 id="orgd62b40d">ACF, PACF y densidad espectral teóricas</h3>
+<div class="outline-text-3" id="text-orgd62b40d">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1, 0.5]
 <span style="font-weight: bold; font-style: italic;">ma_params</span> = [1, -0.9, 0.4]
@@ -179,9 +179,9 @@ plot_arma_parametric_diagnostics(ar_params, ma_params)
 </pre>
 </div>
 </div>
-<div id="outline-container-org98f1b42" class="outline-3">
-<h3 id="org98f1b42">Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma</h3>
-<div class="outline-text-3" id="text-org98f1b42">
+<div id="outline-container-orgebf5823" class="outline-3">
+<h3 id="orgebf5823">Simulación del modelo, estimación de las ACF y PACF muestrales y cálculo del periodograma</h3>
+<div class="outline-text-3" id="text-orgebf5823">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code>plot_arma_analysis(ar_params, ma_params)
 </code></pre>
@@ -191,9 +191,9 @@ plot_arma_parametric_diagnostics(ar_params, ma_params)
 &lt;Figure size 1800x700 with 4 Axes&gt;
 </pre>
 </div>
-<div id="outline-container-orge9ebb34" class="outline-4">
-<h4 id="orge9ebb34">Caso paseo aleatorio</h4>
-<div class="outline-text-4" id="text-orge9ebb34">
+<div id="outline-container-org80d831d" class="outline-4">
+<h4 id="org80d831d">Caso paseo aleatorio</h4>
+<div class="outline-text-4" id="text-org80d831d">
 <p>
 Paseo aleatorio con deriva
 </p>
@@ -220,9 +220,9 @@ Paseo aleatorio sin deriva
 </pre>
 </div>
 </div>
-<div id="outline-container-org8392821" class="outline-4">
-<h4 id="org8392821">Caso ARMA estacional</h4>
-<div class="outline-text-4" id="text-org8392821">
+<div id="outline-container-org2336901" class="outline-4">
+<h4 id="org2336901">Caso ARMA estacional</h4>
+<div class="outline-text-4" id="text-org2336901">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code>plot_arma_seasonal_parametric_diagnostics(ar_params=[1, -0.9], s=12, seasonal_ar_params=[1, -0.9], logs=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 </code></pre>
@@ -244,9 +244,9 @@ Paseo aleatorio sin deriva
 </div>
 </div>
 </div>
-<div id="outline-container-org6ec34d8" class="outline-3">
-<h3 id="org6ec34d8">Raíces de uno de los polinomos</h3>
-<div class="outline-text-3" id="text-org6ec34d8">
+<div id="outline-container-org0153924" class="outline-3">
+<h3 id="org0153924">Raíces de uno de los polinomos</h3>
+<div class="outline-text-3" id="text-org0153924">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ar_params</span> = [1, -0.9, 0.4]
 polynomial_roots_table(ar_params)
@@ -264,16 +264,16 @@ polynomial_roots_table(ar_params)
 </div>
 </div>
 </div>
-<div id="outline-container-orga4a3fdf" class="outline-2">
-<h2 id="orga4a3fdf">Ejemplo de uso</h2>
-<div class="outline-text-2" id="text-orga4a3fdf">
+<div id="outline-container-org587ffba" class="outline-2">
+<h2 id="org587ffba">Ejemplo de uso</h2>
+<div class="outline-text-2" id="text-org587ffba">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">ma_params</span> = [1, -1.5, 0.54]
-<span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ma_params = [1, -1, 0.25]
-</span><span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ma_params = [1, -1, 0.35]
-</span><span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ma_params = [1, -1, 0]
-</span><span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ma_params = [1, 0, 1]
-</span>
+<span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ma_params = [1, -1, 0.25]</span>
+<span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ma_params = [1, -1, 0.35]</span>
+<span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ma_params = [1, -1, 0]</span>
+<span style="font-weight: bold; font-style: italic;">#</span><span style="font-weight: bold; font-style: italic;">ma_params = [1, 0, 1]</span>
+
 polynomial_roots_table(ma_params)
 </code></pre>
 </div>
@@ -310,29 +310,29 @@ polynomial_roots_table(ma_params)
 </pre>
 </div>
 </div>
-<div id="outline-container-orga22d3fb" class="outline-2">
-<h2 id="orga22d3fb">Código en python</h2>
-<div class="outline-text-2" id="text-orga22d3fb">
+<div id="outline-container-orgb45b54f" class="outline-2">
+<h2 id="orgb45b54f">Código en python</h2>
+<div class="outline-text-2" id="text-orgb45b54f">
 <p>
 Éstas son las librerías empleadas en las funciones de más abajo:
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org286d99c"><code><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np
+<pre class="src src-python" id="org712a8e6"><code><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np
 <span style="font-weight: bold;">from</span> numpy.polynomial <span style="font-weight: bold;">import</span> Polynomial
 
 <span style="font-weight: bold;">import</span> pandas <span style="font-weight: bold;">as</span> pd
 
 <span style="font-weight: bold;">import</span> matplotlib <span style="font-weight: bold;">as</span> mpl
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">definimos par&#225;metros para mejorar los gr&#225;ficos
-</span>mpl.rc(<span style="font-style: italic;">'text'</span>, usetex=<span style="font-weight: bold; text-decoration: underline;">False</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">definimos par&#225;metros para mejorar los gr&#225;ficos</span>
+mpl.rc(<span style="font-style: italic;">'text'</span>, usetex=<span style="font-weight: bold; text-decoration: underline;">False</span>)
 <span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt
-<span style="font-weight: bold;">import</span> matplotlib.ticker <span style="font-weight: bold;">as</span> ticker <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">*** nuevo para ARMAs estacionales
-</span>
+<span style="font-weight: bold;">import</span> matplotlib.ticker <span style="font-weight: bold;">as</span> ticker <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">*** nuevo para ARMAs estacionales</span>
+
 <span style="font-weight: bold;">import</span> statsmodels.api <span style="font-weight: bold;">as</span> sm
 <span style="font-weight: bold;">from</span> statsmodels.tsa.arima_process <span style="font-weight: bold;">import</span> ArmaProcess
-<span style="font-weight: bold;">from</span> statsmodels.tsa.arima.model <span style="font-weight: bold;">import</span> ARIMA <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">*** nuevo en paseos aleatorios
-</span>
+<span style="font-weight: bold;">from</span> statsmodels.tsa.arima.model <span style="font-weight: bold;">import</span> ARIMA <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">*** nuevo en paseos aleatorios</span>
+
 <span style="font-weight: bold;">from</span> scipy <span style="font-weight: bold;">import</span> signal
 <span style="font-weight: bold;">from</span> scipy.signal <span style="font-weight: bold;">import</span> freqz
 
@@ -341,34 +341,34 @@ polynomial_roots_table(ma_params)
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orga0d8a2d" class="outline-3">
-<h3 id="orga0d8a2d">Cálculo de la PACF a partir de la ACF (<code>theoretical_pacf_from_acf</code>)</h3>
-<div class="outline-text-3" id="text-orga0d8a2d">
+<div id="outline-container-org1ed6a10" class="outline-3">
+<h3 id="org1ed6a10">Cálculo de la PACF a partir de la ACF (<code>theoretical_pacf_from_acf</code>)</h3>
+<div class="outline-text-3" id="text-org1ed6a10">
 <p>
 La siguiente función calcula la PACF a partir de la ACF resolviendo las <a href="./Lecc05.html#org392fab2">ecuaciones de Yule-Walker</a> recursivamente con el algoritmo <a href="https://en.wikipedia.org/wiki/Levinson_recursion">Levinson-Durbin</a>; véase <i>Pourahmadi, M. (2001, Capítulo 7)</i> o <i>Brockwell &amp; Davis (1991, Capítulo 5)</i>). 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org8cb1714"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">theoretical_pacf_from_acf</span>(acf_vals):
-    <span style="font-style: italic;">"""
-    Calcula la PACF te&#243;rica (para lags &gt;= 0) de forma param&#233;trica usando el algoritmo de Durbin-Levinson.
+<pre class="src src-python" id="orgd2415f5"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">theoretical_pacf_from_acf</span>(acf_vals):
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Calcula la PACF te&#243;rica (para lags &gt;= 0) de forma param&#233;trica usando el algoritmo de Durbin-Levinson.</span>
 
-    Par&#225;metros:
-      acf_vals (list):
-          una lista tal que acf_vals[0] corresponde al retardo 0.
-    
-    Retorna:
-      list: el coeficiente en la posici&#243;n k corresponde a la PACF en el retardo k.
-    """</span>
+<span style="font-style: italic;">    Par&#225;metros:</span>
+<span style="font-style: italic;">      acf_vals (list):</span>
+<span style="font-style: italic;">          una lista tal que acf_vals[0] corresponde al retardo 0.</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Retorna:</span>
+<span style="font-style: italic;">      list: el coeficiente en la posici&#243;n k corresponde a la PACF en el retardo k.</span>
+<span style="font-style: italic;">    """</span>
     <span style="font-weight: bold; font-style: italic;">nlags</span> = <span style="font-weight: bold;">len</span>(acf_vals)-1
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Matriz para almacenar los coeficientes (phi)
-</span>    <span style="font-weight: bold; font-style: italic;">phi</span> = np.zeros((nlags+1, nlags+1))
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">v guarda la varianza de error en cada paso
-</span>    <span style="font-weight: bold; font-style: italic;">v</span> = np.zeros(nlags+1)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Matriz para almacenar los coeficientes (phi)</span>
+    <span style="font-weight: bold; font-style: italic;">phi</span> = np.zeros((nlags+1, nlags+1))
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">v guarda la varianza de error en cada paso</span>
+    <span style="font-weight: bold; font-style: italic;">v</span> = np.zeros(nlags+1)
     <span style="font-weight: bold; font-style: italic;">pacf</span> = np.zeros(nlags+1)
     <span style="font-weight: bold; font-style: italic;">v</span>[0] = acf_vals[0]
-    <span style="font-weight: bold; font-style: italic;">pacf</span>[0] = 1.0  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Por convenci&#243;n, PACF(0)=1.
-</span>    
+    <span style="font-weight: bold; font-style: italic;">pacf</span>[0] = 1.0  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Por convenci&#243;n, PACF(0)=1.</span>
+    
     <span style="font-weight: bold;">for</span> k <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(1, nlags+1):
         <span style="font-weight: bold;">if</span> k == 1:
             <span style="font-weight: bold; font-style: italic;">phi</span>[1,1] = acf_vals[1] / acf_vals[0]
@@ -376,53 +376,53 @@ La siguiente función calcula la PACF a partir de la ACF resolviendo las <a href
             <span style="font-weight: bold; font-style: italic;">v</span>[1] = v[0]*(1 - phi[1,1]**2)
         <span style="font-weight: bold;">else</span>:
             <span style="font-weight: bold; font-style: italic;">sum_val</span> = 0.0
-            <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Sumar phi[k-1,j]*acf_vals[k-j] para j=1,...,k-1.
-</span>            <span style="font-weight: bold;">for</span> j <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(1, k):
+            <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Sumar phi[k-1,j]*acf_vals[k-j] para j=1,...,k-1.</span>
+            <span style="font-weight: bold;">for</span> j <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(1, k):
                 <span style="font-weight: bold; font-style: italic;">sum_val</span> += phi[k-1, j] * acf_vals[k - j]
             <span style="font-weight: bold; font-style: italic;">phi</span>[<span style="font-weight: bold; font-style: italic;">k</span>, <span style="font-weight: bold; font-style: italic;">k</span>] = (acf_vals[k] - sum_val) / v[k-1]
             <span style="font-weight: bold; font-style: italic;">pacf</span>[k] = phi[k, k]
             <span style="font-weight: bold;">for</span> j <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(1, k):
                 <span style="font-weight: bold; font-style: italic;">phi</span>[<span style="font-weight: bold; font-style: italic;">k</span>, <span style="font-weight: bold; font-style: italic;">j</span>] = phi[k-1, j] - phi[k, k] * phi[k-1, k - j]
             <span style="font-weight: bold; font-style: italic;">v</span>[k] = v[k-1] * (1 - phi[k, k]**2)
-    <span style="font-weight: bold;">return</span> pacf  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Incluye PACF en lag 0 con valor 1.
-</span>
+    <span style="font-weight: bold;">return</span> pacf  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Incluye PACF en lag 0 con valor 1.</span>
+
 </code></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-orgcc6d949" class="outline-3">
-<h3 id="orgcc6d949">Representación de la ACF, PACF y densidad espectral teóricas (<code>plot_arma_parametric_diagnostics</code>)</h3>
-<div class="outline-text-3" id="text-orgcc6d949">
+<div id="outline-container-orgb38d87b" class="outline-3">
+<h3 id="orgb38d87b">Representación de la ACF, PACF y densidad espectral teóricas (<code>plot_arma_parametric_diagnostics</code>)</h3>
+<div class="outline-text-3" id="text-orgb38d87b">
 <p>
 La siguiente función pinta las ACF, PACF y densidad espectral teóricas de un modelo ARMA.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgc1a14a2"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_parametric_diagnostics</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>):
-    <span style="font-style: italic;">"""
-    Genera y retorna una figura con tres subgr&#225;ficas para un modelo ARMA:
-      - ACF te&#243;rica (omitiendo retardo 0)
-      - PACF te&#243;rica param&#233;trica (calculada v&#237;a el algoritmo de Durbin-Levinson, omitiendo retardo 0)
-      - Densidad espectral te&#243;rica
-    
-    Par&#225;metros:
-      ar_params (list):
-          Coeficientes del polinomio AR (debe incluir el 1 inicial).
-      ma_params (list):
-          Coeficientes del polinomio MA (debe incluir el 1 inicial).
-      sigma2 (float):
-          Varianza del ruido U&#8348;.
-      lags (int, opcional): 
-          N&#250;mero de retardos considerados (por defecto 20).
-    
-    Retorna:
-      fig : objeto matplotlib.figure.Figure
-    """</span>
+<pre class="src src-python" id="org295bb23"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_parametric_diagnostics</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>):
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Genera y retorna una figura con tres subgr&#225;ficas para un modelo ARMA:</span>
+<span style="font-style: italic;">      - ACF te&#243;rica (omitiendo retardo 0)</span>
+<span style="font-style: italic;">      - PACF te&#243;rica param&#233;trica (calculada v&#237;a el algoritmo de Durbin-Levinson, omitiendo retardo 0)</span>
+<span style="font-style: italic;">      - Densidad espectral te&#243;rica</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Par&#225;metros:</span>
+<span style="font-style: italic;">      ar_params (list):</span>
+<span style="font-style: italic;">          Coeficientes del polinomio AR (debe incluir el 1 inicial).</span>
+<span style="font-style: italic;">      ma_params (list):</span>
+<span style="font-style: italic;">          Coeficientes del polinomio MA (debe incluir el 1 inicial).</span>
+<span style="font-style: italic;">      sigma2 (float):</span>
+<span style="font-style: italic;">          Varianza del ruido U&#8348;.</span>
+<span style="font-style: italic;">      lags (int, opcional): </span>
+<span style="font-style: italic;">          N&#250;mero de retardos considerados (por defecto 20).</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Retorna:</span>
+<span style="font-style: italic;">      fig : objeto matplotlib.figure.Figure</span>
+<span style="font-style: italic;">    """</span>
     
     <span style="font-weight: bold; font-style: italic;">phi</span>   = Polynomial(ar_params, symbol=<span style="font-style: italic;">'B'</span>)
     <span style="font-weight: bold; font-style: italic;">theta</span> = Polynomial(ma_params, symbol=<span style="font-style: italic;">'B'</span>)
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el proceso ARMA
-</span>    <span style="font-weight: bold; font-style: italic;">arma_process</span> = ArmaProcess(ar=phi.coef, ma=theta.coef)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el proceso ARMA</span>
+    <span style="font-weight: bold; font-style: italic;">arma_process</span> = ArmaProcess(ar=phi.coef, ma=theta.coef)
 
     <span style="font-weight: bold; font-style: italic;">s</span>=4
     <span style="font-weight: bold;">if</span> lags:
@@ -430,46 +430,46 @@ La siguiente función pinta las ACF, PACF y densidad espectral teóricas de un m
     <span style="font-weight: bold;">else</span>:
         <span style="font-weight: bold; font-style: italic;">lags</span>=(s*5)+1
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">1. Calcular la ACF te&#243;rica
-</span>    <span style="font-weight: bold; font-style: italic;">acf_theo</span> = arma_process.acf(lags=lags)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">1. Calcular la ACF te&#243;rica</span>
+    <span style="font-weight: bold; font-style: italic;">acf_theo</span> = arma_process.acf(lags=lags)
     <span style="font-weight: bold; font-style: italic;">lags_theo</span> = np.arange(<span style="font-weight: bold;">len</span>(acf_theo))
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Omitir el retardo 0 para gr&#225;ficos de ACF y PACF:
-</span>    <span style="font-weight: bold; font-style: italic;">acf_plot</span> = acf_theo[1:]
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Omitir el retardo 0 para gr&#225;ficos de ACF y PACF:</span>
+    <span style="font-weight: bold; font-style: italic;">acf_plot</span> = acf_theo[1:]
     <span style="font-weight: bold; font-style: italic;">lags_plot</span> = lags_theo[1:]
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">2. Calcular la PACF te&#243;rica de forma param&#233;trica a partir de la ACF
-</span>    <span style="font-weight: bold; font-style: italic;">pacf_theo</span> = theoretical_pacf_from_acf(acf_theo)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">2. Calcular la PACF te&#243;rica de forma param&#233;trica a partir de la ACF</span>
+    <span style="font-weight: bold; font-style: italic;">pacf_theo</span> = theoretical_pacf_from_acf(acf_theo)
     <span style="font-weight: bold; font-style: italic;">pacf_plot</span> = pacf_theo[1:]
     <span style="font-weight: bold; font-style: italic;">lags_pacf</span> = np.arange(<span style="font-weight: bold;">len</span>(pacf_theo))[1:]
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">3. Calcular la densidad espectral te&#243;rica usando freqz
-</span>    <span style="font-weight: bold; font-style: italic;">w</span>, <span style="font-weight: bold; font-style: italic;">h</span> = freqz(theta.coef, phi.coef, worN=1024)
-    <span style="font-weight: bold; font-style: italic;">freq</span> = w / (2 * np.pi)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Conversi&#243;n de radianes/muestra a ciclos/muestra
-</span>    <span style="font-weight: bold; font-style: italic;">spectrum</span> = (sigma2 / (2 * np.pi)) * np.<span style="font-weight: bold;">abs</span>(h)**2
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">3. Calcular la densidad espectral te&#243;rica usando freqz</span>
+    <span style="font-weight: bold; font-style: italic;">w</span>, <span style="font-weight: bold; font-style: italic;">h</span> = freqz(theta.coef, phi.coef, worN=1024)
+    <span style="font-weight: bold; font-style: italic;">freq</span> = w / (2 * np.pi)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Conversi&#243;n de radianes/muestra a ciclos/muestra</span>
+    <span style="font-weight: bold; font-style: italic;">spectrum</span> = (sigma2 / (2 * np.pi)) * np.<span style="font-weight: bold;">abs</span>(h)**2
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">4. Graficar los tres subgr&#225;ficos
-</span>    <span style="font-weight: bold; font-style: italic;">s</span>=5
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">4. Graficar los tres subgr&#225;ficos</span>
+    <span style="font-weight: bold; font-style: italic;">s</span>=5
     <span style="font-weight: bold; font-style: italic;">logs</span>=<span style="font-weight: bold; text-decoration: underline;">False</span>
     <span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">axs</span> = plt.subplots(1, 3, figsize=(18, 3))
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ACF te&#243;rica
-</span>    axs[0].stem(lags_plot, acf_plot, basefmt=<span style="font-style: italic;">" "</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ACF te&#243;rica</span>
+    axs[0].stem(lags_plot, acf_plot, basefmt=<span style="font-style: italic;">" "</span>)
     axs[0].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
     axs[0].set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
     axs[0].set_ylabel(<span style="font-style: italic;">'ACF'</span>)
-    axs[0].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    axs[0].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">PACF te&#243;rica param&#233;trica
-</span>    axs[1].stem(lags_pacf, pacf_plot, basefmt=<span style="font-style: italic;">" "</span>)
+    axs[0].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    axs[0].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">PACF te&#243;rica param&#233;trica</span>
+    axs[1].stem(lags_pacf, pacf_plot, basefmt=<span style="font-style: italic;">" "</span>)
     axs[1].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
     axs[1].set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
     axs[1].set_ylabel(<span style="font-style: italic;">'PACF'</span>)
-    axs[1].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    axs[1].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Densidad espectral te&#243;rica
-</span>    axs[2].plot(freq, spectrum)
+    axs[1].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    axs[1].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Densidad espectral te&#243;rica</span>
+    axs[2].plot(freq, spectrum)
     axs[2].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
     axs[2].set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
     
@@ -521,40 +521,40 @@ Esta fórmula es fundamental porque permite conocer la distribución de la varia
 
 
 <div class="org-src-container">
-<pre class="src src-python" id="orgecae032"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_seasonal_parametric_diagnostics</span>(ar_params=[1,], ma_params=[1,], s=5, seasonal_ar_params=[1,], seasonal_ma_params=[1,], sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>, logs=<span style="font-weight: bold; text-decoration: underline;">False</span>):
-    <span style="font-style: italic;">"""
-    Genera y retorna una figura con tres subgr&#225;ficas para un modelo ARMA estacional:
-      - ACF te&#243;rica (omitiendo retardo 0)
-      - PACF te&#243;rica param&#233;trica (calculada v&#237;a el algoritmo de Durbin-Levinson, omitiendo retardo 0)
-      - Densidad espectral te&#243;rica
-    
-    Par&#225;metros:
-      ar_params (list):
-          Coeficientes del polinomio AR en B (debe incluir el 1 inicial).
-      ma_params (list):
-          Coeficientes del polinomio MA en B  (debe incluir el 1 inicial).
-      seasonal_ar_params (list):
-          Coeficientes del polinomio AR estacional en B^s (debe incluir el 1 inicial).
-      seasonal_ma_params (list):
-          Coeficientes del polinomio MA estacional en B^s (debe incluir el 1 inicial).
-      sigma2 (float):
-          Varianza del ruido U&#8348;.
-      lags (int, opcional): 
-          N&#250;mero de retardos considerados (por defecto 20).
-      seasonal_lags (int, opcional): 
-          N&#250;mero de retardos estacionales (por defecto 0).
-    
-    Retorna:
-      fig : objeto matplotlib.figure.Figure
-    """</span>
+<pre class="src src-python" id="org5f0665f"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_seasonal_parametric_diagnostics</span>(ar_params=[1,], ma_params=[1,], s=5, seasonal_ar_params=[1,], seasonal_ma_params=[1,], sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>, logs=<span style="font-weight: bold; text-decoration: underline;">False</span>):
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Genera y retorna una figura con tres subgr&#225;ficas para un modelo ARMA estacional:</span>
+<span style="font-style: italic;">      - ACF te&#243;rica (omitiendo retardo 0)</span>
+<span style="font-style: italic;">      - PACF te&#243;rica param&#233;trica (calculada v&#237;a el algoritmo de Durbin-Levinson, omitiendo retardo 0)</span>
+<span style="font-style: italic;">      - Densidad espectral te&#243;rica</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Par&#225;metros:</span>
+<span style="font-style: italic;">      ar_params (list):</span>
+<span style="font-style: italic;">          Coeficientes del polinomio AR en B (debe incluir el 1 inicial).</span>
+<span style="font-style: italic;">      ma_params (list):</span>
+<span style="font-style: italic;">          Coeficientes del polinomio MA en B  (debe incluir el 1 inicial).</span>
+<span style="font-style: italic;">      seasonal_ar_params (list):</span>
+<span style="font-style: italic;">          Coeficientes del polinomio AR estacional en B^s (debe incluir el 1 inicial).</span>
+<span style="font-style: italic;">      seasonal_ma_params (list):</span>
+<span style="font-style: italic;">          Coeficientes del polinomio MA estacional en B^s (debe incluir el 1 inicial).</span>
+<span style="font-style: italic;">      sigma2 (float):</span>
+<span style="font-style: italic;">          Varianza del ruido U&#8348;.</span>
+<span style="font-style: italic;">      lags (int, opcional): </span>
+<span style="font-style: italic;">          N&#250;mero de retardos considerados (por defecto 20).</span>
+<span style="font-style: italic;">      seasonal_lags (int, opcional): </span>
+<span style="font-style: italic;">          N&#250;mero de retardos estacionales (por defecto 0).</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Retorna:</span>
+<span style="font-style: italic;">      fig : objeto matplotlib.figure.Figure</span>
+<span style="font-style: italic;">    """</span>
 
     <span style="font-weight: bold;">if</span> lags:
         <span style="font-weight: bold; font-style: italic;">lags</span>=lags
     <span style="font-weight: bold;">else</span>:
         <span style="font-weight: bold; font-style: italic;">lags</span>=(s*5)+2
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir los polinomios AR y MA (incluyendo componentes estacionales)
-</span>    <span style="font-weight: bold; font-style: italic;">phi_r</span>   = Polynomial(ar_params, symbol=<span style="font-style: italic;">'B'</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir los polinomios AR y MA (incluyendo componentes estacionales)</span>
+    <span style="font-weight: bold; font-style: italic;">phi_r</span>   = Polynomial(ar_params, symbol=<span style="font-style: italic;">'B'</span>)
     <span style="font-weight: bold; font-style: italic;">theta_r</span> = Polynomial(ma_params, symbol=<span style="font-style: italic;">'B'</span>)
     <span style="font-weight: bold; font-style: italic;">phi_s</span>   = Seasonal_to_regular_polynomial(seasonal_ar_params, s)
     <span style="font-weight: bold; font-style: italic;">theta_s</span> = Seasonal_to_regular_polynomial(seasonal_ma_params, s)
@@ -562,47 +562,47 @@ Esta fórmula es fundamental porque permite conocer la distribución de la varia
     <span style="font-weight: bold; font-style: italic;">phi</span> = phi_r*phi_s
     <span style="font-weight: bold; font-style: italic;">theta</span> = theta_r*theta_s
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el proceso ARMA estacional
-</span>    <span style="font-weight: bold; font-style: italic;">arma_process</span> = ArmaProcess(ar=phi.coef, ma=theta.coef)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el proceso ARMA estacional</span>
+    <span style="font-weight: bold; font-style: italic;">arma_process</span> = ArmaProcess(ar=phi.coef, ma=theta.coef)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">1. Calcular la ACF te&#243;rica
-</span>    <span style="font-weight: bold; font-style: italic;">acf_theo</span> = arma_process.acf(lags=lags)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">1. Calcular la ACF te&#243;rica</span>
+    <span style="font-weight: bold; font-style: italic;">acf_theo</span> = arma_process.acf(lags=lags)
     <span style="font-weight: bold; font-style: italic;">lags_theo</span> = np.arange(<span style="font-weight: bold;">len</span>(acf_theo))
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Omitir el retardo 0 para gr&#225;ficos de ACF y PACF:
-</span>    <span style="font-weight: bold; font-style: italic;">acf_plot</span> = acf_theo[1:]
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Omitir el retardo 0 para gr&#225;ficos de ACF y PACF:</span>
+    <span style="font-weight: bold; font-style: italic;">acf_plot</span> = acf_theo[1:]
     <span style="font-weight: bold; font-style: italic;">lags_plot</span> = lags_theo[1:]
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">2. Calcular la PACF te&#243;rica de forma param&#233;trica a partir de la ACF
-</span>    <span style="font-weight: bold; font-style: italic;">pacf_theo</span> = theoretical_pacf_from_acf(acf_theo)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">2. Calcular la PACF te&#243;rica de forma param&#233;trica a partir de la ACF</span>
+    <span style="font-weight: bold; font-style: italic;">pacf_theo</span> = theoretical_pacf_from_acf(acf_theo)
     <span style="font-weight: bold; font-style: italic;">pacf_plot</span> = pacf_theo[1:]
     <span style="font-weight: bold; font-style: italic;">lags_pacf</span> = np.arange(<span style="font-weight: bold;">len</span>(pacf_theo))[1:]
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">3. Calcular la densidad espectral te&#243;rica usando freqz
-</span>    <span style="font-weight: bold; font-style: italic;">w</span>, <span style="font-weight: bold; font-style: italic;">h</span> = freqz(theta.coef, phi.coef, worN=1024)
-    <span style="font-weight: bold; font-style: italic;">freq</span> = w / (2 * np.pi)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Conversi&#243;n de radianes/muestra a ciclos/muestra
-</span>    <span style="font-weight: bold; font-style: italic;">spectrum</span> = (sigma2 / (2 * np.pi)) * np.<span style="font-weight: bold;">abs</span>(h)**2
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">3. Calcular la densidad espectral te&#243;rica usando freqz</span>
+    <span style="font-weight: bold; font-style: italic;">w</span>, <span style="font-weight: bold; font-style: italic;">h</span> = freqz(theta.coef, phi.coef, worN=1024)
+    <span style="font-weight: bold; font-style: italic;">freq</span> = w / (2 * np.pi)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Conversi&#243;n de radianes/muestra a ciclos/muestra</span>
+    <span style="font-weight: bold; font-style: italic;">spectrum</span> = (sigma2 / (2 * np.pi)) * np.<span style="font-weight: bold;">abs</span>(h)**2
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">4. Graficar los tres subgr&#225;ficos
-</span>    <span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">axs</span> = plt.subplots(1, 3, figsize=(18, 3))
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">4. Graficar los tres subgr&#225;ficos</span>
+    <span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">axs</span> = plt.subplots(1, 3, figsize=(18, 3))
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ACF te&#243;rica
-</span>    axs[0].stem(lags_plot, acf_plot, basefmt=<span style="font-style: italic;">" "</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ACF te&#243;rica</span>
+    axs[0].stem(lags_plot, acf_plot, basefmt=<span style="font-style: italic;">" "</span>)
     axs[0].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
     axs[0].set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
     axs[0].set_ylabel(<span style="font-style: italic;">'ACF'</span>)
-    axs[0].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    axs[0].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">PACF te&#243;rica param&#233;trica
-</span>    axs[1].stem(lags_pacf, pacf_plot, basefmt=<span style="font-style: italic;">" "</span>)
+    axs[0].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    axs[0].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">PACF te&#243;rica param&#233;trica</span>
+    axs[1].stem(lags_pacf, pacf_plot, basefmt=<span style="font-style: italic;">" "</span>)
     axs[1].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
     axs[1].set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
     axs[1].set_ylabel(<span style="font-style: italic;">'PACF'</span>)
-    axs[1].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    axs[1].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Densidad espectral te&#243;rica
-</span>    axs[2].plot(freq, spectrum)
+    axs[1].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    axs[1].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Densidad espectral te&#243;rica</span>
+    axs[2].plot(freq, spectrum)
     axs[2].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
     axs[2].set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
     
@@ -621,26 +621,26 @@ Esta fórmula es fundamental porque permite conocer la distribución de la varia
 
 
 <div class="org-src-container">
-<pre class="src src-python" id="orga7347db"><code><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">axs</span> = plt.subplots(1, 3, figsize=(18, 3))
+<pre class="src src-python" id="orge4de280"><code><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">axs</span> = plt.subplots(1, 3, figsize=(18, 3))
 
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ACF te&#243;rica
-</span>axs[0].stem(lags_plot, acf_plot, basefmt=<span style="font-style: italic;">" "</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ACF te&#243;rica</span>
+axs[0].stem(lags_plot, acf_plot, basefmt=<span style="font-style: italic;">" "</span>)
 axs[0].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
 axs[0].set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
 axs[0].set_ylabel(<span style="font-style: italic;">'ACF'</span>)
-axs[0].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>axs[0].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">PACF te&#243;rica param&#233;trica
-</span>axs[1].stem(lags_pacf, pacf_plot, basefmt=<span style="font-style: italic;">" "</span>)
+axs[0].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+axs[0].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">PACF te&#243;rica param&#233;trica</span>
+axs[1].stem(lags_pacf, pacf_plot, basefmt=<span style="font-style: italic;">" "</span>)
 axs[1].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
 axs[1].set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
 axs[1].set_ylabel(<span style="font-style: italic;">'PACF'</span>)
-axs[1].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>axs[1].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Densidad espectral te&#243;rica
-</span>axs[2].plot(freq, spectrum)
+axs[1].xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+axs[1].grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Densidad espectral te&#243;rica</span>
+axs[2].plot(freq, spectrum)
 axs[2].axhline(0, color=<span style="font-style: italic;">'black'</span>, lw=0.5, linestyle=<span style="font-style: italic;">'--'</span>)
 axs[2].set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
 
@@ -655,13 +655,13 @@ axs[2].set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
 
 
 <div class="org-src-container">
-<pre class="src src-python" id="org2b389bd"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">SARIMA2ARMA</span>(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0):
-    <span style="font-style: italic;">"""
-    Devuelve los coeficientes de los polinomios AR y MA en B con todas las ra&#237;ces del modelo.
-    """</span>        
+<pre class="src src-python" id="orgbdf14da"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">SARIMA2ARMA</span>(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0):
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Devuelve los coeficientes de los polinomios AR y MA en B con todas las ra&#237;ces del modelo.</span>
+<span style="font-style: italic;">    """</span>        
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir los polinomios AR y MA (incluyendo componentes estacionales y ra&#237;ces unitarias)
-</span>    <span style="font-weight: bold; font-style: italic;">phi_r</span>   = Polynomial(ar_params, symbol=<span style="font-style: italic;">'B'</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir los polinomios AR y MA (incluyendo componentes estacionales y ra&#237;ces unitarias)</span>
+    <span style="font-weight: bold; font-style: italic;">phi_r</span>   = Polynomial(ar_params, symbol=<span style="font-style: italic;">'B'</span>)
     <span style="font-weight: bold; font-style: italic;">theta_r</span> = Polynomial(ma_params, symbol=<span style="font-style: italic;">'B'</span>)
     <span style="font-weight: bold; font-style: italic;">I_r</span>     = Polynomial([1, -1], symbol=<span style="font-style: italic;">'B'</span>)**d
     <span style="font-weight: bold; font-style: italic;">phi_s</span>   = Seasonal_to_regular_polynomial(seasonal_ar_params, s)
@@ -676,38 +676,38 @@ axs[2].set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
 </div>
 </div>
 </div>
-<div id="outline-container-org0e351fd" class="outline-3">
-<h3 id="org0e351fd">Simulación y análisis de un modelo ARMA (<code>plot_arma_analysis</code>)</h3>
-<div class="outline-text-3" id="text-org0e351fd">
+<div id="outline-container-org1b22ba5" class="outline-3">
+<h3 id="org1b22ba5">Simulación y análisis de un modelo ARMA (<code>plot_arma_analysis</code>)</h3>
+<div class="outline-text-3" id="text-org1b22ba5">
 <p>
 Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y densidad espectral estimadas con los datos simulados.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org38e8158"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_analysis</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20, n=400, seed=<span style="font-weight: bold; text-decoration: underline;">None</span>):
-    <span style="font-style: italic;">"""
-    Simula una serie temporal utilizando un modelo ARMA y visualiza la serie generada junto con sus funciones de autocorrelaci&#243;n (ACF), autocorrelaci&#243;n parcial (PACF) y el periodograma estimado.
-    
-    Parameters
-    ----------
-    ar_params : list, optional
-        Coeficientes AR del modelo (por defecto [1]).
-    ma_params : list, optional
-        Coeficientes MA del modelo (por defecto [1]).
-    sigma2 : float, optional
-        Varianza del ruido blanco (por defecto 1).
-    lags : int, optional
-        N&#250;mero de lags a incluir en ACF y PACF (por defecto 20).
-    n : int, optional
-        N&#250;mero de observaciones a simular (por defecto 400).
-    seed : int, optional
-        Semilla para la generaci&#243;n aleatoria (por defecto 0).
-    
-    Returns
-    -------
-    fig : matplotlib.figure.Figure
-        La figura generada que incluye la serie temporal y los gr&#225;ficos ACF, PACF y el periodograma.
-    """</span>
+<pre class="src src-python" id="org2cb88cf"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_arma_analysis</span>(ar_params=[1,], ma_params=[1,], sigma2=1, lags=20, n=400, seed=<span style="font-weight: bold; text-decoration: underline;">None</span>):
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Simula una serie temporal utilizando un modelo ARMA y visualiza la serie generada junto con sus funciones de autocorrelaci&#243;n (ACF), autocorrelaci&#243;n parcial (PACF) y el periodograma estimado.</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Parameters</span>
+<span style="font-style: italic;">    ----------</span>
+<span style="font-style: italic;">    ar_params : list, optional</span>
+<span style="font-style: italic;">        Coeficientes AR del modelo (por defecto [1]).</span>
+<span style="font-style: italic;">    ma_params : list, optional</span>
+<span style="font-style: italic;">        Coeficientes MA del modelo (por defecto [1]).</span>
+<span style="font-style: italic;">    sigma2 : float, optional</span>
+<span style="font-style: italic;">        Varianza del ruido blanco (por defecto 1).</span>
+<span style="font-style: italic;">    lags : int, optional</span>
+<span style="font-style: italic;">        N&#250;mero de lags a incluir en ACF y PACF (por defecto 20).</span>
+<span style="font-style: italic;">    n : int, optional</span>
+<span style="font-style: italic;">        N&#250;mero de observaciones a simular (por defecto 400).</span>
+<span style="font-style: italic;">    seed : int, optional</span>
+<span style="font-style: italic;">        Semilla para la generaci&#243;n aleatoria (por defecto 0).</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Returns</span>
+<span style="font-style: italic;">    -------</span>
+<span style="font-style: italic;">    fig : matplotlib.figure.Figure</span>
+<span style="font-style: italic;">        La figura generada que incluye la serie temporal y los gr&#225;ficos ACF, PACF y el periodograma.</span>
+<span style="font-style: italic;">    """</span>
 
     <span style="font-weight: bold; font-style: italic;">lags</span>=math.floor(n/2) <span style="font-weight: bold;">if</span> n/2 &lt; lags <span style="font-weight: bold;">else</span> lags
     
@@ -715,41 +715,41 @@ Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y 
     <span style="font-weight: bold; font-style: italic;">theta</span> = Polynomial(ma_params, symbol=<span style="font-style: italic;">'B'</span>)
     <span style="font-weight: bold; font-style: italic;">arma_process</span> = sm.tsa.ArmaProcess(phi.coef, theta.coef)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Simulaci&#243;n de la serie temporal
-</span>    <span style="font-weight: bold;">if</span> seed:
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Simulaci&#243;n de la serie temporal</span>
+    <span style="font-weight: bold;">if</span> seed:
         np.random.seed(seed)
     <span style="font-weight: bold; font-style: italic;">data</span> = arma_process.generate_sample(nsample=n)
 
     <span style="font-weight: bold; font-style: italic;">s</span>=5
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura
-</span>    <span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura</span>
+    <span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal
-</span>    <span style="font-weight: bold; font-style: italic;">ax1</span> = fig.add_subplot(2, 1, 1)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal</span>
+    <span style="font-weight: bold; font-style: italic;">ax1</span> = fig.add_subplot(2, 1, 1)
     ax1.plot(data, color=<span style="font-style: italic;">'blue'</span>)
     ax1.set_title(<span style="font-style: italic;">'Serie Temporal Simulada'</span>)
     ax1.set_xlabel(<span style="font-style: italic;">'t'</span>)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear una fila de 3 subgr&#225;ficos para ACF, PACF y periodograma
-</span>    <span style="font-weight: bold; font-style: italic;">ax2</span> = fig.add_subplot(2, 3, 4)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 1
-</span>    sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title=<span style="font-style: italic;">'ACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear una fila de 3 subgr&#225;ficos para ACF, PACF y periodograma</span>
+    <span style="font-weight: bold; font-style: italic;">ax2</span> = fig.add_subplot(2, 3, 4)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 1</span>
+    sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title=<span style="font-style: italic;">'ACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
     ax2.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-    ax2.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    ax2.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;">ax3</span> = fig.add_subplot(2, 3, 5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 2
-</span>    sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title=<span style="font-style: italic;">'PACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+    ax2.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    ax2.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;">ax3</span> = fig.add_subplot(2, 3, 5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 2</span>
+    sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title=<span style="font-style: italic;">'PACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
     ax3.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-    ax3.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    ax3.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;">ax4</span> = fig.add_subplot(2, 3, 6)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 3
-</span>    <span style="font-weight: bold; font-style: italic;">f</span>, <span style="font-weight: bold; font-style: italic;">Pxx</span> = signal.welch(data, fs=1, nperseg=256)
+    ax3.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    ax3.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;">ax4</span> = fig.add_subplot(2, 3, 6)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 3</span>
+    <span style="font-weight: bold; font-style: italic;">f</span>, <span style="font-weight: bold; font-style: italic;">Pxx</span> = signal.welch(data, fs=1, nperseg=256)
     ax4.plot(f, Pxx, color=<span style="font-style: italic;">'purple'</span>)
     ax4.set_title(<span style="font-style: italic;">'Periodograma Estimado'</span>)
     ax4.set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
-    ax4.set_xlim(0, 0.5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Limitar el eje x a 0.5
-</span>    
+    ax4.set_xlim(0, 0.5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Limitar el eje x a 0.5</span>
+    
     plt.tight_layout()
     plt.close(fig)    
     <span style="font-weight: bold;">return</span> fig
@@ -758,36 +758,36 @@ Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y 
 </div>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org38969f7"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_sarima_analysis</span>(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0, sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>, n=400, seed=<span style="font-weight: bold; text-decoration: underline;">None</span>):
-    <span style="font-style: italic;">"""
-    Simula una serie temporal utilizando un modelo ARMA y visualiza la serie generada junto con sus funciones de autocorrelaci&#243;n (ACF), autocorrelaci&#243;n parcial (PACF) y el periodograma estimado.
-    
-    Parameters
-    ----------
-    ar_params : list, optional
-        Coeficientes AR del modelo (por defecto [1]).
-    ma_params : list, optional
-        Coeficientes MA del modelo (por defecto [1]).
-    sigma2 : float, optional
-        Varianza del ruido blanco (por defecto 1).
-    lags : int, optional
-        N&#250;mero de lags a incluir en ACF y PACF (por defecto 20).
-    n : int, optional
-        N&#250;mero de observaciones a simular (por defecto 400).
-    seed : int, optional
-        Semilla para la generaci&#243;n aleatoria (por defecto 0).
-    
-    Returns
-    -------
-    fig : matplotlib.figure.Figure
-        La figura generada que incluye la serie temporal y los gr&#225;ficos ACF, PACF y el periodograma.
-    """</span>
+<pre class="src src-python" id="orgc41071d"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_sarima_analysis</span>(ar_params=[1,], ma_params=[1,], d=0, s=4, seasonal_ar_params=[1,], seasonal_ma_params=[1,], D=0, sigma2=1, lags=<span style="font-weight: bold; text-decoration: underline;">False</span>, n=400, seed=<span style="font-weight: bold; text-decoration: underline;">None</span>):
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Simula una serie temporal utilizando un modelo ARMA y visualiza la serie generada junto con sus funciones de autocorrelaci&#243;n (ACF), autocorrelaci&#243;n parcial (PACF) y el periodograma estimado.</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Parameters</span>
+<span style="font-style: italic;">    ----------</span>
+<span style="font-style: italic;">    ar_params : list, optional</span>
+<span style="font-style: italic;">        Coeficientes AR del modelo (por defecto [1]).</span>
+<span style="font-style: italic;">    ma_params : list, optional</span>
+<span style="font-style: italic;">        Coeficientes MA del modelo (por defecto [1]).</span>
+<span style="font-style: italic;">    sigma2 : float, optional</span>
+<span style="font-style: italic;">        Varianza del ruido blanco (por defecto 1).</span>
+<span style="font-style: italic;">    lags : int, optional</span>
+<span style="font-style: italic;">        N&#250;mero de lags a incluir en ACF y PACF (por defecto 20).</span>
+<span style="font-style: italic;">    n : int, optional</span>
+<span style="font-style: italic;">        N&#250;mero de observaciones a simular (por defecto 400).</span>
+<span style="font-style: italic;">    seed : int, optional</span>
+<span style="font-style: italic;">        Semilla para la generaci&#243;n aleatoria (por defecto 0).</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Returns</span>
+<span style="font-style: italic;">    -------</span>
+<span style="font-style: italic;">    fig : matplotlib.figure.Figure</span>
+<span style="font-style: italic;">        La figura generada que incluye la serie temporal y los gr&#225;ficos ACF, PACF y el periodograma.</span>
+<span style="font-style: italic;">    """</span>
     <span style="font-weight: bold; font-style: italic;">phi</span>, <span style="font-weight: bold; font-style: italic;">theta</span> = SARIMA2ARMA(ar_params=ar_params, ma_params=ma_params, d=d, s=s, seasonal_ar_params=seasonal_ar_params, seasonal_ma_params=seasonal_ma_params, D=D)
     
     <span style="font-weight: bold; font-style: italic;">arma_process</span> = sm.tsa.ArmaProcess(phi, theta)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Simulaci&#243;n de la serie temporal
-</span>    <span style="font-weight: bold;">if</span> seed:
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Simulaci&#243;n de la serie temporal</span>
+    <span style="font-weight: bold;">if</span> seed:
         np.random.seed(seed)
     <span style="font-weight: bold; font-style: italic;">data</span> = arma_process.generate_sample(nsample=n)
        
@@ -798,35 +798,35 @@ Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y 
 
     <span style="font-weight: bold; font-style: italic;">lags</span>=math.floor(n/2) <span style="font-weight: bold;">if</span> n/2 &lt; lags <span style="font-weight: bold;">else</span> lags
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura
-</span>    <span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura</span>
+    <span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal
-</span>    <span style="font-weight: bold; font-style: italic;">ax1</span> = fig.add_subplot(2, 1, 1)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal</span>
+    <span style="font-weight: bold; font-style: italic;">ax1</span> = fig.add_subplot(2, 1, 1)
     ax1.plot(data, color=<span style="font-style: italic;">'blue'</span>)
     ax1.set_title(<span style="font-style: italic;">'Serie Temporal Simulada'</span>)
     ax1.set_xlabel(<span style="font-style: italic;">'t'</span>)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear una fila de 3 subgr&#225;ficos para ACF, PACF y periodograma
-</span>    <span style="font-weight: bold; font-style: italic;">ax2</span> = fig.add_subplot(2, 3, 4)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 1
-</span>    sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title=<span style="font-style: italic;">'ACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear una fila de 3 subgr&#225;ficos para ACF, PACF y periodograma</span>
+    <span style="font-weight: bold; font-style: italic;">ax2</span> = fig.add_subplot(2, 3, 4)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 1</span>
+    sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title=<span style="font-style: italic;">'ACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
     ax2.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-    ax2.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    ax2.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;">ax3</span> = fig.add_subplot(2, 3, 5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 2
-</span>    sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title=<span style="font-style: italic;">'PACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+    ax2.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    ax2.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;">ax3</span> = fig.add_subplot(2, 3, 5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 2</span>
+    sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title=<span style="font-style: italic;">'PACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
     ax3.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-    ax3.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    ax3.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;">ax4</span> = fig.add_subplot(2, 3, 6)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 3
-</span>    <span style="font-weight: bold; font-style: italic;">f</span>, <span style="font-weight: bold; font-style: italic;">Pxx</span> = signal.welch(data, fs=1, nperseg=256)
+    ax3.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    ax3.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;">ax4</span> = fig.add_subplot(2, 3, 6)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 3</span>
+    <span style="font-weight: bold; font-style: italic;">f</span>, <span style="font-weight: bold; font-style: italic;">Pxx</span> = signal.welch(data, fs=1, nperseg=256)
     ax4.plot(f, Pxx, color=<span style="font-style: italic;">'purple'</span>)
     ax4.set_title(<span style="font-style: italic;">'Periodograma Estimado'</span>)
     ax4.set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
-    ax4.set_xlim(0, 0.5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Limitar el eje x a 0.5
-</span>    
+    ax4.set_xlim(0, 0.5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Limitar el eje x a 0.5</span>
+    
     plt.tight_layout()
     plt.close(fig)    
     <span style="font-weight: bold;">return</span> fig
@@ -834,57 +834,57 @@ Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y 
 </code></pre>
 </div>
 </div>
-<div id="outline-container-orgc6b7c70" class="outline-4">
-<h4 id="orgc6b7c70">Caso paseo aleatorio</h4>
-<div class="outline-text-4" id="text-orgc6b7c70">
+<div id="outline-container-org58d3f38" class="outline-4">
+<h4 id="org58d3f38">Caso paseo aleatorio</h4>
+<div class="outline-text-4" id="text-org58d3f38">
 <div class="org-src-container">
-<pre class="src src-python" id="orgc3e2fa4"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_paseo_aleatorio_analysis</span>(sigma2=1, lags=20, n=400, semilla=<span style="font-weight: bold; text-decoration: underline;">None</span>, trend=<span style="font-style: italic;">"n"</span>, pendiente=0):
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Simulaci&#243;n de la serie temporal
-</span>    <span style="font-weight: bold; font-style: italic;">transitorio</span> = 50
+<pre class="src src-python" id="org8af12aa"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">plot_paseo_aleatorio_analysis</span>(sigma2=1, lags=20, n=400, semilla=<span style="font-weight: bold; text-decoration: underline;">None</span>, trend=<span style="font-style: italic;">"n"</span>, pendiente=0):
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Simulaci&#243;n de la serie temporal</span>
+    <span style="font-weight: bold; font-style: italic;">transitorio</span> = 50
     <span style="font-weight: bold;">if</span> semilla:
         np.random.seed(semilla)
 
     <span style="font-weight: bold;">if</span> trend==<span style="font-style: italic;">"n"</span>:
-        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ARIMA(0,1,0) sin deriva
-</span>        <span style="font-weight: bold; font-style: italic;">model_rw</span> = ARIMA(np.zeros(n), order=(0,1,0))
-        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">params = [sigma&#178;] --&gt; varianza del ruido
-</span>        <span style="font-weight: bold; font-style: italic;">data</span> = model_rw.simulate(params=[sigma2], random_state=semilla, nsimulations=transitorio+n)[transitorio:]
+        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">ARIMA(0,1,0) sin deriva</span>
+        <span style="font-weight: bold; font-style: italic;">model_rw</span> = ARIMA(np.zeros(n), order=(0,1,0))
+        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">params = [sigma&#178;] --&gt; varianza del ruido</span>
+        <span style="font-weight: bold; font-style: italic;">data</span> = model_rw.simulate(params=[sigma2], random_state=semilla, nsimulations=transitorio+n)[transitorio:]
     <span style="font-weight: bold;">elif</span> trend==<span style="font-style: italic;">"t"</span>:
-        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Paseo aleatorio con deriva (ARIMA(0,1,0) con tendencia lineal)
-</span>        <span style="font-weight: bold; font-style: italic;">model_rw_drift</span> = ARIMA(np.zeros(n), order=(0,1,0), trend=<span style="font-style: italic;">"t"</span>)
-        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">params = [pendiente, sigma&#178;]
-</span>        <span style="font-weight: bold; font-style: italic;">data</span> = model_rw_drift.simulate(params=[pendiente, sigma2], random_state=semilla, nsimulations=transitorio+n)[transitorio:]
+        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Paseo aleatorio con deriva (ARIMA(0,1,0) con tendencia lineal)</span>
+        <span style="font-weight: bold; font-style: italic;">model_rw_drift</span> = ARIMA(np.zeros(n), order=(0,1,0), trend=<span style="font-style: italic;">"t"</span>)
+        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">params = [pendiente, sigma&#178;]</span>
+        <span style="font-weight: bold; font-style: italic;">data</span> = model_rw_drift.simulate(params=[pendiente, sigma2], random_state=semilla, nsimulations=transitorio+n)[transitorio:]
 
     <span style="font-weight: bold; font-style: italic;">s</span>=5
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura
-</span>    <span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura</span>
+    <span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal
-</span>    <span style="font-weight: bold; font-style: italic;">ax1</span> = fig.add_subplot(2, 1, 1)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal</span>
+    <span style="font-weight: bold; font-style: italic;">ax1</span> = fig.add_subplot(2, 1, 1)
     ax1.plot(data, color=<span style="font-style: italic;">'blue'</span>)
     ax1.set_title(<span style="font-style: italic;">'Serie Temporal Simulada'</span>)
     ax1.set_xlabel(<span style="font-style: italic;">'t'</span>)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear una fila de 3 subgr&#225;ficos para ACF, PACF y periodograma
-</span>    <span style="font-weight: bold; font-style: italic;">ax2</span> = fig.add_subplot(2, 3, 4)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 1
-</span>    sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title=<span style="font-style: italic;">'ACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear una fila de 3 subgr&#225;ficos para ACF, PACF y periodograma</span>
+    <span style="font-weight: bold; font-style: italic;">ax2</span> = fig.add_subplot(2, 3, 4)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 1</span>
+    sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title=<span style="font-style: italic;">'ACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
     ax2.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-    ax2.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    ax2.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;">ax3</span> = fig.add_subplot(2, 3, 5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 2
-</span>    sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title=<span style="font-style: italic;">'PACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+    ax2.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    ax2.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;">ax3</span> = fig.add_subplot(2, 3, 5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 2</span>
+    sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title=<span style="font-style: italic;">'PACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
     ax3.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-    ax3.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>    ax3.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>    
-    <span style="font-weight: bold; font-style: italic;">ax4</span> = fig.add_subplot(2, 3, 6)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 3
-</span>    <span style="font-weight: bold; font-style: italic;">f</span>, <span style="font-weight: bold; font-style: italic;">Pxx</span> = signal.welch(data, fs=1, nperseg=256)
+    ax3.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+    ax3.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+    
+    <span style="font-weight: bold; font-style: italic;">ax4</span> = fig.add_subplot(2, 3, 6)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 3</span>
+    <span style="font-weight: bold; font-style: italic;">f</span>, <span style="font-weight: bold; font-style: italic;">Pxx</span> = signal.welch(data, fs=1, nperseg=256)
     ax4.plot(f, Pxx, color=<span style="font-style: italic;">'purple'</span>)
     ax4.set_title(<span style="font-style: italic;">'Periodograma Estimado'</span>)
     ax4.set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
-    ax4.set_xlim(0, 0.5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Limitar el eje x a 0.5
-</span>    
+    ax4.set_xlim(0, 0.5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Limitar el eje x a 0.5</span>
+    
     plt.tight_layout()
     plt.close(fig)
     <span style="font-weight: bold;">return</span> fig
@@ -892,33 +892,33 @@ Función que simula un modelo ARIMA y pinta la serie temporalm, las ACF, PACF y 
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org2c891d7"></a>Código común para la generación de las 4 figuras<br />
-<div class="outline-text-5" id="text-org2c891d7">
+<li><a id="org8a12f8b"></a>Código común para la generación de las 4 figuras<br />
+<div class="outline-text-5" id="text-org8a12f8b">
 <div class="org-src-container">
-<pre class="src src-python" id="org66ae848"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura
-</span><span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
+<pre class="src src-python" id="orgbb3c9e1"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear la figura</span>
+<span style="font-weight: bold; font-style: italic;">fig</span> = plt.figure(figsize=(18, 7))
 
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal
-</span><span style="font-weight: bold; font-style: italic;">ax1</span> = fig.add_subplot(2, 1, 1)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Subgr&#225;fico de la serie temporal</span>
+<span style="font-weight: bold; font-style: italic;">ax1</span> = fig.add_subplot(2, 1, 1)
 ax1.plot(data, color=<span style="font-style: italic;">'blue'</span>)
 ax1.set_title(<span style="font-style: italic;">'Serie Temporal Simulada'</span>)
 ax1.set_xlabel(<span style="font-style: italic;">'t'</span>)
 
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear una fila de 3 subgr&#225;ficos para ACF, PACF y periodograma
-</span><span style="font-weight: bold; font-style: italic;">ax2</span> = fig.add_subplot(2, 3, 4)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 1
-</span>sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title=<span style="font-style: italic;">'ACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear una fila de 3 subgr&#225;ficos para ACF, PACF y periodograma</span>
+<span style="font-weight: bold; font-style: italic;">ax2</span> = fig.add_subplot(2, 3, 4)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 1</span>
+sm.graphics.tsa.plot_acf(data, lags=lags, ax=ax2, title=<span style="font-style: italic;">'ACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 ax2.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-ax2.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>ax2.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>
-<span style="font-weight: bold; font-style: italic;">ax3</span> = fig.add_subplot(2, 3, 5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 2
-</span>sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title=<span style="font-style: italic;">'PACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+ax2.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+ax2.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+
+<span style="font-weight: bold; font-style: italic;">ax3</span> = fig.add_subplot(2, 3, 5)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 2</span>
+sm.graphics.tsa.plot_pacf(data, lags=lags, ax=ax3, title=<span style="font-style: italic;">'PACF Estimada'</span>, zero=<span style="font-weight: bold; text-decoration: underline;">False</span>, auto_ylims=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 ax3.set_xlabel(<span style="font-style: italic;">'Retardo'</span>)
-ax3.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'
-</span>ax3.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical
-</span>
-<span style="font-weight: bold; font-style: italic;">ax4</span> = fig.add_subplot(2, 3, 6)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 3
-</span><span style="font-weight: bold; font-style: italic;">f</span>, <span style="font-weight: bold; font-style: italic;">Pxx</span> = signal.welch(data, fs=1, nperseg=256)
+ax3.xaxis.set_major_locator(ticker.MultipleLocator(s))  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en m&#250;ltiplos de 's'</span>
+ax3.grid(axis=<span style="font-style: italic;">'x'</span>)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir cuadr&#237;cula vertical</span>
+
+<span style="font-weight: bold; font-style: italic;">ax4</span> = fig.add_subplot(2, 3, 6)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fila 2, Columna 3</span>
+<span style="font-weight: bold; font-style: italic;">f</span>, <span style="font-weight: bold; font-style: italic;">Pxx</span> = signal.welch(data, fs=1, nperseg=256)
 ax4.plot(f, Pxx, color=<span style="font-style: italic;">'purple'</span>)
 ax4.set_title(<span style="font-style: italic;">'Periodograma Estimado'</span>)
 ax4.set_xlabel(<span style="font-style: italic;">'Frecuencia'</span>)
@@ -930,39 +930,39 @@ ax4.set_xlim(0, 0.5)  <span style="font-weight: bold; font-style: italic;"># </s
 </ul>
 </div>
 </div>
-<div id="outline-container-orgc094525" class="outline-3">
-<h3 id="orgc094525">Análisis de las raíces de un polinomio (<code>polynomial_roots_table</code>)</h3>
-<div class="outline-text-3" id="text-orgc094525">
+<div id="outline-container-org96f1b26" class="outline-3">
+<h3 id="org96f1b26">Análisis de las raíces de un polinomio (<code>polynomial_roots_table</code>)</h3>
+<div class="outline-text-3" id="text-org96f1b26">
 <p>
 Función que muestra las raíces de un polinomio en una tabla junto a su parte real, parte imaginaria,  módulo, frecuencia, periodo y multiplicidad.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org35eacb9"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">polynomial_roots_table</span>(coef_polinomio):
-    <span style="font-style: italic;">"""
-    Funci&#243;n que calcula las ra&#237;ces de un polinomio y presenta sus caracter&#237;sticas en forma de tabla.
+<pre class="src src-python" id="org4438e55"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">polynomial_roots_table</span>(coef_polinomio):
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Funci&#243;n que calcula las ra&#237;ces de un polinomio y presenta sus caracter&#237;sticas en forma de tabla.</span>
 
-    Args:
-        coef_polinomio (list): Lista de coeficientes del polinomio, donde el &#237;ndice representa el grado del t&#233;rmino.
+<span style="font-style: italic;">    Args:</span>
+<span style="font-style: italic;">        coef_polinomio (list): Lista de coeficientes del polinomio, donde el &#237;ndice representa el grado del t&#233;rmino.</span>
 
-    Returns:
-        pd.DataFrame: DataFrame que contiene las ra&#237;ces del polinomio junto a su parte real, parte imaginaria, 
-                      m&#243;dulo, frecuencia, per&#237;odo y multiplicidad.
-    
-    Descripci&#243;n:
-        Esta funci&#243;n utiliza la librer&#237;a SymPy para obtener las ra&#237;ces de un polinomio definido por sus coeficientes. 
-        Luego, calcula la parte real e imaginaria de cada ra&#237;z, as&#237; como su m&#243;dulo, frecuencia correspondiente 
-        a la fase de la ra&#237;z, per&#237;odo asociado a la frecuencia y la multiplicidad de cada ra&#237;z. Finalmente, 
-        se presenta la informaci&#243;n en un DataFrame de pandas.
-    """</span>
+<span style="font-style: italic;">    Returns:</span>
+<span style="font-style: italic;">        pd.DataFrame: DataFrame que contiene las ra&#237;ces del polinomio junto a su parte real, parte imaginaria, </span>
+<span style="font-style: italic;">                      m&#243;dulo, frecuencia, per&#237;odo y multiplicidad.</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Descripci&#243;n:</span>
+<span style="font-style: italic;">        Esta funci&#243;n utiliza la librer&#237;a SymPy para obtener las ra&#237;ces de un polinomio definido por sus coeficientes. </span>
+<span style="font-style: italic;">        Luego, calcula la parte real e imaginaria de cada ra&#237;z, as&#237; como su m&#243;dulo, frecuencia correspondiente </span>
+<span style="font-style: italic;">        a la fase de la ra&#237;z, per&#237;odo asociado a la frecuencia y la multiplicidad de cada ra&#237;z. Finalmente, </span>
+<span style="font-style: italic;">        se presenta la informaci&#243;n en un DataFrame de pandas.</span>
+<span style="font-style: italic;">    """</span>
     <span style="font-weight: bold; font-style: italic;">polinomio</span> = Polynomial(coef_polinomio, symbol=<span style="font-style: italic;">'B'</span>)
     <span style="font-weight: bold; font-style: italic;">roots</span> = polinomio.roots()
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Contar la multiplicidad de las ra&#237;ces
-</span>    <span style="font-weight: bold; font-style: italic;">unique_roots</span>, <span style="font-weight: bold; font-style: italic;">counts</span> = np.unique(roots, return_counts=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Contar la multiplicidad de las ra&#237;ces</span>
+    <span style="font-weight: bold; font-style: italic;">unique_roots</span>, <span style="font-weight: bold; font-style: italic;">counts</span> = np.unique(roots, return_counts=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear listas para cada columna de la tabla
-</span>    <span style="font-weight: bold; font-style: italic;">real_parts</span> = []
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear listas para cada columna de la tabla</span>
+    <span style="font-weight: bold; font-style: italic;">real_parts</span> = []
     <span style="font-weight: bold; font-style: italic;">imaginary_parts</span> = []
     <span style="font-weight: bold; font-style: italic;">moduli</span> = []
     <span style="font-weight: bold; font-style: italic;">frequencies</span> = []
@@ -973,23 +973,23 @@ Función que muestra las raíces de un polinomio en una tabla junto a su parte r
         <span style="font-weight: bold; font-style: italic;">real</span> = root.real
         <span style="font-weight: bold; font-style: italic;">imag</span> = root.imag
         
-        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Calcular m&#243;dulo
-</span>        <span style="font-weight: bold; font-style: italic;">modulus</span> = np.<span style="font-weight: bold;">abs</span>(root)
+        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Calcular m&#243;dulo</span>
+        <span style="font-weight: bold; font-style: italic;">modulus</span> = np.<span style="font-weight: bold;">abs</span>(root)
         moduli.append(modulus)
 
-        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Calcular frecuencia y per&#237;odo
-</span>        <span style="font-weight: bold; font-style: italic;">frequency</span> = np.<span style="font-weight: bold;">abs</span>(np.angle(root)) / (2*np.pi)
+        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Calcular frecuencia y per&#237;odo</span>
+        <span style="font-weight: bold; font-style: italic;">frequency</span> = np.<span style="font-weight: bold;">abs</span>(np.angle(root)) / (2*np.pi)
         <span style="font-weight: bold; font-style: italic;">period</span> = 1/frequency <span style="font-weight: bold;">if</span> frequency <span style="font-weight: bold;">else</span> <span style="font-style: italic;">'Inf'</span>
         
-        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Append results
-</span>        real_parts.append(real)
+        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Append results</span>
+        real_parts.append(real)
         imaginary_parts.append(imag)
         frequencies.append(frequency)
         periods.append(period)
-        multipliers.append(count)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Multiplicidad
-</span>
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un DataFrame para mostrar la tabla
-</span>    <span style="font-weight: bold; font-style: italic;">table</span> = pd.DataFrame({
+        multipliers.append(count)  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Multiplicidad</span>
+
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un DataFrame para mostrar la tabla</span>
+    <span style="font-weight: bold; font-style: italic;">table</span> = pd.DataFrame({
         <span style="font-style: italic;">'P. real'</span>: real_parts,
         <span style="font-style: italic;">'P. imag.'</span>: imaginary_parts,
         <span style="font-style: italic;">'M&#243;dulo'</span>: moduli,
@@ -998,84 +998,84 @@ Función que muestra las raíces de un polinomio en una tabla junto a su parte r
         <span style="font-style: italic;">'Multip.'</span>: multipliers
     })
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ordenar la tabla por la columna 'Frequency' en orden ascendente
-</span>    <span style="font-weight: bold; font-style: italic;">tabla</span> = table.sort_values(by=<span style="font-style: italic;">'Frecuencia'</span>).<span style="font-weight: bold;">round</span>(6)   
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ordenar la tabla por la columna 'Frequency' en orden ascendente</span>
+    <span style="font-weight: bold; font-style: italic;">tabla</span> = table.sort_values(by=<span style="font-style: italic;">'Frecuencia'</span>).<span style="font-weight: bold;">round</span>(6)   
     <span style="font-weight: bold;">return</span> tabla
 
 </code></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org51c28a7" class="outline-3">
-<h3 id="org51c28a7">Análisis de las raíces de un polinomio (<code>Localizacion_parametros_plot</code>)</h3>
-<div class="outline-text-3" id="text-org51c28a7">
+<div id="outline-container-orga8d12fa" class="outline-3">
+<h3 id="orga8d12fa">Análisis de las raíces de un polinomio (<code>Localizacion_parametros_plot</code>)</h3>
+<div class="outline-text-3" id="text-orga8d12fa">
 <p>
 Programa que sitúa el par de parámetros de un polinomio de grado 2 respecto del triángulo donde que indica las regiones donde dicho polinomio es invertible.
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org945e1bf"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">Localizacion_parametros_plot</span>(parametro1, parametro2, modelo=<span style="font-style: italic;">'MA'</span>):
-    <span style="font-style: italic;">"""
-    Genera un gr&#225;fico que localiza el par de par&#225;metros de un polinomio de grado 2 en relaci&#243;n con un tri&#225;ngulo,
-    indicando las regiones donde dicho polinomio es invertible.
+<pre class="src src-python" id="orge8a1631"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">Localizacion_parametros_plot</span>(parametro1, parametro2, modelo=<span style="font-style: italic;">'MA'</span>):
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Genera un gr&#225;fico que localiza el par de par&#225;metros de un polinomio de grado 2 en relaci&#243;n con un tri&#225;ngulo,</span>
+<span style="font-style: italic;">    indicando las regiones donde dicho polinomio es invertible.</span>
 
-    Args:
-        parametro1 (float): Valor del primer par&#225;metro del polinomio.
-        parametro2 (float): Valor del segundo par&#225;metro del polinomio.
-        modelo (str, opcional): Tipo de modelo a utilizar. Por defecto es 'MA'. Puede ser 'AR' para ajustar las 
-                                representaciones de los par&#225;metros.
+<span style="font-style: italic;">    Args:</span>
+<span style="font-style: italic;">        parametro1 (float): Valor del primer par&#225;metro del polinomio.</span>
+<span style="font-style: italic;">        parametro2 (float): Valor del segundo par&#225;metro del polinomio.</span>
+<span style="font-style: italic;">        modelo (str, opcional): Tipo de modelo a utilizar. Por defecto es 'MA'. Puede ser 'AR' para ajustar las </span>
+<span style="font-style: italic;">                                representaciones de los par&#225;metros.</span>
 
-    Returns:
-        matplotlib.figure.Figure: Objeto Figure que contiene el gr&#225;fico generado.
-    """</span>
+<span style="font-style: italic;">    Returns:</span>
+<span style="font-style: italic;">        matplotlib.figure.Figure: Objeto Figure que contiene el gr&#225;fico generado.</span>
+<span style="font-style: italic;">    """</span>
     <span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax</span> = plt.subplots(figsize=(10, 6))
     ax.set_aspect(<span style="font-style: italic;">'equal'</span>)
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis
-</span>    <span style="font-weight: bold; font-style: italic;">xmin</span>, <span style="font-weight: bold; font-style: italic;">ymin</span> = -2.2, -1.2
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis</span>
+    <span style="font-weight: bold; font-style: italic;">xmin</span>, <span style="font-weight: bold; font-style: italic;">ymin</span> = -2.2, -1.2
     <span style="font-weight: bold; font-style: italic;">xmax</span>, <span style="font-weight: bold; font-style: italic;">ymax</span> = -xmin, -ymin
     plt.axis([xmin, xmax, ymin, ymax])
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Define the Greek letter based on modelo with subscripts
-</span>    <span style="font-weight: bold; font-style: italic;">simb_param_1</span> = r<span style="font-style: italic;">'$\phi_1$'</span> <span style="font-weight: bold;">if</span> modelo == <span style="font-style: italic;">'AR'</span> <span style="font-weight: bold;">else</span> r<span style="font-style: italic;">'$\theta_1$'</span>
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Define the Greek letter based on modelo with subscripts</span>
+    <span style="font-weight: bold; font-style: italic;">simb_param_1</span> = r<span style="font-style: italic;">'$\phi_1$'</span> <span style="font-weight: bold;">if</span> modelo == <span style="font-style: italic;">'AR'</span> <span style="font-weight: bold;">else</span> r<span style="font-style: italic;">'$\theta_1$'</span>
     <span style="font-weight: bold; font-style: italic;">simb_param_2</span> = r<span style="font-style: italic;">'$\phi_2$'</span> <span style="font-weight: bold;">if</span> modelo == <span style="font-style: italic;">'AR'</span> <span style="font-weight: bold;">else</span> r<span style="font-style: italic;">'$\theta_2$'</span>
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis labels
-</span>    ax.<span style="font-weight: bold;">set</span>(xticks=[], yticks=[])
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis labels</span>
+    ax.<span style="font-weight: bold;">set</span>(xticks=[], yticks=[])
     ax.set_xlabel(simb_param_2, fontsize=16)
     ax.xaxis.set_label_position(<span style="font-style: italic;">'top'</span>)
     ax.set_ylabel(simb_param_1, rotation=0, fontsize=16)
     ax.yaxis.set_label_position(<span style="font-style: italic;">'right'</span>)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Draw (t1, t2) points
-</span>    <span style="font-weight: bold; font-style: italic;">p1</span> = np.linspace(-2, 2, 100)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Draw (t1, t2) points</span>
+    <span style="font-weight: bold; font-style: italic;">p1</span> = np.linspace(-2, 2, 100)
     ax.plot(p1, -<span style="font-weight: bold;">abs</span>(p1) + 1, c=<span style="font-style: italic;">'black'</span>, linestyle=<span style="font-style: italic;">'--'</span>)
     ax.plot(p1, np.full_like(p1, -1), c=<span style="font-style: italic;">'lightgray'</span>, linestyle=<span style="font-style: italic;">'--'</span>)
     ax.plot(p1, -(p1**2 / 4), c=<span style="font-style: italic;">'black'</span>)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fill the region below the parabola and above the base of the triangle
-</span>    ax.fill_between(p1, -(p1**2 / 4), -1, where=-(p1**2 / 4) &gt;= -1, color=<span style="font-style: italic;">'lightgray'</span>, alpha=0.5)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fill the region below the parabola and above the base of the triangle</span>
+    ax.fill_between(p1, -(p1**2 / 4), -1, where=-(p1**2 / 4) &gt;= -1, color=<span style="font-style: italic;">'lightgray'</span>, alpha=0.5)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Turn normal axes off
-</span>    <span style="font-weight: bold;">for</span> spine <span style="font-weight: bold;">in</span> [<span style="font-style: italic;">'left'</span>, <span style="font-style: italic;">'bottom'</span>, <span style="font-style: italic;">'top'</span>, <span style="font-style: italic;">'right'</span>]:
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Turn normal axes off</span>
+    <span style="font-weight: bold;">for</span> spine <span style="font-weight: bold;">in</span> [<span style="font-style: italic;">'left'</span>, <span style="font-style: italic;">'bottom'</span>, <span style="font-style: italic;">'top'</span>, <span style="font-style: italic;">'right'</span>]:
         ax.spines[spine].set_visible(<span style="font-weight: bold; text-decoration: underline;">False</span>)
         
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add arrows to represent axes
-</span>    <span style="font-weight: bold; font-style: italic;">axes_arrows</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'&lt;|-|&gt;'</span>, <span style="font-style: italic;">'lw'</span>: 0.5, <span style="font-style: italic;">'color'</span>: <span style="font-style: italic;">'gray'</span>}  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Hacerlas grises y m&#225;s finas
-</span>    ax.annotate(<span style="font-style: italic;">''</span>, xy=(xmin, 0), xytext=(xmax, 0), arrowprops=axes_arrows)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add arrows to represent axes</span>
+    <span style="font-weight: bold; font-style: italic;">axes_arrows</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'&lt;|-|&gt;'</span>, <span style="font-style: italic;">'lw'</span>: 0.5, <span style="font-style: italic;">'color'</span>: <span style="font-style: italic;">'gray'</span>}  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Hacerlas grises y m&#225;s finas</span>
+    ax.annotate(<span style="font-style: italic;">''</span>, xy=(xmin, 0), xytext=(xmax, 0), arrowprops=axes_arrows)
     ax.annotate(<span style="font-style: italic;">''</span>, xy=(0, ymin), xytext=(0, ymax), arrowprops=axes_arrows)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label complex region
-</span>    ax.text(0.09, -0.8, <span style="font-style: italic;">'Ra&#237;ces complejas'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=14, color=<span style="font-style: italic;">'gray'</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label complex region</span>
+    ax.text(0.09, -0.8, <span style="font-style: italic;">'Ra&#237;ces complejas'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=14, color=<span style="font-style: italic;">'gray'</span>)
     
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small marker to y-axis
-</span>    ax.axhline(y=1.005, xmin=0.495, xmax=0.505, c=<span style="font-style: italic;">'black'</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small marker to y-axis</span>
+    ax.axhline(y=1.005, xmin=0.495, xmax=0.505, c=<span style="font-style: italic;">'black'</span>)
     ax.text(-0.12, -1.12, <span style="font-style: italic;">'-1'</span>, fontsize=10)
     ax.text(-0.12, 0.98, <span style="font-style: italic;">'1'</span>, fontsize=10)
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small markers to x-axis
-</span>    ax.axvline(x=-2, ymin=0.495, ymax=0.505, c=<span style="font-style: italic;">'black'</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small markers to x-axis</span>
+    ax.axvline(x=-2, ymin=0.495, ymax=0.505, c=<span style="font-style: italic;">'black'</span>)
     ax.axvline(x=2, ymin=0.495, ymax=0.505, c=<span style="font-style: italic;">'black'</span>)
     ax.text(-2.12, -0.12, <span style="font-style: italic;">'-2'</span>, fontsize=10)
     ax.text(1.88, -0.12, <span style="font-style: italic;">'2'</span>, fontsize=10)
@@ -1091,58 +1091,58 @@ Programa que sitúa el par de parámetros de un polinomio de grado 2 respecto de
 </div>
 </div>
 </div>
-<div id="outline-container-org797eeec" class="outline-3">
-<h3 id="org797eeec">Conversión de un polinomio \(B^s\) en un polinomio en \(B\)</h3>
-<div class="outline-text-3" id="text-org797eeec">
+<div id="outline-container-org9c9a1e9" class="outline-3">
+<h3 id="org9c9a1e9">Conversión de un polinomio \(B^s\) en un polinomio en \(B\)</h3>
+<div class="outline-text-3" id="text-org9c9a1e9">
 <div class="org-src-container">
-<pre class="src src-python" id="orga587480"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">Seasonal_to_regular_polynomial</span>(coeffs, s):
-    <span style="font-style: italic;">"""
-    Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:
-    """</span>        
-    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">Crea la lista completa de coeficientes para el polinomio
-</span>    <span style="font-weight: bold; font-style: italic;">lista_coefs</span> = [coeffs[i//s] <span style="font-weight: bold;">if</span> i % s == 0 <span style="font-weight: bold;">else</span> 0 <span style="font-weight: bold;">for</span> i <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(s * <span style="font-weight: bold;">len</span>(coeffs) - (s - 1))]
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crea y devuelve el polinomio a partir de los coeficientes
-</span>    <span style="font-weight: bold;">return</span> Polynomial(lista_coefs, symbol=<span style="font-style: italic;">'B'</span>)
+<pre class="src src-python" id="orgedb79af"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">Seasonal_to_regular_polynomial</span>(coeffs, s):
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Transforma la lista de coeficientes de un polinomio en B^s en un polinomio en B:</span>
+<span style="font-style: italic;">    """</span>        
+    <span style="font-weight: bold; font-style: italic;">## </span><span style="font-weight: bold; font-style: italic;">Crea la lista completa de coeficientes para el polinomio</span>
+    <span style="font-weight: bold; font-style: italic;">lista_coefs</span> = [coeffs[i//s] <span style="font-weight: bold;">if</span> i % s == 0 <span style="font-weight: bold;">else</span> 0 <span style="font-weight: bold;">for</span> i <span style="font-weight: bold;">in</span> <span style="font-weight: bold;">range</span>(s * <span style="font-weight: bold;">len</span>(coeffs) - (s - 1))]
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crea y devuelve el polinomio a partir de los coeficientes</span>
+    <span style="font-weight: bold;">return</span> Polynomial(lista_coefs, symbol=<span style="font-style: italic;">'B'</span>)
 
 </code></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-orgeabdf9a" class="outline-3">
-<h3 id="orgeabdf9a">Gráfico región parámetros polinomio grado 2 (<code>RegionParametrica</code>)</h3>
-<div class="outline-text-3" id="text-orgeabdf9a">
+<div id="outline-container-org072f267" class="outline-3">
+<h3 id="org072f267">Gráfico región parámetros polinomio grado 2 (<code>RegionParametrica</code>)</h3>
+<div class="outline-text-3" id="text-org072f267">
 <p>
 Gráfico que muestra las regiones para los pares de coeficientes donde un polinomio de grado dos es invertible. Si se indica que el modelo es <code>'AR'</code> la letra usada para los parámetros es \(\phi\), y si se indica <code>'MA'</code> la letra usada para los parámetros es \(\theta\)
 </p>
 
 <div class="org-src-container">
-<pre class="src src-python" id="org92ffb16"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">RegionParametrica</span>(modelo=<span style="font-style: italic;">'generico'</span>):   
-    <span style="font-style: italic;">"""
-    Dibuja y anota un gr&#225;fico que representa regiones param&#233;tricas dependiendo del modelo especificado.
+<pre class="src src-python" id="orgb524aa0"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">RegionParametrica</span>(modelo=<span style="font-style: italic;">'generico'</span>):   
+    <span style="font-style: italic;">"""</span>
+<span style="font-style: italic;">    Dibuja y anota un gr&#225;fico que representa regiones param&#233;tricas dependiendo del modelo especificado.</span>
 
-    Args:
-        modelo (str): Tipo de modelo a utilizar. Puede ser 'AR', 'MA' o 'generico'. 
-                      'AR' representa un modelo autorregresivo, 'MA' un modelo de medias m&#243;viles y 
-                      cualquier otro valor utilizar&#225; un modelo gen&#233;rico.
+<span style="font-style: italic;">    Args:</span>
+<span style="font-style: italic;">        modelo (str): Tipo de modelo a utilizar. Puede ser 'AR', 'MA' o 'generico'. </span>
+<span style="font-style: italic;">                      'AR' representa un modelo autorregresivo, 'MA' un modelo de medias m&#243;viles y </span>
+<span style="font-style: italic;">                      cualquier otro valor utilizar&#225; un modelo gen&#233;rico.</span>
 
-    Returns:
-        figura: Un objeto figura que representa el gr&#225;fico generado.
-    
-    Ejemplo:
-        &gt;&gt;&gt; fig = RegionParametrica(modelo='AR')
-        &gt;&gt;&gt; plt.show(fig)
-    """</span>  
+<span style="font-style: italic;">    Returns:</span>
+<span style="font-style: italic;">        figura: Un objeto figura que representa el gr&#225;fico generado.</span>
+<span style="font-style: italic;">    </span>
+<span style="font-style: italic;">    Ejemplo:</span>
+<span style="font-style: italic;">        &gt;&gt;&gt; fig = RegionParametrica(modelo='AR')</span>
+<span style="font-style: italic;">        &gt;&gt;&gt; plt.show(fig)</span>
+<span style="font-style: italic;">    """</span>  
 
     <span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax</span> = plt.subplots(figsize=(10, 6))
     ax.set_aspect(<span style="font-style: italic;">'equal'</span>)
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis
-</span>    <span style="font-weight: bold; font-style: italic;">xmin</span>, <span style="font-weight: bold; font-style: italic;">ymin</span> = -3, -2
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis</span>
+    <span style="font-weight: bold; font-style: italic;">xmin</span>, <span style="font-weight: bold; font-style: italic;">ymin</span> = -3, -2
     <span style="font-weight: bold; font-style: italic;">xmax</span>, <span style="font-weight: bold; font-style: italic;">ymax</span> = -xmin, -ymin
     plt.axis([xmin, xmax, ymin, ymax])
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Define the Greek letter based on modelo with subscripts
-</span>    <span style="font-weight: bold;">if</span> modelo == <span style="font-style: italic;">'AR'</span>:
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Define the Greek letter based on modelo with subscripts</span>
+    <span style="font-weight: bold;">if</span> modelo == <span style="font-style: italic;">'AR'</span>:
         <span style="font-weight: bold; font-style: italic;">simb_param_1</span> = r<span style="font-style: italic;">'$\phi_1$'</span>
         <span style="font-weight: bold; font-style: italic;">simb_param_2</span> = r<span style="font-style: italic;">'$\phi_2$'</span>
     <span style="font-weight: bold;">elif</span> modelo == <span style="font-style: italic;">'MA'</span>:
@@ -1154,37 +1154,37 @@ Gráfico que muestra las regiones para los pares de coeficientes donde un polino
 
     <span style="font-weight: bold; font-style: italic;">desdolariza</span> = <span style="font-weight: bold;">lambda</span> texto: texto.replace(<span style="font-style: italic;">'$'</span>, <span style="font-style: italic;">''</span>)
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis labels
-</span>    ax.<span style="font-weight: bold;">set</span>(xticks=[], yticks=[])
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Set axis labels</span>
+    ax.<span style="font-weight: bold;">set</span>(xticks=[], yticks=[])
     ax.set_xlabel(simb_param_2, fontsize=16)
     ax.xaxis.set_label_position(<span style="font-style: italic;">'top'</span>)
     ax.set_ylabel(simb_param_1, rotation=0, fontsize=16)
     ax.yaxis.set_label_position(<span style="font-style: italic;">'right'</span>)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Draw (t1, t2) points
-</span>    <span style="font-weight: bold; font-style: italic;">p1</span> = np.linspace(-2, 2, 100)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Draw (t1, t2) points</span>
+    <span style="font-weight: bold; font-style: italic;">p1</span> = np.linspace(-2, 2, 100)
     ax.plot(p1, -<span style="font-weight: bold;">abs</span>(p1) + 1, c=<span style="font-style: italic;">'black'</span>, linestyle=<span style="font-style: italic;">'--'</span>)
     ax.plot(p1, np.full_like(p1, -1), c=<span style="font-style: italic;">'lightgray'</span>, linestyle=<span style="font-style: italic;">'--'</span>)
     ax.plot(p1, -(p1**2 / 4), c=<span style="font-style: italic;">'black'</span>)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fill the region below the parabola and above the base of the triangle
-</span>    ax.fill_between(p1, -(p1**2 / 4), -1, where=-(p1**2 / 4) &gt;= -1, color=<span style="font-style: italic;">'lightgray'</span>, alpha=0.5)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Fill the region below the parabola and above the base of the triangle</span>
+    ax.fill_between(p1, -(p1**2 / 4), -1, where=-(p1**2 / 4) &gt;= -1, color=<span style="font-style: italic;">'lightgray'</span>, alpha=0.5)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Turn normal axes off
-</span>    <span style="font-weight: bold;">for</span> spine <span style="font-weight: bold;">in</span> [<span style="font-style: italic;">'left'</span>, <span style="font-style: italic;">'bottom'</span>, <span style="font-style: italic;">'top'</span>, <span style="font-style: italic;">'right'</span>]:
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Turn normal axes off</span>
+    <span style="font-weight: bold;">for</span> spine <span style="font-weight: bold;">in</span> [<span style="font-style: italic;">'left'</span>, <span style="font-style: italic;">'bottom'</span>, <span style="font-style: italic;">'top'</span>, <span style="font-style: italic;">'right'</span>]:
         ax.spines[spine].set_visible(<span style="font-weight: bold; text-decoration: underline;">False</span>)
         
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add arrows to represent axes
-</span>    <span style="font-weight: bold; font-style: italic;">axes_arrows</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'&lt;|-|&gt;'</span>, <span style="font-style: italic;">'lw'</span>: 0.5, <span style="font-style: italic;">'color'</span>: <span style="font-style: italic;">'gray'</span>}  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Hacerlas grises y m&#225;s finas
-</span>    ax.annotate(<span style="font-style: italic;">''</span>, xy=(xmin, 0), xytext=(xmax, 0), arrowprops=axes_arrows)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add arrows to represent axes</span>
+    <span style="font-weight: bold; font-style: italic;">axes_arrows</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'&lt;|-|&gt;'</span>, <span style="font-style: italic;">'lw'</span>: 0.5, <span style="font-style: italic;">'color'</span>: <span style="font-style: italic;">'gray'</span>}  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Hacerlas grises y m&#225;s finas</span>
+    ax.annotate(<span style="font-style: italic;">''</span>, xy=(xmin, 0), xytext=(xmax, 0), arrowprops=axes_arrows)
     ax.annotate(<span style="font-style: italic;">''</span>, xy=(0, ymin), xytext=(0, ymax), arrowprops=axes_arrows)
     
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label complex region
-</span>    ax.text(0.09, -0.8, <span style="font-style: italic;">'Ra&#237;ces complejas'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=14, color=<span style="font-style: italic;">'gray'</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label complex region</span>
+    ax.text(0.09, -0.8, <span style="font-style: italic;">'Ra&#237;ces complejas'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=14, color=<span style="font-style: italic;">'gray'</span>)
     
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Annotate the plot with equations
-</span>    <span style="font-weight: bold; font-style: italic;">plot_arrowsl</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'-|&gt;'</span>, <span style="font-style: italic;">'connectionstyle'</span>: <span style="font-style: italic;">"arc3, rad=-0.2"</span>}
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Annotate the plot with equations</span>
+    <span style="font-weight: bold; font-style: italic;">plot_arrowsl</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'-|&gt;'</span>, <span style="font-style: italic;">'connectionstyle'</span>: <span style="font-style: italic;">"arc3, rad=-0.2"</span>}
     <span style="font-weight: bold; font-style: italic;">plot_arrowsr</span> = {<span style="font-style: italic;">'arrowstyle'</span>: <span style="font-style: italic;">'-|&gt;'</span>, <span style="font-style: italic;">'connectionstyle'</span>: <span style="font-style: italic;">"arc3, rad=0.2"</span>}
     ax.annotate(<span style="font-style: italic;">'$'</span> + desdolariza(simb_param_1) + <span style="font-style: italic;">'+'</span> + desdolariza(simb_param_2) + <span style="font-style: italic;">'&lt;1$'</span>, xy=(0.4, 0.25), xytext=(1.1, 0.4), arrowprops=plot_arrowsr, fontsize=<span style="font-style: italic;">'12'</span>)
     ax.annotate(<span style="font-style: italic;">'$'</span> + desdolariza(simb_param_1) + <span style="font-style: italic;">'+'</span> + desdolariza(simb_param_2) + <span style="font-style: italic;">'=1$'</span>, xy=(0.38, 0.6), xytext=(0.6, 0.8), arrowprops=plot_arrowsr, fontsize=<span style="font-style: italic;">'12'</span>)
@@ -1197,19 +1197,19 @@ Gráfico que muestra las regiones para los pares de coeficientes donde un polino
     ax.annotate(<span style="font-style: italic;">'$'</span> + desdolariza(simb_param_1) + <span style="font-style: italic;">'^2 + 4'</span> + desdolariza(simb_param_2) + <span style="font-style: italic;">'= 0$'</span>, xy=(1.0, -0.28), xytext=(1.8, -0.5), arrowprops=plot_arrowsr, fontsize=<span style="font-style: italic;">'12'</span>)
     ax.annotate(<span style="font-style: italic;">'$'</span> + desdolariza(simb_param_1) + <span style="font-style: italic;">'^2 + 4'</span> + desdolariza(simb_param_2) + <span style="font-style: italic;">'&lt; 0$'</span>, xy=(-.9, -0.6), xytext=(-2.8, -0.5), arrowprops=plot_arrowsl, fontsize=<span style="font-style: italic;">'12'</span>)
    
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label cases
-</span>    ax.text(.3, 0.25, <span style="font-style: italic;">'1'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=16, color=<span style="font-style: italic;">'blue'</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Label cases</span>
+    ax.text(.3, 0.25, <span style="font-style: italic;">'1'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=16, color=<span style="font-style: italic;">'blue'</span>)
     ax.text(-.3, 0.25, <span style="font-style: italic;">'2'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=16, color=<span style="font-style: italic;">'blue'</span>)
     ax.text(-.3, -0.35, <span style="font-style: italic;">'3'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=16, color=<span style="font-style: italic;">'blue'</span>)
     ax.text(.3, -0.35, <span style="font-style: italic;">'4'</span>, ha=<span style="font-style: italic;">'center'</span>, fontsize=16, color=<span style="font-style: italic;">'blue'</span>)
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small marker to y-axis
-</span>    ax.axhline(y=1.005, xmin=0.495, xmax=0.505, c=<span style="font-style: italic;">'black'</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small marker to y-axis</span>
+    ax.axhline(y=1.005, xmin=0.495, xmax=0.505, c=<span style="font-style: italic;">'black'</span>)
     ax.text(-0.12, -1.12, <span style="font-style: italic;">'-1'</span>, fontsize=10)
     ax.text(-0.12, 0.98, <span style="font-style: italic;">'1'</span>, fontsize=10)
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small markers to x-axis
-</span>    ax.axvline(x=-2, ymin=0.495, ymax=0.505, c=<span style="font-style: italic;">'black'</span>)
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Add small markers to x-axis</span>
+    ax.axvline(x=-2, ymin=0.495, ymax=0.505, c=<span style="font-style: italic;">'black'</span>)
     ax.axvline(x=2, ymin=0.495, ymax=0.505, c=<span style="font-style: italic;">'black'</span>)
     ax.text(-2.12, -0.12, <span style="font-style: italic;">'-2'</span>, fontsize=10)
     ax.text(1.88, -0.12, <span style="font-style: italic;">'2'</span>, fontsize=10)
@@ -1223,13 +1223,13 @@ Gráfico que muestra las regiones para los pares de coeficientes donde un polino
 </div>
 </div>
 </div>
-<div id="outline-container-org999a803" class="outline-3">
-<h3 id="org999a803">Gráfico rango mediana (<code>RangoMediana</code>)</h3>
-<div class="outline-text-3" id="text-org999a803">
+<div id="outline-container-org0f5b626" class="outline-3">
+<h3 id="org0f5b626">Gráfico rango mediana (<code>RangoMediana</code>)</h3>
+<div class="outline-text-3" id="text-org0f5b626">
 <div class="org-src-container">
-<pre class="src src-python" id="org60606af"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">RangoMediana</span>(datos, k=6, ax=<span style="font-weight: bold; text-decoration: underline;">None</span>):
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inicializar listas para almacenar las medianas y rangos
-</span>    <span style="font-weight: bold; font-style: italic;">medians</span> = []
+<pre class="src src-python" id="org38a065d"><code><span style="font-weight: bold;">def</span> <span style="font-weight: bold;">RangoMediana</span>(datos, k=6, ax=<span style="font-weight: bold; text-decoration: underline;">None</span>):
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Inicializar listas para almacenar las medianas y rangos</span>
+    <span style="font-weight: bold; font-style: italic;">medians</span> = []
     <span style="font-weight: bold; font-style: italic;">ranges</span> = []
     
     <span style="font-weight: bold; font-style: italic;">n</span> = <span style="font-weight: bold;">len</span>(datos)
@@ -1238,20 +1238,20 @@ Gráfico que muestra las regiones para los pares de coeficientes donde un polino
         <span style="font-weight: bold; font-style: italic;">start</span> = i * sub_sample_size
         <span style="font-weight: bold; font-style: italic;">end</span> = start + sub_sample_size
         
-        <span style="font-weight: bold;">if</span> i == k - 1:  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para el &#250;ltimo, incluir los datos sobrantes
-</span>            <span style="font-weight: bold; font-style: italic;">end</span> = n
+        <span style="font-weight: bold;">if</span> i == k - 1:  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para el &#250;ltimo, incluir los datos sobrantes</span>
+            <span style="font-weight: bold; font-style: italic;">end</span> = n
         
         <span style="font-weight: bold; font-style: italic;">sub_sample</span> = datos[start:end]
         
-        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Calcular mediana y rango
-</span>        <span style="font-weight: bold; font-style: italic;">median</span> = np.median(sub_sample)
+        <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Calcular mediana y rango</span>
+        <span style="font-weight: bold; font-style: italic;">median</span> = np.median(sub_sample)
         <span style="font-weight: bold; font-style: italic;">range_value</span> = np.<span style="font-weight: bold;">max</span>(sub_sample) - np.<span style="font-weight: bold;">min</span>(sub_sample)
         
         medians.append(median)
         ranges.append(range_value)
 
-    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el gr&#225;fico rango-mediana en el eje especificado
-</span>    <span style="font-weight: bold;">if</span> ax <span style="font-weight: bold;">is</span> <span style="font-weight: bold;">not</span> <span style="font-weight: bold; text-decoration: underline;">None</span>:
+    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el gr&#225;fico rango-mediana en el eje especificado</span>
+    <span style="font-weight: bold;">if</span> ax <span style="font-weight: bold;">is</span> <span style="font-weight: bold;">not</span> <span style="font-weight: bold; text-decoration: underline;">None</span>:
         ax.scatter(medians, ranges) 
         ax.set_title(<span style="font-style: italic;">'Gr&#225;fico Rango-Mediana'</span>)
         ax.set_xlabel(<span style="font-style: italic;">'Mediana de Submuestra'</span>)
@@ -1265,7 +1265,7 @@ Gráfico que muestra las regiones para los pares de coeficientes donde un polino
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2026-01-22 Thu 11:07</p>
+<p class="date">Created: 2026-05-23 Sat 14:22</p>
 </div>
 </body>
 </html>

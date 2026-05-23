@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-01-22 Thu 11:07 -->
+<!-- 2026-05-23 Sat 14:22 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 9. Cointegración</title>
@@ -66,42 +66,42 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org41a46de">Correlación</a>
+<li><a href="#org0df7285">Correlación</a>
 <ul>
-<li><a href="#orgf03a18b">La causalidad y correlación</a></li>
-<li><a href="#org3571939">Correlación espuria</a></li>
+<li><a href="#org8308676">La causalidad y correlación</a></li>
+<li><a href="#orgad43951">Correlación espuria</a></li>
 </ul>
 </li>
-<li><a href="#orgc636819">Las series con tendencia suelen tener elevadas correlaciones.</a>
+<li><a href="#orgf5c3af1">Las series con tendencia suelen tener elevadas correlaciones.</a>
 <ul>
-<li><a href="#org9b7c5fc">Ejemplo de correlación espuria: PNB vs incidencia de melanoma</a>
+<li><a href="#org4a2e584">Ejemplo de correlación espuria: PNB vs incidencia de melanoma</a>
 <ul>
-<li><a href="#orgc1f5b29">Regresión en niveles</a></li>
+<li><a href="#org55bdd42">Regresión en niveles</a></li>
 </ul>
 </li>
-<li><a href="#org1a36ef8">Explorando si la correlación es probablemente <i>espuria</i> (no causalidad)</a>
+<li><a href="#org248dbf1">Explorando si la correlación es probablemente <i>espuria</i> (no causalidad)</a>
 <ul>
-<li><a href="#org6ae5f82">Regresión en primeras diferencias</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org9d6124d">Cointegración</a>
-<ul>
-<li><a href="#org95a1765">Ejemplo de cointegración: tipos de interes en UK a corto y largo plazo</a>
-<ul>
-<li><a href="#orgf39a971">Series en diferencias</a></li>
-<li><a href="#org843b664">Regresión de las series en niveles</a></li>
-<li><a href="#org68c6450">Conclusión</a></li>
+<li><a href="#org876e8d7">Regresión en primeras diferencias</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#org48005ff">Codigo aux</a></li>
+<li><a href="#org33a16da">Cointegración</a>
+<ul>
+<li><a href="#org6eb720c">Ejemplo de cointegración: tipos de interes en UK a corto y largo plazo</a>
+<ul>
+<li><a href="#org2216457">Series en diferencias</a></li>
+<li><a href="#orgc15376e">Regresión de las series en niveles</a></li>
+<li><a href="#orge30a82d">Conclusión</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#orga7eae58">Codigo aux</a></li>
 </ul>
 </div>
 </div>
-<div class="ABSTRACT" id="org01c0bb3">
+<div class="ABSTRACT" id="org17fef6d">
 <p>
 En esta lección se discutirá la posible relación entre correlación y causalidad. 
 Veremos casos de correlación espuria (correlación sin causalidad) y una introducción a la cointegración (con un caso en el la correlación no desaparece al diferenciar las series). 
@@ -112,42 +112,42 @@ Veremos casos de correlación espuria (correlación sin causalidad) y una introd
 <ul class="org-ul">
 <li>(<a href="https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc09.slides.html">slides</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc09.html">html</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc09.pdf">pdf</a>) &mdash; (<a href="https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc09.ipynb">mybinder</a>)</li>
 </ul>
-<div id="outline-container-org9e0afc5" class="outline-4">
-<h4 id="org9e0afc5">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-org9e0afc5">
+<div id="outline-container-org48796a0" class="outline-4">
+<h4 id="org48796a0">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-org48796a0">
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python
-</span><span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra
-</span><span style="font-weight: bold;">import</span> pandas <span style="font-weight: bold;">as</span> pd <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">data processing, CSV file I/O (e.g. pd.read_csv)
-</span><span style="font-weight: bold;">import</span> matplotlib <span style="font-weight: bold;">as</span> mpl
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">definimos par&#225;metros para mejorar los gr&#225;ficos
-</span>mpl.rc(<span style="font-style: italic;">'text'</span>, usetex=<span style="font-weight: bold; text-decoration: underline;">False</span>)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python</span>
+<span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra</span>
+<span style="font-weight: bold;">import</span> pandas <span style="font-weight: bold;">as</span> pd <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">data processing, CSV file I/O (e.g. pd.read_csv)</span>
+<span style="font-weight: bold;">import</span> matplotlib <span style="font-weight: bold;">as</span> mpl
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">definimos par&#225;metros para mejorar los gr&#225;ficos</span>
+mpl.rc(<span style="font-style: italic;">'text'</span>, usetex=<span style="font-weight: bold; text-decoration: underline;">False</span>)
 <span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt   <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">data visualization</span>
 </code></pre>
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org693dc1e"></a>Creación del directorio auxiliar para albergar las figuras de la lección<br />
-<div class="outline-text-5" id="text-org693dc1e">
+<li><a id="org371a879"></a>Creación del directorio auxiliar para albergar las figuras de la lección<br />
+<div class="outline-text-5" id="text-org371a879">
 <p>
 Para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">imagenes_leccion</span> = <span style="font-style: italic;">"./img/lecc09"</span> <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">directorio para las im&#225;genes de la lecci&#243;n
-</span><span style="font-weight: bold;">import</span> os
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">imagenes_leccion</span> = <span style="font-style: italic;">"./img/lecc09"</span> <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">directorio para las im&#225;genes de la lecci&#243;n</span>
+<span style="font-weight: bold;">import</span> os
 os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-decoration: underline;">True</span>) <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">crea el directorio si no existe</span>
 </code></pre>
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="org37972f0"></a>Codigo aux<br />
-<div class="outline-text-15" id="text-org37972f0">
+<li><a id="org8869e51"></a>Codigo aux<br />
+<div class="outline-text-15" id="text-org8869e51">
 <p>
 Con el siguiente código mejoramos los gráficos.
 </p>
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">definimos par&#225;metros para mejorar los gr&#225;ficos
-</span>mpl.rc(<span style="font-style: italic;">'text'</span>, usetex=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">definimos par&#225;metros para mejorar los gr&#225;ficos</span>
+mpl.rc(<span style="font-style: italic;">'text'</span>, usetex=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 mpl.rc(<span style="font-style: italic;">'text.latex'</span>, preamble=r<span style="font-style: italic;">'\usepackage{amsmath}'</span>)
 </code></pre>
 </div>
@@ -157,9 +157,9 @@ mpl.rc(<span style="font-style: italic;">'text.latex'</span>, preamble=r<span st
 </li>
 </ul>
 </div>
-<div id="outline-container-org41a46de" class="outline-2">
-<h2 id="org41a46de">Correlación</h2>
-<div class="outline-text-2" id="text-org41a46de">
+<div id="outline-container-org0df7285" class="outline-2">
+<h2 id="org0df7285">Correlación</h2>
+<div class="outline-text-2" id="text-org0df7285">
 <p>
 La correlación entre dos muestras de tamaño \(N\) (dos vectores de datos de \(\mathbb{R}^N\)) es el <a href="https://mbujosab.github.io/Ectr/apuntes-Ectr-print.pdf#subsection.3.1"><b>coseno</b> del ángulo formado los vectores de datos en desviaciones respecto a sus correspondientes medias</a>.
 \[\rho_{\boldsymbol{x}\boldsymbol{y}}=\frac{\sigma_{\boldsymbol{x}\boldsymbol{y}}}{\sigma_{\boldsymbol{x}}\sigma_{\boldsymbol{y}}}\]
@@ -174,9 +174,9 @@ Por tanto la correlación es algún valor entre \(-1\) y \(1\).
 <li>Cuando la correlación es \(0\) el vector \(\;\boldsymbol{y}-\boldsymbol{\bar{y}}\;\) es perpendicular al vector \(\;\boldsymbol{x}-\boldsymbol{\bar{x}}\;\)</li>
 </ul>
 </div>
-<div id="outline-container-orgf03a18b" class="outline-3">
-<h3 id="orgf03a18b">La causalidad y correlación</h3>
-<div class="outline-text-3" id="text-orgf03a18b">
+<div id="outline-container-org8308676" class="outline-3">
+<h3 id="org8308676">La causalidad y correlación</h3>
+<div class="outline-text-3" id="text-org8308676">
 <p>
 Cuando existe relación causal entre variables sus muestras suelen estar correladas.
 </p>
@@ -195,9 +195,9 @@ Pero <b>correlaciones significativas no indican la existencia de relaciones caus
 </ul>
 </div>
 </div>
-<div id="outline-container-org3571939" class="outline-3">
-<h3 id="org3571939">Correlación espuria</h3>
-<div class="outline-text-3" id="text-org3571939">
+<div id="outline-container-orgad43951" class="outline-3">
+<h3 id="orgad43951">Correlación espuria</h3>
+<div class="outline-text-3" id="text-orgad43951">
 <p>
 La correlación entre variables sin relación causal se denomina <i>correlación espuria</i>.
 </p>
@@ -225,13 +225,13 @@ Puede ser que no exista causa alguna y aún así haya correlación
 </div>
 </div>
 </div>
-<div id="outline-container-orgc636819" class="outline-2">
-<h2 id="orgc636819">Las series con tendencia suelen tener elevadas correlaciones.</h2>
-<div class="outline-text-2" id="text-orgc636819">
+<div id="outline-container-orgf5c3af1" class="outline-2">
+<h2 id="orgf5c3af1">Las series con tendencia suelen tener elevadas correlaciones.</h2>
+<div class="outline-text-2" id="text-orgf5c3af1">
 </div>
-<div id="outline-container-org9b7c5fc" class="outline-3">
-<h3 id="org9b7c5fc">Ejemplo de correlación espuria: PNB vs incidencia de melanoma</h3>
-<div class="outline-text-3" id="text-org9b7c5fc">
+<div id="outline-container-org4a2e584" class="outline-3">
+<h3 id="org4a2e584">Ejemplo de correlación espuria: PNB vs incidencia de melanoma</h3>
+<div class="outline-text-3" id="text-org4a2e584">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">path</span> = <span style="font-style: italic;">'../datos/'</span>
 <span style="font-weight: bold; font-style: italic;">df1</span> = pd.read_csv(path+<span style="font-style: italic;">'GNPvsMelanoma.csv'</span>)
@@ -248,20 +248,20 @@ Puede ser que no exista causa alguna y aún así haya correlación
 
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear figuras y ejes con proporci&#243;n 15:4
-</span><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax1</span> = plt.subplots(figsize=(15, 4))
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Representar GNP
-</span>ax1.set_xlabel(<span style="font-style: italic;">'A&#241;o'</span>)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear figuras y ejes con proporci&#243;n 15:4</span>
+<span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax1</span> = plt.subplots(figsize=(15, 4))
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Representar GNP</span>
+ax1.set_xlabel(<span style="font-style: italic;">'A&#241;o'</span>)
 ax1.set_ylabel(<span style="font-style: italic;">'GNP'</span>, color=<span style="font-style: italic;">'tab:blue'</span>)
 ax1.plot(df1[<span style="font-style: italic;">'obs'</span>], df1[<span style="font-style: italic;">'GNP'</span>], color=<span style="font-style: italic;">'tab:blue'</span>)
 ax1.tick_params(axis=<span style="font-style: italic;">'y'</span>, labelcolor=<span style="font-style: italic;">'tab:blue'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un segundo eje para Melanoma
-</span><span style="font-weight: bold; font-style: italic;">ax2</span> = ax1.twinx()
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un segundo eje para Melanoma</span>
+<span style="font-weight: bold; font-style: italic;">ax2</span> = ax1.twinx()
 ax2.set_ylabel(<span style="font-style: italic;">'Melanoma'</span>, color=<span style="font-style: italic;">'tab:orange'</span>)
 ax2.plot(df1[<span style="font-style: italic;">'obs'</span>], df1[<span style="font-style: italic;">'Melanoma'</span>], color=<span style="font-style: italic;">'tab:orange'</span>)
 ax2.tick_params(axis=<span style="font-style: italic;">'y'</span>, labelcolor=<span style="font-style: italic;">'tab:orange'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir t&#237;tulo
-</span>plt.title(<span style="font-style: italic;">'GNP en USA y casos de melanoma en Connecticut'</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir t&#237;tulo</span>
+plt.title(<span style="font-style: italic;">'GNP en USA y casos de melanoma en Connecticut'</span>)
 plt.savefig(<span style="font-style: italic;">'./img/lecc09/GNPvsMelanoma.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Cierra la figura para liberar memoria</span>
 </code></pre>
@@ -273,28 +273,28 @@ Serie anual (1936&ndash;1972) del PNB anual de EEUU en miles de millones de dól
 </p>
 
 
-<div id="org71f3749" class="figure">
+<div id="org8b7e80b" class="figure">
 <p><img src="./img/lecc09/GNPvsMelanoma.png" alt="GNPvsMelanoma.png" width="900px" />
 </p>
 </div>
 
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el diagrama de dispersi&#243;n
-</span>plt.figure(figsize=(10, 6))
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el diagrama de dispersi&#243;n</span>
+plt.figure(figsize=(10, 6))
 plt.scatter(df1[<span style="font-style: italic;">'Melanoma'</span>], df1[<span style="font-style: italic;">'GNP'</span>], color=<span style="font-style: italic;">'blue'</span>, alpha=0.5)
 plt.title(<span style="font-style: italic;">'Diagrama de dispersi&#243;n: Melanoma vs GNP'</span>)
 plt.xlabel(<span style="font-style: italic;">'Melanoma'</span>)
 plt.ylabel(<span style="font-style: italic;">'GNP'</span>)
 plt.grid(<span style="font-weight: bold; text-decoration: underline;">True</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Guardar la figura
-</span>plt.savefig(<span style="font-style: italic;">'./img/lecc09/Scatter-GNPvsMelanoma.png'</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Guardar la figura</span>
+plt.savefig(<span style="font-style: italic;">'./img/lecc09/Scatter-GNPvsMelanoma.png'</span>)
 plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Cierra la figura para liberar memoria</span>
 </code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="orgee556d1"><code><span style="font-weight: bold; font-style: italic;">correlation</span> = df1[<span style="font-style: italic;">'GNP'</span>].corr(df1[<span style="font-style: italic;">'Melanoma'</span>])
+<pre class="src src-jupyter-python" id="orgf3904a4"><code><span style="font-weight: bold; font-style: italic;">correlation</span> = df1[<span style="font-style: italic;">'GNP'</span>].corr(df1[<span style="font-style: italic;">'Melanoma'</span>])
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">print(f'Coeficiente de correlaci&#243;n: {correlation:.3f}')</span>
 </code></pre>
 </div>
@@ -311,26 +311,26 @@ Como ambas series presentan una tendencia creciente,
 
 
 
-<div id="org6c180a8" class="figure">
+<div id="org2b1fb72" class="figure">
 <p><img src="./img/lecc09/Scatter-GNPvsMelanoma.png" alt="Scatter-GNPvsMelanoma.png" width="550px" />
 </p>
 </div>
 </div>
-<div id="outline-container-orgc1f5b29" class="outline-4">
-<h4 id="orgc1f5b29">Regresión en niveles</h4>
-<div class="outline-text-4" id="text-orgc1f5b29">
+<div id="outline-container-org55bdd42" class="outline-4">
+<h4 id="org55bdd42">Regresión en niveles</h4>
+<div class="outline-text-4" id="text-org55bdd42">
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="org80f9524"><code><span style="font-weight: bold;">import</span> statsmodels.api <span style="font-weight: bold;">as</span> sm
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir variables independientes y dependientes
-</span><span style="font-weight: bold; font-style: italic;">y</span> = df1[<span style="font-style: italic;">'GNP'</span>]
+<pre class="src src-jupyter-python" id="org8242987"><code><span style="font-weight: bold;">import</span> statsmodels.api <span style="font-weight: bold;">as</span> sm
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir variables independientes y dependientes</span>
+<span style="font-weight: bold; font-style: italic;">y</span> = df1[<span style="font-style: italic;">'GNP'</span>]
 <span style="font-weight: bold; font-style: italic;">X</span> = df1[<span style="font-style: italic;">'Melanoma'</span>]
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Agregar una constante a la matriz de caracter&#237;sticas
-</span><span style="font-weight: bold; font-style: italic;">X</span> = sm.add_constant(X)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ajustar el modelo MCO
-</span><span style="font-weight: bold; font-style: italic;">model</span> = sm.OLS(y, X)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Agregar una constante a la matriz de caracter&#237;sticas</span>
+<span style="font-weight: bold; font-style: italic;">X</span> = sm.add_constant(X)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ajustar el modelo MCO</span>
+<span style="font-weight: bold; font-style: italic;">model</span> = sm.OLS(y, X)
 <span style="font-weight: bold; font-style: italic;">results</span> = model.fit()
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener el resumen del ajuste
-</span><span style="font-weight: bold; font-style: italic;">summary</span> = results.summary(slim=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener el resumen del ajuste</span>
+<span style="font-weight: bold; font-style: italic;">summary</span> = results.summary(slim=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">print(summary)</span>
 </code></pre>
 </div>
@@ -343,7 +343,7 @@ La regresión del PNB sobre los casos de melanoma arroja un excelente ajuste
 
 
 
-<div id="org291b789" class="figure">
+<div id="org1c12762" class="figure">
 <p><img src="./img/lecc09/resultsModel1.png" alt="resultsModel1.png" width="600px" />
 </p>
 </div>
@@ -355,9 +355,9 @@ La regresión del PNB sobre los casos de melanoma arroja un excelente ajuste
 </div>
 </div>
 </div>
-<div id="outline-container-org1a36ef8" class="outline-3">
-<h3 id="org1a36ef8">Explorando si la correlación es probablemente <i>espuria</i> (no causalidad)</h3>
-<div class="outline-text-3" id="text-org1a36ef8">
+<div id="outline-container-org248dbf1" class="outline-3">
+<h3 id="org248dbf1">Explorando si la correlación es probablemente <i>espuria</i> (no causalidad)</h3>
+<div class="outline-text-3" id="text-org248dbf1">
 <p>
 Si fuera cierto que 
 \[
@@ -373,8 +373,8 @@ entonces también sería cierto que
 Añadamos al dataframe la primera diferencia de cada una de las series temporales:
 </p>
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">creamos nuevas columnas con las primeras diferencias
-</span><span style="font-weight: bold; font-style: italic;">df1</span>[<span style="font-style: italic;">'GNP_diff'</span>] = df1[<span style="font-style: italic;">'GNP'</span>].diff()
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">creamos nuevas columnas con las primeras diferencias</span>
+<span style="font-weight: bold; font-style: italic;">df1</span>[<span style="font-style: italic;">'GNP_diff'</span>] = df1[<span style="font-style: italic;">'GNP'</span>].diff()
 <span style="font-weight: bold; font-style: italic;">df1</span>[<span style="font-style: italic;">'Melanoma_diff'</span>] = df1[<span style="font-style: italic;">'Melanoma'</span>].diff()
 <span style="font-weight: bold;">print</span>(df1.head(3))
 </code></pre>
@@ -392,20 +392,20 @@ Añadamos al dataframe la primera diferencia de cada una de las series temporale
 Y generemos el gráfico de las series diferenciadas:
 </p>
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear figuras y ejes con proporci&#243;n 15:4
-</span><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax1</span> = plt.subplots(figsize=(15, 4))
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Graficar GNP
-</span>ax1.set_xlabel(<span style="font-style: italic;">'A&#241;o'</span>)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear figuras y ejes con proporci&#243;n 15:4</span>
+<span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax1</span> = plt.subplots(figsize=(15, 4))
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Graficar GNP</span>
+ax1.set_xlabel(<span style="font-style: italic;">'A&#241;o'</span>)
 ax1.set_ylabel(<span style="font-style: italic;">'Incremento GNP'</span>, color=<span style="font-style: italic;">'tab:blue'</span>)
 ax1.plot(df1[<span style="font-style: italic;">'obs'</span>], df1[<span style="font-style: italic;">'GNP_diff'</span>], color=<span style="font-style: italic;">'tab:blue'</span>)
 ax1.tick_params(axis=<span style="font-style: italic;">'y'</span>, labelcolor=<span style="font-style: italic;">'tab:blue'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un segundo eje para Melanoma
-</span><span style="font-weight: bold; font-style: italic;">ax2</span> = ax1.twinx()
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un segundo eje para Melanoma</span>
+<span style="font-weight: bold; font-style: italic;">ax2</span> = ax1.twinx()
 ax2.set_ylabel(<span style="font-style: italic;">'Incremento Melanoma'</span>, color=<span style="font-style: italic;">'tab:orange'</span>)
 ax2.plot(df1[<span style="font-style: italic;">'obs'</span>], df1[<span style="font-style: italic;">'Melanoma_diff'</span>], color=<span style="font-style: italic;">'tab:orange'</span>)
 ax2.tick_params(axis=<span style="font-style: italic;">'y'</span>, labelcolor=<span style="font-style: italic;">'tab:orange'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir t&#237;tulo
-</span>plt.title(<span style="font-style: italic;">'Incrementos de GNP en USA y de casos de melanoma en Connecticut'</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir t&#237;tulo</span>
+plt.title(<span style="font-style: italic;">'Incrementos de GNP en USA y de casos de melanoma en Connecticut'</span>)
 plt.savefig(<span style="font-style: italic;">'./img/lecc09/d_GNPvsd_Melanoma.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Cierra la figura para liberar memoria</span>
 </code></pre>
@@ -413,7 +413,7 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 
 
 
-<div id="orgc9bb828" class="figure">
+<div id="orgd5f94e0" class="figure">
 <p><img src="./img/lecc09/d_GNPvsd_Melanoma.png" alt="d_GNPvsd_Melanoma.png" width="900px" />
 </p>
 </div>
@@ -422,9 +422,9 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 La aparente relación ya no se aprecia tras diferenciar las series.
 </p>
 </div>
-<div id="outline-container-org6ae5f82" class="outline-4">
-<h4 id="org6ae5f82">Regresión en primeras diferencias</h4>
-<div class="outline-text-4" id="text-org6ae5f82">
+<div id="outline-container-org876e8d7" class="outline-4">
+<h4 id="org876e8d7">Regresión en primeras diferencias</h4>
+<div class="outline-text-4" id="text-org876e8d7">
 <p>
 Además, al realizar la regresión de la primera diferencia de <code>GNP</code> sobre la primera diferencia de <code>Melanoma</code>, 
 obtenemos un ajuste pésimo (tan solo la constante es significativa&hellip; cuando debería ser la única no significativa).
@@ -432,24 +432,24 @@ obtenemos un ajuste pésimo (tan solo la constante es significativa&hellip; cuan
 
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Eliminar filas con NaN en las columnas relevantes
-</span><span style="font-weight: bold; font-style: italic;">df1_cleaned</span> = df1[[<span style="font-style: italic;">'GNP_diff'</span>, <span style="font-style: italic;">'Melanoma_diff'</span>]].dropna()
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir las variables independientes y dependientes
-</span><span style="font-weight: bold; font-style: italic;">y_diff</span> = df1_cleaned[<span style="font-style: italic;">'GNP_diff'</span>]
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Eliminar filas con NaN en las columnas relevantes</span>
+<span style="font-weight: bold; font-style: italic;">df1_cleaned</span> = df1[[<span style="font-style: italic;">'GNP_diff'</span>, <span style="font-style: italic;">'Melanoma_diff'</span>]].dropna()
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir las variables independientes y dependientes</span>
+<span style="font-weight: bold; font-style: italic;">y_diff</span> = df1_cleaned[<span style="font-style: italic;">'GNP_diff'</span>]
 <span style="font-weight: bold; font-style: italic;">X_diff</span> = df1_cleaned[<span style="font-style: italic;">'Melanoma_diff'</span>]
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Agregar una constante a la matriz de caracter&#237;sticas
-</span><span style="font-weight: bold; font-style: italic;">X_diff</span> = sm.add_constant(X_diff)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ajustar el modelo MCO
-</span><span style="font-weight: bold; font-style: italic;">model_diff</span> = sm.OLS(y_diff, X_diff)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Agregar una constante a la matriz de caracter&#237;sticas</span>
+<span style="font-weight: bold; font-style: italic;">X_diff</span> = sm.add_constant(X_diff)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ajustar el modelo MCO</span>
+<span style="font-weight: bold; font-style: italic;">model_diff</span> = sm.OLS(y_diff, X_diff)
 <span style="font-weight: bold; font-style: italic;">results_diff</span> = model_diff.fit()
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener el resumen del ajuste
-</span><span style="font-weight: bold; font-style: italic;">summary_diff</span> = results_diff.summary(slim=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener el resumen del ajuste</span>
+<span style="font-weight: bold; font-style: italic;">summary_diff</span> = results_diff.summary(slim=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">print(summary_diff)</span>
 </code></pre>
 </div>
 
 
-<div id="org1dffe4a" class="figure">
+<div id="org6718916" class="figure">
 <p><img src="./img/lecc09/resultsModel2.png" alt="resultsModel2.png" width="600px" />
 </p>
 </div>
@@ -461,9 +461,9 @@ obtenemos un ajuste pésimo (tan solo la constante es significativa&hellip; cuan
 </div>
 </div>
 </div>
-<div id="outline-container-org9d6124d" class="outline-2">
-<h2 id="org9d6124d">Cointegración</h2>
-<div class="outline-text-2" id="text-org9d6124d">
+<div id="outline-container-org33a16da" class="outline-2">
+<h2 id="org33a16da">Cointegración</h2>
+<div class="outline-text-2" id="text-org33a16da">
 <ul class="org-ul">
 <li>Un proceso estocástico \(\boldsymbol{X}\) sin componentes deterministas es \(I(0)\) si tiene representación ARMA <span class="underline">estacionaria e invertible</span>.</li>
 </ul>
@@ -503,9 +503,9 @@ de manera que las desviaciones del equilibrio tienden a desaparecer a corto plaz
 (pues hay una combinación lineal entre ellas que cancela dicha tendencia).</li>
 </ol>
 </div>
-<div id="outline-container-org95a1765" class="outline-3">
-<h3 id="org95a1765">Ejemplo de cointegración: tipos de interes en UK a corto y largo plazo</h3>
-<div class="outline-text-3" id="text-org95a1765">
+<div id="outline-container-org6eb720c" class="outline-3">
+<h3 id="org6eb720c">Ejemplo de cointegración: tipos de interes en UK a corto y largo plazo</h3>
+<div class="outline-text-3" id="text-org6eb720c">
 <p>
 Generamos un dataframe con los datos:
 </p>
@@ -521,27 +521,27 @@ Generamos un dataframe con los datos:
 Y los graficamos:
 </p>
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear figuras y ejes con proporci&#243;n 15:4
-</span><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax1</span> = plt.subplots(figsize=(15, 4))
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Representar Long
-</span>ax1.set_xlabel(<span style="font-style: italic;">'A&#241;o'</span>)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear figuras y ejes con proporci&#243;n 15:4</span>
+<span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax1</span> = plt.subplots(figsize=(15, 4))
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Representar Long</span>
+ax1.set_xlabel(<span style="font-style: italic;">'A&#241;o'</span>)
 ax1.set_ylabel(<span style="font-style: italic;">'Long'</span>, color=<span style="font-style: italic;">'tab:blue'</span>)
 ax1.plot(df2[<span style="font-style: italic;">'obs'</span>], df2[<span style="font-style: italic;">'Long'</span>], color=<span style="font-style: italic;">'tab:blue'</span>)
 ax1.tick_params(axis=<span style="font-style: italic;">'y'</span>, labelcolor=<span style="font-style: italic;">'tab:blue'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un segundo eje para Short
-</span><span style="font-weight: bold; font-style: italic;">ax2</span> = ax1.twinx()
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un segundo eje para Short</span>
+<span style="font-weight: bold; font-style: italic;">ax2</span> = ax1.twinx()
 ax2.set_ylabel(<span style="font-style: italic;">'Short'</span>, color=<span style="font-style: italic;">'tab:orange'</span>)
 ax2.plot(df2[<span style="font-style: italic;">'obs'</span>], df2[<span style="font-style: italic;">'Short'</span>], color=<span style="font-style: italic;">'tab:orange'</span>)
 ax2.tick_params(axis=<span style="font-style: italic;">'y'</span>, labelcolor=<span style="font-style: italic;">'tab:orange'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Configurar el eje x para mostrar un tic en el primer trimestre de cada a&#241;o
-</span><span style="font-weight: bold; font-style: italic;">xticks</span> = df2[<span style="font-style: italic;">'obs'</span>][df2[<span style="font-style: italic;">'obs'</span>].<span style="font-weight: bold;">str</span>.endswith(<span style="font-style: italic;">'Q1'</span>)]  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en Q1
-</span>ax1.set_xticks(xticks)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Configurar el eje x para mostrar un tic en el primer trimestre de cada a&#241;o</span>
+<span style="font-weight: bold; font-style: italic;">xticks</span> = df2[<span style="font-style: italic;">'obs'</span>][df2[<span style="font-style: italic;">'obs'</span>].<span style="font-weight: bold;">str</span>.endswith(<span style="font-style: italic;">'Q1'</span>)]  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en Q1</span>
+ax1.set_xticks(xticks)
 ax1.set_xticklabels(xticks, rotation=45, ha=<span style="font-style: italic;">'right'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir l&#237;neas verticales en los tics
-</span><span style="font-weight: bold;">for</span> tick <span style="font-weight: bold;">in</span> xticks:
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir l&#237;neas verticales en los tics</span>
+<span style="font-weight: bold;">for</span> tick <span style="font-weight: bold;">in</span> xticks:
     ax1.axvline(x=tick, color=<span style="font-style: italic;">'lightgrey'</span>, linestyle=<span style="font-style: italic;">'--'</span>, linewidth=0.5)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir t&#237;tulo
-</span>plt.title(<span style="font-style: italic;">'Tipos a largo y a corto plazo en el Reino Unido'</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir t&#237;tulo</span>
+plt.title(<span style="font-style: italic;">'Tipos a largo y a corto plazo en el Reino Unido'</span>)
 plt.savefig(<span style="font-style: italic;">'./img/lecc09/UK_Interest_rates.png'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Cierra la figura para liberar memoria</span>
 </code></pre>
@@ -565,7 +565,7 @@ Y calculamos la correlación de ambas series:
 (Muestra: 1952Q2&ndash;1970Q4)
 </p>
 
-<div id="orgdb5aa25" class="figure">
+<div id="org1c7fa3d" class="figure">
 <p><img src="./img/lecc09/UK_Interest_rates.png" alt="UK_Interest_rates.png" width="900px" />
 </p>
 </div>
@@ -580,15 +580,15 @@ Como ambas series presentan una tendencia creciente,
 <li>Valor del coeficiente de correlación: <code>np.float64(0.898)</code></li>
 </ul>
 </div>
-<div id="outline-container-orgf39a971" class="outline-4">
-<h4 id="orgf39a971">Series en diferencias</h4>
-<div class="outline-text-4" id="text-orgf39a971">
+<div id="outline-container-org2216457" class="outline-4">
+<h4 id="org2216457">Series en diferencias</h4>
+<div class="outline-text-4" id="text-org2216457">
 <p>
 Añadamos al dataframe la primera diferencia de cada una de las series temporales:
 </p>
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">creamos nuevas columnas con las primeras diferencias
-</span><span style="font-weight: bold; font-style: italic;">df2</span>[<span style="font-style: italic;">'Long_diff'</span>] = df2[<span style="font-style: italic;">'Long'</span>].diff()
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">creamos nuevas columnas con las primeras diferencias</span>
+<span style="font-weight: bold; font-style: italic;">df2</span>[<span style="font-style: italic;">'Long_diff'</span>] = df2[<span style="font-style: italic;">'Long'</span>].diff()
 <span style="font-weight: bold; font-style: italic;">df2</span>[<span style="font-style: italic;">'Short_diff'</span>] = df2[<span style="font-style: italic;">'Short'</span>].diff()
 <span style="font-weight: bold;">print</span>(df2.head(3))
 </code></pre>
@@ -605,27 +605,27 @@ Añadamos al dataframe la primera diferencia de cada una de las series temporale
 Y generemos el gráfico de las series diferenciadas:
 </p>
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear figuras y ejes con proporci&#243;n 15:4
-</span><span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax1</span> = plt.subplots(figsize=(15, 4))
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Representar Long
-</span>ax1.set_xlabel(<span style="font-style: italic;">'A&#241;o'</span>)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear figuras y ejes con proporci&#243;n 15:4</span>
+<span style="font-weight: bold; font-style: italic;">fig</span>, <span style="font-weight: bold; font-style: italic;">ax1</span> = plt.subplots(figsize=(15, 4))
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Representar Long</span>
+ax1.set_xlabel(<span style="font-style: italic;">'A&#241;o'</span>)
 ax1.set_ylabel(<span style="font-style: italic;">'Primera diferencia de Long'</span>, color=<span style="font-style: italic;">'tab:blue'</span>)
 ax1.plot(df2[<span style="font-style: italic;">'obs'</span>], df2[<span style="font-style: italic;">'Long_diff'</span>], color=<span style="font-style: italic;">'tab:blue'</span>)
 ax1.tick_params(axis=<span style="font-style: italic;">'y'</span>, labelcolor=<span style="font-style: italic;">'tab:blue'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un segundo eje para Short
-</span><span style="font-weight: bold; font-style: italic;">ax2</span> = ax1.twinx()
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear un segundo eje para Short</span>
+<span style="font-weight: bold; font-style: italic;">ax2</span> = ax1.twinx()
 ax2.set_ylabel(<span style="font-style: italic;">'Primera diferencia de Short'</span>, color=<span style="font-style: italic;">'tab:orange'</span>)
 ax2.plot(df2[<span style="font-style: italic;">'obs'</span>], df2[<span style="font-style: italic;">'Short_diff'</span>], color=<span style="font-style: italic;">'tab:orange'</span>)
 ax2.tick_params(axis=<span style="font-style: italic;">'y'</span>, labelcolor=<span style="font-style: italic;">'tab:orange'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Configurar el eje x para mostrar un tic en el primer trimestre de cada a&#241;o
-</span><span style="font-weight: bold; font-style: italic;">xticks</span> = df2[<span style="font-style: italic;">'obs'</span>][df2[<span style="font-style: italic;">'obs'</span>].<span style="font-weight: bold;">str</span>.endswith(<span style="font-style: italic;">'Q1'</span>)]  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en Q1
-</span>ax1.set_xticks(xticks)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Configurar el eje x para mostrar un tic en el primer trimestre de cada a&#241;o</span>
+<span style="font-weight: bold; font-style: italic;">xticks</span> = df2[<span style="font-style: italic;">'obs'</span>][df2[<span style="font-style: italic;">'obs'</span>].<span style="font-weight: bold;">str</span>.endswith(<span style="font-style: italic;">'Q1'</span>)]  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Tics en Q1</span>
+ax1.set_xticks(xticks)
 ax1.set_xticklabels(xticks, rotation=45, ha=<span style="font-style: italic;">'right'</span>)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir l&#237;neas verticales en los tics
-</span><span style="font-weight: bold;">for</span> tick <span style="font-weight: bold;">in</span> xticks:
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir l&#237;neas verticales en los tics</span>
+<span style="font-weight: bold;">for</span> tick <span style="font-weight: bold;">in</span> xticks:
     ax1.axvline(x=tick, color=<span style="font-style: italic;">'lightgrey'</span>, linestyle=<span style="font-style: italic;">'--'</span>, linewidth=0.5)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir t&#237;tulo
-</span>plt.title(<span style="font-style: italic;">'Incrementos de los tiposs a largo y corto plazo en Reino Unido'</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">A&#241;adir t&#237;tulo</span>
+plt.title(<span style="font-style: italic;">'Incrementos de los tiposs a largo y corto plazo en Reino Unido'</span>)
 plt.savefig(<span style="font-style: italic;">'./img/lecc09/UK_Interest_ratesFirstDiff'</span>, dpi=300, bbox_inches=<span style="font-style: italic;">'tight'</span>)
 plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Cierra la figura para liberar memoria</span>
 </code></pre>
@@ -633,7 +633,7 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 
 
 
-<div id="org27f4dba" class="figure">
+<div id="orgd22bd7b" class="figure">
 <p><img src="./img/lecc09/UK_Interest_ratesFirstDiff.png" alt="UK_Interest_ratesFirstDiff.png" width="900px" />
 </p>
 </div>
@@ -643,18 +643,18 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 Regresión en primeras diferencias
 </p>
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Eliminar filas con NaN en las columnas relevantes
-</span><span style="font-weight: bold; font-style: italic;">df2_cleaned</span> = df2[[<span style="font-style: italic;">'Long_diff'</span>, <span style="font-style: italic;">'Short_diff'</span>]].dropna()
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir las variables independientes y dependientes
-</span><span style="font-weight: bold; font-style: italic;">y_UK_diff</span> = df2_cleaned[<span style="font-style: italic;">'Short_diff'</span>]
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Eliminar filas con NaN en las columnas relevantes</span>
+<span style="font-weight: bold; font-style: italic;">df2_cleaned</span> = df2[[<span style="font-style: italic;">'Long_diff'</span>, <span style="font-style: italic;">'Short_diff'</span>]].dropna()
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir las variables independientes y dependientes</span>
+<span style="font-weight: bold; font-style: italic;">y_UK_diff</span> = df2_cleaned[<span style="font-style: italic;">'Short_diff'</span>]
 <span style="font-weight: bold; font-style: italic;">X_UK_diff</span> = df2_cleaned[<span style="font-style: italic;">'Long_diff'</span>]
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Agregar una constante a la matriz de caracter&#237;sticas
-</span><span style="font-weight: bold; font-style: italic;">X_UK_diff</span> = sm.add_constant(X_UK_diff)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ajustar el modelo MCO
-</span><span style="font-weight: bold; font-style: italic;">model_UK_diff</span> = sm.OLS(y_UK_diff, X_UK_diff)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Agregar una constante a la matriz de caracter&#237;sticas</span>
+<span style="font-weight: bold; font-style: italic;">X_UK_diff</span> = sm.add_constant(X_UK_diff)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ajustar el modelo MCO</span>
+<span style="font-weight: bold; font-style: italic;">model_UK_diff</span> = sm.OLS(y_UK_diff, X_UK_diff)
 <span style="font-weight: bold; font-style: italic;">results_model_UK_diff</span> = model_UK_diff.fit()
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener el resumen del ajuste
-</span><span style="font-weight: bold; font-style: italic;">summary_UK_diff</span> = results_model_UK_diff.summary(slim=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener el resumen del ajuste</span>
+<span style="font-weight: bold; font-style: italic;">summary_UK_diff</span> = results_model_UK_diff.summary(slim=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">print(summary_UK_diff)</span>
 </code></pre>
 </div>
@@ -664,7 +664,7 @@ Resultados de la regresión en primeras diferencias de <code>Short</code> sobre 
 </p>
 
 
-<div id="org8087f6d" class="figure">
+<div id="org3e67445" class="figure">
 <p><img src="./img/lecc09/resultsModel3.png" alt="resultsModel3.png" width="600px" />
 </p>
 </div>
@@ -681,21 +681,21 @@ Resultados de la regresión en primeras diferencias de <code>Short</code> sobre 
 </p>
 </div>
 </div>
-<div id="outline-container-org843b664" class="outline-4">
-<h4 id="org843b664">Regresión de las series en niveles</h4>
-<div class="outline-text-4" id="text-org843b664">
+<div id="outline-container-orgc15376e" class="outline-4">
+<h4 id="orgc15376e">Regresión de las series en niveles</h4>
+<div class="outline-text-4" id="text-orgc15376e">
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir variables independientes y dependientes
-</span><span style="font-weight: bold; font-style: italic;">y_UK</span> = df2[<span style="font-style: italic;">'Short'</span>]
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Definir variables independientes y dependientes</span>
+<span style="font-weight: bold; font-style: italic;">y_UK</span> = df2[<span style="font-style: italic;">'Short'</span>]
 <span style="font-weight: bold; font-style: italic;">X_UK</span> = df2[<span style="font-style: italic;">'Long'</span>]
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Agregar una constante a la matriz de caracter&#237;sticas
-</span><span style="font-weight: bold; font-style: italic;">X_UK</span> = sm.add_constant(X_UK)
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ajustar el modelo MCO
-</span><span style="font-weight: bold; font-style: italic;">ajuste_modelo_UK</span> = sm.OLS(y_UK, X_UK).fit()
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Agregar una constante a la matriz de caracter&#237;sticas</span>
+<span style="font-weight: bold; font-style: italic;">X_UK</span> = sm.add_constant(X_UK)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Ajustar el modelo MCO</span>
+<span style="font-weight: bold; font-style: italic;">ajuste_modelo_UK</span> = sm.OLS(y_UK, X_UK).fit()
 <span style="font-weight: bold; font-style: italic;">model_UK</span> = sm.OLS(y_UK, X_UK)
 <span style="font-weight: bold; font-style: italic;">results_model_UK</span> = model_UK.fit()
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener el resumen del ajuste
-</span><span style="font-weight: bold; font-style: italic;">summary_UK</span> = results_model_UK.summary(slim=<span style="font-weight: bold; text-decoration: underline;">True</span>)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener el resumen del ajuste</span>
+<span style="font-weight: bold; font-style: italic;">summary_UK</span> = results_model_UK.summary(slim=<span style="font-weight: bold; text-decoration: underline;">True</span>)
 <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">print(summary_UK)</span>
 </code></pre>
 </div>
@@ -703,7 +703,7 @@ Resultados de la regresión en primeras diferencias de <code>Short</code> sobre 
 
 
 
-<div id="orgc231119" class="figure">
+<div id="org138b388" class="figure">
 <p><img src="./img/lecc09/resultsModel4.png" alt="resultsModel4.png" width="600px" />
 </p>
 </div>
@@ -725,13 +725,13 @@ Veamos si es así&hellip;
 </p>
 </div>
 <ul class="org-ul">
-<li><a id="org0e3d034"></a>Análisis gráfico de los residuos<br />
-<div class="outline-text-5" id="text-org0e3d034">
+<li><a id="org63408da"></a>Análisis gráfico de los residuos<br />
+<div class="outline-text-5" id="text-org63408da">
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener residuos
-</span><span style="font-weight: bold; font-style: italic;">residuos</span> = ajuste_modelo_UK.resid
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el gr&#225;fico de los residuos con el tama&#241;o especificado
-</span>plt.figure(figsize=(15, 4))
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Obtener residuos</span>
+<span style="font-weight: bold; font-style: italic;">residuos</span> = ajuste_modelo_UK.resid
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Crear el gr&#225;fico de los residuos con el tama&#241;o especificado</span>
+plt.figure(figsize=(15, 4))
 plt.plot(residuos)
 plt.title(<span style="font-style: italic;">'Residuos de la Regresi&#243;n'</span>)
 plt.xlabel(<span style="font-style: italic;">'&#205;ndice'</span>)
@@ -744,7 +744,7 @@ plt.close()  <span style="font-weight: bold; font-style: italic;"># </span><span
 
 
 
-<div id="org186b307" class="figure">
+<div id="orgc6080da" class="figure">
 <p><img src="./img/lecc09/UK_Interest_ratesResiduals.png" alt="UK_Interest_ratesResiduals.png" width="900px" />
 </p>
 </div>
@@ -755,12 +755,12 @@ Por el gráfico, los residuos aparentan ser "<i>estacionarios en media</i>"
 </p>
 </div>
 </li>
-<li><a id="org2f470b8"></a>Contraste de hipótesis Dickey-Fuller de los residuos<br />
-<div class="outline-text-5" id="text-org2f470b8">
+<li><a id="org0e4f3f0"></a>Contraste de hipótesis Dickey-Fuller de los residuos<br />
+<div class="outline-text-5" id="text-org0e4f3f0">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold;">from</span> statsmodels.tsa.stattools <span style="font-weight: bold;">import</span> adfuller, kpss
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Contraste de Dickey-Fuller
-</span><span style="font-weight: bold; font-style: italic;">adf_result</span> = adfuller(residuos)
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Contraste de Dickey-Fuller</span>
+<span style="font-weight: bold; font-style: italic;">adf_result</span> = adfuller(residuos)
 <span style="font-weight: bold; font-style: italic;">adf_stat</span>, <span style="font-weight: bold; font-style: italic;">adf_p_value</span> = adf_result[0], adf_result[1]
 (adf_stat, adf_p_value)
 </code></pre>
@@ -793,11 +793,11 @@ Un p-valor tan bajo indica que debemos rechazar la hipótesis nula de que la ser
 </p>
 </div>
 </li>
-<li><a id="org76228c0"></a>Contraste de hipótesis KPSS de los residuos<br />
-<div class="outline-text-5" id="text-org76228c0">
+<li><a id="org275c7ed"></a>Contraste de hipótesis KPSS de los residuos<br />
+<div class="outline-text-5" id="text-org275c7ed">
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Contraste de KPSS
-</span><span style="font-weight: bold; font-style: italic;">kpss_result</span> = kpss(residuos, regression=<span style="font-style: italic;">'c'</span>)
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Contraste de KPSS</span>
+<span style="font-weight: bold; font-style: italic;">kpss_result</span> = kpss(residuos, regression=<span style="font-style: italic;">'c'</span>)
 <span style="font-weight: bold; font-style: italic;">kpss_stat</span>, <span style="font-weight: bold; font-style: italic;">kpss_p_value</span> = kpss_result[0], kpss_result[1]
 (kpss_stat, kpss_p_value)
 </code></pre>
@@ -808,13 +808,13 @@ El test KPSS nos indica que el p-valor es mayor a \(0.1\); por tanto no podemos 
 </p>
 </div>
 </li>
-<li><a id="org4d63259"></a>Función de autocorrelación simple ACF de los residuos<br />
-<div class="outline-text-5" id="text-org4d63259">
+<li><a id="orged04ebb"></a>Función de autocorrelación simple ACF de los residuos<br />
+<div class="outline-text-5" id="text-orged04ebb">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold;">import</span> matplotlib.pyplot <span style="font-weight: bold;">as</span> plt
 <span style="font-weight: bold;">from</span> statsmodels.graphics.tsaplots <span style="font-weight: bold;">import</span> plot_acf
-<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Visualizar la funci&#243;n de autocorrelaci&#243;n
-</span>plt.figure(figsize=(18, 3))
+<span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Visualizar la funci&#243;n de autocorrelaci&#243;n</span>
+plt.figure(figsize=(18, 3))
 plot_acf(residuos, lags=40)
 plt.title(<span style="font-style: italic;">'Funci&#243;n de Autocorrelaci&#243;n de los Residuos'</span>)
 plt.savefig(<span style="font-style: italic;">'./img/lecc09/UK_Interest_rates_ACF.png'</span>)
@@ -827,7 +827,7 @@ Su aspecto es el de la ACF de una serie estacionaria.
 </p>
 
 
-<div id="org4bb1b58" class="figure">
+<div id="org5f9af5e" class="figure">
 <p><img src="./img/lecc09/UK_Interest_rates_ACF.png" alt="UK_Interest_rates_ACF.png" width="500px" />
 </p>
 </div>
@@ -837,8 +837,8 @@ También podemos comprobar que el valor de la autocorrelación de orden 1 está 
 </p>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Calcular la autocorrelaci&#243;n de orden 1
-</span>np.corrcoef(residuos[:-1], residuos[1:])[0, 1]
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Calcular la autocorrelaci&#243;n de orden 1</span>
+np.corrcoef(residuos[:-1], residuos[1:])[0, 1]
 </code></pre>
 </div>
 
@@ -854,9 +854,9 @@ Su valor es claramente inferior a \(1\).
 </li>
 </ul>
 </div>
-<div id="outline-container-org68c6450" class="outline-4">
-<h4 id="org68c6450">Conclusión</h4>
-<div class="outline-text-4" id="text-org68c6450">
+<div id="outline-container-orge30a82d" class="outline-4">
+<h4 id="orge30a82d">Conclusión</h4>
+<div class="outline-text-4" id="text-orge30a82d">
 <p>
 Los análisis realizados sobre los residuos de la regresión entre los tipos de interés a corto y largo plazo sugieren que estos se comportan como un proceso estacionario. 
 </p>
@@ -876,20 +876,20 @@ sugieren que los cambios en los tipos de interés a corto y largo plazo pueden e
 </div>
 </div>
 </div>
-<div id="outline-container-org48005ff" class="outline-2">
-<h2 id="org48005ff">Codigo aux</h2>
-<div class="outline-text-2" id="text-org48005ff">
+<div id="outline-container-orga7eae58" class="outline-2">
+<h2 id="orga7eae58">Codigo aux</h2>
+<div class="outline-text-2" id="text-orga7eae58">
 </div>
 <ul class="org-ul">
-<li><a id="org41706d6"></a>Codigo aux<br />
-<div class="outline-text-15" id="text-org41706d6">
+<li><a id="org879261f"></a>Codigo aux<br />
+<div class="outline-text-15" id="text-org879261f">
 <p>
 <code>El objetivo de los siguientes bloques de código es mostrar en el texto los resultados de las estimaciones con un formato más agradable.</code>
 </p>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">transformar&#233; salidas en \LaTeX{} de statsmodels a ficheros png para incluirlas en las transparencias
-</span><span style="font-weight: bold;">import</span> dataframe_image <span style="font-weight: bold;">as</span> dfi
+<pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">transformar&#233; salidas en \LaTeX{} de statsmodels a ficheros png para incluirlas en las transparencias</span>
+<span style="font-weight: bold;">import</span> dataframe_image <span style="font-weight: bold;">as</span> dfi
 <span style="font-weight: bold;">from</span> sympy.printing.preview <span style="font-weight: bold;">import</span> preview
 <span style="font-weight: bold;">def</span> <span style="font-weight: bold;">repr_png</span>(tex, ImgFile):
     <span style="font-weight: bold; font-style: italic;">preamble</span> = <span style="font-style: italic;">"</span><span style="font-weight: bold; text-decoration: underline;">\\</span><span style="font-style: italic;">documentclass[preview]{standalone}</span><span style="font-weight: bold; text-decoration: underline;">\n</span><span style="font-style: italic;">"</span> \
@@ -899,12 +899,12 @@ sugieren que los cambios en los tipos de interés a corto y largo plazo pueden e
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="org1a4b47a"><code><span style="font-weight: bold;">round</span>(correlation,3)
+<pre class="src src-jupyter-python" id="org79e5b39"><code><span style="font-weight: bold;">round</span>(correlation,3)
 </code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-latex" id="orga807a3b"><code>- Valor del coeficiente de correlaci&#243;n: ~<span style="font-weight: bold;">&lt;&lt;</span><span style="font-style: italic;">Coef-correlacionGNPmelanoma()</span><span style="font-weight: bold;">&gt;&gt;</span>~
+<pre class="src src-latex" id="org3e394ec"><code>- Valor del coeficiente de correlaci&#243;n: ~<span style="font-weight: bold;">&lt;&lt;</span><span style="font-style: italic;">Coef-correlacionGNPmelanoma()</span><span style="font-weight: bold;">&gt;&gt;</span>~
 </code></pre>
 </div>
 
@@ -924,12 +924,12 @@ sugieren que los cambios en los tipos de interés a corto y largo plazo pueden e
 </div>
 
 <div class="org-src-container">
-<pre class="src src-jupyter-python" id="org64a06e3"><code><span style="font-weight: bold;">round</span>(correlationUKinterestRates,3)
+<pre class="src src-jupyter-python" id="orgc904975"><code><span style="font-weight: bold;">round</span>(correlationUKinterestRates,3)
 </code></pre>
 </div>
 
 <div class="org-src-container">
-<pre class="src src-latex" id="org62972c3"><code>- Valor del coeficiente de correlaci&#243;n: ~<span style="font-weight: bold;">&lt;&lt;</span><span style="font-style: italic;">Coef-correlationUKinterestRates()</span><span style="font-weight: bold;">&gt;&gt;</span>~
+<pre class="src src-latex" id="org4dde9a0"><code>- Valor del coeficiente de correlaci&#243;n: ~<span style="font-weight: bold;">&lt;&lt;</span><span style="font-style: italic;">Coef-correlationUKinterestRates()</span><span style="font-weight: bold;">&gt;&gt;</span>~
 </code></pre>
 </div>
 
@@ -948,7 +948,7 @@ sugieren que los cambios en los tipos de interés a corto y largo plazo pueden e
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2026-01-22 Thu 11:07</p>
+<p class="date">Created: 2026-05-23 Sat 14:22</p>
 </div>
 </body>
 </html>
