@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-05-23 Sat 14:22 -->
+<!-- 2026-05-23 Sat 15:42 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 8.B &mdash; Temperaturas de la tierra en desviaciones a la media del mes</title>
@@ -101,36 +101,36 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org3ef2c94">Objetivo de la práctica</a></li>
-<li><a href="#org55b9482">Actividad 1 - Gráfico de series temporales</a></li>
-<li><a href="#org38f7823">Actividad 2 - Correlograma de la primera diferencia de los datos</a></li>
-<li><a href="#orgf18d4c0">Actividad 3 - Identificar un modelo ARIMA para la serie temporal</a>
+<li><a href="#org2975603">Objetivo de la práctica</a></li>
+<li><a href="#org0f65629">Actividad 1 - Gráfico de series temporales</a></li>
+<li><a href="#org9b7af13">Actividad 2 - Correlograma de la primera diferencia de los datos</a></li>
+<li><a href="#org4f46ed4">Actividad 3 - Identificar un modelo ARIMA para la serie temporal</a>
 <ul>
-<li><a href="#org22de434">Intentado con un ARIMA(0,1,1)</a>
+<li><a href="#org1b08197">Intentado con un ARIMA(0,1,1)</a>
 <ul>
-<li><a href="#org2b94e7d">Correlograma de los residuos</a></li>
+<li><a href="#orga630a94">Correlograma de los residuos</a></li>
 </ul>
 </li>
-<li><a href="#org02021b5">Intentado con un ARIMA(0,1,3)</a>
+<li><a href="#org2c637bc">Intentado con un ARIMA(0,1,3)</a>
 <ul>
-<li><a href="#orgc60ce2b">Correlograma de los residuos</a></li>
+<li><a href="#org403cc1d">Correlograma de los residuos</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgdcbe326">Actividad 4 - Previsión para los 12 meses de 2002</a>
+<li><a href="#org5109f1c">Actividad 4 - Previsión para los 12 meses de 2002</a>
 <ul>
-<li><a href="#orgd904ce9">Re-estimación del modelo truncando la muestra</a></li>
-<li><a href="#org1fefacb">Previsión de los 12 últimos meses de la muestra</a></li>
+<li><a href="#orgd64771c">Re-estimación del modelo truncando la muestra</a></li>
+<li><a href="#org6e79c0d">Previsión de los 12 últimos meses de la muestra</a></li>
 </ul>
 </li>
-<li><a href="#org4017d9e">Código completo de la práctica</a></li>
+<li><a href="#org46d85f2">Código completo de la práctica</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org3ef2c94" class="outline-2">
-<h2 id="org3ef2c94">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-org3ef2c94">
+<div id="outline-container-org2975603" class="outline-2">
+<h2 id="org2975603">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-org2975603">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -179,7 +179,7 @@ que previamente ha descargado desde aquí: <a href="https://github.com/mbujosab/
 <i>o bien teclee en linea de comandos</i>:
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="orgc19daa3"><code>open RutaAlDirectorioDelFichero/tempmundo.csv
+<pre class="src src-gretl" id="orgf834312"><code>open RutaAlDirectorioDelFichero/tempmundo.csv
 setobs 12 1881:01
 setinfo Temperature_Deviations --description="Temperaturas mensuales en desviaciones respecto a la media calculada entre los años 1951 y 1975"
 </code></pre>
@@ -189,9 +189,9 @@ donde <code>RutaAlDirectorioDelFichero</code> es la ruta al directorio donde gua
 </p>
 </div>
 </div>
-<div id="outline-container-org55b9482" class="outline-2">
-<h2 id="org55b9482">Actividad 1 - Gráfico de series temporales</h2>
-<div class="outline-text-2" id="text-org55b9482">
+<div id="outline-container-org0f65629" class="outline-2">
+<h2 id="org0f65629">Actividad 1 - Gráfico de series temporales</h2>
+<div class="outline-text-2" id="text-org0f65629">
 <ul class="org-ul">
 <li>Marque la variable <code>Temperature_Deviations</code> (pulsando <code>ctrl</code> y pinchando con el botón derecho del ratón sobre ella). Elija <b><i><code>Gráfico de series temporales</code></i></b></li>
 </ul>
@@ -200,21 +200,21 @@ donde <code>RutaAlDirectorioDelFichero</code> es la ruta al directorio donde gua
 <i>o bien teclee en linea de comandos</i>:
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org1e64177"><code>DesvTemp &lt;- gnuplot Temperature_Deviations --time-series --with-lines  --output="Temperaturas.png"
+<pre class="src src-gretl" id="org8869b50"><code>DesvTemp &lt;- gnuplot Temperature_Deviations --time-series --with-lines  --output="Temperaturas.png"
 </code></pre>
 </div>
 <div class="org-center">
 
-<div id="org13a490d" class="figure">
+<div id="org839aab5" class="figure">
 <p><img src="./P-L08-B-temperaturasDeLaTierra/Temperaturas.png" alt="Temperaturas.png" />
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org38f7823" class="outline-2">
-<h2 id="org38f7823">Actividad 2 - Correlograma de la primera diferencia de los datos</h2>
-<div class="outline-text-2" id="text-org38f7823">
+<div id="outline-container-org9b7af13" class="outline-2">
+<h2 id="org9b7af13">Actividad 2 - Correlograma de la primera diferencia de los datos</h2>
+<div class="outline-text-2" id="text-org9b7af13">
 <p>
 Seleccione con el ratón la variable <code>Temperature_Deviations</code> y luego pulse en el menú desplegable <b><i><code>Añadir</code></i></b> que aparece arriba, en el centro de la ventana principal de <a href="https://gretl.sourceforge.net/es.html">Gretl</a>.
 </p>
@@ -243,7 +243,7 @@ Genere el gráfico de series temporales de esta nueva serie y guárdelo como un 
 </div>
 <div class="org-center">
 
-<div id="org7a84e02" class="figure">
+<div id="org5cb193b" class="figure">
 <p><img src="./P-L08-B-temperaturasDeLaTierra/Dif_Temperaturas.png" alt="Dif_Temperaturas.png" />
 </p>
 </div>
@@ -266,13 +266,13 @@ La instrucción <code>--plot="Dif_Temperature_Deviations-ACF-PACF.png"</code> no
 </p>
 <div class="org-center">
 
-<div id="org1c611fa" class="figure">
+<div id="org0664903" class="figure">
 <p><img src="./P-L08-B-temperaturasDeLaTierra/Dif_Temperature_Deviations-ACF-PACF.png" alt="Dif_Temperature_Deviations-ACF-PACF.png" />
 </p>
 </div>
 </div>
 
-<pre class="example" id="org15797ae">
+<pre class="example" id="org9a7db3c">
 Autocorrelation function for d_Temperature_Deviations
 ***, **, * indicate significance at the 1%, 5%, 10% levels
 using standard error 1/T^0.5
@@ -294,22 +294,22 @@ using standard error 1/T^0.5
 </pre>
 </div>
 </div>
-<div id="outline-container-orgf18d4c0" class="outline-2">
-<h2 id="orgf18d4c0">Actividad 3 - Identificar un modelo ARIMA para la serie temporal</h2>
-<div class="outline-text-2" id="text-orgf18d4c0">
+<div id="outline-container-org4f46ed4" class="outline-2">
+<h2 id="org4f46ed4">Actividad 3 - Identificar un modelo ARIMA para la serie temporal</h2>
+<div class="outline-text-2" id="text-org4f46ed4">
 <p>
 A primera vista parece que la ACF cae abruptamente tras el primer retardo y que la PACF decae exponencialmente. Esto sugiere un modelo MA(1). Estime un modelo IMA(1) para los datos y analice los resultados.<sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>
 </p>
 </div>
-<div id="outline-container-org22de434" class="outline-3">
-<h3 id="org22de434">Intentado con un ARIMA(0,1,1)</h3>
-<div class="outline-text-3" id="text-org22de434">
+<div id="outline-container-org1b08197" class="outline-3">
+<h3 id="org1b08197">Intentado con un ARIMA(0,1,1)</h3>
+<div class="outline-text-3" id="text-org1b08197">
 <div class="org-src-container">
-<pre class="src src-R" id="org8226990"><code>ARIMA011 &lt;- arima 0 1 1 ; Temperature_Deviations
+<pre class="src src-R" id="org3e76670"><code>ARIMA011 &lt;- arima 0 1 1 ; Temperature_Deviations
 </code></pre>
 </div>
 
-<pre class="example" id="orgf9ae411">
+<pre class="example" id="org64ee406">
 Function evaluations: 60
 Evaluations of gradient: 14
 
@@ -342,25 +342,25 @@ ARIMA011 saved
 La constante no es significativa, pero el parámetro \(\theta_1\) sí lo es y la raíz MA está alejada de uno. Veamos el correlograma.
 </p>
 </div>
-<div id="outline-container-org2b94e7d" class="outline-4">
-<h4 id="org2b94e7d">Correlograma de los residuos</h4>
-<div class="outline-text-4" id="text-org2b94e7d">
+<div id="outline-container-orga630a94" class="outline-4">
+<h4 id="orga630a94">Correlograma de los residuos</h4>
+<div class="outline-text-4" id="text-orga630a94">
 <div class="org-src-container">
-<pre class="src src-R" id="orgeb2b0ca"><code>residuosARIMA011 = $uhat
+<pre class="src src-R" id="orgde29c9d"><code>residuosARIMA011 = $uhat
 corrgm residuosARIMA011 --plot="residuosARIMA011-ACF-PACF.png"
 </code></pre>
 </div>
 
 <div class="org-center">
 
-<div id="orgb857166" class="figure">
+<div id="org0406d46" class="figure">
 <p><img src="./P-L08-B-temperaturasDeLaTierra/residuosARIMA011-ACF-PACF.png" alt="residuosARIMA011-ACF-PACF.png" />
 </p>
 </div>
 </div>
 
 
-<pre class="example" id="org6e4d4a9">
+<pre class="example" id="org6881d03">
 Autocorrelation function for residuosARIMA011
 ***, **, * indicate significance at the 1%, 5%, 10% levels
 using standard error 1/T^0.5
@@ -394,15 +394,15 @@ Pruebe con esta nueva especificación ARIMA(0,1,3) sin constante (si la incluye 
 </div>
 </div>
 </div>
-<div id="outline-container-org02021b5" class="outline-3">
-<h3 id="org02021b5">Intentado con un ARIMA(0,1,3)</h3>
-<div class="outline-text-3" id="text-org02021b5">
+<div id="outline-container-org2c637bc" class="outline-3">
+<h3 id="org2c637bc">Intentado con un ARIMA(0,1,3)</h3>
+<div class="outline-text-3" id="text-org2c637bc">
 <div class="org-src-container">
-<pre class="src src-R" id="org7c68445"><code>ARIMA013 &lt;- arima 0 1 3 ; Temperature_Deviations --nc
+<pre class="src src-R" id="org49b29da"><code>ARIMA013 &lt;- arima 0 1 3 ; Temperature_Deviations --nc
 </code></pre>
 </div>
 
-<pre class="example" id="org9b6978e">
+<pre class="example" id="orgd7fc30a">
 Function evaluations: 58
 Evaluations of gradient: 14
 
@@ -440,9 +440,9 @@ El R-cuadrado indica que este modelo es capaz de replicar casi el 75% de la vari
 Analicemos ahora el correlograma.
 </p>
 </div>
-<div id="outline-container-orgc60ce2b" class="outline-4">
-<h4 id="orgc60ce2b">Correlograma de los residuos</h4>
-<div class="outline-text-4" id="text-orgc60ce2b">
+<div id="outline-container-org403cc1d" class="outline-4">
+<h4 id="org403cc1d">Correlograma de los residuos</h4>
+<div class="outline-text-4" id="text-org403cc1d">
 <div class="org-src-container">
 <pre class="src src-R"><code>residuosARIMA013 = $uhat
 corrgm residuosARIMA013 12 --plot="residuosARIMA013-ACF-PACF.png"
@@ -451,14 +451,14 @@ corrgm residuosARIMA013 12 --plot="residuosARIMA013-ACF-PACF.png"
 
 <div class="org-center">
 
-<div id="org1a74206" class="figure">
+<div id="orgb98bade" class="figure">
 <p><img src="./P-L08-B-temperaturasDeLaTierra/residuosARIMA013-ACF-PACF.png" alt="residuosARIMA013-ACF-PACF.png" />
 </p>
 </div>
 </div>
 
 
-<pre class="example" id="org3d16536">
+<pre class="example" id="org97ec20e">
 Autocorrelation function for residuosARIMA013
 ***, **, * indicate significance at the 1%, 5%, 10% levels
 using standard error 1/T^0.5
@@ -485,9 +485,9 @@ Los primeros retardos son conjuntamente nulos (hasta el retardo 8 los estadísti
 </div>
 </div>
 </div>
-<div id="outline-container-orgdcbe326" class="outline-2">
-<h2 id="orgdcbe326">Actividad 4 - Previsión para los 12 meses de 2002</h2>
-<div class="outline-text-2" id="text-orgdcbe326">
+<div id="outline-container-org5109f1c" class="outline-2">
+<h2 id="org5109f1c">Actividad 4 - Previsión para los 12 meses de 2002</h2>
+<div class="outline-text-2" id="text-org5109f1c">
 <p>
 Queremos hacer previsión con este último modelo; y poder comparar sus previsiones con las observaciones correspondientes al año 2002. 
 </p>
@@ -496,9 +496,9 @@ Queremos hacer previsión con este último modelo; y poder comparar sus previsio
 Para hacer este ejercicio, debemos estimar el modelo sin incorporar los datos de dicho año (prever algo que ya ha sido observado no tiene mérito). Dicho de otro modo, debemos usar el conjunto de información \(\mathcal{H}_{Y_{2001:12}}\) de tal manera que las temperaturas de loss meses de 2002 no sean ``observadas''.
 </p>
 </div>
-<div id="outline-container-orgd904ce9" class="outline-3">
-<h3 id="orgd904ce9">Re-estimación del modelo truncando la muestra</h3>
-<div class="outline-text-3" id="text-orgd904ce9">
+<div id="outline-container-orgd64771c" class="outline-3">
+<h3 id="orgd64771c">Re-estimación del modelo truncando la muestra</h3>
+<div class="outline-text-3" id="text-orgd64771c">
 <div class="org-src-container">
 <pre class="src src-R"><code>smpl 1881:01 2001:12
 ARIMA013_2001 &lt;- arima 0 1 3 ; Temperature_Deviations --nc
@@ -506,9 +506,9 @@ ARIMA013_2001 &lt;- arima 0 1 3 ; Temperature_Deviations --nc
 </div>
 </div>
 </div>
-<div id="outline-container-org1fefacb" class="outline-3">
-<h3 id="org1fefacb">Previsión de los 12 últimos meses de la muestra</h3>
-<div class="outline-text-3" id="text-org1fefacb">
+<div id="outline-container-org6e79c0d" class="outline-3">
+<h3 id="org6e79c0d">Previsión de los 12 últimos meses de la muestra</h3>
+<div class="outline-text-3" id="text-org6e79c0d">
 <div class="org-src-container">
 <pre class="src src-R"><code>fcast 2000:01 2002:12 --plot="prediccion2002.png"
 </code></pre>
@@ -517,7 +517,7 @@ ARIMA013_2001 &lt;- arima 0 1 3 ; Temperature_Deviations --nc
 
 <div class="org-center">
 
-<div id="orga7470da" class="figure">
+<div id="org946e6ca" class="figure">
 <p><img src="./P-L08-B-temperaturasDeLaTierra/prediccion2002.png" alt="prediccion2002.png" />
 </p>
 </div>
@@ -527,7 +527,7 @@ ARIMA013_2001 &lt;- arima 0 1 3 ; Temperature_Deviations --nc
 Fíjese que todas las temperaturas están dentro delos intervalos de confianza salvo marzo de 2002, que experimentó una temperatura extraordinariamente elevada.
 </p>
 
-<pre class="example" id="orgcc54508">
+<pre class="example" id="orgb0a7ab7">
  For 95% confidence intervals, z(0.025) = 1.96
 
          Temperature_Devi~    prediction    std. error        95% interval
@@ -560,9 +560,9 @@ Fíjese que todas las temperaturas están dentro delos intervalos de confianza s
 </div>
 </div>
 </div>
-<div id="outline-container-org4017d9e" class="outline-2">
-<h2 id="org4017d9e">Código completo de la práctica</h2>
-<div class="outline-text-2" id="text-org4017d9e">
+<div id="outline-container-org46d85f2" class="outline-2">
+<h2 id="org46d85f2">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-org46d85f2">
 <p>
 <a href="https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L08-B-temperaturasDeLaTierra.inp">P-L08-B-temperaturasDeLaTierra.inp</a>
 </p>
@@ -580,7 +580,7 @@ Fíjese que todas las temperaturas están dentro delos intervalos de confianza s
 </div>
 </div></div>
 <div id="postamble" class="status">
-<p class="date">Created: 2026-05-23 Sat 14:22</p>
+<p class="date">Created: 2026-05-23 Sat 15:42</p>
 </div>
 </body>
 </html>
