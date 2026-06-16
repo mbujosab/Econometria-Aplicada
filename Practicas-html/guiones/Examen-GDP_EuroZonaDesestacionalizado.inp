@@ -1,0 +1,57 @@
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+
+open ../../datos/GDP_Eurozona_desestacionalizado.gdt
+
+logs GDP_EZ19
+
+# Generación de las variables escalón
+series step082 = (obs >= obsnum("2008:2"))
+series step083 = (obs >= obsnum("2008:3"))
+series step084 = (obs >= obsnum("2008:4"))
+
+series step091 = (obs >= obsnum("2009:1"))
+series step092 = (obs >= obsnum("2009:2"))
+
+series step112 = (obs >= obsnum("2011:2"))
+series step113 = (obs >= obsnum("2011:3"))
+series step114 = (obs >= obsnum("2011:4"))
+
+series step121 = (obs >= obsnum("2012:1"))
+series step122 = (obs >= obsnum("2012:2"))
+series step123 = (obs >= obsnum("2012:3"))
+series step124 = (obs >= obsnum("2012:4"))
+
+series step131 = (obs >= obsnum("2013:1"))
+
+list STEPS = step082 step083 step084 \
+             step091 step092 \
+             step112 step113 step114 \
+             step121 step122 step123 step124 \
+             step131
+
+outfile --quiet modeloARIMA_l_GDP_EZ19.txt
+    smpl 1995:1 2019:4
+    arima 2 1 0 ; l_GDP_EZ19
+    modtest --normality --quiet
+    modtest --arch 4 --quiet
+    modtest --autocorr 36 --quiet
+end outfile
+
+outfile --quiet modeloARIMAX_l_GDP_EZ19.txt
+    smpl 1995:1 2019:4
+    arima 2 1 0 ; l_GDP_EZ19 const STEPS
+    modtest --normality --quiet
+    modtest --arch 4 --quiet
+    modtest --autocorr 36 --quiet
+end outfile
+
+fcast 2005:1 2023:3 --plot="prediccion.png"
