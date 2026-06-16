@@ -1,0 +1,490 @@
+#    -*- mode: org -*-
+# Convocatoria extraordinaria 25/26
+#+title: PIB de la Eurozona desestacionalizado
+# +author: Marcos Bujosa
+#+LANGUAGE: es
+#+OPTIONS: toc:nil
+#+OPTIONS: author:nil
+#+OPTIONS: date:nil
+
+#+include: 00preambulo_practicas.txt
+
+# +INFOJS_OPT: view:overview
+# ###########
+# ESTO DA EL FORMATO FINAL DE LA PÁGINA WEB VÉASE [[https://olmon.gitlab.io/org-themes/]]
+#+SETUPFILE: ../css/bigblow_inline.theme
+# ###########
+
+
+#+name: setup-listings
+#+begin_src emacs-lisp :exports none :results silent :tangle no
+  (setq org-latex-listings 'listings)
+  (setq org-latex-custom-lang-environments
+  	;'((emacs-lisp "common-lispcode")))
+  	'((emacs-lisp "hansl-gretl")))
+  (setq org-latex-listings-options
+	'(("frame" "lines")
+	  ("basicstyle" "\\scriptsize")
+	  ("basicstyle" "\\ttfamily")
+	  ("numbers=none" "left")
+	  ("backgroundcolor=\\color{lightgray!20}")
+	  ("numberstyle" "\\tiny")))
+  (setq org-latex-to-pdf-process
+	'("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+  (org-add-link-type
+   "latex" nil
+   (lambda (path desc format)
+     (cond
+      ((eq format 'html)
+       (format "<span class=\"%s\">%s</span>" path desc))
+      ((eq format 'latex)
+       (format "\\%s{%s}" path desc)))))
+#+end_src
+
+#+NAME: if-no--guiones-makefir
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(unless (file-directory-p "guiones")
+  (make-directory "guiones"))
+#+END_SRC
+
+#+NAME: tangle-all-code-blocks
+#+BEGIN_SRC emacs-lisp :exports none :results silent :tangle no
+(org-babel-tangle)
+#+END_SRC
+
+#+begin_src emacs-lisp :results silent :exports none
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((latex . t)))
+#+end_src
+
+
+#+name: execute-gretl-practice
+#+PROPERTY: Examen-GDP_EuroZonaDesestacionalizado
+#+BEGIN_SRC sh :exports none :results silent :var practica="Examen-GDP_EuroZonaDesestacionalizado"
+rm -fr $(pwd)/$practica
+mkdir -p $(pwd)/$practica 
+DIRECTORIO="$(pwd)/$practica" gretlcli -b $(pwd)/guiones/$practica.inp
+# zip $practica $practica.* $practica/*
+#+END_SRC
+
+
+#+begin_src gretl :tangle guiones/Examen-GDP_EuroZonaDesestacionalizado.inp :exports none :eval no
+# Los dos primeros comandos son necesarios para que Gretl guarde los resultados de la práctica en el directorio de trabajo
+# al ejecutar lo siguiente desde un terminal (use los nombres y ruta que correspondan)
+#
+#    DIRECTORIO="Nombre_Directorio_trabajo" gretlcli -b ruta/nombre_fichero_de_la_practica.inp
+#
+# Si esto no le funciona en su sistema, comente las siguientes dos líneas y sitúese en el directorio de trabajo de gretl
+# que corresponda (configure dicho directorio de trabajo desde la ventana principal de Gretl).
+
+string directory = getenv("DIRECTORIO")
+set workdir "@directory"
+#+end_src
+
+
+#+LATEX: \maketitle
+
+#+LATEX: \vspace{-2cm}
+
+
+* Datos
+
+- \(\texttt{GDP_EZ19}\) ($Y_t$): :: serie temporal del PIB trimestral de la Eurozona (19 países) en miles de millones de dólares, desestacionalizada. La muestra abarca desde el primer trimestre de 1995 hasta el primero de 2024.
+
+Modelos ARIMA (con y sin intervención) estimados usando la muestra hasta el cuarto trimestre de 2019. 
+Las previsiones corresponden al periodo posterior a 2019 (posterior a la aparición de la pandemia por COVID).
+
+# - Ficheros: :: Versión del ejercicio en [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-pdf/Examen-GDP_EuroZonaDesestacionalizado.pdf][pdf]]; [[https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/Examen-GDP_EuroZonaDesestacionalizado.html][html]].
+#    - Datos:  [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/datos/GDP_Eurozona_desestacionalizado.gdt][GDP_Eurozona_desestacionalizado.gdt]]
+#    - Guión de gretl: [[https://github.com/mbujosab/Econometria-Aplicada/blob/gh-pages/Practicas-html/guiones/Examen-GDP_EuroZonaDesestacionalizado.inp][Examen-GDP_EuroZonaDesestacionalizado.inp]]
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_EuroZonaDesestacionalizado.inp :eval no :exports none
+open ../../datos/GDP_Eurozona_desestacionalizado.gdt
+#+end_src
+#+latex: }
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_EuroZonaDesestacionalizado.inp :eval no :exports code 
+logs GDP_EZ19
+#+end_src
+#+latex: }
+
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_EuroZonaDesestacionalizado.inp :eval no :exports none
+# Generación de las variables escalón
+series step082 = (obs >= obsnum("2008:2"))
+series step083 = (obs >= obsnum("2008:3"))
+series step084 = (obs >= obsnum("2008:4"))
+
+series step091 = (obs >= obsnum("2009:1"))
+series step092 = (obs >= obsnum("2009:2"))
+
+series step112 = (obs >= obsnum("2011:2"))
+series step113 = (obs >= obsnum("2011:3"))
+series step114 = (obs >= obsnum("2011:4"))
+
+series step121 = (obs >= obsnum("2012:1"))
+series step122 = (obs >= obsnum("2012:2"))
+series step123 = (obs >= obsnum("2012:3"))
+series step124 = (obs >= obsnum("2012:4"))
+
+series step131 = (obs >= obsnum("2013:1"))
+
+list STEPS = step082 step083 step084 \
+             step091 step092 \
+             step112 step113 step114 \
+             step121 step122 step123 step124 \
+             step131
+#+end_src
+#+latex: }
+
+
+* Modelos
+
+** Modelo 1
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: Modelo ARIMA l_GDP_EZ19
+#+begin_src gretl :eval no :exports code 
+smpl 1995:1 2019:4
+arima 2 1 0 ; l_GDP_EZ19
+modtest --normality --quiet
+modtest --arch 4 --quiet
+modtest --autocorr 36 --quiet
+#+end_src
+#+latex: }
+
+#+begin_src gretl :tangle guiones/Examen-GDP_EuroZonaDesestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet modeloARIMA_l_GDP_EZ19.txt
+    <<Modelo ARIMA l_GDP_EZ19>>
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \footnotesize 
+#+name: estimación del modelo univariante
+#+include: ./Examen-GDP_EuroZonaDesestacionalizado/modeloARIMA_l_GDP_EZ19.txt example
+#+latex: }
+
+
+** Modelo 2
+
+Modelo de intervención con una raíz unitaria. Las variables explicativas son de tipo escalón; toman el valor 1 desde el trimestre indicado en el nombre en adelante (en =stepAAT=, =AA= indica el
+año y =T= el trimestre; por ejemplo, =step082= toma el valor =0= hasta el primer trimestre de 2008 y =1= en el segundo trimestre y siguientes). Dichas variables corresponden a los periodos 2008Q2--2009Q2 (para /La Gran Recesión/) y 2011Q2--2013Q1 (para /La Crisis de Deuda Soberana/).
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+NAME: Modelo ARIMAX l_GDP_EZ19
+#+begin_src gretl :eval no :exports code 
+smpl 1995:1 2019:4
+arima 2 1 0 ; l_GDP_EZ19 const STEPS
+modtest --normality --quiet
+modtest --arch 4 --quiet
+modtest --autocorr 36 --quiet
+#+end_src
+#+latex: }
+
+#+begin_src gretl :tangle guiones/Examen-GDP_EuroZonaDesestacionalizado.inp :eval no :exports none :noweb yes
+outfile --quiet modeloARIMAX_l_GDP_EZ19.txt
+    <<Modelo ARIMAX l_GDP_EZ19>>
+end outfile
+#+end_src
+
+#+latex: {\vspace{0pt} \color{gray!70!black} \footnotesize 
+#+name: estimación del modelo univariante
+#+include: ./Examen-GDP_EuroZonaDesestacionalizado/modeloARIMAX_l_GDP_EZ19.txt example
+#+latex: }
+
+
+* Previsiones del modelo 2
+
+#+latex: {\vspace{0pt} \footnotesize \color{gray!70!black}
+#+begin_src gretl :tangle guiones/Examen-GDP_EuroZonaDesestacionalizado.inp :eval no :exports code
+fcast 2005:1 2023:3 --plot="prediccion.png"
+#+end_src
+#+latex: }
+
+
+#+BEGIN_CENTER
+#+NAME: Previsiones
+#+CAPTION: Resultados de previsión extramuestral (desde el primer trimestre de 2020 hasta el primero de 2024) calculados a partir del [[Modelo 2][modelo ARMAX]]. La figura muestra los valores observados, los valores ajustados, las previsiones y los correspondientes intervalos de confianza al 95%.
+#+ATTR_LATEX: :width 0.7\textwidth :center t
+#+attr_org: :width 600
+[[./Examen-GDP_EuroZonaDesestacionalizado/prediccion.png]]
+#+END_CENTER
+
+# +latex: {\vspace{0pt}\color{gray!70!black} \small
+# +include: ./Examen-GDP_EuroZonaDesestacionalizado/Predicciones.txt example
+# +latex: }
+
+
+
+# +latex: \newpage
+
+
+* Preguntas
+
+** Pregunta 1
+
+(2 puntos)
+Comente exhaustivamente los resultados de estimación y diagnosis de los modelos 1 y 2. Indique en cada caso si el coeficiente de determinación \(R^2\) puede interpretarse como el porcentaje de varianza de la variable endógena que explica el modelo. 
+¿Muestran los modelos algún indicio de sobrediferenciación o infradiferenciación?
+# ¿En qué unidades está medida la desviación típica de las innovaciones? 
+
+([[Respuesta 1]])
+
+#+latex: \newpage
+
+** Pregunta 2
+
+(2 puntos)
+Compare los modelos [[Modelo 1][1 (ARIMA)]] y [[Modelo 2][2 (ARMAX)]]. ¿Cuál de los dos modelos:
+- ajusta mejor la muestra?
+- cabe esperar que esté mejor especificado?
+- muestra mejores estadísticos residuales?
+Interprete los coeficientes de las variables exógenas =step082= y =step083= en el [[Modelo 2][modelo 2]]. 
+¿Cuál es su interpretación económica considerando cada coeficiente por separado? 
+¿Cuál es la interpretación económica de la suma de ambos coeficientes?
+
+([[Respuesta 2]])
+
+** Pregunta 3
+
+(2 puntos)
+Compare las previsiones extramuestrales de la [[Previsiones][figura 1]] con los correspondientes valores observados. 
+- Dado el horizonte de previsión considerado, la divergencia entre ambas series... ¿implica que el modelo es estadísticamente inadecuado y por eso predice mal? 
+- ¿Cómo interpretaría la diferencia entre ambas sendas (la prevista y la observada) en el período de la pandemia: enero de 2020 hasta diciembre de 2021?
+- ¿Cómo pueden haber afectado los eventos bélicos recientes (invasión de Ucrania en febrero de 2022 e invasión israelí de la franja de Gaza en octubre de 2023) a la evolución real del PIB en comparación con la senda prevista?
+- ¿Está convergiendo el PIB a la senda de crecimiento pre-pandemia?
+
+([[Respuesta 3]])
+
+** Pregunta 4
+
+(1.5 pts. --- cada apartado correcto $0.15$ pts. Cada apartado incorrecto $-0.15$ pts.)
+
+Indique *explícitamente* en cada caso si la expresión es correcta o no (si no lo es, indique el motivo).
+
+Redondeando a tres decimales, el modelo [[Modelo 1][1 (ARIMA)]] puede escribirse matemáticamente como (preste atención al orden de las transformaciones, el signo de los parámetros, la coherencia de la expresión, etc.):
+
+1. \(\nabla\big(\ln GPD_t -0,004 \big)= \frac{1}{1 -0,553 \, B  -0,050\, B^2} \hat{a}_t\)
+
+2. \(\nabla \ln GPD_t -0,004 = \frac{1}{1 -0,553 \, B  -0,050\, B^2} \hat{a}_t\)
+
+3. \(\ln  GPD_t - 0,004= \nabla(1 \, - \, 0,553 \, B \, - \, 0,050\, B^2) \, \hat{a}_t\)
+
+4. \( \nabla\ln GPD_t - \nabla \, 0,004 = \frac{1}{1 \, - \, 0,553 \, B \, - \, 0,050\, B^2} \hat{a}_t\)
+
+5. \( (1 \, + \, 0,553 \, B \, + \, 0,050\, B^2) \nabla \, (\ln  GPD_t + 0,004) = \hat{a}_t\)
+
+6. \( (1 \, - \, 0,553 \, B \, - \, 0,050\, B^2) (\nabla\ln GPD_t - 0,004) = \hat{a}_t\)
+
+7. \( (1 \, - \, 0,553 \, B \, - \, 0,050\, B^2) \nabla\ln GPD_t = 0,0015  + \hat{a}_t\)
+
+8. \( \frac{1}{\nabla(1 \, - \, 0,553 \, B \, - \, 0,050\, B^2)}(\ln  GPD_t + 0,004) = \hat{a}_t\)
+
+9. \( \frac{1}{1 \, - \, 0,553 \, B \, - \, 0,050\, B^2}(\ln  GPD_t - 0,004) = \nabla \hat{a}_t\)
+
+10. \( \nabla \ln \, GPD_t - 0,004 = \frac{1}{1 \, - \, 0,553 \, B \, - \, 0,050\, B^2} + \hat{a}_t\)
+donde $0,00381874\times(1-0,552936-0,0497438) \approx 0,0015$
+# 10. \( \nabla(\ln  GPD_t - 0,004) = \frac{1}{1 \, - \, 0,553 \, B \, - \, 0,050\, B^2} \hat{a}_t\)
+
+([[Respuesta 4]])
+
+** Grupo de preguntas 5
+
+Para cada afirmación: diga si es verdadera o falsa e *incluya una breve explicación*.
+
+(0.25 pts. --- por cada apartado correctamente justificado)
+
+*** Pregunta 5.1
+
+El coeficiente de determinación (\( R^2 \)) del modelo [[Modelo 1][1 (ARIMA)]] indica que éste consigue captar el 99,79% de la varianza de la variable endógena.
+
+([[Respuesta 5.1]])
+
+*** Pregunta 5.2
+
+La desviación típica de los residuos del modelo [[Modelo 2][2 (ARIMAX)]] indica que éste ajusta mejor los valores de la variable endógena que el modelo [[Modelo 1][1 (ARIMA)]].
+
+([[Respuesta 5.2]])
+
+*** Pregunta 5.3
+
+El valor del criterio de Schwarz correspondiente al [[Modelo 2][modelo 2 (ARIMAX)]] indica este éste podría estar peor especificado que el modelo [[Modelo 1][1 (ARIMA)]].
+
+([[Respuesta 5.3]])
+
+*** Pregunta 5.4
+
+El valor del criterio de Akaike correspondiente al [[Modelo 2][modelo 2 (ARIMAX)]] indica éste podría predecir peor que el [[Modelo 1][modelo 1 (ARIMA)]].
+
+([[Respuesta 5.4]])
+
+*** Pregunta 5.5
+
+El módulo de las raíces AR del [[Modelo 1][modelo 1 (ARIMA)]] para $\nabla \ln GPD_t$ indican que este podría ser no estacionario.
+
+([[Respuesta 5.5]])
+
+*** Pregunta 5.6
+
+El valor de las raíces AR del [[Modelo 1][modelo 1 (ARIMA)]] indican que éste podría ser no invertible.
+
+([[Respuesta 5.6]])
+
+*** Pregunta 5.7
+
+En el [[Modelo 2][modelo 2 (ARIMAX)]], el coeficiente de la variable =step082= es significativo e indica que en el segundo trimestre de 2008 se produjo un descenso /transitorio/ del nivel de PIB en la Eurozona de  magnitud aproximadamente igual al =0,87%= de PIB de ese trimestre.
+
+([[Respuesta 5.7]])
+
+*** Pregunta 5.8
+
+En el [[Modelo 2][modelo 2 (ARIMAX)]], el coeficiente de la variable =step082= es significativo e indica que a partir del segundo trimestre de 2008 se produjo un descenso /permanente/ del nivel de PIB en la Eurozona en una magnitud aproximadamente igual al =0,87%= de PIB de ese trimestre.
+
+([[Respuesta 5.8]])
+
+*** Pregunta 5.9
+
+El [[Modelo 2][modelo 2 (ARIMAX)]] implica que: (a) en 2008 y 2011 se produjeron eventos exógenos que redujeron significativamente el PIB de la Eurozona, por debajo de los niveles que se hubiese esperado alcanzar en ausencia de estos eventos y que (b) tras el final de estos eventos, la senda del PIB ha recuperado los mismos niveles que hubiera tenido si dichos eventos no hubieran acaecido.
+
+([[Respuesta 5.9]])
+
+*** Pregunta 5.10
+
+El [[Modelo 2][modelo 2 (ARIMAX)]] indica que: (a) en 2008 y 2011 se produjeron eventos exógenos que redujeron significativamente el PIB de la Eurozona, por debajo de los niveles que se hubiese esperado alcanzar en ausencia de estos eventos y que (b) tras el final de estos eventos, el PIB ha resultado ser siempre inferior a los niveles que hubiera tenido si dichos eventos no hubieran acaecido.
+
+([[Respuesta 5.10]])
+
+#+latex: \newpage
+
+* Respuestas
+
+** Respuesta 1
+
+En el [[Modelo 1][modelo 1]], el coeficiente =phi_2= no es estadísticamente significativo. En cuanto a los test de los residuos, se rechazan contundentemente las hipótesis nulas de /normalidad/ y /ausencia de efectos ARCH/, pero no se rechaza  la hipótesis nula de /ausencia de autocorrelación/ a los niveles habituales de significación.
+
+En el [[Modelo 2][modelo 2]] todos los coeficientes son estadísticamente significativos como mínimo al 5%  (a excepción del correspondiente a =step113= que es significativo al 10% peo no al 5%, dado que su p-valor es del 6,08%). En cuanto a los test de los residuos, no se rechaza ninguna de las tres hipótesis nulas (citadas en el párrafo anterior) a los niveles habituales de significación.
+
+Ambos modelos ajustan una serie temporal no estacionaria (véase cómo la serie \(\texttt{l_GDP_EZ19}\) deambula en la [[Previsiones][figura 1]]). Consecuentemente el coeficiente de determinación \(R^2\) resulta ser muy elevado (algo que no debe ser interpretado de ningún modo, pues es lo que cabe esperar en tales circunstancias incluso en ajustes con modelos mediocres). Pero incluso si estos modelos ajustarán una serie temporal estacionaria, no debería interpretarse el \(R^2\) como el porcentaje de la varianza muestral de la variable endógena que es capaz de ser replicado por el modelo; dicha interpretación solo cabe en modelos de regresión que incluyen término constante y que son estimados por MCO.
+
+En cuanto a la sobrediferenciación o infradiferenciación: en ambos modelos las raíces de los polinomios AR están fuera del círculo de radio unidad, por lo que la diferencia de los datos, =(1-L)=, parece suficiente para inducir la estacionariedad (es decir, no hay indicios de /infradiferenciación/). Por otra parte, dado que dichos modelos no incorporan ningún polinomio MA, con los resultados de estimación disponibles no es posible anticipar si al incluir un polinomio MA, éste presentaría raíces de modulo 1 (es decir, con los datos de estimación disponibles no podemos ver si hay indicios de sobrediferenciación). No obstante, viendo el perfil de la serie temporal entre los años 2005 y final de 2019 ([[Previsiones][figura 1]]), parece claro que la modelización de la serie requiere una diferencia ordinaria (que es lo que incorporan ambos modelos), por lo que no parece que pueda haber sobrediferenciación por tomar una sola diferencia.
+
+# La desviación típica de las innovaciones está expresada en puntos logarítmicos en tanto por 1. Responder que está en logaritmo de miles de millones de dólares es correcto formalmente, pero incompleto, ya que no permite interpretar el estadístico.
+
+([[Pregunta 1]])
+
+** Respuesta 2
+
+El [[Modelo 2][modelo 2]] parece que se ajusta mejor a la muestra, dada la desviación típica de los errores de ajuste (=D.T. innovaciones=).
+
+Uno de los parámetros del [[Modelo 1][modelo 1]] es no significativo a los niveles habituales de significación. Pese a ello, dado que el criterio de Schwarz penaliza con mayor severidad el número de parámetros (y que el segundo modelo incluye 13 parámetros más que el primero), el criterio de información bayesiano (BIC o criterio de Schwarz) del primer modelo resulta más favorable que en el segundo. Sin embargo, los otros dos criterios de información indican un mejor desempeño para el [[Modelo 2][modelo 2]] (cuyos parámetros son todos significativos).
+
+Los contrastes de los residuos del [[Modelo 2][modelo 2]] son mejores que los del [[Modelo 1][modelo 1]], salvo en el caso de la autocorrelación; donde ambos modelos presentan conclusiones similares (en ambos claramente NO se rechaza la /ausencia de autocorrelación/, aunque el p-valor en el primer modelo sea algo mayor).
+
+El coeficiente de la variable exógena =step082= indica que en el segundo trimestre de 2008 se produjo una reducción del PIB en la Eurozona de un =0,87%= aproximadamente. Análogamente, el coeficiente de la variable exógena =step083= indica que en el tercer trimestre de 2008 se produjo una reducción del PIB en la Eurozona de un =1,00%= aproximadamente. Por lo tanto, si sumamos ambos efectos, el PIB de la Eurozona experimenta una reducción acumulada de aproximadamente un =1.87%= entre el segundo y tercer trimestres de 2008.
+
+# En cuanto a la interpretación de los coeficientes:
+# - El coeficiente de =step082= (=-0,00869573=) significa que, a partir del segundo trimestre de 2008, el PIB de la Eurozona disminuye de manera persistente en aproximadamente un =0.87%= en comparación con su valor previo.
+# - De manera similar, el coeficiente de =step083= (=-0,00995842=) indica que, a partir del tercer trimestre de 2008, el PIB disminuye en aproximadamente un =1.00%=. 
+# Por lo tanto, si sumamos ambos efectos, el PIB de la Eurozona experimenta una reducción acumulada de aproximadamente un =1.87%= en comparación con los niveles anteriores, persistiendo en el tiempo.
+
+([[Pregunta 2]])
+
+** Respuesta 3
+
+La [[Previsiones][figura 1]] se puede entender como un análisis contrafactual: permite comparar la senda observada del PIB de la Eurozona con una senda de previsiones calculada con los datos hasta el cuarto trimestre de 2019 (es decir, con los datos anteriores al confinamiento). 
+Esta senda de previsiones se puede interpretar como una estimación de la evolución del PIB en ausencia de la pandemia y los eventos bélicos posteriores.
+
+Como puede verse, las previsiones superan siempre los valores observados, de forma que:
+- Entre enero de 2020 hasta diciembre de 2021, el PIB observado está muy por debajo del previsto, quedando incluso fuera del intervalo de confianza del 95%. La distancia entre ambas sendas puede interpretarse como una estimación de la pérdida de riqueza económica imputable a la pandemia y el consecuente confinamiento.
+- A finales de 2021 y principios de 2022 el PIB estaba aproximándose a la senda prevista, pero en 2022 inició un movimiento divergente, posiblemente debido a la invasión rusa de Ucrania. La invasión israelí de la franja de Gaza, en octubre de 2023, posiblemente contribuyó al mantenimiento de esta divergencia. 
+El modelo predice mal los valores desde el primer trimestre de 2020; pero debemos atribuirlo a los sucesos exógenos (y por tanto no previsibles para el modelo) correspondientes a la pandemia y los eventos bélicos posteriores. Por tanto, el mal rendimiento predictivo del modelo no tiene que ver con su calidad estadística.
+
+([[Pregunta 3]])
+
+** Respuesta 4
+
+1. INCORRECTA (el operador diferencia tan solo debe actuar sobre $\ln GPD_t$, ya que la constante $0.004$ es la media de $\nabla \ln GPD_t$).
+2. Correcta (expresión en forma MA($\infty$) de la primera diferencia del logaritmo del PIB menos su media).
+3. INCORRECTA (es la representación en forma AR($\infty$) del logaritmo de las ventas).
+4. INCORRECTA (ese es un modelo MA(3) no invertible de $\ln GPD_t$; ni el modelo es MA(3), ni $\ln GPD_t$ es estacionaria).
+5. INCORRECTA (el operador diferencia solo debe actuar sobre $\ln GPD_t$).
+6. Correcta (es la representación AR de la primera diferencia del logaritmo del PIB menos su media).
+7. Correcta (es la representación AR(2) de $\nabla \ln GPD_t$; donde dicho AR(2) tiene un proceso de innovaciones con media $0,0038\times(1 \, - \, 0,553 \, B \, - \, 0,050\, B^2)$).
+8. INCORRECTA (el polinomio AR aparece en el denominador y el operador diferencia también).
+8. INCORRECTA (el polinomio AR aparece en el denominador de la parte AR; y el operador actúa sobre las innovaciones).
+10. INCORRECTA (la fracción $\frac{1}{1 \, - \, 0,553 \, B \, - \, 0,050\, B^2}$ debe multiplicar (no sumar) a las innovaciones).
+
+([[Pregunta 4]])
+
+
+** Respuesta 5.1
+
+Falso. Esa interpretación solo es correcta si está referida a la varianza /muestral/ de la variable endógena en /modelos regresión con un regresor constante y estimados por MCO/. 
+Éste no es un modelo de regresión; es un modelo ARIMA estimado por máxima verosimilitud, por lo que no cabe dicha interpretación.
+
+([[Pregunta 5.1]])
+
+** Respuesta 5.2
+
+La afirmación es verdadera. Una menor desviación típica de los residuos (=D.T. innovaciones=) indica unos errores de ajuste más pequeños cuando los errores tienen media cero; que es aproximadamente el caso ya que en el primer modelo tienen media =-0,000016= y en el segundo =1,69e-06=. La magnitud de los residuos es $\sqrt{\sigma^2+\mu^2}$ que en el primer caso arroja un valor de $0.0046$ y en el segundo de $0.0026$.
+
+([[Pregunta 5.2]])
+
+** Respuesta 5.3
+
+La afirmación es verdadera, ya que el valor del criterio de Schwarz correspondiente al modelo que aparece en el  [[Modelo 2][modelo 2 (ARIMAX)]] es mayor, es decir, peor.
+
+([[Pregunta 5.3]])
+
+** Respuesta 5.4
+
+La afirmación es falsa, ya que el valor del criterio de Akaike correspondiente al [[Modelo 2][modelo 2 (ARIMAX)]] es menor, es decir, mejor.
+
+([[Pregunta 5.4]])
+
+** Respuesta 5.5
+
+La afirmación es falsa. El módulo de las raíces AR del modelo es mayor que 1, lo que indica que el modelo de la /primera diferencia/ del logaritmo del PIB es estacionario (no así el modelo del logaritmo del PIB sin diferenciar).
+
+([[Pregunta 5.5]])
+
+** Respuesta 5.6
+
+La afirmación es falsa. Un modelo AR siempre es invertible.
+
+([[Pregunta 5.6]])
+
+** Respuesta 5.7
+
+La afirmación es falsa. Ese coeficiente denota que, a partir del segundo trimestre de 2008, la senda de evolución del PIB experimentó un descenso en su nivel respecto a lo que habría sido su evolución de no acaecer la crisis financiera de 2008. La magnitud de dicho descenso en el nivel de la senda fue igual al =0,87%= del valor del PIB en el segundo trimestre de 2008 (fíjese que ese coeficiente corresponde a una variable de tipo escalón).
+
+([[Pregunta 5.7]])
+
+** Respuesta 5.8
+
+La afirmación es verdadera. Ese coeficiente denota que se produjo un descenso persistente en el nivel de PIB, ya que afecta a una variable de tipo escalón.
+
+([[Pregunta 5.8]])
+
+
+** Respuesta 5.9
+
+La afirmación es FALSA. Las variables exógenas indican que, en 2008 y en 2011, el PIB se redujo de manera permanente por debajo de los niveles que para trimestre se hubieran alcanzado en ausencia de dichas crisis. 
+
+Lo único que se recupera es la pendiente promedio de la serie, es decir, su ritmo de crecimiento a largo plazo. Sin embargo, el nivel del PIB ya siempre será inferior al que habría alcanzado sin las crisis, dando como resultado una pérdida permanente de renta.
+
+([[Pregunta 5.9]])
+
+
+** Respuesta 5.10
+
+La afirmación es verdadera. La reducción del PIB experimentada en 2008 y 2011, reflejada en los parámetros de las variables exógenas, indica que el nivel del PIB en cada trimestre será permanentemente inferior al que habría alcanzado en ausencia de las crisis.
+
+([[Pregunta 5.10]])
+
