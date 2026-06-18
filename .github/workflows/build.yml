@@ -4,17 +4,18 @@ on:
   push:
     branches:
       - main
+      - ci/build-selectivo-conservador
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    #- name: Checkout repository
-    #  uses: actions/checkout@v3
-
     - name: Checkout del repositorio principal
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Checkout del repositorio de datos
       uses: actions/checkout@v4
@@ -34,6 +35,64 @@ jobs:
       run: |
         echo "Contenido de datos:"
         ls -la datos
+
+    - name: Determinar alcance de build (conservador)
+      id: scope
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "manual run -> full build"
+          echo "run_full=true" >> "$GITHUB_OUTPUT"
+          echo "run_practicas_only=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        BEFORE="${{ github.event.before }}"
+        AFTER="${{ github.sha }}"
+
+        if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
+          echo "No BEFORE SHA (primer push o caso especial) -> full build"
+          echo "run_full=true" >> "$GITHUB_OUTPUT"
+          echo "run_practicas_only=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        CHANGED_FILES="$(git diff --name-only "$BEFORE" "$AFTER" || true)"
+
+        echo "Ficheros cambiados:"
+        echo "$CHANGED_FILES"
+
+        if [ -z "$CHANGED_FILES" ]; then
+          echo "Sin cambios detectados -> full build por seguridad"
+          echo "run_full=true" >> "$GITHUB_OUTPUT"
+          echo "run_practicas_only=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        # Cualquier cambio fuera de org-practicas obliga a build completo (estrategia conservadora)
+        NON_PRACTICAS="$(echo "$CHANGED_FILES" | grep -Ev '^(org-practicas/|main/org-practicas/)' || true)"
+
+        # Si hay cambios en prácticas
+        PRACTICAS_CHANGED="false"
+        if echo "$CHANGED_FILES" | grep -Eq '^(org-practicas/|main/org-practicas/)'; then
+          PRACTICAS_CHANGED="true"
+        fi
+
+        if [ -n "$NON_PRACTICAS" ]; then
+          echo "Hay cambios fuera de org-practicas -> full build"
+          echo "run_full=true" >> "$GITHUB_OUTPUT"
+          echo "run_practicas_only=false" >> "$GITHUB_OUTPUT"
+        elif [ "$PRACTICAS_CHANGED" = "true" ]; then
+          echo "Solo cambios en org-practicas -> build de practicas"
+          echo "run_full=false" >> "$GITHUB_OUTPUT"
+          echo "run_practicas_only=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "Caso no contemplado -> full build"
+          echo "run_full=true" >> "$GITHUB_OUTPUT"
+          echo "run_practicas_only=false" >> "$GITHUB_OUTPUT"
+        fi
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -74,38 +133,12 @@ jobs:
         mkdir -p ~/Software
         git clone https://github.com/jkitchin/scimax.git ~/Software/scimax
         cd ~/Software/scimax
-        # Checkout the v3.0 tag explicitly (creates a branch scimax-3.0)
         git fetch --tags
         git checkout -b scimax-3.0 tags/3.0
 
-    - name: Download ox-ipynb.el (pinned to ef9ba54) 
-      run: | 
+    - name: Download ox-ipynb.el (pinned to ef9ba54)
+      run: |
         wget https://raw.githubusercontent.com/jkitchin/ox-ipynb/ef9ba54/ox-ipynb.el -O ~/Software/scimax/ox-ipynb.el
-
-#    - name: Download ox-ipynb.el (match pinned scimax)
-#      run: |
-#        wget https://raw.githubusercontent.com/jkitchin/ox-ipynb/master/ox-ipynb.el -O ~/Software/scimax/ox-ipynb.el
-
-#    - name: Install Emacs packages required by scimax and org-babel (s, dash, jupyter, org-ref, org-db)
-#      run: |
-#        emacs --batch \
-#          --eval "(require 'package)" \
-#          --eval "(add-to-list 'package-archives '(\"melpa\" . \"https://melpa.org/packages/\"))" \
-#          --eval "(package-refresh-contents)" \
-#          --eval "(package-install 's)" \
-#          --eval "(package-install 'dash)" \
-#          --eval "(package-install 'jupyter)" \
-#          --eval "(package-install 'org-ref)" \
-#          --eval "(package-install 'org-db)" \
-#          --eval "(package-install 'ox-ipynb)" || true
-
-#    - name: Clone Scimax
-#       run: |
-#         git clone https://github.com/jkitchin/scimax.git ~/Software/scimax
-
-#    - name: Download ox-ipynb.el
-#      run: |
-#        wget https://raw.githubusercontent.com/jkitchin/ox-ipynb/master/ox-ipynb.el -O ~/Software/scimax/ox-ipynb.el
 
     - name: Install s.el and dash.el
       run: |
@@ -136,55 +169,40 @@ jobs:
       run: |
         emacs --batch org-publish.org -l org -f org-babel-tangle
 
-    - name: Execute Makefile notebooksYslides
+    - name: Build completo (como antes)
+      if: steps.scope.outputs.run_full == 'true'
       run: |
         set -e
         make notebooksYslides
+        make practicas
+        make calendario
+        make publicacion-lecciones
+        make publicacion-practicas
+        make publicacion
 
-    - name: Inspección tras notebooksYslides
-      run: |
-        echo "Contenido de ./Lecciones-tmp:"
-        find ./Lecciones-tmp
-        echo "Contenido de ./docs:"
-        find ./docs
-
-    - name: Execute Makefile practicas
+    - name: Build solo practicas (conservador)
+      if: steps.scope.outputs.run_practicas_only == 'true'
       run: |
         set -e
         make practicas
-        echo "Contenido de ./Practicas-tmp:"
-        find ./Practicas-tmp
-
-    - name: Execute Makefile calendario
-      run: |
-        set -e
-        make calendario
-
-    - name: Execute Makefile publicacion-lecciones
-      run: |
-        set -e
-        make publicacion-lecciones
-
-    - name: Execute Makefile publicacion-practicas
-      run: |
-        set -e
         make publicacion-practicas
-
-    - name: Execute Makefile publicacion
-      run: |
-        set -e
         make publicacion
 
-    - name: Comprobar contenido de docs antes de deploy
+    - name: Inspección final de docs
       run: |
-        echo "Contenido de docs antes de deploy:"
+        echo "Contenido de docs al final de build:"
         ls -la docs
 
+    - name: Upload docs artifact (modo prueba)
+      uses: actions/upload-artifact@v4
+      with:
+        name: docs-preview
+        path: docs
+
     - name: Deploy docs/ a gh-pages
+      if: github.ref == 'refs/heads/main' && steps.scope.outputs.run_full == 'true'
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.NUEVO_TOKEN_CLASSIC_HASTA_JULIO_2026 }}
         publish_dir: ./docs
         publish_branch: gh-pages
-#        force_orphan: true
-#        allow_empty_commit: true
