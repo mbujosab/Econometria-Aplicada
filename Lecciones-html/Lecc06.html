@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-06-16 Tue 18:36 -->
+<!-- 2026-06-18 Thu 07:33 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 6. Modelos ARMA. Herramientas estadísticas</title>
@@ -66,54 +66,54 @@ $(function() {    $('.note').before("<p class='admonition-title note'>Note</p>")
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orga0e66d4">ACF, PACF y densidad espectral de algunos modelos lineales</a>
+<li><a href="#org0222f9f">ACF, PACF y densidad espectral de algunos modelos lineales</a>
 <ul>
-<li><a href="#orga333d33">Proceso autorregresivo ARMA(p,q)</a>
+<li><a href="#orgb6b4ada">Proceso autorregresivo ARMA(p,q)</a>
 <ul>
-<li><a href="#org3f3011d">Diferencias entre modelos AR(p), MA(q) y ARMA(p,q) a la hora de identificarlos</a></li>
+<li><a href="#org9f8b21e">Diferencias entre modelos AR(p), MA(q) y ARMA(p,q) a la hora de identificarlos</a></li>
 </ul>
 </li>
-<li><a href="#orgc6fb219">Proceso ARMA(1,1)</a>
+<li><a href="#orgd24c47b">Proceso ARMA(1,1)</a>
 <ul>
-<li><a href="#org9757d75">ARMA(1,1) (Ejemplo 1)</a></li>
-<li><a href="#org06edb4a">ARMA(1,1) (Ejemplo 2)</a></li>
-<li><a href="#org783c626">ARMA(1,1) (Ejemplo 3)</a></li>
-<li><a href="#org61fec1e">ARMA(1,1) (Ejemplo 4)</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a href="#org5b8c50f">La especificación del modelo se decide según las características de los datos.</a></li>
-<li><a href="#orgfead9fa">Herramientas para desvelar propiedades de una serie temporal</a>
-<ul>
-<li><a href="#orge4df167">Análisis gráfico</a>
-<ul>
-<li><a href="#org0e3bf44">Gráfico de la serie temporal</a></li>
-<li><a href="#org929afe1">Gráfico rango-media</a></li>
-</ul>
-</li>
-<li><a href="#org7186fdb">Determinación del orden de integración</a>
-<ul>
-<li><a href="#orgc59cddf">Análisis gráfico</a></li>
-<li><a href="#org25ef840">Contrastes formales sobre el orden de integración: DF, ADF y KPSS</a></li>
-<li><a href="#org2c32215">Más indicios sobre la necesidad de diferenciar la serie</a></li>
-<li><a href="#org5ebe420">Indicios de haber diferenciado en exceso</a></li>
-</ul>
-</li>
-<li><a href="#orgb9e7d8a">ACF muestral</a></li>
-<li><a href="#org077ce28">PACF muestral</a>
-<ul>
-<li><a href="#orgd5a2b84">Nota práctica sobre la interpretación de la ACF y PACF muestrales</a></li>
+<li><a href="#org628c4d9">ARMA(1,1) (Ejemplo 1)</a></li>
+<li><a href="#org23e5a18">ARMA(1,1) (Ejemplo 2)</a></li>
+<li><a href="#org366680b">ARMA(1,1) (Ejemplo 3)</a></li>
+<li><a href="#org758e094">ARMA(1,1) (Ejemplo 4)</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orga9b1bfa">Función de autocovarianzas para un ARMA(p,q)</a></li>
-<li><a href="#orgf7cd067">Recordatorio de las Ecuaciones de Yule-Walker para un AR(p) estacionario</a></li>
+<li><a href="#org2677cb1">La especificación del modelo se decide según las características de los datos.</a></li>
+<li><a href="#orgfbc4cc3">Herramientas para desvelar propiedades de una serie temporal</a>
+<ul>
+<li><a href="#org438881e">Análisis gráfico</a>
+<ul>
+<li><a href="#orgc9ecd27">Gráfico de la serie temporal</a></li>
+<li><a href="#org8fa52f7">Gráfico rango-media</a></li>
+</ul>
+</li>
+<li><a href="#org5716dc1">Determinación del orden de integración</a>
+<ul>
+<li><a href="#org6233d58">Análisis gráfico</a></li>
+<li><a href="#org6fbb1b4">Contrastes formales sobre el orden de integración: DF, ADF y KPSS</a></li>
+<li><a href="#org664fece">Más indicios sobre la necesidad de diferenciar la serie</a></li>
+<li><a href="#org2cc07e7">Indicios de haber diferenciado en exceso</a></li>
+</ul>
+</li>
+<li><a href="#orgc87bf90">ACF muestral</a></li>
+<li><a href="#orgf8379c0">PACF muestral</a>
+<ul>
+<li><a href="#org3573d4e">Nota práctica sobre la interpretación de la ACF y PACF muestrales</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#org8f3d89c">Función de autocovarianzas para un ARMA(p,q)</a></li>
+<li><a href="#org31edf06">Recordatorio de las Ecuaciones de Yule-Walker para un AR(p) estacionario</a></li>
 </ul>
 </div>
 </div>
-<div class="abstract" id="orga14c200">
+<div class="abstract" id="org7f96cd4">
 <p>
 Examinaremos la ACF, la PACF y la densidad espectral de procesos ARMA (que son una generalización de los procesos AR y MA). 
 Después repasaremos algunas herramientas estadísticas útiles para tratar de identificar un modelo que se ajuste adecuadamente a los datos de una serie temporal: gráficos, contrastes de raíz unitaria, ACF y PACF muestrales, estadísticos descriptivos y contrastes de normalidad.
@@ -124,9 +124,9 @@ Después repasaremos algunas herramientas estadísticas útiles para tratar de i
 <ul class="org-ul">
 <li>(<a href="https://mbujosab.github.io/Econometria-Aplicada/Transparencias/Lecc06.slides.html">slides</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-html/Lecc06.html">html</a>) &mdash; (<a href="https://mbujosab.github.io/Econometria-Aplicada/Lecciones-pdf/Lecc06.pdf">pdf</a>) &mdash; (<a href="https://mybinder.org/v2/gh/mbujosab/Econometria-Aplicada/gh-pages?labpath=CuadernosElectronicos/Lecc06.ipynb">mybinder</a>)</li>
 </ul>
-<div id="outline-container-org82c9894" class="outline-4">
-<h4 id="org82c9894">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
-<div class="outline-text-4" id="text-org82c9894">
+<div id="outline-container-orgc244a0b" class="outline-4">
+<h4 id="orgc244a0b">Carga de algunos módulos de python y creación de directorios auxiliares</h4>
+<div class="outline-text-4" id="text-orgc244a0b">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Para trabajar con los datos y dibujarlos necesitamos cargar algunos m&#243;dulos de python</span>
 <span style="font-weight: bold;">import</span> numpy <span style="font-weight: bold;">as</span> np <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">linear algebra</span>
@@ -139,8 +139,8 @@ mpl.rc(<span style="font-style: italic;">'text'</span>, usetex=<span style="font
 </div>
 </div>
 <ul class="org-ul">
-<li><a id="orgf56c1ef"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
-<div class="outline-text-5" id="text-orgf56c1ef">
+<li><a id="orga576820"></a>Directorio auxiliar para albergar las figuras de la lección:<br />
+<div class="outline-text-5" id="text-orga576820">
 <p>
 para publicar la lección como pdf o página web, necesito los gráficos como ficheros <code>.png</code> alojados algún directorio específico:
 </p>
@@ -154,9 +154,9 @@ os.makedirs(imagenes_leccion, exist_ok=<span style="font-weight: bold; text-deco
 </li>
 </ul>
 </div>
-<div id="outline-container-org5b8ce96" class="outline-4">
-<h4 id="org5b8ce96">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
-<div class="outline-text-4" id="text-org5b8ce96">
+<div id="outline-container-org688654e" class="outline-4">
+<h4 id="org688654e">Gráficos para las ACF, PACF y densidades espectrales teóricas</h4>
+<div class="outline-text-4" id="text-org688654e">
 <p>
 Cargamos las funciones auxiliares (véase la carpeta <code>src/</code>)
 </p>
@@ -169,13 +169,13 @@ warnings.filterwarnings(<span style="font-style: italic;">"ignore"</span>, categ
 </div>
 </div>
 </div>
-<div id="outline-container-orga0e66d4" class="outline-2">
-<h2 id="orga0e66d4">ACF, PACF y densidad espectral de algunos modelos lineales</h2>
-<div class="outline-text-2" id="text-orga0e66d4">
+<div id="outline-container-org0222f9f" class="outline-2">
+<h2 id="org0222f9f">ACF, PACF y densidad espectral de algunos modelos lineales</h2>
+<div class="outline-text-2" id="text-org0222f9f">
 </div>
-<div id="outline-container-orga333d33" class="outline-3">
-<h3 id="orga333d33">Proceso autorregresivo ARMA(p,q)</h3>
-<div class="outline-text-3" id="text-orga333d33">
+<div id="outline-container-orgb6b4ada" class="outline-3">
+<h3 id="orgb6b4ada">Proceso autorregresivo ARMA(p,q)</h3>
+<div class="outline-text-3" id="text-orgb6b4ada">
 <p>
 Sea \(\;\boldsymbol{X}\;\) el proceso estocástico estacionario solución
 de la ecuación en diferencias:
@@ -272,7 +272,7 @@ La PACF, \(\;\boldsymbol{\pi},\;\) también es una secuencia con grado
 \(\infty\) y cogrado \(-\infty\).
 </p>
 <p>
-La sección <a href="#orga9b1bfa">Función de autocovarianzas para un ARMA(p,q)</a> muestra que en un proceso ARMA(\(p,q\)):
+La sección <a href="#org8f3d89c">Función de autocovarianzas para un ARMA(p,q)</a> muestra que en un proceso ARMA(\(p,q\)):
 \[\boldsymbol{\phi}(\mathsf{B})\gamma_k = 
 \begin{cases}
   \sigma^2 \Big(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\Big)_k & \text{para } k\leq q \\
@@ -304,9 +304,9 @@ Y en cuanto a la PACF \(\boldsymbol{\pi}\):
 es decir, decae exponencialmente o sinusoidalmente.</li>
 </ul>
 </div>
-<div id="outline-container-org3f3011d" class="outline-4">
-<h4 id="org3f3011d">Diferencias entre modelos AR(p), MA(q) y ARMA(p,q) a la hora de identificarlos</h4>
-<div class="outline-text-4" id="text-org3f3011d">
+<div id="outline-container-org9f8b21e" class="outline-4">
+<h4 id="org9f8b21e">Diferencias entre modelos AR(p), MA(q) y ARMA(p,q) a la hora de identificarlos</h4>
+<div class="outline-text-4" id="text-org9f8b21e">
 <p>
 Se puede demostrar que
 </p>
@@ -426,9 +426,9 @@ Desgraciadamente para los modelos ARMA tanto la ACF como la PACF tienen infinito
 </div>
 </div>
 </div>
-<div id="outline-container-orgc6fb219" class="outline-3">
-<h3 id="orgc6fb219">Proceso ARMA(1,1)</h3>
-<div class="outline-text-3" id="text-orgc6fb219">
+<div id="outline-container-orgd24c47b" class="outline-3">
+<h3 id="orgd24c47b">Proceso ARMA(1,1)</h3>
+<div class="outline-text-3" id="text-orgd24c47b">
 <p>
 Sea \(\;(1-\phi z)*\boldsymbol{X}=(1-\theta z)*\boldsymbol{U}\;\) con
 \(|\phi|<1\) y \(|\theta|<1\) y con \(\;\boldsymbol{U}\sim
@@ -460,9 +460,9 @@ WN(0,\sigma^2):\)
 <li>\(\boldsymbol{\pi} \text{ decae geométricamente con } \theta^k\)</li>
 </ul>
 </div>
-<div id="outline-container-org9757d75" class="outline-4">
-<h4 id="org9757d75">ARMA(1,1) (Ejemplo 1)</h4>
-<div class="outline-text-4" id="text-org9757d75">
+<div id="outline-container-org628c4d9" class="outline-4">
+<h4 id="org628c4d9">ARMA(1,1) (Ejemplo 1)</h4>
+<div class="outline-text-4" id="text-org628c4d9">
 <p>
 \[(1 - 0.7\mathsf{B}){X_t}=(1 + 0.8\mathsf{B}){U_t};\quad \phi>0;\;\theta<0\]
 </p>
@@ -477,7 +477,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc06/ACF-arma11R.png'</sp
 
 
 
-<div id="orga7e5479" class="figure">
+<div id="org176e7dc" class="figure">
 <p><img src="./img/lecc06/ACF-arma11R.png" alt="ACF-arma11R.png" width="900px" />
 </p>
 </div>
@@ -492,15 +492,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc06/Sim-arma11R.png'</sp
 
 
 
-<div id="orge7afb55" class="figure">
+<div id="orgb2424ea" class="figure">
 <p><img src="./img/lecc06/Sim-arma11R.png" alt="Sim-arma11R.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org06edb4a" class="outline-4">
-<h4 id="org06edb4a">ARMA(1,1) (Ejemplo 2)</h4>
-<div class="outline-text-4" id="text-org06edb4a">
+<div id="outline-container-org23e5a18" class="outline-4">
+<h4 id="org23e5a18">ARMA(1,1) (Ejemplo 2)</h4>
+<div class="outline-text-4" id="text-org23e5a18">
 <p>
 \[(1 + 0.7\mathsf{B}){X_t}=(1 - 0.8\mathsf{B}){U_t};\quad \phi<0;\;\theta>0\]
 </p>
@@ -516,7 +516,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc06/ACF-arma11A.png'</sp
 
 
 
-<div id="org7b900b8" class="figure">
+<div id="orge12fbce" class="figure">
 <p><img src="./img/lecc06/ACF-arma11A.png" alt="ACF-arma11A.png" width="900px" />
 </p>
 </div>
@@ -531,15 +531,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc06/Sim-arma11A.png'</sp
 
 
 
-<div id="org5d9ec6b" class="figure">
+<div id="org3143b37" class="figure">
 <p><img src="./img/lecc06/Sim-arma11A.png" alt="Sim-arma11A.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org783c626" class="outline-4">
-<h4 id="org783c626">ARMA(1,1) (Ejemplo 3)</h4>
-<div class="outline-text-4" id="text-org783c626">
+<div id="outline-container-org366680b" class="outline-4">
+<h4 id="org366680b">ARMA(1,1) (Ejemplo 3)</h4>
+<div class="outline-text-4" id="text-org366680b">
 <p>
 \[(1 - 0.4\mathsf{B}){X_t}=(1 - 0.8\mathsf{B}){U_t};\quad \phi>0;\;\theta>0\]
 </p>
@@ -555,7 +555,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc06/ACF-arma11NVA.png'</
 
 
 
-<div id="org27bcd6c" class="figure">
+<div id="org1158d38" class="figure">
 <p><img src="./img/lecc06/ACF-arma11NVA.png" alt="ACF-arma11NVA.png" width="900px" />
 </p>
 </div>
@@ -570,15 +570,15 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc06/Sim-arma11NVA.png'</
 
 
 
-<div id="org2abcc95" class="figure">
+<div id="orgdbf26bd" class="figure">
 <p><img src="./img/lecc06/Sim-arma11NVA.png" alt="Sim-arma11NVA.png" width="900px" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org61fec1e" class="outline-4">
-<h4 id="org61fec1e">ARMA(1,1) (Ejemplo 4)</h4>
-<div class="outline-text-4" id="text-org61fec1e">
+<div id="outline-container-org758e094" class="outline-4">
+<h4 id="org758e094">ARMA(1,1) (Ejemplo 4)</h4>
+<div class="outline-text-4" id="text-org758e094">
 <p>
 \[(1 + 0.8\mathsf{B}){X_t}=(1 + 0.4\mathsf{B}){U_t};\quad \phi<0;\;\theta<0\]
 </p>
@@ -594,7 +594,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc06/ACF-arma11RNV.png'</
 
 
 
-<div id="orgb757f81" class="figure">
+<div id="org4458e68" class="figure">
 <p><img src="./img/lecc06/ACF-arma11RNV.png" alt="ACF-arma11RNV.png" width="900px" />
 </p>
 </div>
@@ -609,7 +609,7 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc06/Sim-arma11RNV.png'</
 
 
 
-<div id="org0253e8c" class="figure">
+<div id="org85c572a" class="figure">
 <p><img src="./img/lecc06/Sim-arma11RNV.png" alt="Sim-arma11RNV.png" width="900px" />
 </p>
 </div>
@@ -617,9 +617,9 @@ fig.savefig(<span style="font-style: italic;">'./img/lecc06/Sim-arma11RNV.png'</
 </div>
 </div>
 </div>
-<div id="outline-container-org5b8c50f" class="outline-2">
-<h2 id="org5b8c50f">La especificación del modelo se decide según las características de los datos.</h2>
-<div class="outline-text-2" id="text-org5b8c50f">
+<div id="outline-container-org2677cb1" class="outline-2">
+<h2 id="org2677cb1">La especificación del modelo se decide según las características de los datos.</h2>
+<div class="outline-text-2" id="text-org2677cb1">
 <p>
 ¿Es la serie 
 </p>
@@ -650,17 +650,17 @@ características.
 </p>
 </div>
 </div>
-<div id="outline-container-orgfead9fa" class="outline-2">
-<h2 id="orgfead9fa">Herramientas para desvelar propiedades de una serie temporal</h2>
-<div class="outline-text-2" id="text-orgfead9fa">
+<div id="outline-container-orgfbc4cc3" class="outline-2">
+<h2 id="orgfbc4cc3">Herramientas para desvelar propiedades de una serie temporal</h2>
+<div class="outline-text-2" id="text-orgfbc4cc3">
 </div>
-<div id="outline-container-orge4df167" class="outline-3">
-<h3 id="orge4df167">Análisis gráfico</h3>
-<div class="outline-text-3" id="text-orge4df167">
+<div id="outline-container-org438881e" class="outline-3">
+<h3 id="org438881e">Análisis gráfico</h3>
+<div class="outline-text-3" id="text-org438881e">
 </div>
-<div id="outline-container-org0e3bf44" class="outline-4">
-<h4 id="org0e3bf44">Gráfico de la serie temporal</h4>
-<div class="outline-text-4" id="text-org0e3bf44">
+<div id="outline-container-orgc9ecd27" class="outline-4">
+<h4 id="orgc9ecd27">Gráfico de la serie temporal</h4>
+<div class="outline-text-4" id="text-orgc9ecd27">
 <p>
 Representa sus valores en el eje vertical (\(y\)) frente a una escala
 temporal en el horizontal (\(x\)). Es útil para detectar visualmente:
@@ -690,9 +690,9 @@ comparabilidad entre series y gráficos distintos (si los hubiere).
 </p>
 </div>
 </div>
-<div id="outline-container-org929afe1" class="outline-4">
-<h4 id="org929afe1">Gráfico rango-media</h4>
-<div class="outline-text-4" id="text-org929afe1">
+<div id="outline-container-org8fa52f7" class="outline-4">
+<h4 id="org8fa52f7">Gráfico rango-media</h4>
+<div class="outline-text-4" id="text-org8fa52f7">
 <p>
 Cambios de variabilidad de una serie pueden evidenciarse en su gráfico
 temporal.
@@ -736,7 +736,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc06/rangoMedianaPasajero
 </div>
 
 
-<div id="org379c8b1" class="figure">
+<div id="org9b6a52c" class="figure">
 <p><img src="img/lecc06/rangoMedianaPasajeros.png" alt="rangoMedianaPasajeros.png" width="900px" />
 </p>
 </div>
@@ -749,9 +749,9 @@ dispersión sobre los niveles para medir la relación nivel-dispersión.
 </div>
 </div>
 </div>
-<div id="outline-container-org7186fdb" class="outline-3">
-<h3 id="org7186fdb">Determinación del orden de integración</h3>
-<div class="outline-text-3" id="text-org7186fdb">
+<div id="outline-container-org5716dc1" class="outline-3">
+<h3 id="org5716dc1">Determinación del orden de integración</h3>
+<div class="outline-text-3" id="text-org5716dc1">
 <p>
 Un proceso estocástico sin componentes deterministas es \(I(0)\) si tiene representación ARMA <span class="underline">estacionaria e invertible</span>.
 </p>
@@ -783,9 +783,9 @@ Recuerde que el operador diferencia \(\nabla\) se define a partir del operador r
 \]
 </p>
 </div>
-<div id="outline-container-orgc59cddf" class="outline-4">
-<h4 id="orgc59cddf">Análisis gráfico</h4>
-<div class="outline-text-4" id="text-orgc59cddf">
+<div id="outline-container-org6233d58" class="outline-4">
+<h4 id="org6233d58">Análisis gráfico</h4>
+<div class="outline-text-4" id="text-org6233d58">
 <div class="org-src-container">
 <pre class="src src-jupyter-python"><code><span style="font-weight: bold; font-style: italic;">df</span> = pd.read_csv(<span style="font-style: italic;">'../datos/airline-passengers.csv'</span>)    <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Leer los datos</span>
 <span style="font-weight: bold; font-style: italic;">df</span>[<span style="font-style: italic;">'Month'</span>] = pd.to_datetime(df[<span style="font-style: italic;">'Month'</span>])              <span style="font-weight: bold; font-style: italic;"># </span><span style="font-weight: bold; font-style: italic;">Asegurarse de que la columna Month sea tipo datetime</span>
@@ -826,7 +826,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc06/diferenciasPasajeros
 
 
 
-<div id="orgd3333bc" class="figure">
+<div id="org56c40a0" class="figure">
 <p><img src="img/lecc06/diferenciasPasajeros.png" alt="diferenciasPasajeros.png" width="900px" />
 </p>
 </div>
@@ -873,7 +873,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc06/diferenciasTemperatu
 </div>
 
 
-<div id="org850542e" class="figure">
+<div id="orgcd1bc26" class="figure">
 <p><img src="img/lecc06/diferenciasTemperaturasRetiro.png" alt="diferenciasTemperaturasRetiro.png" width="900px" />
 </p>
 </div>
@@ -916,7 +916,7 @@ plt.savefig(<span style="font-style: italic;">'./img/lecc06/diferenciasPoblacion
 
 
 
-<div id="orgd028114" class="figure">
+<div id="orge363b7d" class="figure">
 <p><img src="./img/lecc06/diferenciasPoblacion.png" alt="diferenciasPoblacion.png" width="900px" />
 </p>
 </div>
@@ -946,13 +946,13 @@ Por ello es conveniente realizar contrastes de hipótesis que nos ayuden a tomar
 </p>
 </div>
 </div>
-<div id="outline-container-org25ef840" class="outline-4">
-<h4 id="org25ef840">Contrastes formales sobre el orden de integración: DF, ADF y KPSS</h4>
-<div class="outline-text-4" id="text-org25ef840">
+<div id="outline-container-org6fbb1b4" class="outline-4">
+<h4 id="org6fbb1b4">Contrastes formales sobre el orden de integración: DF, ADF y KPSS</h4>
+<div class="outline-text-4" id="text-org6fbb1b4">
 </div>
 <ul class="org-ul">
-<li><a id="org0b518e6"></a>Test de Dickey-Fuller (DF)<br />
-<div class="outline-text-5" id="text-org0b518e6">
+<li><a id="orgf16957f"></a>Test de Dickey-Fuller (DF)<br />
+<div class="outline-text-5" id="text-orgf16957f">
 <ul class="org-ul">
 <li>\(H_0\) : la serie es \(I(1)\)</li>
 <li>\(H_1\) : la serie es \(I(0)\).</li>
@@ -979,8 +979,8 @@ Pasos del contraste:
 </ul>
 </div>
 </li>
-<li><a id="orgfa6b003"></a>Test de Dickey-Fuller aumentado (ADF)<br />
-<div class="outline-text-5" id="text-orgfa6b003">
+<li><a id="orgd9fe0be"></a>Test de Dickey-Fuller aumentado (ADF)<br />
+<div class="outline-text-5" id="text-orgd9fe0be">
 <p>
 Una variante habitual del test DF es el test de Dickey-Fuller aumentado (ADF), que consiste en estimar por MCO el modelo: 
 \[
@@ -999,8 +999,8 @@ Otra variante consiste en incluir una tendencia temporal determinista:
 </p>
 </div>
 </li>
-<li><a id="org1dfec20"></a>Test Kwiatkowski–Phillips–Schmidt–Shin (KPSS)<br />
-<div class="outline-text-5" id="text-org1dfec20">
+<li><a id="org8ca33c7"></a>Test Kwiatkowski–Phillips–Schmidt–Shin (KPSS)<br />
+<div class="outline-text-5" id="text-org8ca33c7">
 <p>
 El contraste KPSS es un contraste alternativo (y complementario) al test DF/ADF.
 </p>
@@ -1030,16 +1030,16 @@ por ello debemos complementarlos con el análisis gráfico.
 </li>
 </ul>
 </div>
-<div id="outline-container-org2c32215" class="outline-4">
-<h4 id="org2c32215">Más indicios sobre la necesidad de diferenciar la serie</h4>
-<div class="outline-text-4" id="text-org2c32215">
+<div id="outline-container-org664fece" class="outline-4">
+<h4 id="org664fece">Más indicios sobre la necesidad de diferenciar la serie</h4>
+<div class="outline-text-4" id="text-org664fece">
 <ul class="org-ul">
 <li><p>
 Si la función de autocorrelación (ACF) decae muy lentamente (y de manera aparentemente lineal) es un indicio de que la serie necesita una diferencia regular (salvo si hay una tendencia determinista).
 </p>
 
 
-<div id="orgaa1c268" class="figure">
+<div id="orgf1d1d2a" class="figure">
 <p><img src="img/lecc07/ACF-RW.png" alt="ACF-RW.png" />
 </p>
 </div></li>
@@ -1047,18 +1047,18 @@ Si la función de autocorrelación (ACF) decae muy lentamente (y de manera apare
 </ul>
 </div>
 </div>
-<div id="outline-container-org5ebe420" class="outline-4">
-<h4 id="org5ebe420">Indicios de haber diferenciado en exceso</h4>
-<div class="outline-text-4" id="text-org5ebe420">
+<div id="outline-container-org2cc07e7" class="outline-4">
+<h4 id="org2cc07e7">Indicios de haber diferenciado en exceso</h4>
+<div class="outline-text-4" id="text-org2cc07e7">
 <ul class="org-ul">
 <li>Por el contrario, si al estimar los parámetros MA del modelo, alguna raíz del polinomio de media móvil tiene un valor absoluto muy próximo a uno, es un indicio de que la serie se ha sobre-diferenciado (hay que usar los datos tal como estaban antes de tomar la última diferencia regular).</li>
 </ul>
 </div>
 </div>
 </div>
-<div id="outline-container-orgb9e7d8a" class="outline-3">
-<h3 id="orgb9e7d8a">ACF muestral</h3>
-<div class="outline-text-3" id="text-orgb9e7d8a">
+<div id="outline-container-orgc87bf90" class="outline-3">
+<h3 id="orgc87bf90">ACF muestral</h3>
+<div class="outline-text-3" id="text-orgc87bf90">
 <p>
 La <i>k</i>-ésima autocorrelación muestral simple (\(\widehat{\rho_k}\)) se define como:
 \[
@@ -1081,9 +1081,9 @@ Usaremos el test de Ljung-Box, para evaluar la bondad de un modelo, contrastando
 </p>
 </div>
 </div>
-<div id="outline-container-org077ce28" class="outline-3">
-<h3 id="org077ce28">PACF muestral</h3>
-<div class="outline-text-3" id="text-org077ce28">
+<div id="outline-container-orgf8379c0" class="outline-3">
+<h3 id="orgf8379c0">PACF muestral</h3>
+<div class="outline-text-3" id="text-orgf8379c0">
 <p>
 La <i>k</i>-ésima autocorrelación muestral \(\widehat{\pi_k}\) se puede estimar mediante el algoritmo Levinson-Durbin sustituyendo las autocorrelaciones teóricas por las muestrales.
 </p>
@@ -1099,9 +1099,9 @@ O bien, calculando el <i>k</i>-ésimo coeficiente MCO de una autorregresión de 
 donde \(\widetilde{X}_t=X_t-\bar{X}\;\) y donde \(\;\widehat{\pi_k}=\widehat{\phi_{kk}}\).
 </p>
 </div>
-<div id="outline-container-orgd5a2b84" class="outline-4">
-<h4 id="orgd5a2b84">Nota práctica sobre la interpretación de la ACF y PACF muestrales</h4>
-<div class="outline-text-4" id="text-orgd5a2b84">
+<div id="outline-container-org3573d4e" class="outline-4">
+<h4 id="org3573d4e">Nota práctica sobre la interpretación de la ACF y PACF muestrales</h4>
+<div class="outline-text-4" id="text-org3573d4e">
 <ul class="org-ul">
 <li>Un valor grande en la ACF o en la PACF muestrales en un retardo \(k\) dado, puede no ser relevante si se encuentra aislado y \(k\) es grande.</li>
 
@@ -1120,9 +1120,9 @@ A la hora de identificar un modelo para los datos:
 </div>
 </div>
 </div>
-<div id="outline-container-orga9b1bfa" class="outline-2">
-<h2 id="orga9b1bfa">Función de autocovarianzas para un ARMA(p,q)</h2>
-<div class="outline-text-2" id="text-orga9b1bfa">
+<div id="outline-container-org8f3d89c" class="outline-2">
+<h2 id="org8f3d89c">Función de autocovarianzas para un ARMA(p,q)</h2>
+<div class="outline-text-2" id="text-org8f3d89c">
 <p>
 Sea un ARMA(\(p,q\)) estacionario:
 \(\boldsymbol{\phi}(\mathsf{B}){X_t}=\boldsymbol{\theta}(\mathsf{B}){U_t}\;\)
@@ -1161,9 +1161,9 @@ donde \(\boldsymbol{\theta}(z)*\boldsymbol{\psi}(z^{-1})\) tiene grado \(q\) y c
 </p>
 </div>
 </div>
-<div id="outline-container-orgf7cd067" class="outline-2">
-<h2 id="orgf7cd067">Recordatorio de las Ecuaciones de Yule-Walker para un AR(p) estacionario</h2>
-<div class="outline-text-2" id="text-orgf7cd067">
+<div id="outline-container-org31edf06" class="outline-2">
+<h2 id="org31edf06">Recordatorio de las Ecuaciones de Yule-Walker para un AR(p) estacionario</h2>
+<div class="outline-text-2" id="text-org31edf06">
 <p>
 Sea un AR(\(p\)) estacionario:
 \(\;\;\boldsymbol{\phi}(\mathsf{B})X_t=U_t\;\;\) donde \(\;\;\boldsymbol{\phi}(z)=1-\phi_1z^1-\cdots-\phi_pz^p.\;\)
@@ -1270,7 +1270,7 @@ Yule-Walker.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2026-06-16 Tue 18:36</p>
+<p class="date">Created: 2026-06-18 Thu 07:33</p>
 </div>
 </body>
 </html>
