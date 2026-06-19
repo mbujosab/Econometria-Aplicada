@@ -149,8 +149,15 @@ jobs:
           texlive-latex-base \
           cm-super
         sudo mktexlsr
+     
+    - name: Verificar tgheros (diagnóstico)
+      run: |
+        set +e
+        which kpsewhich
         kpsewhich tgheros.sty
-        test -n "$(kpsewhich tgheros.sty)"
+        echo "kpsewhich_exit=$?"
+        ls -l /usr/share/texlive/texmf-dist/tex/latex/psnfss/tgheros.sty || true
+        exit 0        
         
     - name: Verificar tgheros
       run: |
