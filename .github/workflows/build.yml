@@ -151,6 +151,14 @@ jobs:
         sudo mktexlsr
         kpsewhich tgheros.sty
         test -n "$(kpsewhich tgheros.sty)"
+        
+    - name: Verificar tgheros
+      run: |
+        set +e
+        echo "KPSEWHICH=$(kpsewhich tgheros.sty)"
+        kpsewhich tgheros.sty
+        echo "status=$?"
+        ls -l /usr/share/texlive/texmf-dist/tex/latex/psnfss/tgheros.sty || true        
 
     - name: Disable tlmgr (prevent accidental calls)
       run: sudo mv /usr/bin/tlmgr /usr/bin/tlmgr.disabled || true
