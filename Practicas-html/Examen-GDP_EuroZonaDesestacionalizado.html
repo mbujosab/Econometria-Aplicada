@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-06-21 Sun 09:51 -->
+<!-- 2026-06-21 Sun 11:47 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>PIB de la Eurozona desestacionalizado</title>
@@ -77,9 +77,9 @@ if (typeof HS_STARTUP_FOLDED === 'undefined') {    var HS_STARTUP_FOLDED = false
 <body>
 <div id="content" class="content">
 <h1 class="title">PIB de la Eurozona desestacionalizado</h1>
-<div id="outline-container-orgb19fa4a" class="outline-2">
-<h2 id="orgb19fa4a">Datos</h2>
-<div class="outline-text-2" id="text-orgb19fa4a">
+<div id="outline-container-orgd02e618" class="outline-2">
+<h2 id="orgd02e618">Datos</h2>
+<div class="outline-text-2" id="text-orgd02e618">
 <dl class="org-dl">
 <dt>\(\texttt{GDP_EZ19}\) (\(Y_t\)):</dt><dd>serie temporal del PIB trimestral de la Eurozona (19 países) en miles de millones de dólares, desestacionalizada. La muestra abarca desde el primer trimestre de 1995 hasta el primero de 2024.</dd>
 </dl>
@@ -103,22 +103,22 @@ Las previsiones corresponden al periodo posterior a 2019 (posterior a la aparici
 </div>
 </div>
 </div>
-<div id="outline-container-org76a1a55" class="outline-2">
-<h2 id="org76a1a55">Modelos</h2>
-<div class="outline-text-2" id="text-org76a1a55">
+<div id="outline-container-orgf9e108d" class="outline-2">
+<h2 id="orgf9e108d">Modelos</h2>
+<div class="outline-text-2" id="text-orgf9e108d">
 </div>
-<div id="outline-container-org82490f3" class="outline-3">
-<h3 id="org82490f3">Modelo 1</h3>
-<div class="outline-text-3" id="text-org82490f3">
+<div id="outline-container-org8842b7f" class="outline-3">
+<h3 id="org8842b7f">Modelo 1</h3>
+<div class="outline-text-3" id="text-org8842b7f">
 <div class="org-src-container">
-<pre class="src src-gretl" id="org3091d8c"><code>smpl 1995:1 2019:4
+<pre class="src src-gretl" id="orgd8cbb6a"><code>smpl 1995:1 2019:4
 arima 2 1 0 ; l_GDP_EZ19
 modtest --normality --quiet
 modtest --arch 4 --quiet
 modtest --autocorr 36 --quiet
 </code></pre>
 </div>
-<pre class="example" id="org94f1c63">
+<pre class="example" id="orgabc92bf">
 Function evaluations: 22
 Evaluations of gradient: 7
 
@@ -164,23 +164,23 @@ with p-value = P(Chi-square(34) &gt; 19.1556) = 0.9810
 </pre>
 </div>
 </div>
-<div id="outline-container-org5525da4" class="outline-3">
-<h3 id="org5525da4">Modelo 2</h3>
-<div class="outline-text-3" id="text-org5525da4">
+<div id="outline-container-org627278b" class="outline-3">
+<h3 id="org627278b">Modelo 2</h3>
+<div class="outline-text-3" id="text-org627278b">
 <p>
 Modelo de intervención con una raíz unitaria. Las variables explicativas son de tipo escalón; toman el valor 1 desde el trimestre indicado en el nombre en adelante (en <code>stepAAT</code>, <code>AA</code> indica el
 año y <code>T</code> el trimestre; por ejemplo, <code>step082</code> toma el valor <code>0</code> hasta el primer trimestre de 2008 y <code>1</code> en el segundo trimestre y siguientes). Dichas variables corresponden a los periodos 2008Q2&ndash;2009Q2 (para <i>La Gran Recesión</i>) y 2011Q2&ndash;2013Q1 (para <i>La Crisis de Deuda Soberana</i>).
 </p>
 
 <div class="org-src-container">
-<pre class="src src-gretl" id="orgea8ff16"><code>smpl 1995:1 2019:4
+<pre class="src src-gretl" id="org4585c22"><code>smpl 1995:1 2019:4
 arima 2 1 0 ; l_GDP_EZ19 const STEPS
 modtest --normality --quiet
 modtest --arch 4 --quiet
 modtest --autocorr 36 --quiet
 </code></pre>
 </div>
-<pre class="example" id="org69ea823">
+<pre class="example" id="orgba287eb">
 Function evaluations: 269
 Evaluations of gradient: 127
 
@@ -240,30 +240,30 @@ with p-value = P(Chi-square(34) &gt; 25.4791) = 0.8536
 </div>
 </div>
 </div>
-<div id="outline-container-orga18a3ff" class="outline-2">
-<h2 id="orga18a3ff">Previsiones del modelo 2</h2>
-<div class="outline-text-2" id="text-orga18a3ff">
+<div id="outline-container-orga88a705" class="outline-2">
+<h2 id="orga88a705">Previsiones del modelo 2</h2>
+<div class="outline-text-2" id="text-orga88a705">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>fcast 2005:1 2023:3 --plot="prediccion.png"
 </code></pre>
 </div>
 <div class="org-center">
 
-<div id="org9958e42" class="figure">
+<div id="org54620c4" class="figure">
 <p><img src="./Examen-GDP_EuroZonaDesestacionalizado/prediccion.png" alt="prediccion.png" />
 </p>
-<p><span class="figure-number">Figura 1: </span>Resultados de previsión extramuestral (desde el primer trimestre de 2020 hasta el primero de 2024) calculados a partir del <a href="#org5525da4">modelo ARMAX</a>. La figura muestra los valores observados, los valores ajustados, las previsiones y los correspondientes intervalos de confianza al 95%.</p>
+<p><span class="figure-number">Figura 1: </span>Resultados de previsión extramuestral (desde el primer trimestre de 2020 hasta el primero de 2024) calculados a partir del <a href="#org627278b">modelo ARMAX</a>. La figura muestra los valores observados, los valores ajustados, las previsiones y los correspondientes intervalos de confianza al 95%.</p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org7f9ce4e" class="outline-2">
-<h2 id="org7f9ce4e">Preguntas</h2>
-<div class="outline-text-2" id="text-org7f9ce4e">
+<div id="outline-container-orgf849635" class="outline-2">
+<h2 id="orgf849635">Preguntas</h2>
+<div class="outline-text-2" id="text-orgf849635">
 </div>
-<div id="outline-container-orgceffd49" class="outline-3">
-<h3 id="orgceffd49">Pregunta 1</h3>
-<div class="outline-text-3" id="text-orgceffd49">
+<div id="outline-container-org0b83578" class="outline-3">
+<h3 id="org0b83578">Pregunta 1</h3>
+<div class="outline-text-3" id="text-org0b83578">
 <p>
 (2 puntos)
 Comente exhaustivamente los resultados de estimación y diagnosis de los modelos 1 y 2. Indique en cada caso si el coeficiente de determinación \(R^2\) puede interpretarse como el porcentaje de varianza de la variable endógena que explica el modelo. 
@@ -271,16 +271,16 @@ Comente exhaustivamente los resultados de estimación y diagnosis de los modelos
 </p>
 
 <p>
-(<a href="#org5a369b2">Respuesta 1</a>)
+(<a href="#org2b97bfe">Respuesta 1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org6a6572b" class="outline-3">
-<h3 id="org6a6572b">Pregunta 2</h3>
-<div class="outline-text-3" id="text-org6a6572b">
+<div id="outline-container-org5cd755c" class="outline-3">
+<h3 id="org5cd755c">Pregunta 2</h3>
+<div class="outline-text-3" id="text-org5cd755c">
 <p>
 (2 puntos)
-Compare los modelos <a href="#org82490f3">1 (ARIMA)</a> y <a href="#org5525da4">2 (ARMAX)</a>. ¿Cuál de los dos modelos:
+Compare los modelos <a href="#org8842b7f">1 (ARIMA)</a> y <a href="#org627278b">2 (ARMAX)</a>. ¿Cuál de los dos modelos:
 </p>
 <ul class="org-ul">
 <li>ajusta mejor la muestra?</li>
@@ -288,22 +288,22 @@ Compare los modelos <a href="#org82490f3">1 (ARIMA)</a> y <a href="#org5525da4">
 <li>muestra mejores estadísticos residuales?</li>
 </ul>
 <p>
-Interprete los coeficientes de las variables exógenas <code>step082</code> y <code>step083</code> en el <a href="#org5525da4">modelo 2</a>. 
+Interprete los coeficientes de las variables exógenas <code>step082</code> y <code>step083</code> en el <a href="#org627278b">modelo 2</a>. 
 ¿Cuál es su interpretación económica considerando cada coeficiente por separado? 
 ¿Cuál es la interpretación económica de la suma de ambos coeficientes?
 </p>
 
 <p>
-(<a href="#org723676e">Respuesta 2</a>)
+(<a href="#org18d696e">Respuesta 2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org8443d8a" class="outline-3">
-<h3 id="org8443d8a">Pregunta 3</h3>
-<div class="outline-text-3" id="text-org8443d8a">
+<div id="outline-container-org305d6bc" class="outline-3">
+<h3 id="org305d6bc">Pregunta 3</h3>
+<div class="outline-text-3" id="text-org305d6bc">
 <p>
 (2 puntos)
-Compare las previsiones extramuestrales de la <a href="#org9958e42">figura 1</a> con los correspondientes valores observados. 
+Compare las previsiones extramuestrales de la <a href="#org54620c4">figura 1</a> con los correspondientes valores observados. 
 </p>
 <ul class="org-ul">
 <li>Dado el horizonte de previsión considerado, la divergencia entre ambas series&hellip; ¿implica que el modelo es estadísticamente inadecuado y por eso predice mal?</li>
@@ -313,13 +313,13 @@ Compare las previsiones extramuestrales de la <a href="#org9958e42">figura 1</a>
 </ul>
 
 <p>
-(<a href="#org3a62af2">Respuesta 3</a>)
+(<a href="#org88a7347">Respuesta 3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org93d8e4b" class="outline-3">
-<h3 id="org93d8e4b">Pregunta 4</h3>
-<div class="outline-text-3" id="text-org93d8e4b">
+<div id="outline-container-orgb95b8d8" class="outline-3">
+<h3 id="orgb95b8d8">Pregunta 4</h3>
+<div class="outline-text-3" id="text-orgb95b8d8">
 <p>
 (1.5 pts. &mdash; cada apartado correcto \(0.15\) pts. Cada apartado incorrecto \(-0.15\) pts.)
 </p>
@@ -329,7 +329,7 @@ Indique <b>explícitamente</b> en cada caso si la expresión es correcta o no (s
 </p>
 
 <p>
-Redondeando a tres decimales, el modelo <a href="#org82490f3">1 (ARIMA)</a> puede escribirse matemáticamente como (preste atención al orden de las transformaciones, el signo de los parámetros, la coherencia de la expresión, etc.):
+Redondeando a tres decimales, el modelo <a href="#org8842b7f">1 (ARIMA)</a> puede escribirse matemáticamente como (preste atención al orden de las transformaciones, el signo de los parámetros, la coherencia de la expresión, etc.):
 </p>
 
 <ol class="org-ol">
@@ -358,13 +358,13 @@ donde \(0,00381874\times(1-0,552936-0,0497438) \approx 0,0015\)
 </p>
 
 <p>
-(<a href="#org6738fb2">Respuesta 4</a>)
+(<a href="#orga44a588">Respuesta 4</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org4261be0" class="outline-3">
-<h3 id="org4261be0">Grupo de preguntas 5</h3>
-<div class="outline-text-3" id="text-org4261be0">
+<div id="outline-container-org42f319d" class="outline-3">
+<h3 id="org42f319d">Grupo de preguntas 5</h3>
+<div class="outline-text-3" id="text-org42f319d">
 <p>
 Para cada afirmación: diga si es verdadera o falsa e <b>incluya una breve explicación</b>.
 </p>
@@ -373,169 +373,169 @@ Para cada afirmación: diga si es verdadera o falsa e <b>incluya una breve expli
 (0.25 pts. &mdash; por cada apartado correctamente justificado)
 </p>
 </div>
-<div id="outline-container-org284bc48" class="outline-4">
-<h4 id="org284bc48">Pregunta 5.1</h4>
-<div class="outline-text-4" id="text-org284bc48">
+<div id="outline-container-orgf6cd0c9" class="outline-4">
+<h4 id="orgf6cd0c9">Pregunta 5.1</h4>
+<div class="outline-text-4" id="text-orgf6cd0c9">
 <p>
-El coeficiente de determinación (\( R^2 \)) del modelo <a href="#org82490f3">1 (ARIMA)</a> indica que éste consigue captar el 99,79% de la varianza de la variable endógena.
+El coeficiente de determinación (\( R^2 \)) del modelo <a href="#org8842b7f">1 (ARIMA)</a> indica que éste consigue captar el 99,79% de la varianza de la variable endógena.
 </p>
 
 <p>
-(<a href="#orge6fb781">Respuesta 5.1</a>)
+(<a href="#org51d288e">Respuesta 5.1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgfd7cd16" class="outline-4">
-<h4 id="orgfd7cd16">Pregunta 5.2</h4>
-<div class="outline-text-4" id="text-orgfd7cd16">
+<div id="outline-container-org680564a" class="outline-4">
+<h4 id="org680564a">Pregunta 5.2</h4>
+<div class="outline-text-4" id="text-org680564a">
 <p>
-La desviación típica de los residuos del modelo <a href="#org5525da4">2 (ARIMAX)</a> indica que éste ajusta mejor los valores de la variable endógena que el modelo <a href="#org82490f3">1 (ARIMA)</a>.
+La desviación típica de los residuos del modelo <a href="#org627278b">2 (ARIMAX)</a> indica que éste ajusta mejor los valores de la variable endógena que el modelo <a href="#org8842b7f">1 (ARIMA)</a>.
 </p>
 
 <p>
-(<a href="#org74e4bfc">Respuesta 5.2</a>)
+(<a href="#orgd1e568f">Respuesta 5.2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgfa8d12c" class="outline-4">
-<h4 id="orgfa8d12c">Pregunta 5.3</h4>
-<div class="outline-text-4" id="text-orgfa8d12c">
+<div id="outline-container-org11ea437" class="outline-4">
+<h4 id="org11ea437">Pregunta 5.3</h4>
+<div class="outline-text-4" id="text-org11ea437">
 <p>
-El valor del criterio de Schwarz correspondiente al <a href="#org5525da4">modelo 2 (ARIMAX)</a> indica este éste podría estar peor especificado que el modelo <a href="#org82490f3">1 (ARIMA)</a>.
+El valor del criterio de Schwarz correspondiente al <a href="#org627278b">modelo 2 (ARIMAX)</a> indica este éste podría estar peor especificado que el modelo <a href="#org8842b7f">1 (ARIMA)</a>.
 </p>
 
 <p>
-(<a href="#org07c32ad">Respuesta 5.3</a>)
+(<a href="#orgca87e27">Respuesta 5.3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgbe74de1" class="outline-4">
-<h4 id="orgbe74de1">Pregunta 5.4</h4>
-<div class="outline-text-4" id="text-orgbe74de1">
+<div id="outline-container-orgeea80de" class="outline-4">
+<h4 id="orgeea80de">Pregunta 5.4</h4>
+<div class="outline-text-4" id="text-orgeea80de">
 <p>
-El valor del criterio de Akaike correspondiente al <a href="#org5525da4">modelo 2 (ARIMAX)</a> indica éste podría predecir peor que el <a href="#org82490f3">modelo 1 (ARIMA)</a>.
+El valor del criterio de Akaike correspondiente al <a href="#org627278b">modelo 2 (ARIMAX)</a> indica éste podría predecir peor que el <a href="#org8842b7f">modelo 1 (ARIMA)</a>.
 </p>
 
 <p>
-(<a href="#org87d8486">Respuesta 5.4</a>)
+(<a href="#org115b29a">Respuesta 5.4</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org6c24fc6" class="outline-4">
-<h4 id="org6c24fc6">Pregunta 5.5</h4>
-<div class="outline-text-4" id="text-org6c24fc6">
+<div id="outline-container-org2e4634a" class="outline-4">
+<h4 id="org2e4634a">Pregunta 5.5</h4>
+<div class="outline-text-4" id="text-org2e4634a">
 <p>
-El módulo de las raíces AR del <a href="#org82490f3">modelo 1 (ARIMA)</a> para \(\nabla \ln GPD_t\) indican que este podría ser no estacionario.
+El módulo de las raíces AR del <a href="#org8842b7f">modelo 1 (ARIMA)</a> para \(\nabla \ln GPD_t\) indican que este podría ser no estacionario.
 </p>
 
 <p>
-(<a href="#org7fd1d50">Respuesta 5.5</a>)
+(<a href="#org3389894">Respuesta 5.5</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgc1904c6" class="outline-4">
-<h4 id="orgc1904c6">Pregunta 5.6</h4>
-<div class="outline-text-4" id="text-orgc1904c6">
+<div id="outline-container-org5f9c5bc" class="outline-4">
+<h4 id="org5f9c5bc">Pregunta 5.6</h4>
+<div class="outline-text-4" id="text-org5f9c5bc">
 <p>
-El valor de las raíces AR del <a href="#org82490f3">modelo 1 (ARIMA)</a> indican que éste podría ser no invertible.
+El valor de las raíces AR del <a href="#org8842b7f">modelo 1 (ARIMA)</a> indican que éste podría ser no invertible.
 </p>
 
 <p>
-(<a href="#org9092706">Respuesta 5.6</a>)
+(<a href="#orgb7235ec">Respuesta 5.6</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org89be184" class="outline-4">
-<h4 id="org89be184">Pregunta 5.7</h4>
-<div class="outline-text-4" id="text-org89be184">
+<div id="outline-container-orgea5231d" class="outline-4">
+<h4 id="orgea5231d">Pregunta 5.7</h4>
+<div class="outline-text-4" id="text-orgea5231d">
 <p>
-En el <a href="#org5525da4">modelo 2 (ARIMAX)</a>, el coeficiente de la variable <code>step082</code> es significativo e indica que en el segundo trimestre de 2008 se produjo un descenso <i>transitorio</i> del nivel de PIB en la Eurozona de  magnitud aproximadamente igual al <code>0,87%</code> de PIB de ese trimestre.
+En el <a href="#org627278b">modelo 2 (ARIMAX)</a>, el coeficiente de la variable <code>step082</code> es significativo e indica que en el segundo trimestre de 2008 se produjo un descenso <i>transitorio</i> del nivel de PIB en la Eurozona de  magnitud aproximadamente igual al <code>0,87%</code> de PIB de ese trimestre.
 </p>
 
 <p>
-(<a href="#org582003a">Respuesta 5.7</a>)
+(<a href="#org8db3729">Respuesta 5.7</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orge928d15" class="outline-4">
-<h4 id="orge928d15">Pregunta 5.8</h4>
-<div class="outline-text-4" id="text-orge928d15">
+<div id="outline-container-orgd2ee57e" class="outline-4">
+<h4 id="orgd2ee57e">Pregunta 5.8</h4>
+<div class="outline-text-4" id="text-orgd2ee57e">
 <p>
-En el <a href="#org5525da4">modelo 2 (ARIMAX)</a>, el coeficiente de la variable <code>step082</code> es significativo e indica que a partir del segundo trimestre de 2008 se produjo un descenso <i>permanente</i> del nivel de PIB en la Eurozona en una magnitud aproximadamente igual al <code>0,87%</code> de PIB de ese trimestre.
+En el <a href="#org627278b">modelo 2 (ARIMAX)</a>, el coeficiente de la variable <code>step082</code> es significativo e indica que a partir del segundo trimestre de 2008 se produjo un descenso <i>permanente</i> del nivel de PIB en la Eurozona en una magnitud aproximadamente igual al <code>0,87%</code> de PIB de ese trimestre.
 </p>
 
 <p>
-(<a href="#org0197302">Respuesta 5.8</a>)
+(<a href="#orgbe587cb">Respuesta 5.8</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org647a261" class="outline-4">
-<h4 id="org647a261">Pregunta 5.9</h4>
-<div class="outline-text-4" id="text-org647a261">
+<div id="outline-container-orgc4af6fd" class="outline-4">
+<h4 id="orgc4af6fd">Pregunta 5.9</h4>
+<div class="outline-text-4" id="text-orgc4af6fd">
 <p>
-El <a href="#org5525da4">modelo 2 (ARIMAX)</a> implica que: (a) en 2008 y 2011 se produjeron eventos exógenos que redujeron significativamente el PIB de la Eurozona, por debajo de los niveles que se hubiese esperado alcanzar en ausencia de estos eventos y que (b) tras el final de estos eventos, la senda del PIB ha recuperado los mismos niveles que hubiera tenido si dichos eventos no hubieran acaecido.
+El <a href="#org627278b">modelo 2 (ARIMAX)</a> implica que: (a) en 2008 y 2011 se produjeron eventos exógenos que redujeron significativamente el PIB de la Eurozona, por debajo de los niveles que se hubiese esperado alcanzar en ausencia de estos eventos y que (b) tras el final de estos eventos, la senda del PIB ha recuperado los mismos niveles que hubiera tenido si dichos eventos no hubieran acaecido.
 </p>
 
 <p>
-(<a href="#orga4928fa">Respuesta 5.9</a>)
+(<a href="#org7f9eabc">Respuesta 5.9</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orgcbd8555" class="outline-4">
-<h4 id="orgcbd8555">Pregunta 5.10</h4>
-<div class="outline-text-4" id="text-orgcbd8555">
+<div id="outline-container-org81e0335" class="outline-4">
+<h4 id="org81e0335">Pregunta 5.10</h4>
+<div class="outline-text-4" id="text-org81e0335">
 <p>
-El <a href="#org5525da4">modelo 2 (ARIMAX)</a> indica que: (a) en 2008 y 2011 se produjeron eventos exógenos que redujeron significativamente el PIB de la Eurozona, por debajo de los niveles que se hubiese esperado alcanzar en ausencia de estos eventos y que (b) tras el final de estos eventos, el PIB ha resultado ser siempre inferior a los niveles que hubiera tenido si dichos eventos no hubieran acaecido.
+El <a href="#org627278b">modelo 2 (ARIMAX)</a> indica que: (a) en 2008 y 2011 se produjeron eventos exógenos que redujeron significativamente el PIB de la Eurozona, por debajo de los niveles que se hubiese esperado alcanzar en ausencia de estos eventos y que (b) tras el final de estos eventos, el PIB ha resultado ser siempre inferior a los niveles que hubiera tenido si dichos eventos no hubieran acaecido.
 </p>
 
 <p>
-(<a href="#orge6b6ec0">Respuesta 5.10</a>)
+(<a href="#org7886aa6">Respuesta 5.10</a>)
 </p>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org4f9a9d6" class="outline-2">
-<h2 id="org4f9a9d6">Respuestas</h2>
-<div class="outline-text-2" id="text-org4f9a9d6">
+<div id="outline-container-org3c33f5c" class="outline-2">
+<h2 id="org3c33f5c">Respuestas</h2>
+<div class="outline-text-2" id="text-org3c33f5c">
 </div>
-<div id="outline-container-org5a369b2" class="outline-3">
-<h3 id="org5a369b2">Respuesta 1</h3>
-<div class="outline-text-3" id="text-org5a369b2">
+<div id="outline-container-org2b97bfe" class="outline-3">
+<h3 id="org2b97bfe">Respuesta 1</h3>
+<div class="outline-text-3" id="text-org2b97bfe">
 <p>
-En el <a href="#org82490f3">modelo 1</a> (ARIMA(2,1,0) del logaritmo del PIB), el coeficiente <code>phi_2</code> no es estadísticamente significativo. En cuanto a los test de los residuos, se rechazan contundentemente las hipótesis nulas de <i>normalidad</i> y <i>ausencia de efectos ARCH</i>, pero no se rechaza  la hipótesis nula de <i>ausencia de autocorrelación</i> a los niveles habituales de significación.
+En el <a href="#org8842b7f">modelo 1</a> (ARIMA(2,1,0) del logaritmo del PIB), el coeficiente <code>phi_2</code> no es estadísticamente significativo. En cuanto a los test de los residuos, se rechazan contundentemente las hipótesis nulas de <i>normalidad</i> y <i>ausencia de efectos ARCH</i>, aunque no se rechaza  la hipótesis nula de <i>ausencia de autocorrelación</i> a los niveles habituales de significación.
 </p>
 
 <p>
-En el <a href="#org5525da4">modelo 2</a> (ARIMAX(2,1,0) del logaritmo del PIB) todos los coeficientes son estadísticamente significativos como mínimo al 5%  (a excepción del correspondiente a <code>step113</code> que es significativo al 10% peor no al 5%, dado que su p-valor es del 6,3%). En cuanto a los test de los residuos, no se rechaza ninguna de las tres hipótesis nulas (citadas en el párrafo anterior) a los niveles habituales de significación.
+En el <a href="#org627278b">modelo 2</a> (ARIMAX(2,1,0) del logaritmo del PIB) todos los coeficientes son estadísticamente significativos como mínimo al 5%  (a excepción del correspondiente a <code>step113</code> que es significativo al 10% peor no al 5%, dado que su p-valor es del 6,3%). En cuanto a los test de los residuos, no se rechaza ninguna de las tres hipótesis nulas (citadas en el párrafo anterior) a los niveles habituales de significación.
 </p>
 
 <p>
-Ambos modelos ajustan una serie temporal no estacionaria (véase cómo la serie \(\texttt{l_GDP_EZ19}\) deambula en la <a href="#org9958e42">figura 1</a>). Consecuentemente el coeficiente de determinación \(R^2\) resulta ser muy elevado (algo que no debe ser interpretado de ningún modo, pues es lo que cabe esperar en tales circunstancias incluso en ajustes con modelos mediocres). Pero incluso si estos modelos ajustarán una serie temporal estacionaria, no debería interpretarse el \(R^2\) como el porcentaje de la varianza muestral de la variable endógena que es capaz de ser replicado por el modelo; dicha interpretación solo cabe en modelos de regresión que incluyen término constante y que son estimados por MCO.
+Ambos modelos ajustan una serie temporal no estacionaria (véase cómo la serie \(\texttt{l_GDP_EZ19}\) deambula en la <a href="#org54620c4">figura 1</a>). Consecuentemente el coeficiente de determinación \(R^2\) resulta ser muy elevado (algo que no debe ser interpretado de ningún modo, pues es lo que cabe esperar en tales circunstancias incluso en ajustes con modelos mediocres). Pero incluso si estos modelos ajustarán una serie temporal estacionaria, no debería interpretarse el \(R^2\) como el porcentaje de la varianza muestral de la variable endógena que es capaz de ser replicado por el modelo; dicha interpretación solo cabe en modelos de regresión que incluyen término constante y que son estimados por MCO.
 </p>
 
 <p>
-En cuanto a la sobrediferenciación o infradiferenciación: en ambos modelos las raíces de los polinomios AR están fuera del círculo de radio unidad, por lo que la diferencia de los datos, <code>(1-L)</code>, parece suficiente para inducir la estacionariedad (es decir, no hay indicios de <i>infradiferenciación</i>). Por otra parte, dado que dichos modelos no incorporan ningún polinomio MA, con los resultados de estimación disponibles no es posible anticipar si al incluir un polinomio MA, éste presentaría raíces de modulo 1 (es decir, con los datos de estimación disponibles no podemos ver si hay indicios de sobrediferenciación). No obstante, viendo el perfil de la serie temporal entre los años 2005 y final de 2019 (<a href="#org9958e42">figura 1</a>), parece claro que la modelización de la serie requiere una diferencia ordinaria (que es lo que incorporan ambos modelos), por lo que no cabe esperar que pueda haber sobrediferenciación por tomar una única diferencia regular.
+En cuanto a la sobrediferenciación o infradiferenciación: en ambos modelos las raíces de los polinomios AR están fuera del círculo de radio unidad, por lo que la diferencia de los datos, <code>(1-L)</code>, parece suficiente para inducir la estacionariedad (es decir, no hay indicios de <i>infradiferenciación</i>). Por otra parte, dado que dichos modelos no incorporan ningún polinomio MA, con los resultados de estimación disponibles no es posible anticipar si al incluir un polinomio MA, éste presentaría raíces de modulo 1 (es decir, con los datos de estimación disponibles no podemos ver si hay indicios de sobrediferenciación). No obstante, viendo el perfil de la serie temporal entre los años 2005 y final de 2019 (<a href="#org54620c4">figura 1</a>), parece claro que la modelización de la serie requiere una diferencia ordinaria (que es lo que incorporan ambos modelos), por lo que no cabe esperar que pueda haber sobrediferenciación por tomar una única diferencia regular.
 </p>
 
 <p>
-(<a href="#orgceffd49">Pregunta 1</a>)
+(<a href="#org0b83578">Pregunta 1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org723676e" class="outline-3">
-<h3 id="org723676e">Respuesta 2</h3>
-<div class="outline-text-3" id="text-org723676e">
+<div id="outline-container-org18d696e" class="outline-3">
+<h3 id="org18d696e">Respuesta 2</h3>
+<div class="outline-text-3" id="text-org18d696e">
 <p>
-El <a href="#org5525da4">modelo 2</a> parece que se ajusta mejor a la muestra, dada la desviación típica de los errores de ajuste (<code>D.T. innovaciones</code>).
+El <a href="#org627278b">modelo 2</a> parece que se ajusta mejor a la muestra, dada la desviación típica de los errores de ajuste (<code>D.T. innovaciones</code>).
 </p>
 
 <p>
-Uno de los parámetros del <a href="#org82490f3">modelo 1</a> no es estadísticamente significativo a los niveles \(\alpha\) habituales. Pese a ello, dado que el criterio de Schwarz penaliza con mayor severidad el número de parámetros (y que el segundo modelo incluye 13 parámetros más que el primero), el criterio de información bayesiano (BIC o criterio de Schwarz) del primer modelo resulta más favorable que en el segundo. Sin embargo, los otros dos criterios de información indican un mejor desempeño para el <a href="#org5525da4">modelo 2</a> (cuyos parámetros son todos significativos).
+Uno de los parámetros del <a href="#org8842b7f">modelo 1</a> no es estadísticamente significativo a los niveles \(\alpha\) habituales. Pese a ello, dado que el criterio de Schwarz penaliza con mayor severidad el número de parámetros (y que el segundo modelo incluye 13 parámetros más que el primero), el criterio de información bayesiano (BIC o criterio de Schwarz) del primer modelo resulta más favorable que en el segundo. Sin embargo, los otros dos criterios de información indican un mejor desempeño para el <a href="#org627278b">modelo 2</a> (cuyos parámetros son todos significativos).
 </p>
 
 <p>
-Los contrastes de los residuos del <a href="#org5525da4">modelo 2</a> son mejores que los del <a href="#org82490f3">modelo 1</a>, salvo en el caso de la autocorrelación; donde ambos modelos presentan conclusiones similares (en ambos claramente NO se rechaza la <i>ausencia de autocorrelación</i>, aunque el p-valor en el primer modelo sea algo mayor).
+Los contrastes de los residuos del <a href="#org627278b">modelo 2</a> son mejores que los del <a href="#org8842b7f">modelo 1</a>, salvo en el caso de la autocorrelación; donde ambos modelos presentan conclusiones similares (en ambos claramente NO se rechaza la <i>ausencia de autocorrelación</i>, aunque el p-valor en el primer modelo sea algo mayor).
 </p>
 
 <p>
@@ -543,15 +543,15 @@ El coeficiente de la variable exógena <code>step082</code> indica que en el seg
 </p>
 
 <p>
-(<a href="#org6a6572b">Pregunta 2</a>)
+(<a href="#org5cd755c">Pregunta 2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org3a62af2" class="outline-3">
-<h3 id="org3a62af2">Respuesta 3</h3>
-<div class="outline-text-3" id="text-org3a62af2">
+<div id="outline-container-org88a7347" class="outline-3">
+<h3 id="org88a7347">Respuesta 3</h3>
+<div class="outline-text-3" id="text-org88a7347">
 <p>
-La <a href="#org9958e42">figura 1</a> se puede entender como un análisis contrafactual: permite comparar la senda observada del PIB de la Eurozona con una senda de previsiones calculada con los datos hasta el cuarto trimestre de 2019 (es decir, con los datos anteriores al confinamiento). 
+La <a href="#org54620c4">figura 1</a> se puede entender como un análisis contrafactual: permite comparar la senda observada del PIB de la Eurozona con una senda de previsiones calculada con los datos hasta el cuarto trimestre de 2019 (es decir, con los datos anteriores al confinamiento). 
 Esta senda de previsiones se puede interpretar como una estimación de la evolución del PIB en ausencia de la pandemia y los eventos bélicos posteriores.
 </p>
 
@@ -567,13 +567,13 @@ El modelo predice mal los valores desde el primer trimestre de 2020; pero debemo
 </p>
 
 <p>
-(<a href="#org8443d8a">Pregunta 3</a>)
+(<a href="#org305d6bc">Pregunta 3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org6738fb2" class="outline-3">
-<h3 id="org6738fb2">Respuesta 4</h3>
-<div class="outline-text-3" id="text-org6738fb2">
+<div id="outline-container-orga44a588" class="outline-3">
+<h3 id="orga44a588">Respuesta 4</h3>
+<div class="outline-text-3" id="text-orga44a588">
 <ol class="org-ol">
 <li>INCORRECTA (el operador diferencia tan solo debe actuar sobre \(\ln GPD_t\), ya que la constante \(0.004\) es la media de \(\nabla \ln GPD_t\)).</li>
 <li>Correcta (expresión en forma MA(\(\infty\)) de la primera diferencia del logaritmo del PIB menos su media).</li>
@@ -588,110 +588,110 @@ El modelo predice mal los valores desde el primer trimestre de 2020; pero debemo
 </ol>
 
 <p>
-(<a href="#org93d8e4b">Pregunta 4</a>)
+(<a href="#orgb95b8d8">Pregunta 4</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orge6fb781" class="outline-3">
-<h3 id="orge6fb781">Respuesta 5.1</h3>
-<div class="outline-text-3" id="text-orge6fb781">
+<div id="outline-container-org51d288e" class="outline-3">
+<h3 id="org51d288e">Respuesta 5.1</h3>
+<div class="outline-text-3" id="text-org51d288e">
 <p>
-Falso. Esa interpretación solo es correcta si está referida a la varianza <i>muestral</i> de la variable endógena en <i>modelos regresión con un regresor constante y estimados por MCO</i>. 
+FALSO. Esa interpretación solo es correcta si está referida a la varianza <i>muestral</i> de la variable endógena en <i>modelos regresión con un regresor constante y estimados por MCO</i>. 
 Éste no es un modelo de regresión; es un modelo ARIMA estimado por máxima verosimilitud, por lo que no cabe dicha interpretación.
 </p>
 
 <p>
-(<a href="#org284bc48">Pregunta 5.1</a>)
+(<a href="#orgf6cd0c9">Pregunta 5.1</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org74e4bfc" class="outline-3">
-<h3 id="org74e4bfc">Respuesta 5.2</h3>
-<div class="outline-text-3" id="text-org74e4bfc">
+<div id="outline-container-orgd1e568f" class="outline-3">
+<h3 id="orgd1e568f">Respuesta 5.2</h3>
+<div class="outline-text-3" id="text-orgd1e568f">
 <p>
 La afirmación es verdadera. Una menor desviación típica de los residuos (<code>D.T. innovaciones</code>) indica unos errores de ajuste más pequeños cuando los errores tienen media cero; que es aproximadamente el caso ya que en el primer modelo tienen media <code>-0,000016</code> y en el segundo <code>1,69e-06</code>. La magnitud de los residuos es \(\sqrt{\sigma^2+\mu^2}\) que en el primer caso arroja un valor de \(0.0046\) y en el segundo de \(0.0026\).
 </p>
 
 <p>
-(<a href="#orgfd7cd16">Pregunta 5.2</a>)
+(<a href="#org680564a">Pregunta 5.2</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org07c32ad" class="outline-3">
-<h3 id="org07c32ad">Respuesta 5.3</h3>
-<div class="outline-text-3" id="text-org07c32ad">
+<div id="outline-container-orgca87e27" class="outline-3">
+<h3 id="orgca87e27">Respuesta 5.3</h3>
+<div class="outline-text-3" id="text-orgca87e27">
 <p>
-La afirmación es verdadera, ya que el valor del criterio de Schwarz correspondiente al modelo que aparece en el  <a href="#org5525da4">modelo 2 (ARIMAX)</a> es mayor, es decir, peor.
+La afirmación es FALSA ya que el valor del criterio de Schwarz correspondiente al modelo que aparece en el <a href="#org627278b">modelo 2 (ARIMAX)</a> es menor, es decir, mejor.
 </p>
 
 <p>
-(<a href="#orgfa8d12c">Pregunta 5.3</a>)
+(<a href="#org11ea437">Pregunta 5.3</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org87d8486" class="outline-3">
-<h3 id="org87d8486">Respuesta 5.4</h3>
-<div class="outline-text-3" id="text-org87d8486">
+<div id="outline-container-org115b29a" class="outline-3">
+<h3 id="org115b29a">Respuesta 5.4</h3>
+<div class="outline-text-3" id="text-org115b29a">
 <p>
-La afirmación es falsa, ya que el valor del criterio de Akaike correspondiente al <a href="#org5525da4">modelo 2 (ARIMAX)</a> es menor, es decir, mejor.
+La afirmación es FALSA, ya que el valor del criterio de Akaike correspondiente al <a href="#org627278b">modelo 2 (ARIMAX)</a> es menor, es decir, mejor.
 </p>
 
 <p>
-(<a href="#orgbe74de1">Pregunta 5.4</a>)
+(<a href="#orgeea80de">Pregunta 5.4</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org7fd1d50" class="outline-3">
-<h3 id="org7fd1d50">Respuesta 5.5</h3>
-<div class="outline-text-3" id="text-org7fd1d50">
+<div id="outline-container-org3389894" class="outline-3">
+<h3 id="org3389894">Respuesta 5.5</h3>
+<div class="outline-text-3" id="text-org3389894">
 <p>
-La afirmación es falsa. El módulo de las raíces AR del modelo es mayor que 1, lo que indica que el modelo de la <i>primera diferencia</i> del logaritmo del PIB es estacionario (no así el modelo del logaritmo del PIB sin diferenciar).
+La afirmación es FALSA. El módulo de las raíces AR del modelo es mayor que 1, lo que indica que el modelo de la <i>primera diferencia</i> del logaritmo del PIB es estacionario (no así el modelo del logaritmo del PIB sin diferenciar).
 </p>
 
 <p>
-(<a href="#org6c24fc6">Pregunta 5.5</a>)
+(<a href="#org2e4634a">Pregunta 5.5</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org9092706" class="outline-3">
-<h3 id="org9092706">Respuesta 5.6</h3>
-<div class="outline-text-3" id="text-org9092706">
+<div id="outline-container-orgb7235ec" class="outline-3">
+<h3 id="orgb7235ec">Respuesta 5.6</h3>
+<div class="outline-text-3" id="text-orgb7235ec">
 <p>
-La afirmación es falsa. Un modelo AR siempre es invertible.
+La afirmación es FALSA. Un modelo AR siempre es invertible.
 </p>
 
 <p>
-(<a href="#orgc1904c6">Pregunta 5.6</a>)
+(<a href="#org5f9c5bc">Pregunta 5.6</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org582003a" class="outline-3">
-<h3 id="org582003a">Respuesta 5.7</h3>
-<div class="outline-text-3" id="text-org582003a">
+<div id="outline-container-org8db3729" class="outline-3">
+<h3 id="org8db3729">Respuesta 5.7</h3>
+<div class="outline-text-3" id="text-org8db3729">
 <p>
-La afirmación es falsa. Ese coeficiente denota que, a partir del segundo trimestre de 2008, la senda de evolución del PIB experimentó un descenso permanente en su nivel respecto a lo que habría sido el nivel de su evolución de no acaecer la crisis financiera de 2008 (fíjese que ese coeficiente corresponde a una variable de tipo escalón). La magnitud de dicho descenso en el nivel de la senda fue igual al <code>0,87%</code> del valor del PIB en el segundo trimestre de 2008.
+La afirmación es FALSA. Ese coeficiente denota que, a partir del segundo trimestre de 2008, la senda de evolución del PIB experimentó un descenso permanente en su nivel respecto a lo que habría sido el nivel de su evolución de no acaecer la crisis financiera de 2008 (fíjese que ese coeficiente corresponde a una variable de tipo escalón). La magnitud de dicho descenso en el nivel de la senda fue igual al <code>0,87%</code> del valor del PIB en el segundo trimestre de 2008.
 </p>
 
 <p>
-(<a href="#org89be184">Pregunta 5.7</a>)
+(<a href="#orgea5231d">Pregunta 5.7</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-org0197302" class="outline-3">
-<h3 id="org0197302">Respuesta 5.8</h3>
-<div class="outline-text-3" id="text-org0197302">
+<div id="outline-container-orgbe587cb" class="outline-3">
+<h3 id="orgbe587cb">Respuesta 5.8</h3>
+<div class="outline-text-3" id="text-orgbe587cb">
 <p>
 La afirmación es verdadera. Ese coeficiente denota que se produjo un descenso persistente en el nivel de PIB, ya que afecta a una variable de tipo escalón.
 </p>
 
 <p>
-(<a href="#orge928d15">Pregunta 5.8</a>)
+(<a href="#orgd2ee57e">Pregunta 5.8</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orga4928fa" class="outline-3">
-<h3 id="orga4928fa">Respuesta 5.9</h3>
-<div class="outline-text-3" id="text-orga4928fa">
+<div id="outline-container-org7f9eabc" class="outline-3">
+<h3 id="org7f9eabc">Respuesta 5.9</h3>
+<div class="outline-text-3" id="text-org7f9eabc">
 <p>
 La afirmación es FALSA. Las variables exógenas indican que, en 2008 y en 2011, el PIB se redujo de manera <i>permanente</i> por debajo de los niveles que para trimestre se hubieran alcanzado en ausencia de dichas crisis. 
 </p>
@@ -701,26 +701,26 @@ Lo único que se recupera es la pendiente promedio de la serie, es decir, su rit
 </p>
 
 <p>
-(<a href="#org647a261">Pregunta 5.9</a>)
+(<a href="#orgc4af6fd">Pregunta 5.9</a>)
 </p>
 </div>
 </div>
-<div id="outline-container-orge6b6ec0" class="outline-3">
-<h3 id="orge6b6ec0">Respuesta 5.10</h3>
-<div class="outline-text-3" id="text-orge6b6ec0">
+<div id="outline-container-org7886aa6" class="outline-3">
+<h3 id="org7886aa6">Respuesta 5.10</h3>
+<div class="outline-text-3" id="text-org7886aa6">
 <p>
 La afirmación es verdadera. La reducción del PIB experimentada en 2008 y 2011, reflejada en los parámetros de las variables exógenas, indica que el nivel del PIB en cada trimestre será permanentemente inferior al que habría alcanzado en ausencia de las crisis.
 </p>
 
 <p>
-(<a href="#orgcbd8555">Pregunta 5.10</a>)
+(<a href="#org81e0335">Pregunta 5.10</a>)
 </p>
 </div>
 </div>
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2026-06-21 Sun 09:51</p>
+<p class="date">Created: 2026-06-21 Sun 11:47</p>
 </div>
 </body>
 </html>
