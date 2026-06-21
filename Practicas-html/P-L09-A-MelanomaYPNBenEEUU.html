@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-06-18 Thu 07:33 -->
+<!-- 2026-06-21 Sun 08:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 9.A &mdash; Correlación entre la incidencia de melanoma en Connecticut y el PNB de EEUU</title>
@@ -101,31 +101,31 @@ org_html_manager.setup();  // activate after the parameters are set
 <h2>&Iacute;ndice</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#org2398edb">Objetivo de la práctica</a></li>
-<li><a href="#org4b24ff9">Actividad 1 - Dibujar ambas series en un mismo gráfico</a></li>
-<li><a href="#org32ab94f">Actividad 2 - Dibujar el diagrama de dispersión y calcular la correlación</a>
+<li><a href="#org2f940f7">Objetivo de la práctica</a></li>
+<li><a href="#org5a99bce">Actividad 1 - Dibujar ambas series en un mismo gráfico</a></li>
+<li><a href="#org094a15b">Actividad 2 - Dibujar el diagrama de dispersión y calcular la correlación</a>
 <ul>
-<li><a href="#org555e996">Calcular la correlación entre ambas series</a></li>
+<li><a href="#orgf2135ba">Calcular la correlación entre ambas series</a></li>
 </ul>
 </li>
-<li><a href="#org23f89b6">Actividad 3 - Regresar <code>GNP</code> sobre <code>Melanoma</code> y constatar que el ajuste es bueno</a></li>
-<li><a href="#orgfac65a0">Actividad 4 - Regresar <code>d_GNP</code> sobre <code>d_Melanoma</code> y constatar que el ajuste es pésimo</a>
+<li><a href="#org6eb8d6e">Actividad 3 - Regresar <code>GNP</code> sobre <code>Melanoma</code> y constatar que el ajuste es bueno</a></li>
+<li><a href="#org5bee1fa">Actividad 4 - Regresar <code>d_GNP</code> sobre <code>d_Melanoma</code> y constatar que el ajuste es pésimo</a>
 <ul>
 <li>
 <ul>
-<li><a href="#orgf4d5a7f">Calcular la primera diferencia de las series. Explorar si puede haber relación entre ellas.</a></li>
-<li><a href="#orgcedc691">Regresión en primeras diferencias</a></li>
+<li><a href="#orgf0195c6">Calcular la primera diferencia de las series. Explorar si puede haber relación entre ellas.</a></li>
+<li><a href="#org79b3cd2">Regresión en primeras diferencias</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a href="#orgd167ba5">Código completo de la práctica</a></li>
+<li><a href="#orgff3c006">Código completo de la práctica</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-org2398edb" class="outline-2">
-<h2 id="org2398edb">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-org2398edb">
+<div id="outline-container-org2f940f7" class="outline-2">
+<h2 id="org2f940f7">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-org2f940f7">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -180,7 +180,7 @@ Comencemos cargando los datos:
 <i>o bien teclee en linea de comandos</i>:
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org54553a6"><code>open RutaAlDirectorioDelFichero/GNPvsMelanoma.csv
+<pre class="src src-gretl" id="org766730d"><code>open RutaAlDirectorioDelFichero/GNPvsMelanoma.csv
 setobs 1 1936
 setinfo GNP --description="US GNP"
 setinfo Melanoma --description="Incidencia de melanoma en la población masculina de Connecticut"
@@ -191,9 +191,9 @@ donde <code>RutaAlDirectorioDelFichero</code> es la ruta al directorio donde gua
 </p>
 </div>
 </div>
-<div id="outline-container-org4b24ff9" class="outline-2">
-<h2 id="org4b24ff9">Actividad 1 - Dibujar ambas series en un mismo gráfico</h2>
-<div class="outline-text-2" id="text-org4b24ff9">
+<div id="outline-container-org5a99bce" class="outline-2">
+<h2 id="org5a99bce">Actividad 1 - Dibujar ambas series en un mismo gráfico</h2>
+<div class="outline-text-2" id="text-org5a99bce">
 <p>
 Marque las series <code>GNP</code> y <code>Melanoma</code>. 
 Pulse sobre ellas con el botón derecho del ratón. 
@@ -208,12 +208,12 @@ Guarde el gráfico en la sesión como un icono.
 <i>o bien teclee en linea de comandos</i>:
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org3902e4c"><code> GraficoSeriesEnNiveles &lt;- gnuplot GNP Melanoma --time-series --with-lines   --output="GNPyMelanoma.png"
+<pre class="src src-gretl" id="org496430f"><code> GraficoSeriesEnNiveles &lt;- gnuplot GNP Melanoma --time-series --with-lines   --output="GNPyMelanoma.png"
 </code></pre>
 </div>
 <div class="org-center">
 
-<div id="org5ef8b3b" class="figure">
+<div id="org9c5cad8" class="figure">
 <p><img src="./P-L09-A-MelanomaYPNBenEEUU/GNPyMelanoma.png" alt="GNPyMelanoma.png" />
 </p>
 </div>
@@ -226,9 +226,9 @@ Guarde el gráfico en la sesión como un icono.
 </ol>
 </div>
 </div>
-<div id="outline-container-org32ab94f" class="outline-2">
-<h2 id="org32ab94f">Actividad 2 - Dibujar el diagrama de dispersión y calcular la correlación</h2>
-<div class="outline-text-2" id="text-org32ab94f">
+<div id="outline-container-org094a15b" class="outline-2">
+<h2 id="org094a15b">Actividad 2 - Dibujar el diagrama de dispersión y calcular la correlación</h2>
+<div class="outline-text-2" id="text-org094a15b">
 <p>
 Marque las series <code>GNP</code> y <code>Melanoma</code> y pulse sobre ellas con el botón derecho del ratón. 
 Seleccione <b><i><code>Gráfico de dispersión XY</code></i></b> (elija <code>Melanoma</code> para el eje X y suprima la recta estimada). Guarde el gráfico como icono.
@@ -243,15 +243,15 @@ Seleccione <b><i><code>Gráfico de dispersión XY</code></i></b> (elija <code>Me
 </div>
 <div class="org-center">
 
-<div id="org9895422" class="figure">
+<div id="org1581b07" class="figure">
 <p><img src="./P-L09-A-MelanomaYPNBenEEUU/ScatterPlotGNPyMelanoma.png" alt="ScatterPlotGNPyMelanoma.png" />
 </p>
 </div>
 </div>
 </div>
-<div id="outline-container-org555e996" class="outline-3">
-<h3 id="org555e996">Calcular la correlación entre ambas series</h3>
-<div class="outline-text-3" id="text-org555e996">
+<div id="outline-container-orgf2135ba" class="outline-3">
+<h3 id="orgf2135ba">Calcular la correlación entre ambas series</h3>
+<div class="outline-text-3" id="text-orgf2135ba">
 <p>
 Marque las series <code>GNP</code> y <code>Melanoma</code>. 
 Pulse sobre ellas con el botón derecho del ratón. 
@@ -274,9 +274,9 @@ En el menú desplegable seleccione <b><i><code>Matriz de correlación</code></i>
 </div>
 </div>
 </div>
-<div id="outline-container-org23f89b6" class="outline-2">
-<h2 id="org23f89b6">Actividad 3 - Regresar <code>GNP</code> sobre <code>Melanoma</code> y constatar que el ajuste es bueno</h2>
-<div class="outline-text-2" id="text-org23f89b6">
+<div id="outline-container-org6eb8d6e" class="outline-2">
+<h2 id="org6eb8d6e">Actividad 3 - Regresar <code>GNP</code> sobre <code>Melanoma</code> y constatar que el ajuste es bueno</h2>
+<div class="outline-text-2" id="text-org6eb8d6e">
 <p>
 Estime el modelo mediante los menús desplegables: <b><i><code>Modelo -&gt; Mínimos
   Cuadrados Ordinarios</code></i></b>; 
@@ -297,7 +297,7 @@ end outfile
 </code></pre>
 </div>
 
-<pre class="example" id="orgb0303d2">
+<pre class="example" id="orgcc041dd">
 AjusteEnNiveles:
 OLS, using observations 1936-1972 (T = 37)
 Dependent variable: GNP
@@ -344,13 +344,13 @@ Veamos si ocurre esto&hellip;
 </p>
 </div>
 </div>
-<div id="outline-container-orgfac65a0" class="outline-2">
-<h2 id="orgfac65a0">Actividad 4 - Regresar <code>d_GNP</code> sobre <code>d_Melanoma</code> y constatar que el ajuste es pésimo</h2>
-<div class="outline-text-2" id="text-orgfac65a0">
+<div id="outline-container-org5bee1fa" class="outline-2">
+<h2 id="org5bee1fa">Actividad 4 - Regresar <code>d_GNP</code> sobre <code>d_Melanoma</code> y constatar que el ajuste es pésimo</h2>
+<div class="outline-text-2" id="text-org5bee1fa">
 </div>
-<div id="outline-container-orgf4d5a7f" class="outline-4">
-<h4 id="orgf4d5a7f">Calcular la primera diferencia de las series. Explorar si puede haber relación entre ellas.</h4>
-<div class="outline-text-4" id="text-orgf4d5a7f">
+<div id="outline-container-orgf0195c6" class="outline-4">
+<h4 id="orgf0195c6">Calcular la primera diferencia de las series. Explorar si puede haber relación entre ellas.</h4>
+<div class="outline-text-4" id="text-orgf0195c6">
 <p>
 Seleccione con el ratón la variable <code>GNP</code> y <code>Melanoma</code>. 
 Luego pulse en el menú desplegable <b><i><code>Añadir</code></i></b> que aparece arriba, en el centro de la ventana principal de <a href="https://gretl.sourceforge.net/es.html">Gretl</a>.
@@ -379,9 +379,9 @@ corr d_GNP d_Melanoma
 </div>
 </div>
 </div>
-<div id="outline-container-orgcedc691" class="outline-4">
-<h4 id="orgcedc691">Regresión en primeras diferencias</h4>
-<div class="outline-text-4" id="text-orgcedc691">
+<div id="outline-container-org79b3cd2" class="outline-4">
+<h4 id="org79b3cd2">Regresión en primeras diferencias</h4>
+<div class="outline-text-4" id="text-org79b3cd2">
 <p>
 Estime el modelo mediante los menús desplegables: <b><i><code>Modelo -&gt; Mínimos Cuadrados Ordinarios</code></i></b>; 
 indique a <a href="https://gretl.sourceforge.net/es.html">Gretl</a> el regresando y regresor y pulse <b><i><code>Aceptar</code></i></b>.
@@ -401,7 +401,7 @@ end outfile
 </code></pre>
 </div>
 
-<pre class="example" id="org33df42a">
+<pre class="example" id="org0b2db01">
 AjusteEnPrimerasDiferencias:
 OLS, using observations 1937-1972 (T = 36)
 Dependent variable: d_GNP
@@ -444,9 +444,9 @@ y los resultados de la regresión en diferencias lo ponen de relieve.
 </div>
 </div>
 </div>
-<div id="outline-container-orgd167ba5" class="outline-2">
-<h2 id="orgd167ba5">Código completo de la práctica</h2>
-<div class="outline-text-2" id="text-orgd167ba5">
+<div id="outline-container-orgff3c006" class="outline-2">
+<h2 id="orgff3c006">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-orgff3c006">
 <p>
 <a href="https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L09-A-MelanomaYPNBenEEUU.inp">P-L09-A-MelanomaYPNBenEEUU.inp</a>
 </p>
@@ -454,7 +454,7 @@ y los resultados de la regresión en diferencias lo ponen de relieve.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2026-06-18 Thu 07:33</p>
+<p class="date">Created: 2026-06-21 Sun 08:37</p>
 </div>
 </body>
 </html>

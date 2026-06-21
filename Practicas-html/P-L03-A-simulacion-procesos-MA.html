@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es">
 <head>
-<!-- 2026-06-18 Thu 07:33 -->
+<!-- 2026-06-21 Sun 08:37 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Lección 3.A - Simulación de procesos MA de manera rudimentaria</title>
@@ -77,9 +77,9 @@ if (typeof HS_STARTUP_FOLDED === 'undefined') {    var HS_STARTUP_FOLDED = false
 <body>
 <div id="content" class="content">
 <h1 class="title">Lección 3.A - Simulación de procesos MA de manera rudimentaria</h1>
-<div id="outline-container-org6674d13" class="outline-2">
-<h2 id="org6674d13">Objetivo de la práctica</h2>
-<div class="outline-text-2" id="text-org6674d13">
+<div id="outline-container-org1382f5a" class="outline-2">
+<h2 id="org1382f5a">Objetivo de la práctica</h2>
+<div class="outline-text-2" id="text-org1382f5a">
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
 
 
@@ -106,9 +106,9 @@ if (typeof HS_STARTUP_FOLDED === 'undefined') {    var HS_STARTUP_FOLDED = false
 </ol>
 </div>
 </div>
-<div id="outline-container-org06c9561" class="outline-2">
-<h2 id="org06c9561">Actividad 1 - Fijar el tamaño y fechas de la muestra</h2>
-<div class="outline-text-2" id="text-org06c9561">
+<div id="outline-container-org3695036" class="outline-2">
+<h2 id="org3695036">Actividad 1 - Fijar el tamaño y fechas de la muestra</h2>
+<div class="outline-text-2" id="text-org3695036">
 <p>
 Para simular series temporales es necesario establecer el tamaño de la muestra y a qué fechas corresponderán los datos simulados. Para lograrlo siga los siguientes pasos:
 </p>
@@ -128,16 +128,16 @@ Para simular series temporales es necesario establecer el tamaño de la muestra 
 (las líneas de documentación que comienzan con # no son necesarias):
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org864a5cd"><code>### Establecemos la muestra para las simulaciones
+<pre class="src src-gretl" id="org62d8558"><code>### Establecemos la muestra para las simulaciones
 nulldata 300
 setobs 4 1960:01 --time-series
 </code></pre>
 </div>
 </div>
 </div>
-<div id="outline-container-org497786e" class="outline-2">
-<h2 id="org497786e">Actividad 2 - Simular un ruido blanco</h2>
-<div class="outline-text-2" id="text-org497786e">
+<div id="outline-container-orgcc0ab5e" class="outline-2">
+<h2 id="orgcc0ab5e">Actividad 2 - Simular un ruido blanco</h2>
+<div class="outline-text-2" id="text-orgcc0ab5e">
 <p>
 Gretl permite generar datos (pseudo)aleatorios con distintas distribuciones (teclee <code>help randgen</code> en la consola de Gretl para consultar la documentación sobre la <i>función</i> <code>randgen</code>). 
 Con los siguientes pasos generaremos un proceso de ruido blanco con distribución Normal\((0,1)\):
@@ -152,7 +152,7 @@ Con los siguientes pasos generaremos un proceso de ruido blanco con distribució
 <i>O bien teclee en linea de comandos</i>: 
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org5f79855"><code># set seed 2025   # (si quiere generar siempre los mismos números fije la semilla a un valor concreto)
+<pre class="src src-gretl" id="org45644cb"><code># set seed 2025   # (si quiere generar siempre los mismos números fije la semilla a un valor concreto)
 series WN = normal(0,1)
 </code></pre>
 </div>
@@ -164,9 +164,9 @@ Si quiere usar otras distribuciones, use la función <code>randgen</code> siguie
 </p>
 </div>
 </div>
-<div id="outline-container-org77b9923" class="outline-2">
-<h2 id="org77b9923">Actividad 3 - Visualizar los datos generados y sus estadísticos</h2>
-<div class="outline-text-2" id="text-org77b9923">
+<div id="outline-container-org56019c9" class="outline-2">
+<h2 id="org56019c9">Actividad 3 - Visualizar los datos generados y sus estadísticos</h2>
+<div class="outline-text-2" id="text-org56019c9">
 <p>
 Ya vimos en las prácticas anteriores cómo hacerlo (pinchando sobre la serie en cuestión con el botón derecho del ratón y seleccionando la opción apropiada del menú desplegable que aparece).
 </p>
@@ -184,19 +184,19 @@ RuidoBlanco &lt;- gnuplot WN --time-series --with-lines
 se muestra un procedimiento diferente. Dicho procedimiento guarda los estadísticos en un archivo de texto <code>.txt</code> y el gráfico en un fichero <code>.png</code> (sin generar iconos).
 He utilizado dichos ficheros <code>.txt</code> y <code>.png</code> para poder mostrar los resultados a continuación).
 </p>
-<pre class="example" id="orgf334245">
+<pre class="example" id="org7f563f6">
 Summary statistics, using the observations 1960:1 - 2034:4
 for the variable 'WN' (300 valid observations)
 
-  Mean                     -0.063737
-  Minimum                    -2.8495
-  Maximum                     2.2900
-  Standard deviation          1.0080
+  Mean                     0.0080542
+  Minimum                    -2.8804
+  Maximum                     3.3334
+  Standard deviation          1.0132
   Missing obs.                     0
 </pre>
 <div class="org-center">
 
-<div id="org0472db0" class="figure">
+<div id="org80eb454" class="figure">
 <p><img src="P-L03-A-simulacion-procesos-MA/WN.png" alt="WN.png" />
 </p>
 </div>
@@ -211,16 +211,16 @@ Observe que la media y la desviación típica muestrales no coinciden con los pa
 Dado que la semilla que he utilizado es diferente de la suya, los números (pseudo)aleatorios que usted ha obtenido resultarán distintos. Como consecuencia, también variarán los estadísticos y su gráfico, aunque lo que usted obtenga se asemejará bastante a lo que se presenta aquí.
 </p>
 </div>
-<div id="outline-container-org20d2560" class="outline-3">
-<h3 id="org20d2560">Un proceso de ruido blanco es estacionario</h3>
-<div class="outline-text-3" id="text-org20d2560">
+<div id="outline-container-org998e54d" class="outline-3">
+<h3 id="org998e54d">Un proceso de ruido blanco es estacionario</h3>
+<div class="outline-text-3" id="text-org998e54d">
 <p>
 Al ser <code>WN</code> la realización de un proceso de ruido blanco, cabe esperar que los estadísticos correspondientes a la primera mitad de la muestra se parezcan a los de la segunda.
 </p>
 </div>
-<div id="outline-container-orgabccfc6" class="outline-4">
-<h4 id="orgabccfc6">Restrinja la muestra a la primera mitad y visualice los estadísticos descriptivos</h4>
-<div class="outline-text-4" id="text-orgabccfc6">
+<div id="outline-container-org62cf7be" class="outline-4">
+<h4 id="org62cf7be">Restrinja la muestra a la primera mitad y visualice los estadísticos descriptivos</h4>
+<div class="outline-text-4" id="text-org62cf7be">
 <ul class="org-ul">
 <li><b><i><code>Muestra --&gt; Establecer rango</code></i></b></li>
 <li><p>
@@ -238,21 +238,21 @@ summary WN --simple
 <li>Observe los estadísticos descriptivos de <code>WN</code></li>
 </ul>
 
-<pre class="example" id="orga42f060">
+<pre class="example" id="orga0d685e">
 Summary statistics, using the observations 1960:1 - 1997:2
 for the variable 'WN' (150 valid observations)
 
-  Mean                     -0.027090
-  Minimum                    -2.8495
-  Maximum                     2.2900
-  Standard deviation          1.0663
+  Mean                      0.070793
+  Minimum                    -2.3089
+  Maximum                     2.6440
+  Standard deviation         0.95712
   Missing obs.                     0
 </pre>
 </div>
 </div>
-<div id="outline-container-orgc9ad668" class="outline-4">
-<h4 id="orgc9ad668">Restrinja la muestra a la segunda mitad, visualice los estadísticos descriptivos y compárelos con los anteriores</h4>
-<div class="outline-text-4" id="text-orgc9ad668">
+<div id="outline-container-org7c03089" class="outline-4">
+<h4 id="org7c03089">Restrinja la muestra a la segunda mitad, visualice los estadísticos descriptivos y compárelos con los anteriores</h4>
+<div class="outline-text-4" id="text-org7c03089">
 <p>
 Para ello antes hay que recuperar el rango completo&hellip; 
 </p>
@@ -275,23 +275,23 @@ summary WN --simple
 <li>Observe los estadísticos descriptivos de <code>WN</code></li>
 </ul>
 
-<pre class="example" id="org2976466">
+<pre class="example" id="org9b2f120">
 Summary statistics, using the observations 1997:3 - 2034:4
 for the variable 'WN' (150 valid observations)
 
-  Mean                      -0.10038
-  Minimum                    -2.5241
-  Maximum                     2.2878
-  Standard deviation         0.94818
+  Mean                     -0.054684
+  Minimum                    -2.8804
+  Maximum                     3.3334
+  Standard deviation          1.0659
   Missing obs.                     0
 </pre>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-org6fa4dce" class="outline-2">
-<h2 id="org6fa4dce">Actividad 2 - Generar procesos de media móvil</h2>
-<div class="outline-text-2" id="text-org6fa4dce">
+<div id="outline-container-org30a2388" class="outline-2">
+<h2 id="org30a2388">Actividad 2 - Generar procesos de media móvil</h2>
+<div class="outline-text-2" id="text-org30a2388">
 <p>
 Simulemos un proceso MA(1) a partir de la simulación de ruido blanco anterior; por ejemplo, el proceso:
 \[
@@ -332,15 +332,15 @@ En la ventana emergente escribimos <code>X = WN + 0.8*WN(-1)</code>
 <i>O bien teclee en linea de comandos</i>:
 </p>
 <div class="org-src-container">
-<pre class="src src-gretl" id="org838cf8a"><code>### La serie X es la realización de un proceso MA(1)
+<pre class="src src-gretl" id="orgde9d58a"><code>### La serie X es la realización de un proceso MA(1)
 series X = WN + 0.8*WN(-1)
 </code></pre>
 </div></li>
 </ul>
 </div>
-<div id="outline-container-org6c18bc4" class="outline-3">
-<h3 id="org6c18bc4">Dibuje el proceso MA(1) que ha simulado y observe sus estadísticos</h3>
-<div class="outline-text-3" id="text-org6c18bc4">
+<div id="outline-container-org05211eb" class="outline-3">
+<h3 id="org05211eb">Dibuje el proceso MA(1) que ha simulado y observe sus estadísticos</h3>
+<div class="outline-text-3" id="text-org05211eb">
 <div class="org-src-container">
 <pre class="src src-gretl"><code>MA1 &lt;- gnuplot X --time-series --with-lines
 summary X --simple
@@ -348,34 +348,34 @@ summary X --simple
 </div>
 <div class="org-center">
 
-<div id="org6de636b" class="figure">
+<div id="orgba12eb2" class="figure">
 <p><img src="P-L03-A-simulacion-procesos-MA/MA1.png" alt="MA1.png" />
 </p>
 </div>
 </div>
 
-<pre class="example" id="org21ddad5">
+<pre class="example" id="orgc22d8ba">
 Summary statistics, using the observations 1960:1 - 2034:4
 for the variable 'X' (299 valid observations)
 
-  Mean                      -0.12087
-  Minimum                    -3.4810
-  Maximum                     2.9474
-  Standard deviation          1.2821
+  Mean                      0.017079
+  Minimum                    -3.7850
+  Maximum                     3.6640
+  Standard deviation          1.3062
   Missing obs.                     1
 </pre>
 </div>
 </div>
-<div id="outline-container-orgc06cf25" class="outline-3">
-<h3 id="orgc06cf25">Un proceso de ruido blanco es estacionario</h3>
-<div class="outline-text-3" id="text-orgc06cf25">
+<div id="outline-container-orge32d316" class="outline-3">
+<h3 id="orge32d316">Un proceso de ruido blanco es estacionario</h3>
+<div class="outline-text-3" id="text-orge32d316">
 <p>
 Al ser <code>WN</code> la realización de un proceso de ruido blanco, cabe esperar que los estadísticos correspondientes a la primera mitad de la muestra se parezcan a los de la segunda.
 </p>
 </div>
-<div id="outline-container-org68dc1ca" class="outline-4">
-<h4 id="org68dc1ca">Restrinja la muestra a la primera mitad y visualice los estadísticos descriptivos</h4>
-<div class="outline-text-4" id="text-org68dc1ca">
+<div id="outline-container-org950bcd5" class="outline-4">
+<h4 id="org950bcd5">Restrinja la muestra a la primera mitad y visualice los estadísticos descriptivos</h4>
+<div class="outline-text-4" id="text-org950bcd5">
 <ul class="org-ul">
 <li><b><i><code>Muestra --&gt; Establecer rango</code></i></b></li>
 <li><p>
@@ -394,21 +394,21 @@ summary X --simple
 <li>Observe los estadísticos descriptivos de <code>X</code></li>
 </ul>
 
-<pre class="example" id="org48f0bb0">
+<pre class="example" id="org99ed5e1">
 Summary statistics, using the observations 1960:1 - 1997:2
 for the variable 'X' (149 valid observations)
 
-  Mean                     -0.057842
-  Minimum                    -3.4605
-  Maximum                     2.9474
-  Standard deviation          1.3649
+  Mean                       0.12580
+  Minimum                    -2.5738
+  Maximum                     2.9062
+  Standard deviation          1.2206
   Missing obs.                     1
 </pre>
 </div>
 </div>
-<div id="outline-container-orgcc18bfb" class="outline-4">
-<h4 id="orgcc18bfb">Restrinja la muestra a la segunda mitad, visualice los estadísticos descriptivos y compárelos con los anteriores</h4>
-<div class="outline-text-4" id="text-orgcc18bfb">
+<div id="outline-container-org7b738f6" class="outline-4">
+<h4 id="org7b738f6">Restrinja la muestra a la segunda mitad, visualice los estadísticos descriptivos y compárelos con los anteriores</h4>
+<div class="outline-text-4" id="text-org7b738f6">
 <p>
 Para ello antes hay que recuperar el rango completo&hellip; 
 </p>
@@ -432,23 +432,23 @@ summary X --simple
 <li>Observe los estadísticos descriptivos de <code>X</code></li>
 </ul>
 
-<pre class="example" id="orgaad7e43">
+<pre class="example" id="org3dfb0e7">
 Summary statistics, using the observations 1997:3 - 2034:4
 for the variable 'X' (150 valid observations)
 
-  Mean                      -0.18348
-  Minimum                    -3.4810
-  Maximum                     2.7809
-  Standard deviation          1.1955
+  Mean                     -0.090918
+  Minimum                    -3.7850
+  Maximum                     3.6640
+  Standard deviation          1.3817
   Missing obs.                     0
 </pre>
 </div>
 </div>
 </div>
 </div>
-<div id="outline-container-orgc0f6dfc" class="outline-2">
-<h2 id="orgc0f6dfc">Por su cuenta</h2>
-<div class="outline-text-2" id="text-orgc0f6dfc">
+<div id="outline-container-org470340a" class="outline-2">
+<h2 id="org470340a">Por su cuenta</h2>
+<div class="outline-text-2" id="text-org470340a">
 <ul class="org-ul">
 <li>Genere una serie temporal <code>Y</code> que sea la realización de un MA(1) con parámetro distinto; por ejemplo con \(\theta_1 = -0.8\).</li>
 <li>Genere una serie temporal <code>Z</code> que sea la realización de un MA(2).</li>
@@ -466,9 +466,9 @@ pues los procesos MA siempre son estacionarios.
 </p>
 </div>
 </div>
-<div id="outline-container-org64b2436" class="outline-2">
-<h2 id="org64b2436">Código completo de la práctica</h2>
-<div class="outline-text-2" id="text-org64b2436">
+<div id="outline-container-org3742ad5" class="outline-2">
+<h2 id="org3742ad5">Código completo de la práctica</h2>
+<div class="outline-text-2" id="text-org3742ad5">
 <p>
 <a href="https://mbujosab.github.io/Econometria-Aplicada/Practicas-html/guiones/P-L03-A-simulacion-procesos-MA.inp">P-L03-A-simulacion-procesos-MA.inp</a>
 </p>
@@ -476,7 +476,7 @@ pues los procesos MA siempre son estacionarios.
 </div>
 </div>
 <div id="postamble" class="status">
-<p class="date">Created: 2026-06-18 Thu 07:33</p>
+<p class="date">Created: 2026-06-21 Sun 08:37</p>
 </div>
 </body>
 </html>
